@@ -36,6 +36,10 @@ public abstract class BasicSelectableListAdapter<T, H extends RecyclerView.ViewH
     }
 
 
+    /**
+     * 设置选中项目
+     * @param data 选中数据
+     */
     public void setSelected(T data){
         if(mBeans.indexOf(data)>=0){
             selectedIndex = mBeans.indexOf(data);

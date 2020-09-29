@@ -1,7 +1,6 @@
 package com.stupidtree.hichat.ui.widgets;
 
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
