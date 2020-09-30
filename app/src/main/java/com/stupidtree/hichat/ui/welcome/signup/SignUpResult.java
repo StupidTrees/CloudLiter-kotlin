@@ -2,12 +2,17 @@ package com.stupidtree.hichat.ui.welcome.signup;
 
 import androidx.annotation.StringRes;
 
+import com.stupidtree.hichat.data.model.UserLocal;
+
+import org.jetbrains.annotations.NotNull;
+
 public class SignUpResult {
 
     public enum STATES {SUCCESS,ERROR,REQUEST_FAILED,USER_EXISTS}
     STATES state;
     int message;
     String token;
+    UserLocal userLocal;
 
     public SignUpResult() {
     }
@@ -46,6 +51,15 @@ public class SignUpResult {
         this.token = token;
     }
 
+    public UserLocal getUserLocal() {
+        return userLocal;
+    }
+
+    public void setUserLocal(UserLocal userLocal) {
+        this.userLocal = userLocal;
+    }
+
+    @NotNull
     @Override
     public String toString() {
         return "LoginResult{" +

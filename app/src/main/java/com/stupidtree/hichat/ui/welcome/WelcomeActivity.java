@@ -15,6 +15,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModel;
 import androidx.viewpager.widget.ViewPager;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -67,7 +69,7 @@ public class WelcomeActivity extends BaseActivity<ViewModel> {
                 return null;
             }
 
-            @Nullable
+            @NotNull
             @Override
             public CharSequence getPageTitle(int position) {
                 if (position == 0) {

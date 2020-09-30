@@ -65,18 +65,15 @@ public class LoginFragment extends BaseFragment<LoginViewModel> {
         });
 
         //登录结果的数据变更监听
-        viewModel.getLoginResult().observe(this, new Observer<LoginResult>() {
-            @Override
-            public void onChanged(LoginResult loginResult) {
-                loadingProgressBar.setVisibility(View.INVISIBLE);
-                Toast.makeText(getContext(),loginResult.getMessage(),Toast.LENGTH_SHORT).show();
-                if(loginResult.getState()== LoginResult.STATES.SUCCESS){
-                    requireActivity().finish();
-                }else if(loginResult.getState()== LoginResult.STATES.WRONG_USERNAME) {
-                    usernameEditText.setError(getString(loginResult.getMessage()));
-                }else if(loginResult.getState()== LoginResult.STATES.WRONG_PASSWORD){
-                    passwordEditText.setError(getString(loginResult.getMessage()));
-                }
+        viewModel.getLoginResult().observe(this, loginResult -> {
+            loadingProgressBar.setVisibility(View.INVISIBLE);
+            Toast.makeText(getContext(),loginResult.getMessage(),Toast.LENGTH_SHORT).show();
+            if(loginResult.getState()== LoginResult.STATES.SUCCESS){
+                requireActivity().finish();
+            }else if(loginResult.getState()== LoginResult.STATES.WRONG_USERNAME) {
+                usernameEditText.setError(getString(loginResult.getMessage()));
+            }else if(loginResult.getState()== LoginResult.STATES.WRONG_PASSWORD){
+                passwordEditText.setError(getString(loginResult.getMessage()));
             }
         });
 

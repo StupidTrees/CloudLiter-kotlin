@@ -4,7 +4,7 @@ import retrofit2.Retrofit;
 
 public abstract class BaseWebSource<S> {
     Retrofit retrofit;
-    public S service;
+    protected S service;
 
     public BaseWebSource(Retrofit retrofit) {
         this.retrofit = retrofit;

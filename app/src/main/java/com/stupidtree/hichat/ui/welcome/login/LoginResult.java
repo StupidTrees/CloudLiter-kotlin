@@ -2,6 +2,8 @@ package com.stupidtree.hichat.ui.welcome.login;
 
 import androidx.annotation.StringRes;
 
+import com.stupidtree.hichat.data.model.UserLocal;
+
 /**
  * 封装了登录结果，预计要弃用
  */
@@ -11,6 +13,15 @@ public class LoginResult {
     STATES state;
     int message;
     String token;
+    UserLocal userLocal;
+
+    public UserLocal getUserLocal() {
+        return userLocal;
+    }
+
+    public void setUserLocal(UserLocal userLocal) {
+        this.userLocal = userLocal;
+    }
 
     public LoginResult() {
     }

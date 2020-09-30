@@ -1,13 +1,12 @@
 package com.stupidtree.hichat.data.source;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 
 import com.google.gson.JsonElement;
-import com.stupidtree.hichat.data.ApiResponse;
 import com.stupidtree.hichat.data.model.FriendContact;
+import com.stupidtree.hichat.service.LiveDataCallAdapter;
 import com.stupidtree.hichat.service.RelationService;
 import com.stupidtree.hichat.service.codes;
 import com.stupidtree.hichat.ui.base.DataState;
@@ -15,9 +14,6 @@ import com.stupidtree.hichat.ui.base.DataState;
 import java.util.LinkedList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -45,6 +41,7 @@ public class RelationWebSource extends BaseWebSource<RelationService> {
     public RelationWebSource() {
         super(new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(LiveDataCallAdapter.LiveDataCallAdapterFactory.INSTANCE)
                 .baseUrl("http://hita.store:3000").build());
     }
 
@@ -56,73 +53,83 @@ public class RelationWebSource extends BaseWebSource<RelationService> {
 
     /**
      * 获取好友列表
+     *
      * @param token 登录状态token
-     * @param id 此用户id（可选）
+     * @param id    此用户id（可选）
      * @return 朋友列表的LiveData
      */
-    public MutableLiveData<DataState<List<FriendContact>>> getFriends(String token, String id) {
-        final MutableLiveData<DataState<List<FriendContact>>> result = new MutableLiveData<>();
-        service.getFriends(token, id).enqueue(new Callback<ApiResponse<JsonElement>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<JsonElement>> call, Response<ApiResponse<JsonElement>> response) {
-                Log.e("success", String.valueOf(response.body()));
-                List<FriendContact> res = new LinkedList<>();
-                ApiResponse<JsonElement> resp = response.body();
-                if (resp != null) {
-                    Log.e("data", String.valueOf(resp.getData()));
-                    if (resp.getData().isJsonArray()) {
-                        for (JsonElement je : resp.getData().getAsJsonArray()) {
-                            FriendContact fc = FriendContact.getInstanceFromJsonObject(je);
-                            if (null != fc) {
-                                res.add(fc);
+    public LiveData<DataState<List<FriendContact>>> getFriends(String token, String id) {
+        return Transformations.map(service.getFriends(token, id), input -> {
+            if (null == input) {
+                return new DataState<>(FETCH_FAILED);
+            } else {
+                switch (input.getCode()) {
+                    case codes.SUCCESS:
+                        List<FriendContact> res = new LinkedList<>();
+                        if (input.getData().isJsonArray()) {
+                            for (JsonElement je : input.getData().getAsJsonArray()) {
+                                FriendContact fc = FriendContact.getInstanceFromJsonObject(je);
+                                if (null != fc) {
+                                    res.add(fc);
+                                }
                             }
                         }
-                    }
+                        return new DataState<>(res);
+                    case codes.TOKEN_INVALID:
+                        return new DataState<>(TOKEN_INVALID);
+                    default:
+                        return new DataState<>(FETCH_FAILED);
                 }
-                result.setValue(new DataState<>(res));
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse<JsonElement>> call, Throwable t) {
-                Log.e("failed", String.valueOf(t));
-                result.setValue(
-                        new DataState<>(FETCH_FAILED, t.getMessage()));
             }
         });
-        return result;
     }
 
 
     /**
      * 建立好友关系
-     * @param token 用户登陆状态的token
+     *
+     * @param token  用户登陆状态的token
      * @param friend 目标的用户id
      * @return 操作结果
      */
-    public MutableLiveData<DataState<Boolean>> makeFriends(@NonNull String token, String friend) {
-        MutableLiveData<DataState<Boolean>> result = new MutableLiveData<>();
-        service.makeFriends(token, friend).enqueue(new Callback<ApiResponse<Boolean>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<Boolean>> call, Response<ApiResponse<Boolean>> response) {
-                switch (response.body().getCode()) {
+    public LiveData<DataState<Boolean>> makeFriends(@NonNull String token, String friend) {
+        return Transformations.map(service.makeFriends(token, friend), input -> {
+            if (null == input) {
+                return new DataState<>(FETCH_FAILED);
+            } else {
+                switch (input.getCode()) {
                     case codes.TOKEN_INVALID:
-                        result.setValue(new DataState<>(TOKEN_INVALID));
-                        break;
+                        return new DataState<>(TOKEN_INVALID);
                     case codes.SUCCESS:
-                        result.setValue(new DataState<>(true));
-                        break;
+                        return new DataState<>(true);
                     default:
-                        result.setValue(new DataState<>(FETCH_FAILED));
+                        return new DataState<>(FETCH_FAILED);
                 }
             }
-
-            @Override
-            public void onFailure(Call<ApiResponse<Boolean>> call, Throwable t) {
-                result.setValue(new DataState<>(FETCH_FAILED));
-            }
         });
-        return result;
     }
 
 
+    /**
+     * 判断是否为好友
+     * @param token 令牌
+     * @param userId 我的id
+     * @param friend 他的id
+     * @return 操作结果
+     */
+    public LiveData<DataState<Boolean>> isFriends(@NonNull String token,String userId,String friend){
+        return Transformations.map(service.isFriends(token, userId, friend), input -> {
+            if(input==null){
+                return new DataState<>(FETCH_FAILED);
+            }else{
+                switch (input.getCode()){
+                    case codes.SUCCESS:
+                        return new DataState<>(input.getData());
+                    case codes.TOKEN_INVALID:
+                        return new DataState<>(TOKEN_INVALID);
+                    default:return new DataState<>(FETCH_FAILED,input.getMessage());
+                }
+            }
+        });
+    }
 }

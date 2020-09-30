@@ -1,13 +1,12 @@
 package com.stupidtree.hichat.ui.welcome.login;
 
-import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
-import com.stupidtree.hichat.data.repository.UserRepository;
 import com.stupidtree.hichat.R;
+import com.stupidtree.hichat.data.repository.UserRepository;
 import com.stupidtree.hichat.utils.TextUtils;
 
 /**

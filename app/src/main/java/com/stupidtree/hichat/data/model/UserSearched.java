@@ -6,6 +6,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.stupidtree.hichat.ui.welcome.signup.SignUpTrigger;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 /**
@@ -53,6 +55,7 @@ public class UserSearched {
         return avatar;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "UserSearched{" +

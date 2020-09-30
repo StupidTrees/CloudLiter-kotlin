@@ -4,7 +4,6 @@ import androidx.annotation.Nullable;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.stupidtree.hichat.ui.welcome.signup.SignUpTrigger;
 import com.stupidtree.hichat.utils.JsonUtils;
 
 import java.util.Objects;

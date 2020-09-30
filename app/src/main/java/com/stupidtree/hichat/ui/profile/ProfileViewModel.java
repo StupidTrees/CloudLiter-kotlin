@@ -1,6 +1,5 @@
 package com.stupidtree.hichat.ui.profile;
 
-import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -87,7 +86,7 @@ public class ProfileViewModel extends ViewModel {
 
     public LiveData<DataState<Boolean>> getMakeFriendsResult() {
         if(makeFriendsResult==null){
-            makeFriendsResult = Transformations.switchMap(makeFriendsController, (Function<ProfileTrigger, LiveData<DataState<Boolean>>>) input -> {
+            makeFriendsResult = Transformations.switchMap(makeFriendsController, input -> {
                 UserLocal user = meRepository.getLoggedInUserDirect();
                 if (input.isActioning()) {
                     if (user.isValid()) {

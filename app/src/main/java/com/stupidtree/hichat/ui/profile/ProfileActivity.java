@@ -76,16 +76,13 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
             }
 
         });
-        viewModel.getMakeFriendsResult().observe(this, new Observer<DataState<Boolean>>() {
-            @Override
-            public void onChanged(DataState<Boolean> booleanDataState) {
-                if(booleanDataState.getState()== DataState.STATE.SUCCESS){
-                    //状态为成功，退出
-                    Toast.makeText(getThis(), R.string.make_friends_success,Toast.LENGTH_SHORT).show();
-                    finish();
-                }else{
-                    Toast.makeText(getThis(), R.string.fail,Toast.LENGTH_SHORT).show();
-                }
+        viewModel.getMakeFriendsResult().observe(this, booleanDataState -> {
+            if(booleanDataState.getState()== DataState.STATE.SUCCESS){
+                //状态为成功，退出
+                Toast.makeText(getThis(), R.string.make_friends_success,Toast.LENGTH_SHORT).show();
+                finish();
+            }else{
+                Toast.makeText(getThis(), R.string.fail,Toast.LENGTH_SHORT).show();
             }
         });
         viewModel.getRelationLiveData().observe(this, booleanDataState -> {

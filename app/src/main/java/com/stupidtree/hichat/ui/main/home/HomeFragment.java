@@ -1,22 +1,18 @@
 package com.stupidtree.hichat.ui.main.home;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-
 import com.stupidtree.hichat.R;
+import com.stupidtree.hichat.ui.base.BaseFragment;
 
-public class HomeFragment extends Fragment {
+import butterknife.BindView;
 
-    private HomeViewModel homeViewModel;
+public class HomeFragment extends BaseFragment<HomeViewModel> {
+
+
+    @BindView(R.id.text_home)
+    TextView textView;
+
 
     public HomeFragment(){}
 
@@ -24,18 +20,21 @@ public class HomeFragment extends Fragment {
     public static HomeFragment newInstance(){
         return new HomeFragment();
     }
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
-        final TextView textView = root.findViewById(R.id.text_home);
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
-        return root;
+
+    @Override
+    protected Class<HomeViewModel> getViewModelClass() {
+        return HomeViewModel.class;
     }
+
+    @Override
+    protected void initViews(View view) {
+        viewModel.getText().observe(getViewLifecycleOwner(), s -> textView.setText(s));
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.fragment_home;
+    }
+
+
 }

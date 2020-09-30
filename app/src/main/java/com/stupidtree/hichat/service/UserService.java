@@ -1,5 +1,7 @@
 package com.stupidtree.hichat.service;
 
+import androidx.lifecycle.LiveData;
+
 import com.google.gson.JsonObject;
 import com.stupidtree.hichat.data.ApiResponse;
 import com.stupidtree.hichat.data.model.UserProfile;
@@ -36,8 +38,8 @@ public interface UserService {
      */
     @FormUrlEncoded
     @POST("/user/login")
-    Call<ApiResponse<JsonObject>> login(@Field("username") String username,
-                            @Field("password") String password);
+    LiveData<ApiResponse<JsonObject>> login(@Field("username") String username,
+                                            @Field("password") String password);
 
     /**
      * 用户注册
@@ -49,7 +51,7 @@ public interface UserService {
      */
     @FormUrlEncoded
     @POST("/user/sign_up")
-    Call<ApiResponse<JsonObject>> signUp(@Field("username") String username,
+    LiveData<ApiResponse<JsonObject>> signUp(@Field("username") String username,
                            @Field("password") String password,
                             @Field("gender") String gender,
                             @Field("nickname") String nickname);
@@ -61,7 +63,7 @@ public interface UserService {
      * @return call，返回的会是用户基本资料
      */
     @GET("/user/profile/get")
-    Call<ApiResponse<UserProfile>> getUserProfile(@Query("id") String id,
+    LiveData<ApiResponse<UserProfile>> getUserProfile(@Query("id") String id,
                                                   @Header("token") String token);
 
 
@@ -69,10 +71,10 @@ public interface UserService {
      * 根据语句搜索用户
      * @param text 语句
      * @param token 登录状态的token
-     * @return
+     * @return 搜索结果
      */
     @GET("/user/search")
-    Call<ApiResponse<List<UserSearched>>> searchUser(@Query("text") String text,
+    LiveData<ApiResponse<List<UserSearched>>> searchUser(@Query("text") String text,
                                                      @Header("token") String token);
 
     /**
@@ -83,7 +85,7 @@ public interface UserService {
      */
     @Multipart
     @POST("/user/profile/upload_avatar")
-    Call<ApiResponse<JsonObject>> uploadAvatar(@Part MultipartBody.Part file,@Header("token") String token);
+    LiveData<ApiResponse<JsonObject>> uploadAvatar(@Part MultipartBody.Part file,@Header("token") String token);
 
     /**
      * 更换昵称
@@ -93,7 +95,7 @@ public interface UserService {
      */
     @FormUrlEncoded
     @POST("/user/profile/change_nickname")
-    Call<ApiResponse<Object>> changeNickname(@Field("nickname")String nickname,@Header("token")String token);
+    LiveData<ApiResponse<Object>> changeNickname(@Field("nickname")String nickname,@Header("token")String token);
 
 
     /**
@@ -104,7 +106,7 @@ public interface UserService {
      */
     @FormUrlEncoded
     @POST("/user/profile/change_gender")
-    Call<ApiResponse<Object>> changeGender(@Field("gender")String gender,@Header("token")String token);
+    LiveData<ApiResponse<Object>> changeGender(@Field("gender")String gender,@Header("token")String token);
 
 }
 

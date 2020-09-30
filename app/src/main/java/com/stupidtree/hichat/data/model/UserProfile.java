@@ -1,6 +1,8 @@
 package com.stupidtree.hichat.data.model;
 
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * 显示在用户资料页的用户资料Model
  * 和服务器返回数据匹配，无需适配函数
@@ -37,6 +39,7 @@ public class UserProfile {
         return avatar;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "UserProfile{" +

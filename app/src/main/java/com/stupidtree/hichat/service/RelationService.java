@@ -1,9 +1,9 @@
 package com.stupidtree.hichat.service;
 
+import androidx.lifecycle.LiveData;
+
 import com.google.gson.JsonElement;
 import com.stupidtree.hichat.data.ApiResponse;
-
-import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -24,7 +24,7 @@ public interface RelationService {
      * @return 好友列表
      */
     @GET("/relation/friends")
-    Call<ApiResponse<JsonElement>> getFriends(@Header("token") String token, @Query("id") String id);
+    LiveData<ApiResponse<JsonElement>> getFriends(@Header("token") String token, @Query("id") String id);
 
 
     /**
@@ -35,7 +35,7 @@ public interface RelationService {
      * @return 判断结果
      */
     @GET("relation/is_friend")
-    Call<ApiResponse<Boolean>> isFriends(@Header("token") String token, @Query("id1") String id1, @Query("id2") String id2);
+    LiveData<ApiResponse<Boolean>> isFriends(@Header("token") String token, @Query("id1") String id1, @Query("id2") String id2);
 
 
     /**
@@ -46,7 +46,9 @@ public interface RelationService {
      */
     @FormUrlEncoded
     @POST("relation/make_friends")
-    Call<ApiResponse<Boolean>> makeFriends(@Header("token")String token,@Field("friend")String friendId);
+    LiveData<ApiResponse<Boolean>> makeFriends(@Header("token")String token,@Field("friend")String friendId);
+
+
 
 
 }

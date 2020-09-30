@@ -61,7 +61,7 @@ public abstract class BaseTabAdapter extends FragmentStatePagerAdapter {
 
     @NotNull
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(@NotNull ViewGroup container, int position) {
         Fragment fragment = (Fragment) super.instantiateItem(container, position);
         mFragments[position] = fragment;
         return fragment;

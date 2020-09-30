@@ -13,8 +13,8 @@ public class DataState<T> {
     /**
      * 定义几种基本的状态
      * SUCCESS 请求成功
-     * NOT_LOGGED_IN 用户未登录
      * FETCH_FAILED 请求失败
+     * NOT_LOGGED_IN 用户未登录
      * TOKEN_INVALID token已失效
      */
     public enum STATE{NOT_LOGGED_IN,SUCCESS,FETCH_FAILED,TOKEN_INVALID}

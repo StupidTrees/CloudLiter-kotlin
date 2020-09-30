@@ -1,6 +1,5 @@
 package com.stupidtree.hichat.ui.myprofile;
 
-import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -61,7 +60,7 @@ public class MyProfileViewModel extends ViewModel {
     public LiveData<DataState<UserProfile>> getUserProfileLiveData() {
         if(userProfileLiveData==null){
             //controller改变的时候，通知userProfile改变
-            userProfileLiveData = Transformations.switchMap(profileController, (Function<ProfileTrigger, LiveData<DataState<UserProfile>>>) input -> {
+            userProfileLiveData = Transformations.switchMap(profileController, input -> {
                 UserLocal userLocal = meRepository.getLoggedInUserDirect();
                 if(userLocal.isValid()){
                     //从用户资料仓库总取出数据
@@ -77,22 +76,19 @@ public class MyProfileViewModel extends ViewModel {
     public LiveData<DataState<String>> getChangeAvatarResult() {
         if(changeAvatarResult==null){
             //controller改变时。。。巴拉巴拉
-            changeAvatarResult = Transformations.switchMap(changeAvatarController, new Function<ChangeInfoTrigger, LiveData<DataState<String>>>() {
-                @Override
-                public LiveData<DataState<String>> apply(ChangeInfoTrigger input) {
-                    if(input.isActioning()){
-                        //要先判断本地用户当前是否登录
-                        UserLocal userLocal = meRepository.getLoggedInUserDirect();
-                        if(userLocal.isValid()){
-                            //通知用户资料仓库，开始更换头像
-                            return profileRepository.changeAvatar(Objects.requireNonNull(userLocal.getToken()),input.getValue());
-                        }else{
-                            return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
-                        }
-
+            changeAvatarResult = Transformations.switchMap(changeAvatarController, input -> {
+                if(input.isActioning()){
+                    //要先判断本地用户当前是否登录
+                    UserLocal userLocal = meRepository.getLoggedInUserDirect();
+                    if(userLocal.isValid()){
+                        //通知用户资料仓库，开始更换头像
+                        return profileRepository.changeAvatar(Objects.requireNonNull(userLocal.getToken()),input.getValue());
                     }else{
-                        return new MutableLiveData<>();
+                        return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     }
+
+                }else{
+                    return new MutableLiveData<>();
                 }
             });
         }
@@ -103,19 +99,16 @@ public class MyProfileViewModel extends ViewModel {
     public LiveData<DataState<String>> getChangeNicknameResult() {
         if(changeNicknameResult==null){
             //也是一样的
-            changeNicknameResult = Transformations.switchMap(changeNicknameController, new Function<ChangeInfoTrigger, LiveData<DataState<String>>>() {
-                @Override
-                public LiveData<DataState<String>> apply(ChangeInfoTrigger input) {
-                    if(input.isActioning()){
-                        UserLocal userLocal = meRepository.getLoggedInUserDirect();
-                        if(userLocal.isValid()){
-                            return profileRepository.changeNickname(Objects.requireNonNull(userLocal.getToken()),input.getValue());
-                        }else{
-                            return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
-                        }
+            changeNicknameResult = Transformations.switchMap(changeNicknameController, input -> {
+                if(input.isActioning()){
+                    UserLocal userLocal = meRepository.getLoggedInUserDirect();
+                    if(userLocal.isValid()){
+                        return profileRepository.changeNickname(Objects.requireNonNull(userLocal.getToken()),input.getValue());
+                    }else{
+                        return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     }
-                    return new MutableLiveData<>();
                 }
+                return new MutableLiveData<>();
             });
         }
         return changeNicknameResult;
