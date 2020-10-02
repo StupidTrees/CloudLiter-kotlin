@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.model.UserSearched;
-import com.stupidtree.hichat.data.repository.MeRepository;
+import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.data.repository.UserRepository;
 import com.stupidtree.hichat.ui.base.DataState;
 
@@ -35,11 +35,11 @@ public class SearchViewModel extends ViewModel {
     //用户仓库
     UserRepository userRepository;
     //本地用户仓库
-    MeRepository meRepository;
+    LocalUserRepository localUserRepository;
 
     public SearchViewModel(){
         userRepository = UserRepository.getInstance();
-        meRepository = MeRepository.getInstance();
+        localUserRepository = LocalUserRepository.getInstance();
     }
 
 
@@ -47,7 +47,7 @@ public class SearchViewModel extends ViewModel {
     public LiveData<DataState<List<UserSearched>>> getSearchListStateLiveData(){
         if(searchListStateLiveData==null) {
             searchListStateLiveData = Transformations.switchMap(searchTriggerLiveData, input -> {
-                UserLocal userLocal = meRepository.getLoggedInUserDirect();
+                UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
                 if(userLocal.isValid()){
                     //通知用户仓库进行搜索，从中获取搜索结果
                     return userRepository.searchUser(input.getSearchText(), userLocal.getToken());

@@ -38,6 +38,7 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'org.jetbrains:annotations-java5:15.0'
     implementation 'org.jetbrains:annotations-java5:15.0'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
@@ -55,4 +56,11 @@ dependencies {
 
     //Glide图片加载
     implementation 'com.github.bumptech.glide:glide:4.9.0'
+
+
+    //javaWebSocket框架
+    implementation "org.java-websocket:Java-WebSocket:1.4.0"
+
+    //socketIO
+    implementation "io.socket:socket.io-client:1.0.0"
 }

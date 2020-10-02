@@ -3,6 +3,9 @@ package com.stupidtree.hichat.data.source;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.stupidtree.hichat.data.model.UserLocal;
 
@@ -39,8 +42,9 @@ public class UserPreferenceSource {
         return sharedPreferences;
     }
     public void saveLocalUser(UserLocal user) {
-        SharedPreferences preferences = getPreference();
-        preferences.edit()
+        Log.e("save_local_user", String.valueOf(user));
+        getPreference().edit()
+                .putString("id",user.getId())
                 .putString("username", user.getUsername())
                 .putString("nickname", user.getNickname())
                 .putString("gender", String.valueOf(user.getGender()))
@@ -70,14 +74,18 @@ public class UserPreferenceSource {
         SharedPreferences preferences = context.getSharedPreferences(SP_NAME_LOCAL_USER, Context.MODE_PRIVATE);
         preferences.edit().putString("username",null).putString("nickname",null).putString("token",null).apply();
     }
+
+    @NonNull
     public UserLocal getLocalUser(){
         SharedPreferences preferences = getPreference();
         UserLocal result = new UserLocal();
+        result.setId(preferences.getString("id",null));
         result.setUsername(preferences.getString("username",null));
         result.setNickname(preferences.getString("nickname",null));
         result.setToken(preferences.getString("token",null));
         result.setGender(preferences.getString("gender","MALE"));
         result.setAvatar(preferences.getString("avatar",null));
+        Log.e("get_local_user", String.valueOf(result));
         return result;
     }
 

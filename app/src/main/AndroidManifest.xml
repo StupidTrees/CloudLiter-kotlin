@@ -35,12 +35,19 @@
             android:name=".ui.search.SearchActivity"
             android:windowSoftInputMode="adjustPan" />
         <activity
+            android:name=".ui.chat.ChatBaseActivity"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
+        <service android:name=".service.SocketIOClientService">
+
+        </service>
+        <activity
             android:name=".ui.welcome.WelcomeActivity"
             android:label="@string/title_activity_welcome"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.main.MainActivity"
-            android:label="@string/app_name"></activity> <!-- 加上他，否则无法从相册选取图片 -->
+            android:label="@string/app_name" />
+        <!-- 加上他，否则无法从相册选取图片 -->
         <provider
             android:name=".MFileProvider"
             android:authorities="com.stupidtree.hichat.fileprovider"

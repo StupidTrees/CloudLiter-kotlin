@@ -6,7 +6,7 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.stupidtree.hichat.data.model.UserLocal;
-import com.stupidtree.hichat.data.repository.MeRepository;
+import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.ui.base.Trigger;
 
 
@@ -28,11 +28,11 @@ public class MeViewModel extends ViewModel {
      * 仓库区
      */
     //仓库：本地用户仓库
-    private MeRepository meRepository;
+    private LocalUserRepository localUserRepository;
 
 
     public MeViewModel() {
-        meRepository = MeRepository.getInstance();
+        localUserRepository = LocalUserRepository.getInstance();
     }
 
     public LiveData<UserLocal> getLocalUser() {
@@ -41,7 +41,7 @@ public class MeViewModel extends ViewModel {
             localUserMutableLiveData = Transformations.switchMap(localUserViewController, input -> {
                 if (input.isActioning()) {
                     //从仓库中调取数据
-                    return meRepository.getLoggedInUser();
+                    return localUserRepository.getLoggedInUser();
                 }
                 return new MutableLiveData<>(new UserLocal());
             });

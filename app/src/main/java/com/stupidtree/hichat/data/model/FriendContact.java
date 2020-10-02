@@ -22,9 +22,9 @@ public class FriendContact {
     //性别
     UserLocal.GENDER gender;
     //联系人的用户id
-    Integer id;
+    String id;
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
@@ -64,7 +64,7 @@ public class FriendContact {
             FriendContact res = new FriendContact();
             //res.group = jo.get("group").getAsInt();
             res.name = userInfo.get("nickname").getAsString();
-            res.id = userInfo.get("id").getAsInt();
+            res.id = userInfo.get("id").getAsString();
             res.avatar = JsonUtils.getStringData(userInfo,"avatar");
             String gender = userInfo.get("gender").getAsString();
             res.gender = Objects.equals(gender,"MALE")? UserLocal.GENDER.MALE: UserLocal.GENDER.FEMALE;

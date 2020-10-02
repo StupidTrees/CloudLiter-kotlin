@@ -13,6 +13,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+/**
+ * 用于将retrofit2的请求结果Call对象适配为LiveData
+ */
 public class LiveDataCallAdapter implements CallAdapter<LiveData<?>> {
     private final Type responseType;
 

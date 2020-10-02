@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.model.UserProfile;
-import com.stupidtree.hichat.data.repository.MeRepository;
+import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.data.repository.ProfileRepository;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.ui.profile.ProfileTrigger;
@@ -50,18 +50,18 @@ public class MyProfileViewModel extends ViewModel {
     //仓库1：用户资料仓库
     private ProfileRepository profileRepository;
     //仓库2：本地用户仓库
-    private MeRepository meRepository;
+    private LocalUserRepository localUserRepository;
 
     public MyProfileViewModel(){
         profileRepository = ProfileRepository.getInstance();
-        meRepository = MeRepository.getInstance();
+        localUserRepository = LocalUserRepository.getInstance();
     }
 
     public LiveData<DataState<UserProfile>> getUserProfileLiveData() {
         if(userProfileLiveData==null){
             //controller改变的时候，通知userProfile改变
             userProfileLiveData = Transformations.switchMap(profileController, input -> {
-                UserLocal userLocal = meRepository.getLoggedInUserDirect();
+                UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
                 if(userLocal.isValid()){
                     //从用户资料仓库总取出数据
                     return profileRepository.getUserProfile(userLocal.getId(), Objects.requireNonNull(userLocal.getToken()));
@@ -79,7 +79,7 @@ public class MyProfileViewModel extends ViewModel {
             changeAvatarResult = Transformations.switchMap(changeAvatarController, input -> {
                 if(input.isActioning()){
                     //要先判断本地用户当前是否登录
-                    UserLocal userLocal = meRepository.getLoggedInUserDirect();
+                    UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
                     if(userLocal.isValid()){
                         //通知用户资料仓库，开始更换头像
                         return profileRepository.changeAvatar(Objects.requireNonNull(userLocal.getToken()),input.getValue());
@@ -101,7 +101,7 @@ public class MyProfileViewModel extends ViewModel {
             //也是一样的
             changeNicknameResult = Transformations.switchMap(changeNicknameController, input -> {
                 if(input.isActioning()){
-                    UserLocal userLocal = meRepository.getLoggedInUserDirect();
+                    UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
                     if(userLocal.isValid()){
                         return profileRepository.changeNickname(Objects.requireNonNull(userLocal.getToken()),input.getValue());
                     }else{
@@ -118,7 +118,7 @@ public class MyProfileViewModel extends ViewModel {
         if(changeGenderResult==null){
             changeGenderResult = Transformations.switchMap(changeGenderController, input -> {
                 if(input.isActioning()){
-                    UserLocal userLocal = meRepository.getLoggedInUserDirect();
+                    UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
                     if(userLocal.isValid()){
                         return profileRepository.changeGender(Objects.requireNonNull(userLocal.getToken()),input.getValue());
                     }else{
@@ -132,7 +132,7 @@ public class MyProfileViewModel extends ViewModel {
     }
 
     public void logout(){
-        meRepository.logout();
+        localUserRepository.logout();
     }
 
     /**
@@ -164,7 +164,7 @@ public class MyProfileViewModel extends ViewModel {
      * 开始页面刷新（即用户profile的获取）
      */
     public void startRefresh(){
-        UserLocal userLocal = meRepository.getLoggedInUserDirect();
+        UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
         profileController.setValue(ProfileTrigger.getActioning(userLocal.getId()));
     }
 }

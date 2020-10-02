@@ -12,22 +12,27 @@ import com.stupidtree.hichat.data.source.UserPreferenceSource;
  * 层次：Repository
  * ”我的“页面的Repository
  */
-public class MeRepository {
+public class LocalUserRepository {
 
     //也是单例模式
-    private static MeRepository instance;
+    private static LocalUserRepository instance;
 
     //数据源：SharedPreference性质的本地状态数据源
     UserPreferenceSource mePreferenceSource;
 
-    MeRepository(){
+    //将已登录用户缓存在内存里
+    UserLocal loggedInUser = null;
+
+
+
+    LocalUserRepository(){
         //初始化数据源
         mePreferenceSource = new UserPreferenceSource(HiApplication.getContext());
     }
 
-    public static MeRepository getInstance(){
+    public static LocalUserRepository getInstance(){
         if(null == instance){
-            instance = new MeRepository();
+            instance = new LocalUserRepository();
         }
         return instance;
     }
@@ -37,6 +42,7 @@ public class MeRepository {
      * 登出
      */
     public void logout(){
+        loggedInUser = null;
         mePreferenceSource.clearLocalUser();
     }
 
@@ -46,8 +52,8 @@ public class MeRepository {
      */
     public MutableLiveData<UserLocal> getLoggedInUser(){
        final MutableLiveData<UserLocal> result = new MutableLiveData<>();
-       UserLocal userLocal = mePreferenceSource.getLocalUser();
-       result.setValue(userLocal);
+       loggedInUser = mePreferenceSource.getLocalUser();
+       result.setValue(loggedInUser);
        return result;
     }
 
@@ -58,6 +64,7 @@ public class MeRepository {
      */
     public void ChangeLocalAvatar(String newAvatar){
         mePreferenceSource.saveAvatar(newAvatar);
+        loggedInUser = mePreferenceSource.getLocalUser();
         // getThis().getSharedPreferences("Glide", Context.MODE_PRIVATE).edit().
     }
 
@@ -67,6 +74,7 @@ public class MeRepository {
      */
     public void ChangeLocalNickname(String nickname){
         mePreferenceSource.saveNickname(nickname);
+        loggedInUser = mePreferenceSource.getLocalUser();
     }
 
     /**
@@ -75,6 +83,7 @@ public class MeRepository {
      */
     public void ChangeLocalGender(String gender){
         mePreferenceSource.saveGender(gender);
+        loggedInUser = mePreferenceSource.getLocalUser();
     }
 
     /**
@@ -84,6 +93,10 @@ public class MeRepository {
      */
     @NonNull
     public UserLocal getLoggedInUserDirect(){
-        return mePreferenceSource.getLocalUser();
+        //Log.e("get_local_user", String.valueOf(loggedInUser));
+        if(loggedInUser==null){
+            loggedInUser = mePreferenceSource.getLocalUser();
+        }
+        return loggedInUser;
     }
 }

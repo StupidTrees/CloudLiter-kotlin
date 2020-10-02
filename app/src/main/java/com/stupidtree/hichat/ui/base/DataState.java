@@ -19,12 +19,15 @@ public class DataState<T> {
      */
     public enum STATE{NOT_LOGGED_IN,SUCCESS,FETCH_FAILED,TOKEN_INVALID}
 
+    public enum LIST_ACTION{REPLACE_ALL,APPEND,PUSH_HEAD}
     //表征数据状态
     STATE state;
     //数据本体
     T data;
     //附带的message
     String message;
+    //列表数据的动作
+    LIST_ACTION listAction = LIST_ACTION.REPLACE_ALL;
 
 
 
@@ -51,6 +54,15 @@ public class DataState<T> {
 
     public void setData(T data) {
         this.data = data;
+    }
+
+    public LIST_ACTION getListAction() {
+        return listAction;
+    }
+
+    public DataState<T> setListAction(LIST_ACTION listAction) {
+        this.listAction = listAction;
+        return this;
     }
 
     public String getMessage() {

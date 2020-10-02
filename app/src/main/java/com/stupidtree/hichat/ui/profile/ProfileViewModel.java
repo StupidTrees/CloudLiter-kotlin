@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.model.UserProfile;
-import com.stupidtree.hichat.data.repository.MeRepository;
+import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.data.repository.ProfileRepository;
 import com.stupidtree.hichat.ui.base.DataState;
 
@@ -41,17 +41,17 @@ public class ProfileViewModel extends ViewModel {
     //用户资料仓库
     private ProfileRepository repository;
     //本地用户仓库
-    private MeRepository meRepository;
+    private LocalUserRepository localUserRepository;
 
     public ProfileViewModel() {
         repository = ProfileRepository.getInstance();
-        meRepository = MeRepository.getInstance();
+        localUserRepository = LocalUserRepository.getInstance();
     }
 
     public LiveData<DataState<UserProfile>> getUserProfileLiveData() {
         if (profileLiveData == null) {
             profileLiveData = Transformations.switchMap(profileController, input -> {
-                UserLocal user = meRepository.getLoggedInUserDirect();
+                UserLocal user = localUserRepository.getLoggedInUserDirect();
                 if (input.isActioning()) {
                     if (user.isValid()) {
                         //从用户资料仓库中拉取数据
@@ -69,7 +69,7 @@ public class ProfileViewModel extends ViewModel {
     public LiveData<DataState<Boolean>> getRelationLiveData(){
         if(relationLiveData==null){
             relationLiveData = Transformations.switchMap(profileController, input -> {
-                UserLocal user = meRepository.getLoggedInUserDirect();
+                UserLocal user = localUserRepository.getLoggedInUserDirect();
                 if (input.isActioning()) {
                     if (user.isValid()) {
                         //通知用户资料仓库进行好友判别
@@ -87,7 +87,7 @@ public class ProfileViewModel extends ViewModel {
     public LiveData<DataState<Boolean>> getMakeFriendsResult() {
         if(makeFriendsResult==null){
             makeFriendsResult = Transformations.switchMap(makeFriendsController, input -> {
-                UserLocal user = meRepository.getLoggedInUserDirect();
+                UserLocal user = localUserRepository.getLoggedInUserDirect();
                 if (input.isActioning()) {
                     if (user.isValid()) {
                         //也是通过这个仓库进行好友建立

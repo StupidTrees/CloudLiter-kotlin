@@ -12,9 +12,9 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.stupidtree.hichat.ui.base.BaseFragment;
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.FriendContact;
+import com.stupidtree.hichat.ui.base.BaseFragment;
 import com.stupidtree.hichat.ui.base.BaseListAdapter;
 import com.stupidtree.hichat.ui.base.BaseViewHolder;
 import com.stupidtree.hichat.ui.base.DataState;
@@ -44,6 +44,7 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
      * 适配器区
      */
     XListAdapter listAdapter;//列表适配器
+
 
 
     public ContactFragment() {
@@ -106,6 +107,10 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
         viewModel.startFetchData();
     }
 
+
+
+
+
     /**
      * 定义本页面的列表适配器
      */
@@ -149,6 +154,7 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
             ViewGroup item;
             @BindView(R.id.avatar)
             ImageView avatar;
+
 
             public XHolder(@NonNull View itemView) {
                 super(itemView);

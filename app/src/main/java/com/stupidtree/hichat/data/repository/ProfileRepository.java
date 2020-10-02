@@ -95,7 +95,7 @@ public class ProfileRepository {
         return Transformations.map(userWebSource.changeAvatar(token, body), input -> {
             if (input.getState() == DataState.STATE.SUCCESS) {
                 //通知本地用户更新资料
-                MeRepository.getInstance().ChangeLocalAvatar(input.getData());
+                LocalUserRepository.getInstance().ChangeLocalAvatar(input.getData());
             }
             return input;
         });
@@ -112,7 +112,7 @@ public class ProfileRepository {
     public LiveData<DataState<String>> changeNickname(@NonNull String token, @NonNull String nickname) {
         return Transformations.map(userWebSource.changeNickname(token, nickname), input -> {
             if (input.getState() == DataState.STATE.SUCCESS) {
-                MeRepository.getInstance().ChangeLocalNickname(nickname);
+                LocalUserRepository.getInstance().ChangeLocalNickname(nickname);
             }
             return input;
         });
@@ -128,7 +128,7 @@ public class ProfileRepository {
     public LiveData<DataState<String>> changeGender(@NonNull String token, @NonNull String gender) {
         return Transformations.map(userWebSource.changeGender(token, gender), input -> {
             if (input.getState() == DataState.STATE.SUCCESS) {
-                MeRepository.getInstance().ChangeLocalGender(gender);
+                LocalUserRepository.getInstance().ChangeLocalGender(gender);
             }
             return input;
         });

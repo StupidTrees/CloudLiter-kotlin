@@ -1,5 +1,7 @@
 package com.stupidtree.hichat.data.source;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
@@ -97,6 +99,7 @@ public class RelationWebSource extends BaseWebSource<RelationService> {
             if (null == input) {
                 return new DataState<>(FETCH_FAILED);
             } else {
+                Log.e("result",input.getCode()+",,"+input.getMessage());
                 switch (input.getCode()) {
                     case codes.TOKEN_INVALID:
                         return new DataState<>(TOKEN_INVALID);

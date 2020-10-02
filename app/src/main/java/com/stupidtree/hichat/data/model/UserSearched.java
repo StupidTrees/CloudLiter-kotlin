@@ -19,7 +19,7 @@ public class UserSearched {
     String nickname;//昵称
     String avatar;//头像
     UserLocal.GENDER gender;//性别
-    Integer id;//id
+    String id;//id
 
     @Override
     public boolean equals(Object o) {
@@ -47,7 +47,7 @@ public class UserSearched {
         return gender;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 

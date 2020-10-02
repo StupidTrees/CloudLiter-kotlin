@@ -357,6 +357,11 @@ public abstract class BaseListAdapter<T, H extends RecyclerView.ViewHolder> exte
     }
 
 
+    public void notifyItemAppended(List<T> newL){
+        mBeans.addAll(newL);
+        notifyItemRangeInserted(mBeans.size()-newL.size(),newL.size());
+    }
+
     @Override
     public int getItemCount() {
         return mBeans.size() + getIndexBias();

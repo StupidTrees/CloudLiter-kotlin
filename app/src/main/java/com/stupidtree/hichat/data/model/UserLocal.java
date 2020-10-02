@@ -1,11 +1,16 @@
 package com.stupidtree.hichat.data.model;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.stupidtree.hichat.ui.welcome.signup.SignUpTrigger;
 import com.stupidtree.hichat.utils.JsonUtils;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -42,6 +47,7 @@ public class UserLocal {
         JsonObject info = JsonUtils.getObjectData(responseData, "info");
         String token = JsonUtils.getStringData(responseData, "token");
         if (info != null) {
+            String id = JsonUtils.getStringData(info, "id");
             String username = JsonUtils.getStringData(info, "username");
             String nickname = JsonUtils.getStringData(info, "nickname");
             String gender = JsonUtils.getStringData(info, "gender");
@@ -51,6 +57,7 @@ public class UserLocal {
             userLocal.setGender(gender);
             userLocal.setAvatar(avatar);
             userLocal.setToken(token);
+            userLocal.setId(id);
             return userLocal;
         }
         return userLocal;
@@ -58,7 +65,8 @@ public class UserLocal {
 
 
     public boolean isValid() {
-        return token != null && username != null;
+        Log.e("valid", String.valueOf(token != null && id!=null));
+        return token != null && id!=null;
     }
 
     public void setGender(String gender) {
@@ -79,6 +87,10 @@ public class UserLocal {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void setId(@Nullable String id) {
+        this.id = id;
     }
 
     @Nullable
@@ -106,5 +118,12 @@ public class UserLocal {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+
+    @NotNull
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
     }
 }

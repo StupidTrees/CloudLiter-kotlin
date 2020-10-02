@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModel;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -20,7 +19,7 @@ import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.BaseTabAdapter;
 import com.stupidtree.hichat.ui.main.contact.ContactFragment;
-import com.stupidtree.hichat.ui.main.home.HomeFragment;
+import com.stupidtree.hichat.ui.main.conversations.ConversationsBaseFragment;
 import com.stupidtree.hichat.ui.main.me.MeFragment;
 import com.stupidtree.hichat.utils.ActivityUtils;
 
@@ -29,7 +28,7 @@ import butterknife.BindView;
 /**
  * 很显然，这是主界面
  */
-public class MainActivity extends BaseActivity<ViewModel> {
+public class MainActivity extends BaseActivity<MainViewModel> {
 
     @BindView(R.id.pager)
     ViewPager pager;
@@ -46,16 +45,13 @@ public class MainActivity extends BaseActivity<ViewModel> {
     @BindView(R.id.title)
     TextView title;
 
-    @Override
-    protected Class<ViewModel> getViewModelClass() {
-        return null;
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setWindowParams(true, true, false);
         super.onCreate(savedInstanceState);
-          }
+        viewModel.bindService(this);
+    }
 
     @Override
     protected void initViews() {
@@ -67,7 +63,7 @@ public class MainActivity extends BaseActivity<ViewModel> {
             protected Fragment initItem(int position) {
                 switch (position) {
                     case 0:
-                        return HomeFragment.newInstance();
+                        return ConversationsBaseFragment.newInstance();
                     case 1:
                         return ContactFragment.newInstance();
                     default:
@@ -160,9 +156,22 @@ public class MainActivity extends BaseActivity<ViewModel> {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        viewModel.callOnline();
+    }
+
+
+
+    @Override
     protected int getLayoutId() {
         return R.layout.activity_main;
     }
 
+    @Override
+    protected Class<MainViewModel> getViewModelClass() {
+        return MainViewModel.class;
+    }
 
-   }
+
+}
