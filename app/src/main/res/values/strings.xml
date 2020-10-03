@@ -51,4 +51,6 @@
     <string name="username2">账号</string>
     <string name="gender">性别</string>
     <string name="choose_gender">选择性别</string>
+    <string name="online">在线</string>
+    <string name="offline">离线</string>
 </resources>

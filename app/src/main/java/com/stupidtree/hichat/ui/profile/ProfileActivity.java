@@ -16,6 +16,7 @@ import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.model.UserProfile;
 import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.DataState;
+import com.stupidtree.hichat.utils.ActivityUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
 
 import butterknife.BindView;
@@ -90,7 +91,9 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                 if(booleanDataState.getData()){
                     //是好友关系，则提供发消息入口
                     button.setText(R.string.send_message);
-                    button.setEnabled(false);
+                    button.setEnabled(true);
+                    button.setOnClickListener(view -> ActivityUtils.startChatActivity(getThis(),
+                            viewModel.getConversation()));
                 }else{
                     //不是好友关系，则显示”添加好友“
                     button.setText(R.string.make_friends);

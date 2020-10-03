@@ -14,6 +14,12 @@ public class Trigger{
         trigger.setActioning();
         return trigger;
     }
+
+    public static Trigger getStill(){
+        Trigger trigger = new Trigger();
+        trigger.cancelActioning();
+        return trigger;
+    }
     public void setActioning(){
         state = STATES.ACTION;
     }
@@ -25,4 +31,6 @@ public class Trigger{
     public boolean  isActioning(){
         return state==STATES.ACTION;
     }
+
+
 }

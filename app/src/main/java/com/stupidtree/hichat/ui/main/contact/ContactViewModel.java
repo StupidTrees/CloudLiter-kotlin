@@ -48,8 +48,6 @@ public class ContactViewModel extends ViewModel {
     private LocalUserRepository localUserRepository;
 
 
-
-
     public ContactViewModel() {
         listController = new MutableLiveData<>();
         friendsRepository = FriendsRepository.getInstance();
@@ -59,18 +57,19 @@ public class ContactViewModel extends ViewModel {
 
     /**
      * 获取联系人列表的LiveData
+     *
      * @return 结果呗
      */
     public LiveData<DataState<List<FriendContact>>> getListData() {
-        if(listData==null){
+        if (listData == null) {
             //switchMap的作用是
             //当ListController发生数据变更时，将用如下定义的方式更新listData的value
             listData = Transformations.switchMap(listController, input -> {
-                if(input.isActioning()){
+                if (input.isActioning()) {
                     UserLocal user = localUserRepository.getLoggedInUserDirect();
-                    if(!user.isValid()){
+                    if (!user.isValid()) {
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
-                    }else{
+                    } else {
                         return friendsRepository.getFriends(user.getToken(), null);
                     }
                 }
@@ -86,6 +85,8 @@ public class ContactViewModel extends ViewModel {
     public void startFetchData() {
         listController.setValue(Trigger.getActioning());
     }
+
+
 
 
 }

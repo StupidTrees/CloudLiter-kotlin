@@ -19,7 +19,7 @@ import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.BaseTabAdapter;
 import com.stupidtree.hichat.ui.main.contact.ContactFragment;
-import com.stupidtree.hichat.ui.main.conversations.ConversationsBaseFragment;
+import com.stupidtree.hichat.ui.main.conversations.ConversationsFragment;
 import com.stupidtree.hichat.ui.main.me.MeFragment;
 import com.stupidtree.hichat.utils.ActivityUtils;
 
@@ -50,7 +50,6 @@ public class MainActivity extends BaseActivity<MainViewModel> {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setWindowParams(true, true, false);
         super.onCreate(savedInstanceState);
-        viewModel.bindService(this);
     }
 
     @Override
@@ -63,7 +62,7 @@ public class MainActivity extends BaseActivity<MainViewModel> {
             protected Fragment initItem(int position) {
                 switch (position) {
                     case 0:
-                        return ConversationsBaseFragment.newInstance();
+                        return ConversationsFragment.newInstance();
                     case 1:
                         return ContactFragment.newInstance();
                     default:
@@ -153,12 +152,6 @@ public class MainActivity extends BaseActivity<MainViewModel> {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addCategory(Intent.CATEGORY_HOME);
         startActivity(intent);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        viewModel.callOnline();
     }
 
 

@@ -2,10 +2,7 @@ package com.stupidtree.hichat.ui.chat;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,15 +15,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.gson.Gson;
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.model.Conversation;
-import com.stupidtree.hichat.ui.base.BaseActivityWithReceiver;
+import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.BaseListAdapter;
 import com.stupidtree.hichat.ui.base.BaseViewHolder;
 import com.stupidtree.hichat.ui.base.DataState;
@@ -38,9 +33,10 @@ import java.util.Objects;
 
 import butterknife.BindView;
 
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_RECEIVE_MESSAGE;
-
-public class ChatBaseActivity extends BaseActivityWithReceiver<ChatViewModel> {
+/**
+ * 对话窗口
+ */
+public class ChatActivity extends BaseActivity<ChatViewModel> {
     /**
      * View绑定区
      */
@@ -54,6 +50,10 @@ public class ChatBaseActivity extends BaseActivityWithReceiver<ChatViewModel> {
     RecyclerView list;
     @BindView(R.id.send)
     View send;
+    @BindView(R.id.state)
+    TextView stateText;
+    @BindView(R.id.state_icon)
+    ImageView stateIcon;
 
     /**
      * 适配器
@@ -61,28 +61,6 @@ public class ChatBaseActivity extends BaseActivityWithReceiver<ChatViewModel> {
     CAdapter listAdapter;
 
 
-    @NonNull
-    @Override
-    protected BroadcastReceiver initReceiver() {
-        return new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.e("ChatActivity:received", String.valueOf(intent));
-                ChatMessage cm = new Gson().fromJson(intent.getStringExtra("message"), ChatMessage.class);
-                Log.e("message", String.valueOf(cm));
-                if (Objects.equals(cm.getFromId(), viewModel.getFriendId())) {
-                    viewModel.receiveMessage(cm);
-                }
-            }
-        };
-    }
-
-    @Override
-    protected IntentFilter getIntentFilter() {
-        IntentFilter IF = new IntentFilter();
-        IF.addAction(ACTION_RECEIVE_MESSAGE);
-        return IF;
-    }
 
 
     @Override
@@ -93,7 +71,6 @@ public class ChatBaseActivity extends BaseActivityWithReceiver<ChatViewModel> {
             viewModel.setConversationData((Conversation) getIntent().getExtras().getSerializable("conversation"));
         }
         viewModel.bindService(this);
-        initReceiver();
     }
 
     @Override
@@ -123,6 +100,17 @@ public class ChatBaseActivity extends BaseActivityWithReceiver<ChatViewModel> {
                 }
                 if (listAdapter.getItemCount() > 0) {
                     list.smoothScrollToPosition(listAdapter.getItemCount() - 1);
+                }
+            }
+        });
+        viewModel.getFriendStateLiveData().observe(this, friendStateDataState -> {
+            if(friendStateDataState.getState()== DataState.STATE.SUCCESS){
+                if(friendStateDataState.getData().getState()== FriendState.STATE.ONLINE){
+                    stateText.setText(R.string.online);
+                    stateIcon.setImageResource(R.drawable.element_round_primary);
+                }else{
+                    stateText.setText(R.string.offline);
+                    stateIcon.setImageResource(R.drawable.element_round_grey);
                 }
             }
         });
@@ -162,6 +150,13 @@ public class ChatBaseActivity extends BaseActivityWithReceiver<ChatViewModel> {
         Log.e("ChatActivity", "onResume");
         viewModel.fetchHistoryData();
         viewModel.markAllRead();
+        viewModel.getIntoConversation();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        viewModel.leftConversation();
     }
 
     @Override

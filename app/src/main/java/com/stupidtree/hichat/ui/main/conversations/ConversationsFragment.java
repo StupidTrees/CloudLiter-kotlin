@@ -1,9 +1,6 @@
 package com.stupidtree.hichat.ui.main.conversations;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,13 +9,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.Conversation;
-import com.stupidtree.hichat.ui.base.BaseFragmentWithReceiver;
+import com.stupidtree.hichat.ui.base.BaseFragment;
 import com.stupidtree.hichat.ui.base.BaseListAdapter;
 import com.stupidtree.hichat.ui.base.BaseViewHolder;
 import com.stupidtree.hichat.ui.base.DataState;
@@ -33,9 +29,11 @@ import java.util.Objects;
 
 import butterknife.BindView;
 
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_RECEIVE_MESSAGE;
 
-public class ConversationsBaseFragment extends BaseFragmentWithReceiver<ConversationsViewModel> {
+/**
+ * “消息”页面
+ */
+public class ConversationsFragment extends BaseFragment<ConversationsViewModel> {
 
     /**
      * View绑定区
@@ -51,12 +49,12 @@ public class ConversationsBaseFragment extends BaseFragmentWithReceiver<Conversa
 
 
 
-    public ConversationsBaseFragment() {
+    public ConversationsFragment() {
     }
 
 
-    public static ConversationsBaseFragment newInstance() {
-        return new ConversationsBaseFragment();
+    public static ConversationsFragment newInstance() {
+        return new ConversationsFragment();
     }
 
     @Override
@@ -64,11 +62,8 @@ public class ConversationsBaseFragment extends BaseFragmentWithReceiver<Conversa
         return ConversationsViewModel.class;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        viewModel.bindService(getActivity());
-    }
+
+
 
     @Override
     protected void initViews(View view) {
@@ -86,6 +81,7 @@ public class ConversationsBaseFragment extends BaseFragmentWithReceiver<Conversa
             }
 
         });
+        viewModel.getUnreadMessageState().observe(this, listDataState -> viewModel.startRefresh());
     }
 
     @Override
@@ -99,31 +95,18 @@ public class ConversationsBaseFragment extends BaseFragmentWithReceiver<Conversa
         viewModel.startRefresh();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        viewModel.bindService(getActivity());
+        viewModel.callOnline();
+    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(receiver);
+        viewModel.unbindService(getActivity());
     }
-
-    @NonNull
-    @Override
-    protected BroadcastReceiver initReceiver(Context context) {
-        return new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                viewModel.startRefresh();
-            }
-        };
-    }
-
-    @Override
-    protected IntentFilter getIntentFilter() {
-        IntentFilter IF = new IntentFilter();
-        IF.addAction(ACTION_RECEIVE_MESSAGE);
-        return IF;
-    }
-
 
     class CAdapter extends BaseListAdapter<Conversation, CAdapter.CHolder> {
         /**

@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
+import com.stupidtree.hichat.data.model.Conversation;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.model.UserProfile;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
@@ -117,5 +118,18 @@ public class ProfileViewModel extends ViewModel {
      */
     public void startMakingFriends(String id){
         makeFriendsController.setValue(ProfileTrigger.getActioning(id));
+    }
+
+    /**
+     * 获取会话
+     * @return
+     */
+    public Conversation getConversation(){
+        if(profileLiveData.getValue()!=null){
+            return Conversation.getFromProfileAndMe(
+                    profileLiveData.getValue().getData(),localUserRepository.getLoggedInUserDirect()
+            );
+        }
+        return null;
     }
 }

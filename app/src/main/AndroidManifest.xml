@@ -35,7 +35,7 @@
             android:name=".ui.search.SearchActivity"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".ui.chat.ChatBaseActivity"
+            android:name=".ui.chat.ChatActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
         <service android:name=".service.SocketIOClientService">
 
