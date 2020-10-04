@@ -48,6 +48,7 @@ public class UserPreferenceSource {
                 .putString("username", user.getUsername())
                 .putString("nickname", user.getNickname())
                 .putString("gender", String.valueOf(user.getGender()))
+                .putString("signature",user.getSignature()) //获取签名
                 .putString("token", user.getToken())
                 .putString("avatar",user.getAvatar())
                 .apply();
@@ -68,6 +69,11 @@ public class UserPreferenceSource {
     public void saveGender(String gender){
         getPreference().edit()
                 .putString("gender",gender)
+                .apply();
+    }
+    public void saveSignature(String signature){
+        getPreference().edit()
+                .putString("signature",signature)
                 .apply();
     }
     public void clearLocalUser(){

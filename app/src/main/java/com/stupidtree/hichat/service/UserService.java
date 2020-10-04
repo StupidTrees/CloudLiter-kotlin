@@ -108,6 +108,17 @@ public interface UserService {
     @POST("/user/profile/change_gender")
     LiveData<ApiResponse<Object>> changeGender(@Field("gender")String gender,@Header("token")String token);
 
+
+    /**
+     * 更换签名
+     * @param signature 新签名
+     * @param token 登录状态的token（表征了用户身份）
+     * @return 操作结果
+     */
+    @FormUrlEncoded
+    @POST("/user/profile/change_signature")
+    LiveData<ApiResponse<Object>> changeSignature(@Field("signature")String signature,@Header("token")String token);
+
 }
 
 

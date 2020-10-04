@@ -117,6 +117,7 @@ public class MyProfileActivity extends BaseActivity<MyProfileViewModel> {
                 }
             }
         });
+
         viewModel.getChangeNicknameResult().observe(this, stringDataState -> {
             if (stringDataState.getState() == DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show();
@@ -134,6 +135,16 @@ public class MyProfileActivity extends BaseActivity<MyProfileViewModel> {
                 Toast.makeText(getApplicationContext(), "失败", Toast.LENGTH_SHORT).show();
             }
         });
+
+        viewModel.getChangeSignatureResult().observe(this, stringDataState -> {
+            if (stringDataState.getState() == DataState.STATE.SUCCESS) {
+                Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show();
+                viewModel.startRefresh();
+            } else {
+                Toast.makeText(getApplicationContext(), "失败", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
         nicknameLayout.setOnClickListener(view -> {
             DataState<UserProfile> up = viewModel.getUserProfileLiveData().getValue();
@@ -165,6 +176,22 @@ public class MyProfileActivity extends BaseActivity<MyProfileViewModel> {
             }
 
         });
+
+        signatureLayout.setOnClickListener(view -> {
+            DataState<UserProfile> up = viewModel.getUserProfileLiveData().getValue();
+            if (up != null && up.getState() == DataState.STATE.SUCCESS) {
+                new PopUpEditText()
+                        .setTitle(R.string.choose_signature)
+                        .setText(up.getData().getSignature())
+                        .setOnConfirmListener(text -> {
+                            //控制viewModel发起更改签名请求
+                            viewModel.startChangeSignature(text);
+                        })
+                        .show(getSupportFragmentManager(), "edit");
+            }
+
+        });
+
         logoutButton.setOnClickListener(view1 -> {
             //通知ViewModel登出
             viewModel.logout();

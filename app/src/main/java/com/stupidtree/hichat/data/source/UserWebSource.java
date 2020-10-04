@@ -267,6 +267,33 @@ public class UserWebSource extends BaseWebSource<UserService> {
 
 
     /**
+     * 更换性别
+     * @param token 令牌
+     * @param signature 签名
+     * @return 操作结果
+     */
+    public LiveData<DataState<String>> changeSignature(@NonNull String token,@NonNull String signature){
+        return Transformations.map(service.changeSignature(signature, token), input -> {
+            Log.e( "changeSignature: ", input.toString());
+            if(input!=null){
+
+                switch (input.getCode()){
+                    case SUCCESS:
+                        System.out.println("SUCCEED");
+                        return new DataState<>(DataState.STATE.SUCCESS);
+                    case TOKEN_INVALID:
+                        return new DataState<>(DataState.STATE.TOKEN_INVALID);
+                    default:
+                        return new DataState<>(DataState.STATE.FETCH_FAILED,input.getMessage());
+                }
+            }
+
+            return new DataState<>(DataState.STATE.FETCH_FAILED);
+        });
+    }
+
+
+    /**
      * 更换头像
      * @param token 令牌
      * @param file 图片请求包

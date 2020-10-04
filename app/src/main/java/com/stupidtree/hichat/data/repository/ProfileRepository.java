@@ -134,4 +134,20 @@ public class ProfileRepository {
         });
     }
 
+    /**
+     * 更改用户昵称
+     *
+     * @param token    令牌
+     * @param signature 新昵称
+     * @return 操作结果
+     */
+    public LiveData<DataState<String>> changeSignature(@NonNull String token, @NonNull String signature) {
+        return Transformations.map(userWebSource.changeSignature(token, signature), input -> {
+            if (input.getState() == DataState.STATE.SUCCESS) {
+                LocalUserRepository.getInstance().ChangeLocalSignature(signature);
+            }
+            return input;
+        });
+    }
+
 }
