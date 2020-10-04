@@ -194,7 +194,7 @@ public class MyProfileActivity extends BaseActivity<MyProfileViewModel> {
 
         logoutButton.setOnClickListener(view1 -> {
             //通知ViewModel登出
-            viewModel.logout();
+            viewModel.logout(this);
             finish();
         });
     }

@@ -1,11 +1,16 @@
 package com.stupidtree.hichat.data.repository;
 
+import android.content.Context;
+import android.content.Intent;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.stupidtree.hichat.HiApplication;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.source.UserPreferenceSource;
+
+import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_OFFLINE;
 
 
 /**
@@ -41,7 +46,12 @@ public class LocalUserRepository {
     /**
      * 登出
      */
-    public void logout(){
+    public void logout(@NonNull Context context){
+        if(loggedInUser!=null){
+            Intent i = new Intent(ACTION_OFFLINE);
+            i.putExtra("userId",loggedInUser.getId());
+            context.sendBroadcast(i);
+        }
         loggedInUser = null;
         mePreferenceSource.clearLocalUser();
     }

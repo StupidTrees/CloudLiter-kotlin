@@ -2,7 +2,9 @@ package com.stupidtree.hichat.data.source;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -10,6 +12,8 @@ import androidx.annotation.NonNull;
 import com.stupidtree.hichat.data.model.UserLocal;
 
 import java.util.UUID;
+
+import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_ONLINE;
 
 /**
  * 层次：DataSource
@@ -42,6 +46,11 @@ public class UserPreferenceSource {
         return sharedPreferences;
     }
     public void saveLocalUser(UserLocal user) {
+        Intent i = new Intent(ACTION_ONLINE);
+        Bundle b = new Bundle();
+        b.putSerializable("user",user);
+        i.putExtras(b);
+        context.sendBroadcast(i);
         Log.e("save_local_user", String.valueOf(user));
         getPreference().edit()
                 .putString("id",user.getId())

@@ -58,8 +58,10 @@ public class SocketIOClientService extends Service {
     public static final String ACTION_INTO_CONVERSATION = "CLOUD_LITER_INTO_CONVERSATION";
     public static final String ACTION_LEFT_CONVERSATION = "CLOUD_LITER_LEFT_CONVERSATION";
     public static final String ACTION_ONLINE = "CLOUD_LITER_ONLINE";
+    public static final String ACTION_OFFLINE = "CLOUD_LITER_OFFLINE";
     public static final String ACTION_MARK_ALL_READ = "CLOUD_LITER_MARK_ALL_READ";
     public static final String ACTION_MARK_READ = "CLOUD_LITER_MARK_READ";
+
 
     /**
      * 接收到的、未读的消息
@@ -104,6 +106,10 @@ public class SocketIOClientService extends Service {
                             socket.emit("login", userLocal);
                         }
                         break;
+                    case ACTION_OFFLINE:
+                        if(intent.getStringExtra("userId")!=null){
+                            socket.emit("logout",intent.getStringExtra("userId"));
+                        }
                     case ACTION_MARK_ALL_READ:
                         //从新消息队列中把该对话下的所有消息删除
                         conversationId = intent.getStringExtra("conversationId");
@@ -148,6 +154,7 @@ public class SocketIOClientService extends Service {
         IntentFilter IF = new IntentFilter();
         IF.addAction(ACTION_INTO_CONVERSATION);
         IF.addAction(ACTION_ONLINE);
+        IF.addAction(ACTION_OFFLINE);
         IF.addAction(ACTION_LEFT_CONVERSATION);
         IF.addAction(ACTION_MARK_ALL_READ);
         IF.addAction(ACTION_MARK_READ);

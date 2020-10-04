@@ -1,5 +1,8 @@
 package com.stupidtree.hichat.ui.myprofile;
 
+import android.content.Context;
+
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -154,8 +157,8 @@ public class MyProfileViewModel extends ViewModel {
         return changeSignatureResult;
     }
 
-    public void logout(){
-        localUserRepository.logout();
+    public void logout(@NonNull Context context){
+        localUserRepository.logout(context);
     }
 
     /**
