@@ -154,6 +154,7 @@ public class MyProfileViewModel extends ViewModel {
         return changeSignatureResult;
     }
 
+
     public void logout(){
         localUserRepository.logout();
     }

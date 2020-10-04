@@ -23,6 +23,9 @@ public class FriendContact {
     UserLocal.GENDER gender;
     //联系人的用户id
     String id;
+    //联系人用户的备注
+    String remark;
+
 
     public String getId() {
         return id;
@@ -31,6 +34,8 @@ public class FriendContact {
     public String getName() {
         return name;
     }
+
+    public String getRemark(){return remark;}
 
     public String getAvatar() {
         return avatar;
@@ -66,6 +71,7 @@ public class FriendContact {
             res.name = userInfo.get("nickname").getAsString();
             res.id = userInfo.get("id").getAsString();
             res.avatar = JsonUtils.getStringData(userInfo,"avatar");
+            res.remark=jo.get("remark").getAsString();
             String gender = userInfo.get("gender").getAsString();
             res.gender = Objects.equals(gender,"MALE")? UserLocal.GENDER.MALE: UserLocal.GENDER.FEMALE;
             return res;

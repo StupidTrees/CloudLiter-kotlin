@@ -6,10 +6,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
 import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.source.ChatMessageWebSource;
 import com.stupidtree.hichat.data.source.SocketWebSource;
+import com.stupidtree.hichat.data.source.UserWebSource;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.ui.chat.ChatListTrigger;
 import com.stupidtree.hichat.ui.chat.FriendStateTrigger;
@@ -35,6 +37,8 @@ public class ChatRepository {
     ChatMessageWebSource chatMessageWebSource;
     //数据源2：和后台服务通信的Service
     SocketWebSource socketWebSource;
+    //数据源3：网络类型数据源，用户网络操作
+    private UserWebSource userWebSource;
 
     public ChatRepository(){
         chatMessageWebSource = ChatMessageWebSource.getInstance();
@@ -85,4 +89,6 @@ public class ChatRepository {
     public MutableLiveData<FriendStateTrigger> getFriendsStateController(){
         return socketWebSource.getFriendStateController();
     }
+
+
 }

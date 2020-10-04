@@ -15,7 +15,9 @@ import com.stupidtree.hichat.data.model.Conversation;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.repository.ChatRepository;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
+import com.stupidtree.hichat.data.repository.ProfileRepository;
 import com.stupidtree.hichat.ui.base.DataState;
+import com.stupidtree.hichat.ui.myprofile.ChangeInfoTrigger;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,7 +43,8 @@ public class ChatViewModel extends ViewModel {
      */
     private ChatRepository chatRepository;
     private LocalUserRepository localUserRepository;
-
+    //仓库1：用户资料仓库
+    private ProfileRepository profileRepository;
 
 
     public ChatViewModel() {
@@ -148,6 +151,7 @@ public class ChatViewModel extends ViewModel {
     public void unbindService(Context context){
         chatRepository.unbindService(context);
     }
+
 
     /**
      * 控制获取完整的消息记录列表

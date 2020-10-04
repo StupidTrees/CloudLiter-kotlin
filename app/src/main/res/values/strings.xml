@@ -53,4 +53,7 @@
     <string name="choose_gender">选择性别</string>
     <string name="online">在线</string>
     <string name="offline">离线</string>
+    <string name="choose_signature">我想说</string>
+    <string name="change_remark">输入备注</string>
+    <string name="remark_change">修改备注</string>
 </resources>
