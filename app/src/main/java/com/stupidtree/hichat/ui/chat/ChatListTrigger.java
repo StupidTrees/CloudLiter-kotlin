@@ -18,6 +18,12 @@ public class ChatListTrigger extends Trigger {
         return chatListTrigger;
     }
 
+    public static ChatListTrigger getStill(){
+        ChatListTrigger chatListTrigger = new ChatListTrigger();
+        chatListTrigger.cancelActioning();
+        return chatListTrigger;
+    }
+
     public String getConversationId() {
         return conversationId;
     }

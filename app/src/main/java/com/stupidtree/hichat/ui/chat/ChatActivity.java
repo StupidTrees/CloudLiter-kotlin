@@ -20,12 +20,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.ChatMessage;
-import com.stupidtree.hichat.data.model.Conversation;
 import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.BaseListAdapter;
 import com.stupidtree.hichat.ui.base.BaseViewHolder;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.utils.ImageUtils;
+import com.stupidtree.hichat.utils.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -61,15 +61,20 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
     CAdapter listAdapter;
 
 
-
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setWindowParams(true, true, false);
-        if (getIntent().getExtras() != null) {
-            viewModel.setConversationData((Conversation) getIntent().getExtras().getSerializable("conversation"));
+        if (getIntent().getStringExtra("friendId") != null) {
+            viewModel.setFriendId(getIntent().getStringExtra("friendId"));
+            viewModel.startFetchingConversation(getIntent().getStringExtra("friendId"));
         }
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         viewModel.bindService(this);
     }
 
@@ -90,10 +95,21 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
         toolbar.inflateMenu(R.menu.toolbar_chat_menu);
         setToolbarActionBack(toolbar);
         //给viewModel设置监听
-        viewModel.getConversationMutableLiveData().observe(this, (Conversation conversation) -> titleText.setText(conversation.getFriendNickname()));
+        viewModel.getConversationLiveData().observe(this, conversationDataState -> {
+            if (conversationDataState.getState() == DataState.STATE.SUCCESS) {
+                //获取到对话，才刷新
+                titleText.setText(conversationDataState.getData().getFriendNickname());
+                viewModel.markAllRead(this);
+                viewModel.getIntoConversation(this);
+                viewModel.fetchHistoryData();
+            }
+        });
         viewModel.getListData().observe(this, listDataState -> {
             if (listDataState.getState() == DataState.STATE.SUCCESS) {
                 if (listDataState.getListAction() == DataState.LIST_ACTION.APPEND) {
+                    if (listDataState.getData().size() == 1) {
+                        viewModel.markRead(this, listDataState.getData().get(0));
+                    }
                     listAdapter.notifyItemAppended(listDataState.getData());
                 } else {
                     listAdapter.notifyItemChangedSmooth(listDataState.getData(), false);
@@ -104,11 +120,11 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
             }
         });
         viewModel.getFriendStateLiveData().observe(this, friendStateDataState -> {
-            if(friendStateDataState.getState()== DataState.STATE.SUCCESS){
-                if(friendStateDataState.getData().getState()== FriendState.STATE.ONLINE){
+            if (friendStateDataState.getState() == DataState.STATE.SUCCESS) {
+                if (friendStateDataState.getData().getState() == FriendState.STATE.ONLINE) {
                     stateText.setText(R.string.online);
                     stateIcon.setImageResource(R.drawable.element_round_primary);
-                }else{
+                } else {
                     stateText.setText(R.string.offline);
                     stateIcon.setImageResource(R.drawable.element_round_grey);
                 }
@@ -131,8 +147,10 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
 
         //点击发送
         send.setOnClickListener(view -> {
-            viewModel.sendMessage(inputEditText.getText().toString());
-            inputEditText.setText("");
+            if (!TextUtils.isEmpty(inputEditText.getText().toString())) {
+                viewModel.sendMessage(inputEditText.getText().toString());
+                inputEditText.setText("");
+            }
         });
 
     }
@@ -144,19 +162,11 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.e("ChatActivity", "onResume");
-        viewModel.fetchHistoryData();
-        viewModel.markAllRead();
-        viewModel.getIntoConversation();
-    }
 
     @Override
     protected void onStop() {
         super.onStop();
-        viewModel.leftConversation();
+        viewModel.leftConversation(this);
     }
 
     @Override

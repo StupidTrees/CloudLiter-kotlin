@@ -1,6 +1,7 @@
 package com.stupidtree.hichat.ui.main.conversations;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -70,7 +71,7 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
         listAdapter = new CAdapter(getContext(), new LinkedList<>());
         list.setAdapter(listAdapter);
         list.setLayoutManager(new LinearLayoutManager(getContext()));
-        listAdapter.setOnItemClickListener((data, card, position) -> ActivityUtils.startChatActivity(requireContext(), data));
+        listAdapter.setOnItemClickListener((data, card, position) -> ActivityUtils.startChatActivity(requireContext(), data.getFriendId()));
         viewModel.getListData().observe(this, listDataState -> {
             if (listDataState.getState() == DataState.STATE.SUCCESS) {
                 List<Conversation> list = listDataState.getData();
@@ -93,20 +94,22 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
     public void onResume() {
         super.onResume();
         viewModel.startRefresh();
+        viewModel.callOnline(requireContext());
     }
+
 
     @Override
     public void onStart() {
         super.onStart();
         viewModel.bindService(getActivity());
-        viewModel.callOnline();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDetach() {
+        super.onDetach();
         viewModel.unbindService(getActivity());
     }
+
 
     class CAdapter extends BaseListAdapter<Conversation, CAdapter.CHolder> {
         /**

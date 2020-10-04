@@ -121,14 +121,12 @@ public class ProfileViewModel extends ViewModel {
     }
 
     /**
-     * 获取会话
+     * 获取该用户id
      * @return
      */
-    public Conversation getConversation(){
+    public String getUserId(){
         if(profileLiveData.getValue()!=null){
-            return Conversation.getFromProfileAndMe(
-                    profileLiveData.getValue().getData(),localUserRepository.getLoggedInUserDirect()
-            );
+           return profileLiveData.getValue().getData().getId();
         }
         return null;
     }

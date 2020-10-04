@@ -41,13 +41,14 @@ public class ActivityUtils {
     /**
      * 启动聊天Activity
      * @param from 调用者
-     * @param conversation 聊天对象
+     * @param friendId 朋友id
      */
-    public static void startChatActivity(@NonNull Context from, @NonNull Conversation conversation){
+    public static void startChatActivity(@NonNull Context from, @NonNull String friendId){
         Intent i = new Intent(from, ChatActivity.class);
-        Bundle b = new Bundle();
-        b.putSerializable("conversation",conversation);
-        i.putExtras(b);
+//        Bundle b = new Bundle();
+//        b.putSerializable("conversation",conversation);
+//        i.putExtras(b);
+        i.putExtra("friendId",friendId);
         from.startActivity(i);
     }
 

@@ -90,4 +90,31 @@ public class ConversationWebSource extends BaseWebSource<ConversationService> {
     }
 
 
+    /**
+     * 查询两用户的对话对象
+     * @param token 令牌
+     * @param userId 我的id
+     * @param friendId 朋友的id
+     * @return 查询结果
+     */
+    public LiveData<DataState<Conversation>> queryConversation(@NonNull String token, @Nullable String userId,@NonNull String friendId) {
+        return Transformations.map(service.queryConversation(token, userId, friendId), new Function<ApiResponse<Conversation>, DataState<Conversation>>() {
+            @Override
+            public DataState<Conversation> apply(ApiResponse<Conversation> input) {
+                if(null==input){
+                    return new DataState<>(DataState.STATE.FETCH_FAILED);
+                }
+                switch (input.getCode()) {
+                    case SUCCESS:
+                        return new DataState<>(input.getData());
+                    case TOKEN_INVALID:
+                        return new DataState<>(DataState.STATE.TOKEN_INVALID);
+                    default:
+                        return new DataState<>(DataState.STATE.FETCH_FAILED);
+                }
+            }
+        });
+    }
+
+
 }

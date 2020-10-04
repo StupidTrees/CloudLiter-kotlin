@@ -93,7 +93,7 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                     button.setText(R.string.send_message);
                     button.setEnabled(true);
                     button.setOnClickListener(view -> ActivityUtils.startChatActivity(getThis(),
-                            viewModel.getConversation()));
+                            viewModel.getUserId()));
                 }else{
                     //不是好友关系，则显示”添加好友“
                     button.setText(R.string.make_friends);

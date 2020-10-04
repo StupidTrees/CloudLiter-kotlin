@@ -3,9 +3,11 @@ package com.stupidtree.hichat.ui.chat;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
@@ -16,6 +18,7 @@ import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.repository.ChatRepository;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.ui.base.DataState;
+import com.stupidtree.hichat.utils.MTransformations;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,11 +28,17 @@ public class ChatViewModel extends ViewModel {
     /**
      * 数据区
      */
-    private MutableLiveData<Conversation> conversationMutableLiveData = new MutableLiveData<>();
+    //数据本体 朋友id
+    private String friendId;
+    //数据本体：对话对象
+    private MediatorLiveData<DataState<Conversation>> conversationLiveData;
+    //trigger:控制↑的刷新
+    private MutableLiveData<ConversationTrigger> conversationController = new MutableLiveData<>();
+
     //数据本体：消息列表
     private LiveData<DataState<List<ChatMessage>>> listData;
     //trigger:控制器
-    private MutableLiveData<ChatListTrigger> listDataController;
+    private MediatorLiveData<ChatListTrigger> listDataController;
 
     //状态数据：朋友在线状态
     private LiveData<DataState<FriendState>> friendStateLiveData;
@@ -42,19 +51,30 @@ public class ChatViewModel extends ViewModel {
     private ChatRepository chatRepository;
     private LocalUserRepository localUserRepository;
 
-
+    public void setFriendId(String friendId) {
+        this.friendId = friendId;
+    }
 
     public ChatViewModel() {
         chatRepository = ChatRepository.getInstance();
         localUserRepository = LocalUserRepository.getInstance();
-        listDataController = chatRepository.getChatListController();
+        listDataController = MTransformations.map(chatRepository.getChatListController(), input -> {
+            if (conversationLiveData.getValue() == null || conversationLiveData.getValue().getData() == null) {
+                return ChatListTrigger.getStill();
+            }
+            if (Objects.equals(input.getNewMessage().getFromId(), conversationLiveData.getValue().getData().getFriendId())) {
+                return input;
+            } else {
+                return ChatListTrigger.getStill();
+            }
+        });
         friendStateController = Transformations.map(chatRepository.getFriendsStateController(), input -> {
             Log.e("apply", String.valueOf(input.online));
-            if(conversationMutableLiveData.getValue()==null){
+            if (getFriendId() == null) {
                 return FriendStateTrigger.getStill();
             }
-            if(Objects.equals(input.id,conversationMutableLiveData.getValue().getFriendId())){
-                return FriendStateTrigger.getActioning(input.id,input.online);
+            if (Objects.equals(input.id, getFriendId())) {
+                return FriendStateTrigger.getActioning(input.id, input.online);
             }
             return FriendStateTrigger.getStill();
         });
@@ -62,12 +82,12 @@ public class ChatViewModel extends ViewModel {
 
 
     /**
-     * 初始化聊天对象
+     * 开始获取对话对象
      *
-     * @param conversationData 聊天对象
+     * @param friendId 朋友id
      */
-    public void setConversationData(Conversation conversationData) {
-        conversationMutableLiveData.setValue(conversationData);
+    public void startFetchingConversation(String friendId) {
+        conversationController.setValue(ConversationTrigger.getActioning(friendId));
     }
 
     /**
@@ -75,8 +95,17 @@ public class ChatViewModel extends ViewModel {
      *
      * @return 结果
      */
-    public MutableLiveData<Conversation> getConversationMutableLiveData() {
-        return conversationMutableLiveData;
+    public LiveData<DataState<Conversation>> getConversationLiveData() {
+        if (conversationLiveData == null) {
+            conversationLiveData = MTransformations.switchMap(conversationController, input -> {
+                if (localUserRepository.isUserLoggedIn()) {
+                    return chatRepository.queryConversation(Objects.requireNonNull(localUserRepository.getLoggedInUserDirect().getToken()),
+                            localUserRepository.getLoggedInUserDirect().getId(), input.friendId);
+                }
+                return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
+            });
+        }
+        return conversationLiveData;
     }
 
     /**
@@ -88,6 +117,9 @@ public class ChatViewModel extends ViewModel {
     public LiveData<DataState<List<ChatMessage>>> getListData() {
         if (listData == null) {
             listData = Transformations.switchMap(listDataController, input -> {
+                if (!input.isActioning()) {
+                    return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
+                }
                 UserLocal local = localUserRepository.getLoggedInUserDirect();
                 if (!local.isValid()) {
                     return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
@@ -104,18 +136,15 @@ public class ChatViewModel extends ViewModel {
 
     public LiveData<DataState<FriendState>> getFriendStateLiveData() {
         if (friendStateLiveData == null) {
-            friendStateLiveData = Transformations.switchMap(friendStateController, new Function<FriendStateTrigger, LiveData<DataState<FriendState>>>() {
-                @Override
-                public LiveData<DataState<FriendState>> apply(FriendStateTrigger input) {
-                    if(input.isActioning()){
-                        if (input.online) {
-                            return new MutableLiveData<>(new DataState<>(FriendState.getOnline()));
-                        } else {
-                            return new MutableLiveData<>(new DataState<>(FriendState.getOffline()));
-                        }
+            friendStateLiveData = Transformations.switchMap(friendStateController, input -> {
+                if (input.isActioning()) {
+                    if (input.online) {
+                        return new MutableLiveData<>(new DataState<>(FriendState.getOnline()));
+                    } else {
+                        return new MutableLiveData<>(new DataState<>(FriendState.getOffline()));
                     }
-                    return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
                 }
+                return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
             });
         }
         return friendStateLiveData;
@@ -128,24 +157,24 @@ public class ChatViewModel extends ViewModel {
      */
     public void sendMessage(String content) {
         UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
-        if (userLocal.isValid() && conversationMutableLiveData.getValue() != null) {
+        if (userLocal.isValid() && getFriendId() != null) {
             ChatMessage message = new ChatMessage(userLocal.getId(),
-                    conversationMutableLiveData.getValue().getFriendId(), content);
+                    getFriendId(), content);
             //通知仓库发送消息
             chatRepository.sendMessage(message);
-            if (conversationMutableLiveData.getValue() != null) {
-                String conId = conversationMutableLiveData.getValue().getId();
+            if (getConversationId() != null) {
+                String conId = getConversationId();
                 listDataController.setValue(ChatListTrigger.getActioning(conId, message));
             }
         }
 
     }
 
-    public void bindService(Context context){
+    public void bindService(Context context) {
         chatRepository.bindService(context);
     }
 
-    public void unbindService(Context context){
+    public void unbindService(Context context) {
         chatRepository.unbindService(context);
     }
 
@@ -153,8 +182,8 @@ public class ChatViewModel extends ViewModel {
      * 控制获取完整的消息记录列表
      */
     public void fetchHistoryData() {
-        if (conversationMutableLiveData.getValue() != null) {
-            String conId = conversationMutableLiveData.getValue().getId();
+        if (getConversationId() != null) {
+            String conId = getConversationId();
             listDataController.setValue(ChatListTrigger.getActioning(conId));
         }
     }
@@ -173,50 +202,55 @@ public class ChatViewModel extends ViewModel {
 
     @Nullable
     public String getFriendAvatar() {
-        if (conversationMutableLiveData.getValue() != null) {
-            return conversationMutableLiveData.getValue().getFriendAvatar();
+        if (conversationLiveData.getValue() != null && conversationLiveData.getValue().getData() != null) {
+            return conversationLiveData.getValue().getData().getFriendAvatar();
         }
         return null;
     }
 
     @Nullable
-    public String getFriendId() {
-        if (conversationMutableLiveData.getValue() != null) {
-            return conversationMutableLiveData.getValue().getFriendId();
+    public String getConversationId() {
+        if (conversationLiveData.getValue() == null || conversationLiveData.getValue().getData() == null) {
+            return null;
         }
-        return null;
+        return conversationLiveData.getValue().getData().getId();
+    }
+
+    @Nullable
+    public String getFriendId() {
+        return friendId;
     }
 
     /**
      * 声明进入了对话
      */
-    public void getIntoConversation() {
-        if (conversationMutableLiveData.getValue() != null && localUserRepository.isUserLoggedIn()
+    public void getIntoConversation(Context context) {
+        if (getFriendId() != null && getConversationId() != null && localUserRepository.isUserLoggedIn()
         ) {
-            chatRepository.getIntoConversation(Objects.requireNonNull(localUserRepository.getLoggedInUserDirect().getId()),
-                    conversationMutableLiveData.getValue().getFriendId(), conversationMutableLiveData.getValue().getId());
+            chatRepository.getIntoConversation(context, Objects.requireNonNull(localUserRepository.getLoggedInUserDirect().getId()),
+                    getFriendId(), getConversationId());
         }
     }
 
     /**
      * 声明离开对话
      */
-    public void leftConversation() {
-        if (conversationMutableLiveData.getValue() != null && localUserRepository.isUserLoggedIn()
+    public void leftConversation(@NonNull Context context) {
+        if (getConversationId() != null && localUserRepository.isUserLoggedIn()
         ) {
-            chatRepository.leftConversation(Objects.requireNonNull(localUserRepository.getLoggedInUserDirect().getId()),
-                    conversationMutableLiveData.getValue().getId());
+            chatRepository.leftConversation(context, Objects.requireNonNull(localUserRepository.getLoggedInUserDirect().getId()),
+                    getConversationId());
         }
     }
 
-    public void markAllRead() {
-        if (conversationMutableLiveData.getValue() != null && localUserRepository.isUserLoggedIn()) {
-            chatRepository.markAllRead(Objects.requireNonNull(getMyId()), conversationMutableLiveData.getValue().getId());
+    public void markAllRead(@NonNull Context context) {
+        if (getConversationId() != null && localUserRepository.isUserLoggedIn()) {
+            chatRepository.markAllRead(context, Objects.requireNonNull(getMyId()), getConversationId());
         }
     }
 
-    private void markRead(ChatMessage chatMessage) {
-        chatRepository.markRead(chatMessage);
+    public void markRead(@NonNull Context context, ChatMessage chatMessage) {
+        chatRepository.markRead(context, chatMessage.getId());
     }
 
 }

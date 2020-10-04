@@ -1,5 +1,7 @@
 package com.stupidtree.hichat.data.model;
 
+import android.os.Message;
+
 import androidx.annotation.NonNull;
 
 import java.io.Serializable;
@@ -30,6 +32,20 @@ public class Conversation implements Serializable {
             conversation.setFriendId(friend.getId());
             conversation.setFriendNickname(friend.getNickname());
             int fi = Integer.parseInt(friend.getId());
+            int mi = Integer.parseInt(userLocal.getId());
+            conversation.setId(Math.min(fi,mi)+"-"+Math.max(fi,mi));
+
+        }
+        return conversation;
+    }
+
+    public static Conversation getFromMessageAndMe(@NonNull ChatMessage message, UserLocal userLocal){
+        Conversation conversation = new Conversation();
+        if(userLocal.getId()!=null&&message.getFromId()!=null){
+//            conversation.setFriendAvatar(friend.getAvatar());
+            conversation.setFriendId(message.getFromId());
+//            conversation.setFriendNickname(friend.getNickname());
+            int fi = Integer.parseInt(message.getFromId());
             int mi = Integer.parseInt(userLocal.getId());
             conversation.setId(Math.min(fi,mi)+"-"+Math.max(fi,mi));
 

@@ -1,9 +1,8 @@
 package com.stupidtree.hichat.ui.main.conversations;
 
 import android.content.Context;
-import android.util.Log;
 
-import androidx.arch.core.util.Function;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -110,10 +109,10 @@ public class ConversationsViewModel extends ViewModel {
         return res;
     }
 
-    public void callOnline() {
+    public void callOnline(@NonNull Context context) {
         UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
         if (userLocal.isValid()) {
-            conversationRepository.callOnline(userLocal);
+            conversationRepository.callOnline(context,userLocal);
         }
     }
 }

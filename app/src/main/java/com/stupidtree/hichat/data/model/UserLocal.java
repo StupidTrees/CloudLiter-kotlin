@@ -12,6 +12,7 @@ import com.stupidtree.hichat.utils.JsonUtils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 
@@ -19,7 +20,7 @@ import java.util.Objects;
  * 缓存在本地的此用户Model
  * 暂未和服务器返回数据格式匹配，需要适配函数
  */
-public class UserLocal {
+public class UserLocal implements Serializable {
     //定义性别的枚举类型
     public enum GENDER {MALE, FEMALE}
 

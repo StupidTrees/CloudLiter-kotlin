@@ -16,12 +16,14 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.stupidtree.hichat.R;
+import com.stupidtree.hichat.service.SocketIOClientService;
 import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.BaseTabAdapter;
 import com.stupidtree.hichat.ui.main.contact.ContactFragment;
 import com.stupidtree.hichat.ui.main.conversations.ConversationsFragment;
 import com.stupidtree.hichat.ui.main.me.MeFragment;
 import com.stupidtree.hichat.utils.ActivityUtils;
+import com.stupidtree.hichat.utils.NotificationUtils;
 
 import butterknife.BindView;
 
@@ -50,6 +52,15 @@ public class MainActivity extends BaseActivity<MainViewModel> {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setWindowParams(true, true, false);
         super.onCreate(savedInstanceState);
+        Intent bindIntent = new Intent(this, SocketIOClientService.class);
+        startService(bindIntent);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NotificationUtils.checkNotification(this);
     }
 
     @Override

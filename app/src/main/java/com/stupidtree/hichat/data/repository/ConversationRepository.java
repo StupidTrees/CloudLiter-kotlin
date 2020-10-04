@@ -1,6 +1,7 @@
 package com.stupidtree.hichat.data.repository;
 
 import android.content.Context;
+import android.content.IntentFilter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +15,9 @@ import com.stupidtree.hichat.data.source.SocketWebSource;
 import com.stupidtree.hichat.ui.base.DataState;
 
 import java.util.List;
+
+import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_FRIEND_STATE_CHANGED;
+import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_RECEIVE_MESSAGE;
 
 /**
  * 层次：Repository
@@ -41,11 +45,16 @@ public class ConversationRepository {
     }
 
     public void bindService(Context context){
+        IntentFilter IF = new IntentFilter();
+        IF.addAction(ACTION_RECEIVE_MESSAGE);
+        IF.addAction(ACTION_FRIEND_STATE_CHANGED);
+        context.registerReceiver(socketWebSource,IF);
         socketWebSource.bindService("conversation",context);
     }
 
     public void unbindService(Context context){
         socketWebSource.unbindService(context);
+        context.unregisterReceiver(socketWebSource);
     }
 
 
@@ -65,7 +74,7 @@ public class ConversationRepository {
     }
 
 
-    public void callOnline(@NonNull UserLocal userLocal){
-        socketWebSource.callOnline(userLocal);
+    public void callOnline(@NonNull Context context,@NonNull UserLocal userLocal){
+        socketWebSource.callOnline(context,userLocal);
     }
 }

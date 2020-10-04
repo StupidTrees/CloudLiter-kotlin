@@ -2,10 +2,11 @@ package com.stupidtree.hichat.data.model;
 
 import com.google.gson.Gson;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
 
-public class ChatMessage {
+public class ChatMessage implements Serializable {
     String id;
     String fromId;
     String toId;

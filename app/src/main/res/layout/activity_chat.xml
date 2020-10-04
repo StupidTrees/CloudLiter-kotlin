@@ -105,13 +105,29 @@
             android:textColor="?attr/textColorPrimary"
             android:textColorHint="?attr/textColorSecondary" />
 
-        <ImageView
+        <androidx.cardview.widget.CardView
             android:id="@+id/send"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="16dp"
             android:clickable="true"
-            android:padding="16dp"
-            app:srcCompat="@drawable/ic_male_blue_24" />
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            app:cardBackgroundColor="?attr/colorPrimary"
+            app:cardCornerRadius="18dp">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                android:text="@string/send"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 </LinearLayout>
