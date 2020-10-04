@@ -48,7 +48,15 @@ public interface RelationService {
     @POST("relation/make_friends")
     LiveData<ApiResponse<Boolean>> makeFriends(@Header("token")String token,@Field("friend")String friendId);
 
-
+    /**
+     * 更换备注
+     * @param remark 新备注
+     * @param token 登录状态的token（表征了用户身份）
+     * @return 操作结果
+     */
+    @FormUrlEncoded
+    @POST("/relation/friend_remark")
+    LiveData<ApiResponse<Object>> changeRemark(@Field("remark")String remark,@Header("token")String token);
 
 
 }

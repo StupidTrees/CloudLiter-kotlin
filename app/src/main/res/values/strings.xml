@@ -44,7 +44,7 @@
     <string name="my_profile_title">个人信息</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
-    <string name="input_hint">输入内容…</string>
+    <string name="input_hint">输入内容...</string>
     <string name="set_nickname">设置昵称</string>
     <string name="no_image_selected">没有选择图片</string>
     <string name="avatar_change_success">更换成功</string>
@@ -54,7 +54,9 @@
     <string name="send">发送</string>
     <string name="online">在线</string>
     <string name="offline">离线</string>
-    <string name="choose_signature">我想说…</string>
+    <string name="choose_signature">我想说</string>
+    <string name="change_remark">输入备注</string>
+    <string name="remark_change">修改备注</string>
     <string name="attention_please">提示</string>
     <string name="need_that_freaking_notification_permission">为确保消息的高调到达，请开启悬浮通知权限</string>
 </resources>

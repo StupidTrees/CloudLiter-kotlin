@@ -87,6 +87,8 @@ public class LocalUserRepository {
         loggedInUser = mePreferenceSource.getLocalUser();
     }
 
+
+
     /**
      * 更改本地缓存的用户性别
      * @param gender 性别/MALE/FEMALE

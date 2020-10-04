@@ -6,7 +6,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -60,6 +59,8 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
      * 适配器
      */
     CAdapter listAdapter;
+
+
 
 
     @Override

@@ -1,6 +1,7 @@
 package com.stupidtree.hichat.ui.main.contact;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -131,8 +132,14 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
             if (data != null) {
                 //显示头像
                 ImageUtils.loadAvatarInto(mContext, data.getAvatar(), holder.avatar);
-                //显示名称
-                holder.name.setText(data.getName());
+                //显示名称(备注)
+                if(data.getRemark()!=""){
+                    holder.name.setText(data.getRemark());
+                }
+                else {
+                    holder.name.setText(data.getName());
+                }
+
                 //设置点击事件
                 if (mOnItemClickListener != null) {
                     holder.item.setOnClickListener(view -> mOnItemClickListener.onItemClick(data, view, position));

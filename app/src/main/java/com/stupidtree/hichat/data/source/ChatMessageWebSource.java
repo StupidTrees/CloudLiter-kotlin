@@ -75,6 +75,7 @@ public class ChatMessageWebSource extends BaseWebSource<ChatMessageService> {
     }
 
 
+
     @Override
     protected Class<ChatMessageService> getServiceClass() {
         return ChatMessageService.class;

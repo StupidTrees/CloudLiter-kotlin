@@ -243,6 +243,9 @@ public class UserWebSource extends BaseWebSource<UserService> {
     }
 
 
+
+
+
     /**
      * 更换性别
      * @param token 令牌
@@ -267,7 +270,7 @@ public class UserWebSource extends BaseWebSource<UserService> {
 
 
     /**
-     * 更换性别
+     * 更换签名
      * @param token 令牌
      * @param signature 签名
      * @return 操作结果
