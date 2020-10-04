@@ -61,7 +61,7 @@
             android:layout_height="24dp"
             android:layout_gravity="end"
             android:layout_marginTop="6dp"
-            android:background="@drawable/element_round_red"
+            android:background="@drawable/element_round_primary"
             android:gravity="center"
             android:text="1"
             android:textColor="@android:color/white" />

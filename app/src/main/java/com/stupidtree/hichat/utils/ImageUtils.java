@@ -32,8 +32,7 @@ public class ImageUtils {
             GlideUrl glideUrl = new GlideUrl("http://hita.store:3000/user/profile/avatar?path=" +
                     filename, new LazyHeaders.Builder().addHeader("device-type", "android").build());
             Glide.with(context).load(glideUrl
-            ).apply(RequestOptions.bitmapTransform(new CircleCrop()))
-                    .diskCacheStrategy(DiskCacheStrategy.NONE).into(target);
+            ).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(target);
         }
 
     }

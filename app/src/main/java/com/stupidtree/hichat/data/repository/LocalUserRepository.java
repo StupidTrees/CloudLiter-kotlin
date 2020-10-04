@@ -106,4 +106,12 @@ public class LocalUserRepository {
         }
         return loggedInUser;
     }
+
+    /**
+     * 用户是否登录
+     * @return 是否登陆
+     */
+    public boolean isUserLoggedIn(){
+        return loggedInUser!=null&&loggedInUser.isValid();
+    }
 }

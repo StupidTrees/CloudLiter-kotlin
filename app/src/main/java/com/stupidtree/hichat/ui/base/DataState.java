@@ -12,14 +12,15 @@ import androidx.annotation.NonNull;
 public class DataState<T> {
     /**
      * 定义几种基本的状态
+     * NOTHING 空状态，什么都不要做
      * SUCCESS 请求成功
      * FETCH_FAILED 请求失败
      * NOT_LOGGED_IN 用户未登录
      * TOKEN_INVALID token已失效
      */
-    public enum STATE{NOT_LOGGED_IN,SUCCESS,FETCH_FAILED,TOKEN_INVALID}
+    public enum STATE{NOTHING,NOT_LOGGED_IN,SUCCESS,FETCH_FAILED,TOKEN_INVALID}
 
-    public enum LIST_ACTION{REPLACE_ALL,APPEND,PUSH_HEAD}
+    public enum LIST_ACTION{REPLACE_ALL,APPEND,PUSH_HEAD,DELETE}
     //表征数据状态
     STATE state;
     //数据本体
@@ -67,5 +68,15 @@ public class DataState<T> {
 
     public String getMessage() {
         return message;
+    }
+
+    @Override
+    public String toString() {
+        return "DataState{" +
+                "state=" + state +
+                ", data=" + data +
+                ", message='" + message + '\'' +
+                ", listAction=" + listAction +
+                '}';
     }
 }

@@ -20,7 +20,8 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="36dp"
+            android:layout_marginTop="8dp"
             android:background="#00000000"
             app:contentInsetStart="0dp"
             app:contentInsetStartWithNavigation="0dp"
@@ -29,22 +30,50 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center">
+                android:gravity="bottom|center"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/title"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center"
                     android:gravity="center"
                     android:text="标题"
                     android:textColor="?attr/textColorPrimary"
                     android:textSize="18sp">
 
                 </TextView>
+
             </LinearLayout>
 
         </androidx.appcompat.widget.Toolbar>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="6dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/state_icon"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="6dp"
+                app:srcCompat="@drawable/element_round_grey" />
+
+            <TextView
+                android:id="@+id/state"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/offline"
+                android:textSize="11sp" />
+        </LinearLayout>
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView

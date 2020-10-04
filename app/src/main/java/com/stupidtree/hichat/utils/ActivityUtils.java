@@ -7,7 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 
 import com.stupidtree.hichat.data.model.Conversation;
-import com.stupidtree.hichat.ui.chat.ChatBaseActivity;
+import com.stupidtree.hichat.ui.chat.ChatActivity;
 import com.stupidtree.hichat.ui.myprofile.MyProfileActivity;
 import com.stupidtree.hichat.ui.profile.ProfileActivity;
 import com.stupidtree.hichat.ui.search.SearchActivity;
@@ -44,7 +44,7 @@ public class ActivityUtils {
      * @param conversation 聊天对象
      */
     public static void startChatActivity(@NonNull Context from, @NonNull Conversation conversation){
-        Intent i = new Intent(from, ChatBaseActivity.class);
+        Intent i = new Intent(from, ChatActivity.class);
         Bundle b = new Bundle();
         b.putSerializable("conversation",conversation);
         i.putExtras(b);

@@ -23,6 +23,20 @@ public class Conversation implements Serializable {
     Timestamp createdAt;
     Timestamp updatedAt;
 
+    public static Conversation getFromProfileAndMe(@NonNull UserProfile friend,UserLocal userLocal){
+        Conversation conversation = new Conversation();
+        if(userLocal.getId()!=null&&friend.getId()!=null){
+            conversation.setFriendAvatar(friend.getAvatar());
+            conversation.setFriendId(friend.getId());
+            conversation.setFriendNickname(friend.getNickname());
+            int fi = Integer.parseInt(friend.getId());
+            int mi = Integer.parseInt(userLocal.getId());
+            conversation.setId(Math.min(fi,mi)+"-"+Math.max(fi,mi));
+
+        }
+        return conversation;
+    }
+
     @NonNull
     public String getId() {
         return id;
