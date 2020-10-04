@@ -87,6 +87,13 @@ public class LocalUserRepository {
     }
 
     /**
+     * 更改本地缓存的签名
+     * @param signature 新签名
+     */
+    public void ChangeLocalSignature(String signature){ mePreferenceSource.saveSignature(signature);
+    }
+
+    /**
      * 直接获取本地已登陆的用户对象
      * 同步获取
      * @return 本地用户对象

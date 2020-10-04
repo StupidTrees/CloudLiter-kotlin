@@ -28,6 +28,7 @@ public class UserLocal {
     @Nullable
     String id; //用户id
     String nickname; //用户昵称
+    String signature;//用户签名
     @Nullable
     String token; //保存用户登陆状态的token（重要）
     UserLocal.GENDER gender; //用户性别
@@ -104,6 +105,14 @@ public class UserLocal {
 
     public UserLocal.GENDER getGender() {
         return gender;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 
     @Nullable

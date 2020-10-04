@@ -43,6 +43,11 @@ public class MyProfileViewModel extends ViewModel {
     //Trigger：控制更改性别请求的发送，其中携带了新性别字符串
     MutableLiveData<ChangeInfoTrigger> changeGenderController = new MutableLiveData<>();
 
+    //状态数据：更改签名的结果
+    LiveData<DataState<String>> changeSignatureResult;
+    //Trigger：控制更改签名请求的发送，其中携带了新昵称字符串
+    MutableLiveData<ChangeInfoTrigger> changeSignatureController = new MutableLiveData<>();
+
 
     /**
      * 仓库区
@@ -131,6 +136,24 @@ public class MyProfileViewModel extends ViewModel {
         return changeGenderResult;
     }
 
+    public LiveData<DataState<String>> getChangeSignatureResult() {
+        if(changeSignatureResult==null){
+            //也是一样的
+            changeSignatureResult = Transformations.switchMap(changeSignatureController, input -> {
+                if(input.isActioning()){
+                    UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                    if(userLocal.isValid()){
+                        return profileRepository.changeSignature(Objects.requireNonNull(userLocal.getToken()),input.getValue());
+                    }else{
+                        return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
+                    }
+                }
+                return new MutableLiveData<>();
+            });
+        }
+        return changeSignatureResult;
+    }
+
     public void logout(){
         localUserRepository.logout();
     }
@@ -158,6 +181,14 @@ public class MyProfileViewModel extends ViewModel {
     public void startChangeGender(UserLocal.GENDER gender){
         String genderStr = gender== UserLocal.GENDER.MALE?"MALE":"FEMALE";
         changeGenderController.setValue(ChangeInfoTrigger.getActioning(genderStr));
+    }
+
+    /**
+     * 发起更换签名请求
+     * @param signature 新签名字符串
+     */
+    public void startChangeSignature(String signature){
+        changeSignatureController.setValue(ChangeInfoTrigger.getActioning(signature));
     }
 
     /**
