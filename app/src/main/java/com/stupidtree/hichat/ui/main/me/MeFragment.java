@@ -70,7 +70,8 @@ public class MeFragment extends BaseFragment<MeViewModel> {
             //装载头像
             ImageUtils.loadLocalAvatarInto(requireContext(), userLocalInfo.getAvatar(), avatarImageView);
             //设置各种文字
-            usernameTextView.setText(userLocalInfo.getUsername());
+
+            usernameTextView.setText(userLocalInfo.getSignature());
             nicknameTextView.setText(userLocalInfo.getNickname());
             genderIcon.setVisibility(View.VISIBLE);
             //根据性别
