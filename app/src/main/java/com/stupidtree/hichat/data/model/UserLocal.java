@@ -51,10 +51,12 @@ public class UserLocal {
             String id = JsonUtils.getStringData(info, "id");
             String username = JsonUtils.getStringData(info, "username");
             String nickname = JsonUtils.getStringData(info, "nickname");
+            String signature=JsonUtils.getStringData(info,"signature");
             String gender = JsonUtils.getStringData(info, "gender");
             String avatar = JsonUtils.getStringData(info, "avatar");
             userLocal.setUsername(username);
             userLocal.setNickname(nickname);
+            userLocal.setSignature(signature);
             userLocal.setGender(gender);
             userLocal.setAvatar(avatar);
             userLocal.setToken(token);

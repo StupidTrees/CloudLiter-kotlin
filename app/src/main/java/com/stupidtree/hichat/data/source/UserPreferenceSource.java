@@ -88,6 +88,7 @@ public class UserPreferenceSource {
         result.setId(preferences.getString("id",null));
         result.setUsername(preferences.getString("username",null));
         result.setNickname(preferences.getString("nickname",null));
+        result.setSignature(preferences.getString("signature","这个人很佛系，啥都没写"));
         result.setToken(preferences.getString("token",null));
         result.setGender(preferences.getString("gender","MALE"));
         result.setAvatar(preferences.getString("avatar",null));
