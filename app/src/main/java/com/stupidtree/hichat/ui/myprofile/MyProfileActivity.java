@@ -168,6 +168,7 @@ public class MyProfileActivity extends BaseActivity<MyProfileViewModel> {
 
         });
 
+        //点击更改性别，弹出选择框
         genderLayout.setOnClickListener(view -> {
             DataState<UserProfile> up = viewModel.getUserProfileLiveData().getValue();
             if (up != null && up.getState() == DataState.STATE.SUCCESS) {
