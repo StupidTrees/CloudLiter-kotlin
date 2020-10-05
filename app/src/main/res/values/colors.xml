@@ -3,4 +3,13 @@
     <color name="colorPrimary">#2962ff</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#2962ff</color>
+
+    <color name="profileRed">#FF4500</color>
+    <color name="profileOrange">#FF9E00 </color>
+    <color name="profileYellow">#FFD800</color>
+    <color name="profileGreen">#B3FF86</color>
+    <color name="profileCyan">#00FFDE</color>
+    <color name="profileBlue">#00B8FF</color>
+    <color name="profilePurple">#7D00FF</color>
+
 </resources>

@@ -1,17 +1,16 @@
 package com.stupidtree.hichat.ui.main.conversations;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.Conversation;
@@ -47,6 +46,10 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
 
     @BindView(R.id.place_holder_text)
     TextView placeHolderText; //不显示列表时显示文字
+
+    @BindView(R.id.refresh)
+    SwipeRefreshLayout refreshLayout;
+
     /**
      * 适配器区
      */
@@ -77,7 +80,15 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
         list.setAdapter(listAdapter);
         list.setLayoutManager(new LinearLayoutManager(getContext()));
         listAdapter.setOnItemClickListener((data, card, position) -> ActivityUtils.startChatActivity(requireContext(), data.getFriendId()));
+
+        //设置下拉刷新
+        //设置下拉刷新
+        refreshLayout.setColorSchemeResources(R.color.colorPrimary,R.color.colorAccent);
+        refreshLayout.setOnRefreshListener(() -> viewModel.startRefresh());
+
+
         viewModel.getListData().observe(this, listDataState -> {
+            refreshLayout.setRefreshing(false);
             if (listDataState.getState() == DataState.STATE.SUCCESS) {
                 List<Conversation> listD = listDataState.getData();
                 Collections.sort(listD, (conversation, t1) -> t1.getUpdatedAt().compareTo(conversation.getUpdatedAt()));
@@ -100,7 +111,10 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
                 placeHolderText.setText(R.string.fetch_failed);
             }
         });
-        viewModel.getUnreadMessageState().observe(this, listDataState -> viewModel.startRefresh());
+        viewModel.getUnreadMessageState().observe(this, listDataState ->{
+            refreshLayout.setRefreshing(true);
+            viewModel.startRefresh();
+        } );
     }
 
     @Override

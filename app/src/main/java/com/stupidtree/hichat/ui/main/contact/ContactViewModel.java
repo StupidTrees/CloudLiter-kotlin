@@ -62,7 +62,7 @@ public class ContactViewModel extends ViewModel {
                         return friendsRepository.getFriends(user.getToken(), null);
                     }
                 }
-                return new MutableLiveData<>();
+                return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
             });
         }
         return listData;

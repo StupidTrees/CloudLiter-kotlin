@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.lifecycle.Observer;
 
 import com.stupidtree.hichat.R;
@@ -21,6 +22,7 @@ import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.ui.widgets.PopUpEditText;
 import com.stupidtree.hichat.ui.widgets.PopUpSelectableList;
+import com.stupidtree.hichat.utils.ColorUtils;
 import com.stupidtree.hichat.utils.FileProviderUtils;
 import com.stupidtree.hichat.utils.GalleryPicker;
 import com.stupidtree.hichat.utils.ImageUtils;
@@ -83,6 +85,11 @@ public class MyProfileActivity extends BaseActivity<MyProfileViewModel> {
     @BindView(R.id.gender)
     TextView genderText;//性别文本
 
+    @BindView(R.id.icon_color)
+    CardView colorIcon;
+
+    @BindView(R.id.icon_color_inner)
+    CardView colorIconInner;
     @Override
     protected Class<MyProfileViewModel> getViewModelClass() {
         return MyProfileViewModel.class;
@@ -256,6 +263,8 @@ public class MyProfileActivity extends BaseActivity<MyProfileViewModel> {
         //设置各种文本信息
         colorText.setText(profile.getColorName());
         nicknameText.setText(profile.getNickname());
+        colorIcon.setCardBackgroundColor(ColorUtils.getColorByEnum(getThis(),profile.getColor()));
+        colorIconInner.setCardBackgroundColor(ColorUtils.getColorByEnum(getThis(),profile.getColor()));
         if(!TextUtils.isEmpty(profile.getSignature())){
             signatureText.setText(profile.getSignature());
         }else{

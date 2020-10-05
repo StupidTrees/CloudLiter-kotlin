@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.lifecycle.Observer;
 
 import com.stupidtree.hichat.R;
@@ -18,6 +19,7 @@ import com.stupidtree.hichat.data.model.UserProfile;
 import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.utils.ActivityUtils;
+import com.stupidtree.hichat.utils.ColorUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
 import com.stupidtree.hichat.utils.TextUtils;
 
@@ -56,6 +58,10 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
     @BindView(R.id.relation_layout)
     View relationSettingButton;
 
+    @BindView(R.id.icon_color)
+    CardView colorIcon;
+    @BindView(R.id.icon_color_inner)
+    CardView colorIconInner;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setWindowParams(true,true,false);
@@ -140,11 +146,16 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
             usernameTextView.setText(userInfo.getUsername());
             nicknameTextView.setText(userInfo.getNickname());
             genderIcon.setVisibility(View.VISIBLE);
+            colorIcon.setVisibility(View.VISIBLE);
+            colorIconInner.setVisibility(View.VISIBLE);
             if(TextUtils.isEmpty(userInfo.getSignature())){
                 signatureTextView.setText(R.string.place_holder_no_signature);
             }else{
                 signatureTextView.setText(userInfo.getSignature());
             }
+            colorIcon.setCardBackgroundColor(ColorUtils.getColorByEnum(getThis(),userInfo.getColor()));
+            colorIconInner.setCardBackgroundColor(ColorUtils.getColorByEnum(getThis(),userInfo.getColor()));
+
             if(userInfo.getGender()== UserLocal.GENDER.MALE){
                 genderIcon.setImageResource(R.drawable.ic_male_blue_24);
             }else{

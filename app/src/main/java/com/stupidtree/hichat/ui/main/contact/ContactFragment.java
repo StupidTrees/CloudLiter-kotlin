@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.UserRelation;
@@ -45,6 +46,8 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
     @BindView(R.id.list)
     RecyclerView list; //列表
 
+    @BindView(R.id.refresh)
+    SwipeRefreshLayout refreshLayout;
 
     /**
      * 适配器区
@@ -74,12 +77,13 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
             //点击列表项时，跳转到对应用户的Profile页面
             ActivityUtils.startProfileActivity(requireActivity(), String.valueOf(data.getId()));
         });
+        //设置下拉刷新
+        refreshLayout.setColorSchemeResources(R.color.colorPrimary,R.color.colorAccent);
+        refreshLayout.setOnRefreshListener(() -> viewModel.startFetchData());
 
         //当列表数据变更时，将自动调用本匿名函数
         viewModel.getListData().observe(this, contactListState -> {
-            if (contactListState == null) {
-                return;
-            }
+            refreshLayout.setRefreshing(false);
             if (contactListState.getState() == DataState.STATE.SUCCESS) {
                 //状态为”成功“，那么列表设置为可见，并通知列表适配器丝滑地更新列表项
                 listAdapter.notifyItemChangedSmooth(contactListState.getData(), new BaseListAdapter.RefreshJudge<UserRelation>() {
