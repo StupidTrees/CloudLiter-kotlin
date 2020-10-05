@@ -9,5 +9,33 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <LinearLayout
+        android:id="@+id/place_holder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:alpha="0.3"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:src="@drawable/place_holder_conversation" />
+
+        <TextView
+            android:id="@+id/place_holder_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="4dp"
+            android:text="@string/please_log_in"
+            android:textColor="?attr/textColorSecondary"
+            android:textSize="16sp" />
+    </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

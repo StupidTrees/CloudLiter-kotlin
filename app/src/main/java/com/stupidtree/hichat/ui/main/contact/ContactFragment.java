@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,17 +34,21 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
     /**
      * View绑定区
      */
-    @BindView(R.id.not_logged_in)
-    ViewGroup notLoggedIn;//未登录显示的东西
+    @BindView(R.id.place_holder)
+    ViewGroup placeHolder;//列表无内容时显示的布局
+
+    @BindView(R.id.place_holder_text)
+    TextView placeHolderText; //不显示列表时显示文字
+
 
     @BindView(R.id.list)
     RecyclerView list; //列表
+
 
     /**
      * 适配器区
      */
     XListAdapter listAdapter;//列表适配器
-
 
 
     public ContactFragment() {
@@ -78,18 +81,26 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
             }
             if (contactListState.getState() == DataState.STATE.SUCCESS) {
                 //状态为”成功“，那么列表设置为可见，并通知列表适配器丝滑地更新列表项
-                list.setVisibility(View.VISIBLE);
-                notLoggedIn.setVisibility(View.GONE);
                 listAdapter.notifyItemChangedSmooth(contactListState.getData(), false);
+                if(contactListState.getData().size()>0){
+                    list.setVisibility(View.VISIBLE);
+                    placeHolder.setVisibility(View.GONE);
+                }else{
+                    list.setVisibility(View.GONE);
+                    placeHolder.setVisibility(View.VISIBLE);
+                    placeHolderText.setText(R.string.no_contact);
+                }
+
             } else if (contactListState.getState() == DataState.STATE.NOT_LOGGED_IN) {
                 //状态为”未登录“，那么设置”未登录“内东西为可见，隐藏列表
                 list.setVisibility(View.GONE);
-                notLoggedIn.setVisibility(View.VISIBLE);
+                placeHolder.setVisibility(View.VISIBLE);
+                placeHolderText.setText(R.string.not_logged_in);
             } else if (contactListState.getState() == DataState.STATE.FETCH_FAILED) {
                 //状态为”获取失败“，那么弹出提示
-                list.setVisibility(View.VISIBLE);
-                notLoggedIn.setVisibility(View.GONE);
-                Toast.makeText(getContext(), "获取失败" + contactListState.getMessage(), Toast.LENGTH_SHORT).show();
+                list.setVisibility(View.GONE);
+                placeHolder.setVisibility(View.VISIBLE);
+                placeHolderText.setText(R.string.fetch_failed);
             }
         });
 
@@ -107,9 +118,6 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
         super.onResume();
         viewModel.startFetchData();
     }
-
-
-
 
 
     /**
@@ -133,7 +141,7 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
                 //显示头像
                 ImageUtils.loadAvatarInto(mContext, data.getAvatar(), holder.avatar);
                 //显示名称(备注)
-                if(!TextUtils.isEmpty(data.getRemark())){
+                if (!TextUtils.isEmpty(data.getRemark())) {
                     holder.name.setText(data.getRemark());
                 } else {
                     holder.name.setText(data.getName());

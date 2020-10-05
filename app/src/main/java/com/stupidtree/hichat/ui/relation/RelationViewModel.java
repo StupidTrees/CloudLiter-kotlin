@@ -1,17 +1,13 @@
 package com.stupidtree.hichat.ui.relation;
 
-import androidx.annotation.Nullable;
-import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
-
 import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.data.repository.RelationRepository;
 import com.stupidtree.hichat.ui.base.DataState;
-
 import java.util.Objects;
 
 public class RelationViewModel extends ViewModel {

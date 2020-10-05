@@ -86,7 +86,7 @@ public class MeFragment extends BaseFragment<MeViewModel> {
             usernameTextView.setText(R.string.not_logged_in);
             nicknameTextView.setText(R.string.please_log_in);
             genderIcon.setVisibility(View.GONE);
-            avatarImageView.setImageResource(R.drawable.ic_baseline_emoji_emotions_24);
+            avatarImageView.setImageResource(R.drawable.place_holder_avatar);
             profileViewGroup.setOnClickListener(view -> ActivityUtils.startLoginActivity(requireActivity()));
 
         }

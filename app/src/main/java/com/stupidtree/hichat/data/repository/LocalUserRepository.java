@@ -15,7 +15,7 @@ import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_OFFLINE
 
 /**
  * 层次：Repository
- * ”我的“页面的Repository
+ * ”我的“页面的Repository，同时也是全局的本地用户仓库
  */
 public class LocalUserRepository {
 

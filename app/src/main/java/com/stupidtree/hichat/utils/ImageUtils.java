@@ -27,7 +27,7 @@ public class ImageUtils {
 
     public static void loadAvatarInto(@NonNull Context context, String filename, @NonNull ImageView target) {
         if (TextUtils.isEmpty(filename)) {
-            target.setImageResource(R.drawable.ic_baseline_emoji_emotions_24);
+            target.setImageResource(R.drawable.place_holder_avatar);
         } else {
             GlideUrl glideUrl = new GlideUrl("http://hita.store:3000/user/profile/avatar?path=" +
                     filename, new LazyHeaders.Builder().addHeader("device-type", "android").build());
@@ -40,7 +40,7 @@ public class ImageUtils {
     public static void loadLocalAvatarInto(@NonNull Context context, String filename, @NonNull ImageView target) {
         String sign = UserPreferenceSource.getInstance(context).getMyAvatarGlideSignature();
         if (TextUtils.isEmpty(filename)) {
-            target.setImageResource(R.drawable.ic_baseline_emoji_emotions_24);
+            target.setImageResource(R.drawable.place_holder_avatar);
         } else {
             GlideUrl glideUrl = new GlideUrl("http://hita.store:3000/user/profile/avatar?path=" +
                     filename, new LazyHeaders.Builder().addHeader("device-type", "android").build());

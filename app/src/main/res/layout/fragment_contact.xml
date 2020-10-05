@@ -12,10 +12,11 @@
         android:layout_height="match_parent" />
 
     <LinearLayout
-        android:id="@+id/not_logged_in"
+        android:id="@+id/place_holder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:alpha="0.3"
         android:orientation="vertical"
         android:visibility="invisible">
 
@@ -23,13 +24,17 @@
             android:id="@+id/imageView"
             android:layout_width="140dp"
             android:layout_height="140dp"
-            android:src="@drawable/ic_baseline_emoji_emotions_24" />
+            android:src="@drawable/place_holder_contact" />
 
         <TextView
+            android:id="@+id/place_holder_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="请登录" />
+            android:layout_marginTop="4dp"
+            android:text="@string/please_log_in"
+            android:textColor="?attr/textColorSecondary"
+            android:textSize="16sp" />
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

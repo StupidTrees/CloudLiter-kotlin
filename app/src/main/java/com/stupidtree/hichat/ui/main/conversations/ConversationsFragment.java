@@ -42,6 +42,11 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
     @BindView(R.id.list)
     RecyclerView list;
 
+    @BindView(R.id.place_holder)
+    ViewGroup placeHolder;//列表无内容时显示的布局
+
+    @BindView(R.id.place_holder_text)
+    TextView placeHolderText; //不显示列表时显示文字
     /**
      * 适配器区
      */
@@ -74,13 +79,26 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
         listAdapter.setOnItemClickListener((data, card, position) -> ActivityUtils.startChatActivity(requireContext(), data.getFriendId()));
         viewModel.getListData().observe(this, listDataState -> {
             if (listDataState.getState() == DataState.STATE.SUCCESS) {
-                List<Conversation> list = listDataState.getData();
-                Collections.sort(list, (conversation, t1) -> t1.getUpdatedAt().compareTo(conversation.getUpdatedAt()));
-                listAdapter.notifyItemChangedSmooth(list);
-            } else {
-                Toast.makeText(getContext(), "失败", Toast.LENGTH_SHORT).show();
+                List<Conversation> listD = listDataState.getData();
+                Collections.sort(listD, (conversation, t1) -> t1.getUpdatedAt().compareTo(conversation.getUpdatedAt()));
+                listAdapter.notifyItemChangedSmooth(listD);
+                if(listD.size()>0){
+                    list.setVisibility(View.VISIBLE);
+                    placeHolder.setVisibility(View.GONE);
+                }else{
+                    list.setVisibility(View.GONE);
+                    placeHolder.setVisibility(View.VISIBLE);
+                    placeHolderText.setText(R.string.no_conversation);
+                }
+            } else if(listDataState.getState()== DataState.STATE.NOT_LOGGED_IN) {
+                placeHolder.setVisibility(View.VISIBLE);
+                list.setVisibility(View.GONE);
+                placeHolderText.setText(R.string.not_logged_in);
+            }else{
+                placeHolder.setVisibility(View.VISIBLE);
+                list.setVisibility(View.GONE);
+                placeHolderText.setText(R.string.fetch_failed);
             }
-
         });
         viewModel.getUnreadMessageState().observe(this, listDataState -> viewModel.startRefresh());
     }
