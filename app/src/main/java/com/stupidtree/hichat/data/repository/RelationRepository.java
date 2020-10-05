@@ -3,7 +3,9 @@ package com.stupidtree.hichat.data.repository;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 
+import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.data.source.RelationWebSource;
 import com.stupidtree.hichat.ui.base.DataState;
@@ -16,6 +18,9 @@ public class RelationRepository {
      */
     //数据源：网络类型
     RelationWebSource relationWebSource;
+
+    //将已登录用户缓存在内存里
+    UserLocal loggedInUser = null;
 
 
     public static RelationRepository getInstance() {
@@ -63,4 +68,14 @@ public class RelationRepository {
         return relationWebSource.queryRelation(token,friendId);
     }
 
+    /**
+     * 更改用户备注
+     *
+     * @param token    令牌
+     * @param remark 新备注
+     * @return 操作结果
+     */
+    public LiveData<DataState<String>> changeRemark(@NonNull String token, @NonNull String remark,@NonNull String friend_id) {
+        return relationWebSource.changeRemark(token,remark,friend_id);
+    }
 }

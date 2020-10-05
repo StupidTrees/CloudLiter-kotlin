@@ -7,10 +7,14 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
+import com.stupidtree.hichat.data.model.UserLocal;
+import com.stupidtree.hichat.data.model.UserProfile;
 import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
+import com.stupidtree.hichat.data.repository.ProfileRepository;
 import com.stupidtree.hichat.data.repository.RelationRepository;
 import com.stupidtree.hichat.ui.base.DataState;
+import com.stupidtree.hichat.ui.myprofile.ChangeInfoTrigger;
 
 import java.util.Objects;
 
@@ -23,12 +27,18 @@ public class RelationViewModel extends ViewModel {
     LiveData<DataState<UserRelation>> relationData;
     //Trigger：控制↑的刷新
     MutableLiveData<RelationQueryTrigger> relationQueryController = new MutableLiveData<>();
+    //状态数据：更改签名的结果
+    LiveData<DataState<String>> changeRemarkResult;
+    //Trigger：控制更改签名请求的发送，其中携带了新昵称字符串
+    MutableLiveData<ChangeInfoTrigger> changeRemarkController = new MutableLiveData<>();
 
     /**
      * 仓库区
      */
     RelationRepository relationRepository;
     LocalUserRepository localUserRepository;
+    //仓库1：用户资料仓库
+    private ProfileRepository profileRepository;
 
     public RelationViewModel(){
         localUserRepository = LocalUserRepository.getInstance();
@@ -52,7 +62,39 @@ public class RelationViewModel extends ViewModel {
         return relationData;
     }
 
+
+
+    public LiveData<DataState<String>> getChangeRemarkResult() {
+        if(changeRemarkResult==null){
+            //也是一样的
+            changeRemarkResult = Transformations.switchMap(changeRemarkController, input -> {
+                if(input.isActioning()){
+                    UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                    if(userLocal.isValid()&&relationData.getValue().getData().getId()!=null){
+                        System.out.println("friend id is"+relationData.getValue().getData().getId());
+                        return relationRepository.changeRemark(Objects.requireNonNull(userLocal.getToken()),input.getValue(),relationData.getValue().getData().getId());
+                    }else{
+                        return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
+                    }
+                }
+                return new MutableLiveData<>();
+            });
+        }
+        return changeRemarkResult;
+    }
+
+
+
     public void startFetchRelationData(String friendId){
         relationQueryController.setValue(RelationQueryTrigger.getActioning(friendId));
+    }
+
+    /**
+     * 发起更换备注请求
+     * @param remark 新备注字符串
+     */
+    public void startChangeRemark(String remark){
+        System.out.println("In RelationViewModel stage, remark get is "+remark);
+        changeRemarkController.setValue(ChangeInfoTrigger.getActioning(remark));
     }
 }

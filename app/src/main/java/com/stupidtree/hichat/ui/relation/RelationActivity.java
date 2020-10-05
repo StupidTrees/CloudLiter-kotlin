@@ -4,13 +4,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 
 import com.stupidtree.hichat.R;
+import com.stupidtree.hichat.data.model.UserProfile;
+import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.DataState;
+import com.stupidtree.hichat.ui.widgets.PopUpEditText;
 
 import butterknife.BindView;
 
@@ -21,6 +25,9 @@ public class RelationActivity extends BaseActivity<RelationViewModel> {
 
     @BindView(R.id.remark)
     TextView remarkText;
+
+    @BindView(R.id.set_remark)
+    TextView set_remark;
 
 
     @BindView(R.id.toolbar)
@@ -46,6 +53,29 @@ public class RelationActivity extends BaseActivity<RelationViewModel> {
 
     @Override
     protected void initViews() {
+        set_remark.setOnClickListener(view -> {
+            DataState<UserRelation> up = viewModel.getRelationData().getValue();
+            if (up != null && up.getState() == DataState.STATE.SUCCESS) {
+                new PopUpEditText()
+                        .setTitle(R.string.prompt_set_remark)
+                        .setText(up.getData().getRemark())
+                        .setOnConfirmListener(text -> {
+                            //控制viewModel发起更改昵称请求
+                            viewModel.startChangeRemark(text);
+                        })
+                        .show(getSupportFragmentManager(), "edit");
+            }
+
+        });
+        viewModel.getChangeRemarkResult().observe(this, stringDataState -> {
+            if (stringDataState.getState() == DataState.STATE.SUCCESS) {
+                Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show();
+                viewModel.startFetchRelationData(getIntent().getStringExtra("friendId"));
+            } else {
+                Toast.makeText(getApplicationContext(), "失败", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         viewModel.getRelationData().observe(this, friendContactDataState -> {
             if(friendContactDataState.getState()== DataState.STATE.SUCCESS){
                 remarkText.setText(friendContactDataState.getData().getRemark());

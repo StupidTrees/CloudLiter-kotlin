@@ -80,7 +80,12 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
                 //状态为”成功“，那么列表设置为可见，并通知列表适配器丝滑地更新列表项
                 list.setVisibility(View.VISIBLE);
                 notLoggedIn.setVisibility(View.GONE);
-                listAdapter.notifyItemChangedSmooth(contactListState.getData(), false);
+                listAdapter.notifyItemChangedSmooth(contactListState.getData(), new BaseListAdapter.RefreshJudge<UserRelation>() {
+                    @Override
+                    public boolean judge(UserRelation oldData, UserRelation newData) {
+                        return false;
+                    }
+                });
             } else if (contactListState.getState() == DataState.STATE.NOT_LOGGED_IN) {
                 //状态为”未登录“，那么设置”未登录“内东西为可见，隐藏列表
                 list.setVisibility(View.GONE);
