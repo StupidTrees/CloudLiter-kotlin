@@ -8,6 +8,7 @@ import androidx.lifecycle.Transformations;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.service.LiveDataCallAdapter;
 import com.stupidtree.hichat.service.RelationService;
@@ -20,6 +21,7 @@ import java.util.List;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.stupidtree.hichat.service.codes.SUCCESS;
 import static com.stupidtree.hichat.ui.base.DataState.STATE.FETCH_FAILED;
 import static com.stupidtree.hichat.ui.base.DataState.STATE.TOKEN_INVALID;
 
@@ -47,6 +49,8 @@ public class RelationWebSource extends BaseWebSource<RelationService> {
                 .addCallAdapterFactory(LiveDataCallAdapter.LiveDataCallAdapterFactory.INSTANCE)
                 .baseUrl("http://hita.store:3000").build());
     }
+
+
 
     @Override
     protected Class<RelationService> getServiceClass() {
@@ -164,6 +168,33 @@ public class RelationWebSource extends BaseWebSource<RelationService> {
                     default:return new DataState<>(FETCH_FAILED,input.getMessage());
                 }
             }
+        });
+    }
+
+
+    /**
+     * 更换备注
+     * @param token 令牌
+     * @param remark 备注
+     * @return 操作结果
+     */
+    public LiveData<DataState<String>> changeRemark(@NonNull String token,@NonNull String remark,@NonNull String friend_id){
+        return Transformations.map(service.changeRemark(friend_id,remark, token), input -> {
+            //Log.e( "changeRemark: ", input.toString());
+            if(input!=null){
+                System.out.println("input remark is "+ input);
+                switch (input.getCode()){
+                    case SUCCESS:
+                        System.out.println("SUCCEED");
+                        return new DataState<>(DataState.STATE.SUCCESS);
+                    case codes.TOKEN_INVALID:
+                        return new DataState<>(DataState.STATE.TOKEN_INVALID);
+                    default:
+                        return new DataState<>(DataState.STATE.FETCH_FAILED,input.getMessage());
+                }
+            }
+
+            return new DataState<>(DataState.STATE.FETCH_FAILED);
         });
     }
 }

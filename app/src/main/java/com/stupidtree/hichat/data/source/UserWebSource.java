@@ -319,6 +319,8 @@ public class UserWebSource extends BaseWebSource<UserService> {
     }
 
 
+
+
     /**
      * 更换头像
      * @param token 令牌

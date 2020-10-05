@@ -66,12 +66,13 @@ public interface RelationService {
     /**
      * 更换备注
      * @param remark 新备注
+     * @param friend_id 朋友id
      * @param token 登录状态的token（表征了用户身份）
      * @return 操作结果
      */
     @FormUrlEncoded
     @POST("/relation/friend_remark")
-    LiveData<ApiResponse<Object>> changeRemark(@Field("remark")String remark,@Header("token")String token);
+    LiveData<ApiResponse<Object>> changeRemark(@Field("id2")String friend_id,@Field("remark")String remark,@Header("token")String token);
 
 
 

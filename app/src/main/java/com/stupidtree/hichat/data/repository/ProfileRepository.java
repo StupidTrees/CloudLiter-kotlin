@@ -131,10 +131,10 @@ public class ProfileRepository {
     }
 
     /**
-     * 更改用户昵称
+     * 更改用户签名
      *
      * @param token    令牌
-     * @param signature 新昵称
+     * @param signature 新签名
      * @return 操作结果
      */
     public LiveData<DataState<String>> changeSignature(@NonNull String token, @NonNull String signature) {
@@ -145,5 +145,7 @@ public class ProfileRepository {
             return input;
         });
     }
+
+
 
 }
