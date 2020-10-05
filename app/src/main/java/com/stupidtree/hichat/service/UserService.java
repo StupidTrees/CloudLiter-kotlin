@@ -108,6 +108,16 @@ public interface UserService {
     @POST("/user/profile/change_gender")
     LiveData<ApiResponse<Object>> changeGender(@Field("gender")String gender,@Header("token")String token);
 
+    /**
+     * 更换颜色
+     * @param color 新颜色 红橙黄绿青蓝紫
+     * @param token 登录状态的token
+     * @return 操作结果
+     */
+    @FormUrlEncoded
+    @POST("/user/profile/change_color")
+    LiveData<ApiResponse<Object>> changeColor(@Field("color")String color,@Header("token")String token);
+
 
     /**
      * 更换签名

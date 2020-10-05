@@ -12,14 +12,14 @@ import org.jetbrains.annotations.NotNull;
  * 和服务器返回数据匹配，无需适配函数
  */
 public class UserProfile {
-    enum COLOR{RED,ORANGE,YELLOW,GREEN,CYAN,BLUE,PURPLE}
+    public enum COLOR{RED,ORANGE,YELLOW,GREEN,CYAN,BLUE,PURPLE}
     String id; //用户id
     String username; //用户名
     String nickname; //昵称
     UserLocal.GENDER gender; //性别
     String signature; //签名
     String avatar; //头像
-    COLOR color; //颜色
+    UserProfile.COLOR color; //颜色
 
     public String getId() {
         return id;
@@ -43,6 +43,10 @@ public class UserProfile {
 
     public String getAvatar() {
         return avatar;
+    }
+
+    public UserProfile.COLOR getColor() {
+        return color;
     }
 
     @StringRes

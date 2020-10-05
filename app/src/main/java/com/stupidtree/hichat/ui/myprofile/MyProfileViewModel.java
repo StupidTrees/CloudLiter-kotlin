@@ -46,6 +46,11 @@ public class MyProfileViewModel extends ViewModel {
     //Trigger：控制更改性别请求的发送，其中携带了新性别字符串
     MutableLiveData<ChangeInfoTrigger> changeGenderController = new MutableLiveData<>();
 
+    //状态数据：更改颜色结果
+    LiveData<DataState<String>> changeColorResult;
+    //Trigger：控制更改颜色请求的发送，其中携带了新颜色的字符串
+    MutableLiveData<ChangeInfoTrigger> changeColorController = new MutableLiveData<>();
+
     //状态数据：更改签名的结果
     LiveData<DataState<String>> changeSignatureResult;
     //Trigger：控制更改签名请求的发送，其中携带了新昵称字符串
@@ -139,6 +144,23 @@ public class MyProfileViewModel extends ViewModel {
         return changeGenderResult;
     }
 
+    public LiveData<DataState<String>> getChangeColorResult() {
+        if(changeColorResult==null){
+            changeColorResult = Transformations.switchMap(changeColorController, input -> {
+               if(input.isActioning()){
+                   UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                   if(userLocal.isValid()){
+                       return profileRepository.changeColor(Objects.requireNonNull(userLocal.getToken()),input.getValue());
+                   }else {
+                       return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
+                   }
+               }
+               return new MutableLiveData<>();
+            });
+        }
+        return changeColorResult;
+    }
+
     public LiveData<DataState<String>> getChangeSignatureResult() {
         if(changeSignatureResult==null){
             //也是一样的
@@ -184,6 +206,15 @@ public class MyProfileViewModel extends ViewModel {
     public void startChangeGender(UserLocal.GENDER gender){
         String genderStr = gender== UserLocal.GENDER.MALE?"MALE":"FEMALE";
         changeGenderController.setValue(ChangeInfoTrigger.getActioning(genderStr));
+    }
+
+    /**
+     * 发起更换颜色请求
+     * @param color 新颜色
+     */
+    public void startChangeColor(UserProfile.COLOR color){
+        String colorStr = color.name();
+        changeColorController.setValue(ChangeInfoTrigger.getActioning(colorStr));
     }
 
     /**

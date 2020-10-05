@@ -143,6 +143,15 @@ public class MyProfileActivity extends BaseActivity<MyProfileViewModel> {
             }
         });
 
+        viewModel.getChangeColorResult().observe(this, stringDataState -> {
+            if (stringDataState.getState() == DataState.STATE.SUCCESS) {
+                Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show();
+                viewModel.startRefresh();
+            } else {
+                Toast.makeText(getApplicationContext(), "失败", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         viewModel.getChangeSignatureResult().observe(this, stringDataState -> {
             if (stringDataState.getState() == DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show();
@@ -183,6 +192,35 @@ public class MyProfileActivity extends BaseActivity<MyProfileViewModel> {
                 }).show(getSupportFragmentManager(), "select");
             }
 
+        });
+
+        //点击更改颜色，弹出选择框
+        colorLayout.setOnClickListener(view -> {
+            DataState<UserProfile> up = viewModel.getUserProfileLiveData().getValue();
+            if (up != null && up.getState() == DataState.STATE.SUCCESS) {
+                new PopUpSelectableList<UserProfile.COLOR>()
+                        .setTitle(R.string.choose_color)
+                        .setInitValue(up.getData().getColor())
+                        .setListData(
+                                Arrays.asList(getString(R.string.red),
+                                              getString(R.string.orange),
+                                              getString(R.string.yellow),
+                                              getString(R.string.green),
+                                              getString(R.string.cyan),
+                                              getString(R.string.blue),
+                                              getString(R.string.purple)),
+                                Arrays.asList(UserProfile.COLOR.RED,
+                                              UserProfile.COLOR.ORANGE,
+                                              UserProfile.COLOR.YELLOW,
+                                              UserProfile.COLOR.GREEN,
+                                              UserProfile.COLOR.CYAN,
+                                              UserProfile.COLOR.BLUE,
+                                              UserProfile.COLOR.PURPLE)
+                        ).setOnConfirmListener((title, key) -> {
+                            viewModel.startChangeColor(key);
+                }).show(getSupportFragmentManager(), "select");
+
+            }
         });
 
         signatureLayout.setOnClickListener(view -> {

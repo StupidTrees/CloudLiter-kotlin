@@ -115,6 +115,22 @@ public class ProfileRepository {
     }
 
     /**
+     * 更改用户性别
+     *
+     * @param token  令牌
+     * @param color 新颜色 赤橙黄绿青蓝紫
+     * @return 操作结果
+     */
+    public LiveData<DataState<String>> changeColor(@NonNull String token,@NonNull String color) {
+        return Transformations.map(userWebSource.changeColor(token,color), input -> {
+            if(input.getState() == DataState.STATE.SUCCESS) {
+                //？？？？？？？？？？？？？？
+            }
+            return input;
+        });
+    }
+
+    /**
      * 更改用户昵称
      *
      * @param token    令牌

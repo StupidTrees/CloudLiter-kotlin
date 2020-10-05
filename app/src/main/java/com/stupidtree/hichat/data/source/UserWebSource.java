@@ -270,6 +270,29 @@ public class UserWebSource extends BaseWebSource<UserService> {
 
 
     /**
+     * 更换颜色
+     * @param token 令牌
+     * @param color 颜色
+     * @return 操作结果
+     */
+    public LiveData<DataState<String>> changeColor(@NonNull String token,@NonNull String color){
+        return Transformations.map(service.changeColor(color,token), input -> {
+            if(input != null){
+                switch (input.getCode()){
+                    case SUCCESS:
+                        return new DataState<>(DataState.STATE.SUCCESS);
+                    case TOKEN_INVALID:
+                        return new DataState<>(DataState.STATE.TOKEN_INVALID);
+                    default:
+                        return new DataState<>(DataState.STATE.FETCH_FAILED,input.getMessage());
+                }
+            }
+            return new DataState<>(DataState.STATE.FETCH_FAILED);
+        });
+    }
+
+
+    /**
      * 更换签名
      * @param token 令牌
      * @param signature 签名
