@@ -23,6 +23,7 @@ import com.stupidtree.hichat.utils.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 
@@ -81,7 +82,12 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
             }
             if (contactListState.getState() == DataState.STATE.SUCCESS) {
                 //状态为”成功“，那么列表设置为可见，并通知列表适配器丝滑地更新列表项
-                listAdapter.notifyItemChangedSmooth(contactListState.getData(), false);
+                listAdapter.notifyItemChangedSmooth(contactListState.getData(), new BaseListAdapter.RefreshJudge<UserRelation>() {
+                    @Override
+                    public boolean judge(UserRelation oldData, UserRelation newData) {
+                        return !Objects.equals(oldData,newData)||!Objects.equals(oldData.getRemark(),newData.getRemark());
+                    }
+                });
                 if(contactListState.getData().size()>0){
                     list.setVisibility(View.VISIBLE);
                     placeHolder.setVisibility(View.GONE);

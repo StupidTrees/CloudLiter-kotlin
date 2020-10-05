@@ -66,7 +66,7 @@ public class RelationViewModel extends ViewModel {
             changeRemarkResult = Transformations.switchMap(changeRemarkController, input -> {
                 if(input.isActioning()){
                     UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
-                    if(userLocal.isValid()&&relationData.getValue().getData().getId()!=null){
+                    if(userLocal.isValid()&&relationData.getValue()!=null){
                         System.out.println("friend id is"+relationData.getValue().getData().getId());
                         return relationRepository.changeRemark(Objects.requireNonNull(userLocal.getToken()),input.getValue(),relationData.getValue().getData().getId());
                     }else{
@@ -83,5 +83,9 @@ public class RelationViewModel extends ViewModel {
 
     public void startFetchRelationData(String friendId){
         relationQueryController.setValue(RelationQueryTrigger.getActioning(friendId));
+    }
+
+    public void startChangeRemark(String newRemark){
+        changeRemarkController.setValue(ChangeInfoTrigger.getActioning(newRemark));
     }
 }

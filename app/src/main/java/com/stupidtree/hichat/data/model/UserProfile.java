@@ -69,6 +69,7 @@ public class UserProfile {
         }
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "UserProfile{" +
