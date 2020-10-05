@@ -2,7 +2,7 @@ package com.stupidtree.hichat.data.repository;
 
 import androidx.lifecycle.LiveData;
 
-import com.stupidtree.hichat.data.model.FriendContact;
+import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.data.source.RelationWebSource;
 import com.stupidtree.hichat.ui.base.DataState;
 
@@ -38,7 +38,7 @@ public class FriendsRepository {
      * @param id 用户id
      * @return 转发自数据源的LiveData
      */
-    public LiveData<DataState<List<FriendContact>>> getFriends(String token, String id){
+    public LiveData<DataState<List<UserRelation>>> getFriends(String token, String id){
         return relationWebSource.getFriends(token,id);
     }
 

@@ -1,5 +1,6 @@
 package com.stupidtree.hichat.ui.profile;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.utils.ActivityUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
+import com.stupidtree.hichat.utils.TextUtils;
 
 import butterknife.BindView;
 
@@ -51,6 +53,8 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
     @BindView(R.id.avatar)
     ImageView avatarImageView;
 
+    @BindView(R.id.relation_layout)
+    View relationSettingButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,15 +93,21 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
         viewModel.getRelationLiveData().observe(this, booleanDataState -> {
             if(booleanDataState.getState()== DataState.STATE.SUCCESS){
                 if(booleanDataState.getData()){
-                    //是好友关系，则提供发消息入口
+                    //是好友关系，则提供发消息入口，且提供朋友设置入口
                     button.setText(R.string.send_message);
                     button.setEnabled(true);
                     button.setOnClickListener(view -> ActivityUtils.startChatActivity(getThis(),
                             viewModel.getUserId()));
+                    relationSettingButton.setVisibility(View.VISIBLE);
+                    relationSettingButton.setOnClickListener(view -> {
+                        ActivityUtils.startRelationActivity(getThis(),viewModel.getUserId());
+                    });
                 }else{
                     //不是好友关系，则显示”添加好友“
                     button.setText(R.string.make_friends);
                     button.setEnabled(true);
+                    relationSettingButton.setVisibility(View.GONE);
+                    relationSettingButton.setOnClickListener(null);
                     button.setOnClickListener(view -> {
                         //通知viewModel进行添加好友请求
                         viewModel.startMakingFriends(getIntent().getStringExtra("id"));
@@ -107,6 +117,7 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                 button.setVisibility(View.GONE);
             }
         });
+
     }
 
     @Override
@@ -128,8 +139,12 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
             ImageUtils.loadAvatarInto(getThis(),userInfo.getAvatar(),avatarImageView);
             usernameTextView.setText(userInfo.getUsername());
             nicknameTextView.setText(userInfo.getNickname());
-            signatureTextView.setText(userInfo.getSignature());
             genderIcon.setVisibility(View.VISIBLE);
+            if(TextUtils.isEmpty(userInfo.getSignature())){
+                signatureTextView.setText(R.string.place_holder_no_signature);
+            }else{
+                signatureTextView.setText(userInfo.getSignature());
+            }
             if(userInfo.getGender()== UserLocal.GENDER.MALE){
                 genderIcon.setImageResource(R.drawable.ic_male_blue_24);
             }else{

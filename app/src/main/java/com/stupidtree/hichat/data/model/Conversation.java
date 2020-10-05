@@ -21,6 +21,7 @@ public class Conversation implements Serializable {
     String groupId;
     String friendNickname;
     String friendAvatar;
+    String friendRemark;
     String relationId;
     Timestamp createdAt;
     Timestamp updatedAt;
@@ -101,6 +102,10 @@ public class Conversation implements Serializable {
 
     public void setRelationId(String relationId) {
         this.relationId = relationId;
+    }
+
+    public String getFriendRemark() {
+        return friendRemark;
     }
 
     public Timestamp getCreatedAt() {

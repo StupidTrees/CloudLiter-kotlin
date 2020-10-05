@@ -6,13 +6,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
-    <!-- 解锁屏幕需要的权限 -->
-    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-    <!-- 申请电源锁需要的权限 -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!--震动权限-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- 解锁屏幕需要的权限 -->
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" /> <!-- 申请电源锁需要的权限 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- 震动权限 -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
@@ -26,7 +22,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="q">
-
+        <activity android:name=".ui.relation.RelationActivity"></activity>
         <!-- 不加↑这两行，裁剪没法用 -->
         <activity android:name=".ui.myprofile.MyProfileActivity" />
         <activity
@@ -46,9 +42,7 @@
             android:name=".ui.chat.ChatActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
-        <service android:name=".service.SocketIOClientService">
-
-        </service>
+        <service android:name=".service.SocketIOClientService"></service>
 
         <activity
             android:name=".ui.welcome.WelcomeActivity"
@@ -56,8 +50,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.main.MainActivity"
-            android:label="@string/app_name" />
-        <!-- 加上他，否则无法从相册选取图片 -->
+            android:label="@string/app_name" /> <!-- 加上他，否则无法从相册选取图片 -->
         <provider
             android:name=".MFileProvider"
             android:authorities="com.stupidtree.hichat.fileprovider"

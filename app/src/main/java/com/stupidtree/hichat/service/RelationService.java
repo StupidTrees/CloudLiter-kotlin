@@ -3,6 +3,7 @@ package com.stupidtree.hichat.service;
 import androidx.lifecycle.LiveData;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.stupidtree.hichat.data.ApiResponse;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -39,6 +40,17 @@ public interface RelationService {
 
 
     /**
+     * 获得我和好友的关系对象
+     * @param token 登录状态的token
+     * @param friendId 好友的id
+     * @return 判断结果
+     */
+    @GET("relation/query")
+    LiveData<ApiResponse<JsonObject>> queryRelation(@Header("token") String token, @Query("friendId") String friendId);
+
+
+
+    /**
      * 请求建立好友关系
      * @param token 登录状态的token
      * @param friendId 对方的id
@@ -47,6 +59,9 @@ public interface RelationService {
     @FormUrlEncoded
     @POST("relation/make_friends")
     LiveData<ApiResponse<Boolean>> makeFriends(@Header("token")String token,@Field("friend")String friendId);
+
+
+
 
     /**
      * 更换备注
@@ -57,6 +72,9 @@ public interface RelationService {
     @FormUrlEncoded
     @POST("/relation/friend_remark")
     LiveData<ApiResponse<Object>> changeRemark(@Field("remark")String remark,@Header("token")String token);
+
+
+
 
 
 }

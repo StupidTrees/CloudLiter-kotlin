@@ -10,6 +10,7 @@ import com.stupidtree.hichat.data.model.Conversation;
 import com.stupidtree.hichat.ui.chat.ChatActivity;
 import com.stupidtree.hichat.ui.myprofile.MyProfileActivity;
 import com.stupidtree.hichat.ui.profile.ProfileActivity;
+import com.stupidtree.hichat.ui.relation.RelationActivity;
 import com.stupidtree.hichat.ui.search.SearchActivity;
 import com.stupidtree.hichat.ui.welcome.WelcomeActivity;
 
@@ -31,6 +32,12 @@ public class ActivityUtils {
         Intent i = new Intent(from, ProfileActivity.class);
         i.putExtra("id",id);
         from.startActivity(i);
+    }
+
+    public static void startRelationActivity(@NonNull Context from,@NonNull String friendId){
+        Intent intent = new Intent(from, RelationActivity.class);
+        intent.putExtra("friendId",friendId);
+        from.startActivity(intent);
     }
 
     public static void startMyProfileActivity(@NonNull Context from){

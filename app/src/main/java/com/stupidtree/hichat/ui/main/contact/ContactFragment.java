@@ -1,7 +1,6 @@
 package com.stupidtree.hichat.ui.main.contact;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -14,13 +13,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.stupidtree.hichat.R;
-import com.stupidtree.hichat.data.model.FriendContact;
+import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.ui.base.BaseFragment;
 import com.stupidtree.hichat.ui.base.BaseListAdapter;
 import com.stupidtree.hichat.ui.base.BaseViewHolder;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.utils.ActivityUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
+import com.stupidtree.hichat.utils.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -66,7 +66,7 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
         listAdapter = new XListAdapter(getContext(), new LinkedList<>());
         list.setAdapter(listAdapter);
         list.setLayoutManager(new LinearLayoutManager(getContext()));
-        listAdapter.setOnItemClickListener((FriendContact data, View card, int position) -> {
+        listAdapter.setOnItemClickListener((UserRelation data, View card, int position) -> {
             //点击列表项时，跳转到对应用户的Profile页面
             ActivityUtils.startProfileActivity(requireActivity(), String.valueOf(data.getId()));
         });
@@ -115,10 +115,10 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
     /**
      * 定义本页面的列表适配器
      */
-    static class XListAdapter extends BaseListAdapter<FriendContact, XListAdapter.XHolder> {
+    static class XListAdapter extends BaseListAdapter<UserRelation, XListAdapter.XHolder> {
 
 
-        public XListAdapter(Context mContext, List<FriendContact> mBeans) {
+        public XListAdapter(Context mContext, List<UserRelation> mBeans) {
             super(mContext, mBeans);
         }
 
@@ -128,15 +128,14 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
         }
 
         @Override
-        protected void bindHolder(@NonNull XHolder holder, @Nullable FriendContact data, int position) {
+        protected void bindHolder(@NonNull XHolder holder, @Nullable UserRelation data, int position) {
             if (data != null) {
                 //显示头像
                 ImageUtils.loadAvatarInto(mContext, data.getAvatar(), holder.avatar);
                 //显示名称(备注)
-                if(data.getRemark()!=""){
+                if(!TextUtils.isEmpty(data.getRemark())){
                     holder.name.setText(data.getRemark());
-                }
-                else {
+                } else {
                     holder.name.setText(data.getName());
                 }
 

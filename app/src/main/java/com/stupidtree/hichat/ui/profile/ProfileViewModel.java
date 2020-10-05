@@ -10,6 +10,7 @@ import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.model.UserProfile;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.data.repository.ProfileRepository;
+import com.stupidtree.hichat.data.repository.RelationRepository;
 import com.stupidtree.hichat.ui.base.DataState;
 
 import java.util.Objects;
@@ -41,12 +42,15 @@ public class ProfileViewModel extends ViewModel {
      */
     //用户资料仓库
     private ProfileRepository repository;
+    //用户关系仓库
+    private RelationRepository relationRepository;
     //本地用户仓库
     private LocalUserRepository localUserRepository;
 
     public ProfileViewModel() {
         repository = ProfileRepository.getInstance();
         localUserRepository = LocalUserRepository.getInstance();
+        relationRepository = RelationRepository.getInstance();
     }
 
     public LiveData<DataState<UserProfile>> getUserProfileLiveData() {
@@ -74,7 +78,7 @@ public class ProfileViewModel extends ViewModel {
                 if (input.isActioning()) {
                     if (user.isValid()) {
                         //通知用户资料仓库进行好友判别
-                        return repository.isMyFriend(Objects.requireNonNull(user.getToken()),user.getId(),input.getId());
+                        return relationRepository.isMyFriend(Objects.requireNonNull(user.getToken()),user.getId(),input.getId());
                     }else{
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     }
@@ -92,7 +96,7 @@ public class ProfileViewModel extends ViewModel {
                 if (input.isActioning()) {
                     if (user.isValid()) {
                         //也是通过这个仓库进行好友建立
-                        return repository.makeFriends(Objects.requireNonNull(user.getToken()),input.getId());
+                        return relationRepository.makeFriends(Objects.requireNonNull(user.getToken()),input.getId());
                     }else{
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     }

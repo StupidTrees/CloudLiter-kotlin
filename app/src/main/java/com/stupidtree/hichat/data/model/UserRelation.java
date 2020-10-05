@@ -12,7 +12,7 @@ import java.util.Objects;
  * 显示在联系人列表的数据Model
  * 暂未和服务器返回数据格式匹配，需要适配函数
  */
-public class FriendContact {
+public class UserRelation {
     //姓名
     String name;
     //头像链接
@@ -45,7 +45,7 @@ public class FriendContact {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FriendContact that = (FriendContact) o;
+        UserRelation that = (UserRelation) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(id, that.id);
     }
@@ -62,16 +62,16 @@ public class FriendContact {
      * @return FriendContact对象
      */
     @Nullable
-    public static FriendContact getInstanceFromJsonObject(JsonElement je){
+    public static UserRelation getInstanceFromJsonObject(JsonElement je){
         try {
             JsonObject jo = je.getAsJsonObject();
             JsonObject userInfo = jo.get("user").getAsJsonObject();
-            FriendContact res = new FriendContact();
+            UserRelation res = new UserRelation();
             //res.group = jo.get("group").getAsInt();
             res.name = userInfo.get("nickname").getAsString();
             res.id = userInfo.get("id").getAsString();
             res.avatar = JsonUtils.getStringData(userInfo,"avatar");
-            res.remark=jo.get("remark").getAsString();
+            res.remark=JsonUtils.getStringData(jo,"remark");
             String gender = userInfo.get("gender").getAsString();
             res.gender = Objects.equals(gender,"MALE")? UserLocal.GENDER.MALE: UserLocal.GENDER.FEMALE;
             return res;

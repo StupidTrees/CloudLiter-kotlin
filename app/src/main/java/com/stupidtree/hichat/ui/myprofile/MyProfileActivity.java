@@ -24,6 +24,7 @@ import com.stupidtree.hichat.ui.widgets.PopUpSelectableList;
 import com.stupidtree.hichat.utils.FileProviderUtils;
 import com.stupidtree.hichat.utils.GalleryPicker;
 import com.stupidtree.hichat.utils.ImageUtils;
+import com.stupidtree.hichat.utils.TextUtils;
 
 import java.util.Arrays;
 
@@ -55,6 +56,9 @@ public class MyProfileActivity extends BaseActivity<MyProfileViewModel> {
     @BindView(R.id.signature_layout)
     ViewGroup signatureLayout;//签名那一栏
 
+    @BindView(R.id.color_layout)
+    ViewGroup colorLayout;//颜色那一栏
+
     @BindView(R.id.nickname)
     TextView nicknameText;//昵称文本
 
@@ -63,6 +67,9 @@ public class MyProfileActivity extends BaseActivity<MyProfileViewModel> {
 
     @BindView(R.id.avatar)
     ImageView avatarImage;//头像图片
+
+    @BindView(R.id.color)
+    TextView colorText;//颜色文本
 
     @BindView(R.id.logout)
     Button logoutButton;//登出按钮
@@ -208,8 +215,13 @@ public class MyProfileActivity extends BaseActivity<MyProfileViewModel> {
         //设置头像
         ImageUtils.loadLocalAvatarInto(getThis(), profile.getAvatar(), avatarImage);
         //设置各种文本信息
+        colorText.setText(profile.getColorName());
         nicknameText.setText(profile.getNickname());
-        signatureText.setText(profile.getSignature());
+        if(!TextUtils.isEmpty(profile.getSignature())){
+            signatureText.setText(profile.getSignature());
+        }else{
+            signatureText.setText(R.string.place_holder_no_signature);
+        }
         usernameText.setText(profile.getUsername());
         genderText.setText(profile.getGender() == UserLocal.GENDER.MALE ? R.string.male : R.string.female);
     }

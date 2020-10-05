@@ -1,6 +1,10 @@
 package com.stupidtree.hichat.data.model;
 
 
+import androidx.annotation.StringRes;
+
+import com.stupidtree.hichat.R;
+
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -8,12 +12,14 @@ import org.jetbrains.annotations.NotNull;
  * 和服务器返回数据匹配，无需适配函数
  */
 public class UserProfile {
+    enum COLOR{RED,ORANGE,YELLOW,GREEN,CYAN,BLUE,PURPLE}
     String id; //用户id
     String username; //用户名
     String nickname; //昵称
     UserLocal.GENDER gender; //性别
     String signature; //签名
     String avatar; //头像
+    COLOR color; //颜色
 
     public String getId() {
         return id;
@@ -39,16 +45,36 @@ public class UserProfile {
         return avatar;
     }
 
-    @NotNull
+    @StringRes
+    public int getColorName() {
+        switch (color){
+            case RED:
+                return R.string.red;
+            case ORANGE:
+                return R.string.orange;
+            case YELLOW:
+                return R.string.yellow;
+            case GREEN:
+                return R.string.green;
+            case CYAN:
+                return R.string.cyan;
+            case PURPLE:
+                return R.string.purple;
+            default:
+                return R.string.blue;
+        }
+    }
+
     @Override
     public String toString() {
         return "UserProfile{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", username='" + username + '\'' +
                 ", nickname='" + nickname + '\'' +
                 ", gender=" + gender +
                 ", signature='" + signature + '\'' +
                 ", avatar='" + avatar + '\'' +
+                ", color=" + color +
                 '}';
     }
 }

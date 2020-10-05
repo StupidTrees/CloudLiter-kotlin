@@ -7,7 +7,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 
 import com.google.gson.JsonElement;
-import com.stupidtree.hichat.data.model.FriendContact;
+import com.google.gson.JsonObject;
+import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.service.LiveDataCallAdapter;
 import com.stupidtree.hichat.service.RelationService;
 import com.stupidtree.hichat.service.codes;
@@ -60,17 +61,17 @@ public class RelationWebSource extends BaseWebSource<RelationService> {
      * @param id    此用户id（可选）
      * @return 朋友列表的LiveData
      */
-    public LiveData<DataState<List<FriendContact>>> getFriends(String token, String id) {
+    public LiveData<DataState<List<UserRelation>>> getFriends(String token, String id) {
         return Transformations.map(service.getFriends(token, id), input -> {
             if (null == input) {
                 return new DataState<>(FETCH_FAILED);
             } else {
                 switch (input.getCode()) {
                     case codes.SUCCESS:
-                        List<FriendContact> res = new LinkedList<>();
+                        List<UserRelation> res = new LinkedList<>();
                         if (input.getData().isJsonArray()) {
                             for (JsonElement je : input.getData().getAsJsonArray()) {
-                                FriendContact fc = FriendContact.getInstanceFromJsonObject(je);
+                                UserRelation fc = UserRelation.getInstanceFromJsonObject(je);
                                 if (null != fc) {
                                     res.add(fc);
                                 }
@@ -128,6 +129,36 @@ public class RelationWebSource extends BaseWebSource<RelationService> {
                 switch (input.getCode()){
                     case codes.SUCCESS:
                         return new DataState<>(input.getData());
+                    case codes.TOKEN_INVALID:
+                        return new DataState<>(TOKEN_INVALID);
+                    default:return new DataState<>(FETCH_FAILED,input.getMessage());
+                }
+            }
+        });
+    }
+
+
+    /**
+     * 获取我和朋友的关系对象
+     * @param token 令牌
+     * @param friendId 朋友的id
+     * @return 操作结果
+     */
+    public LiveData<DataState<UserRelation>> queryRelation(@NonNull String token,@NonNull String friendId){
+        return Transformations.map(service.queryRelation(token,friendId), input -> {
+            if(input==null){
+                return new DataState<>(FETCH_FAILED);
+            }else{
+                switch (input.getCode()){
+                    case codes.SUCCESS:
+                        JsonObject jo = input.getData();
+                        UserRelation ur = UserRelation.getInstanceFromJsonObject(jo);
+                        Log.e("获取关系对象", String.valueOf(ur));
+                        if(ur!=null){
+                            return new DataState<>(ur);
+                        }else{
+                            return new DataState<>(FETCH_FAILED);
+                        }
                     case codes.TOKEN_INVALID:
                         return new DataState<>(TOKEN_INVALID);
                     default:return new DataState<>(FETCH_FAILED,input.getMessage());

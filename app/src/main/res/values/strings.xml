@@ -20,6 +20,14 @@
     <string name="http_request_failed">请求失败！</string>
     <string name="male">男</string>
     <string name="female">女</string>
+    <string name="red">红</string>
+    <string name="orange">橙</string>
+    <string name="yellow">黄</string>
+    <string name="green">绿</string>
+    <string name="cyan">青</string>
+    <string name="blue">蓝</string>
+    <string name="purple">紫</string>
+
     <string name="title_activity_welcome">WelcomeActivity</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
@@ -59,4 +67,14 @@
     <string name="remark_change">修改备注</string>
     <string name="attention_please">提示</string>
     <string name="need_that_freaking_notification_permission">为确保消息的高调到达，请开启悬浮通知权限</string>
+    <string name="relation_title">好友设置</string>
+    <string name="prompt_set_remark">设置好友备注</string>
+    <string name="add_into_blacklist">加入黑名单</string>
+    <string name="delete_friend">删除好友</string>
+    <string name="title_profile">" "</string>
+    <string name="relation_setting">朋友设置</string>
+    <string name="prompt_set_group">设置好友分组</string>
+    <string name="prompt_user_word_cloud">TA的词云</string>
+    <string name="place_holder_no_signature">这个人很佛系，啥都没写</string>
+    <string name="color">颜色</string>
 </resources>
