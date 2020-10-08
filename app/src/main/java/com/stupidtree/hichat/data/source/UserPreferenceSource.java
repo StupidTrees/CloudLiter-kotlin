@@ -111,7 +111,12 @@ public class UserPreferenceSource {
     }
 
     public String getMyAvatarGlideSignature(){
-        return getPreference().getString("my_avatar", UUID.randomUUID().toString());
+        String signature = getPreference().getString("my_avatar", null);
+        if(signature==null){
+            signature = UUID.randomUUID().toString();
+            getPreference().edit().putString("my_avatar",signature).apply();
+        }
+        return signature;
     }
 
 

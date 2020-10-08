@@ -140,6 +140,7 @@ public class Conversation implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

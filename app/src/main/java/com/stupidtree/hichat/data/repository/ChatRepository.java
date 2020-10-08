@@ -41,12 +41,10 @@ public class ChatRepository {
     ChatMessageWebSource chatMessageWebSource;
     //数据源2：和后台服务通信的Service
     SocketWebSource socketWebSource;
-    //数据源3：网络类型数据，对话对象的网络数据源
-    ConversationWebSource conversationWebSource;
+
 
     public ChatRepository(){
         chatMessageWebSource = ChatMessageWebSource.getInstance();
-        conversationWebSource = ConversationWebSource.getInstance();
         socketWebSource = new SocketWebSource();
     }
 
@@ -56,8 +54,8 @@ public class ChatRepository {
      * @param conversationId 对话id
      * @return 消息记录
      */
-    public LiveData<DataState<List<ChatMessage>>> getMessages(@NonNull String token, @Nullable String conversationId){
-        return chatMessageWebSource.getMessages(token,conversationId);
+    public LiveData<DataState<List<ChatMessage>>> getMessages(@NonNull String token, @Nullable String conversationId, int pageSize, int pageNum){
+        return chatMessageWebSource.getMessages(token,conversationId,pageSize,pageNum);
     }
 
     public void bindService(Context context){
@@ -100,9 +98,7 @@ public class ChatRepository {
         return socketWebSource.getFriendStateController();
     }
 
-    public LiveData<DataState<Conversation>> queryConversation(@NonNull String token, @Nullable String userId,@NonNull String friendId){
-        return conversationWebSource.queryConversation(token,userId,friendId);
-    }
+
 
 
 }

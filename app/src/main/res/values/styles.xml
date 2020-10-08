@@ -6,6 +6,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="backgroundColorBottom">#FFFAFAFA</item>
+        <item name="backgroundColorBottomAsTint">#CFFAFAFA</item>
         <item name="backgroundColorSecond">#FFFFFFFF</item>
         <item name="textColorPrimary">#FF000000</item>
         <item name="textColorSecondary">#FF808080</item>

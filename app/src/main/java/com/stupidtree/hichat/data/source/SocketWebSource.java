@@ -31,7 +31,12 @@ import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_MARK_RE
 import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_ONLINE;
 import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_RECEIVE_MESSAGE;
 
+/**
+ * 实时聊天网络资源
+ * 数据来自socketio连接
+ */
 public class SocketWebSource extends BroadcastReceiver {
+
 
     MutableLiveData<ChatListTrigger> chatListController = new MutableLiveData<>();
     MutableLiveData<FriendStateTrigger> friendStateController = new MutableLiveData<>();
@@ -59,7 +64,7 @@ public class SocketWebSource extends BroadcastReceiver {
             case ACTION_FRIEND_STATE_CHANGED:
                 if (intent.hasExtra("id") && intent.hasExtra("online")) {
                     friendStateController.setValue(FriendStateTrigger.getActioning(
-                            intent.getStringExtra("id"), intent.getBooleanExtra("online", false)
+                            intent.getStringExtra("id"), intent.getStringExtra("online")
                     ));
                 }
                 break;

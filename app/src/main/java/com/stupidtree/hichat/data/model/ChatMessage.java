@@ -2,6 +2,8 @@ package com.stupidtree.hichat.data.model;
 
 import com.google.gson.Gson;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -11,10 +13,13 @@ public class ChatMessage implements Serializable {
     String fromId;
     String toId;
     String content;
+    String friendRemark;
+    String friendAvatar;
     String conversationId;
     String relationId;
     Timestamp createdAt;
     Timestamp updatedAt;
+    //long createdTime;
 
 
     public ChatMessage(String fromId, String toId, String content) {
@@ -24,9 +29,13 @@ public class ChatMessage implements Serializable {
         createdAt = new Timestamp(System.currentTimeMillis());
     }
 
-    public void setMine(boolean mine){
-
+    public static ChatMessage getTimeStampHolderInstance(Timestamp timestamp){
+        ChatMessage cm = new ChatMessage(null,null,null);
+        cm.id = "TIME";
+        cm.createdAt = timestamp;
+        return cm;
     }
+
     public String getFromId() {
         return fromId;
     }
@@ -39,13 +48,17 @@ public class ChatMessage implements Serializable {
         return content;
     }
 
-    public Timestamp getCreatedAt() {
+    public Timestamp getCreatedTime(){
         return createdAt;
     }
-
+    @NotNull
     @Override
     public String toString() {
         return new Gson().toJson(this);
+    }
+
+    public String getFriendRemark() {
+        return friendRemark;
     }
 
     public String getId() {
@@ -62,6 +75,10 @@ public class ChatMessage implements Serializable {
 
     public Timestamp getUpdatedAt() {
         return updatedAt;
+    }
+
+    public String getFriendAvatar() {
+        return friendAvatar;
     }
 
     @Override

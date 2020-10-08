@@ -22,9 +22,13 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="q">
-        <activity android:name=".ui.relation.RelationActivity"></activity>
         <!-- 不加↑这两行，裁剪没法用 -->
-        <activity android:name=".ui.myprofile.MyProfileActivity" />
+        <activity android:name=".ui.conversation.ConversationActivity"
+            android:launchMode="singleTask"/>
+        <activity android:name=".ui.relation.RelationActivity"
+            android:launchMode="singleTask"/>
+        <activity android:name=".ui.myprofile.MyProfileActivity"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".ui.SplashActivity"
             android:theme="@style/SplashTheme">
@@ -34,7 +38,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.profile.ProfileActivity" />
+        <activity android:name=".ui.profile.ProfileActivity"
+            android:launchMode="singleTask"
+            />
         <activity
             android:name=".ui.search.SearchActivity"
             android:windowSoftInputMode="adjustPan" />
@@ -42,7 +48,7 @@
             android:name=".ui.chat.ChatActivity"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
-        <service android:name=".service.SocketIOClientService"></service>
+        <service android:name=".service.SocketIOClientService" />
 
         <activity
             android:name=".ui.welcome.WelcomeActivity"
@@ -50,6 +56,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.main.MainActivity"
+            android:launchMode="singleTask"
             android:label="@string/app_name" /> <!-- 加上他，否则无法从相册选取图片 -->
         <provider
             android:name=".MFileProvider"

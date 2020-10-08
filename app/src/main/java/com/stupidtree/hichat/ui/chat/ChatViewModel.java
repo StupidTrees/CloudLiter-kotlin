@@ -16,6 +16,7 @@ import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.model.Conversation;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.repository.ChatRepository;
+import com.stupidtree.hichat.data.repository.ConversationRepository;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.utils.MTransformations;
@@ -45,10 +46,15 @@ public class ChatViewModel extends ViewModel {
     //trigger：控制↑的刷新
     private LiveData<FriendStateTrigger> friendStateController;
 
+
+    private int pageSize = 15;
+    private int topPageNum = 0;
+
     /**
      * 仓库区
      */
     private ChatRepository chatRepository;
+    private ConversationRepository conversationRepository;
     private LocalUserRepository localUserRepository;
 
     public void setFriendId(String friendId) {
@@ -57,6 +63,7 @@ public class ChatViewModel extends ViewModel {
 
     public ChatViewModel() {
         chatRepository = ChatRepository.getInstance();
+        conversationRepository = ConversationRepository.getInstance();
         localUserRepository = LocalUserRepository.getInstance();
         listDataController = MTransformations.map(chatRepository.getChatListController(), input -> {
             if (conversationLiveData.getValue() == null || conversationLiveData.getValue().getData() == null) {
@@ -99,7 +106,7 @@ public class ChatViewModel extends ViewModel {
         if (conversationLiveData == null) {
             conversationLiveData = MTransformations.switchMap(conversationController, input -> {
                 if (localUserRepository.isUserLoggedIn()) {
-                    return chatRepository.queryConversation(Objects.requireNonNull(localUserRepository.getLoggedInUserDirect().getToken()),
+                    return conversationRepository.queryConversation(Objects.requireNonNull(localUserRepository.getLoggedInUserDirect().getToken()),
                             localUserRepository.getLoggedInUserDirect().getId(), input.friendId);
                 }
                 return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
@@ -127,7 +134,18 @@ public class ChatViewModel extends ViewModel {
                 if (input.getMode() == ChatListTrigger.MODE.ADD_MESSAGE) {
                     return new MutableLiveData<>(new DataState<>(Collections.singletonList(input.getNewMessage())).setListAction(DataState.LIST_ACTION.APPEND));
                 } else {
-                    return chatRepository.getMessages(Objects.requireNonNull(local.getToken()), input.getConversationId());
+                    return Transformations.map(chatRepository.getMessages(Objects.requireNonNull(local.getToken()), input.getConversationId(), input.pageSize, input.pageNum), new Function<DataState<List<ChatMessage>>, DataState<List<ChatMessage>>>() {
+                        @Override
+                        public DataState<List<ChatMessage>> apply(DataState<List<ChatMessage>> input2) {
+                            if (input.getMode() == ChatListTrigger.MODE.LOAD_MORE) {
+                                input2.setListAction(DataState.LIST_ACTION.PUSH_HEAD);
+                            } else {
+                                input2.setListAction(DataState.LIST_ACTION.REPLACE_ALL);
+                            }
+                            return input2;
+                        }
+                    });
+
                 }
             });
         }
@@ -138,10 +156,16 @@ public class ChatViewModel extends ViewModel {
         if (friendStateLiveData == null) {
             friendStateLiveData = Transformations.switchMap(friendStateController, input -> {
                 if (input.isActioning()) {
-                    if (input.online) {
-                        return new MutableLiveData<>(new DataState<>(FriendState.getOnline()));
-                    } else {
-                        return new MutableLiveData<>(new DataState<>(FriendState.getOffline()));
+                    switch (input.online) {
+                        case "ONLINE":
+                            return new MutableLiveData<>(new DataState<>(FriendState.getOnline()));
+                        case "OFFLINE":
+                            return new MutableLiveData<>(new DataState<>(FriendState.getOffline()));
+                        case "YOU":
+                            return new MutableLiveData<>(new DataState<>(FriendState.getWithYou()));
+
+                        case "OTHER":
+                            return new MutableLiveData<>(new DataState<>(FriendState.getWithOther()));
                     }
                 }
                 return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
@@ -184,7 +208,18 @@ public class ChatViewModel extends ViewModel {
     public void fetchHistoryData() {
         if (getConversationId() != null) {
             String conId = getConversationId();
-            listDataController.setValue(ChatListTrigger.getActioning(conId));
+            listDataController.setValue(ChatListTrigger.getActioning(conId, pageSize));
+        }
+    }
+
+    /**
+     * 控制获取完整的消息记录列表
+     */
+    public void loadMore() {
+        if (getConversationId() != null) {
+            String conId = getConversationId();
+            topPageNum++;
+            listDataController.setValue(ChatListTrigger.getActioning(conId, pageSize, topPageNum));
         }
     }
 

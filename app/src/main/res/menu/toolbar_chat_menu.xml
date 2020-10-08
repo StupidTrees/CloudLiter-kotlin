@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/menu_action_make_friend"
-        android:icon="@drawable/ic_baseline_person_24"
+        android:icon="@drawable/ic_baseline_menu_24"
         android:title="@string/make_friends"
         app:showAsAction="always" />
 </menu>

@@ -10,7 +10,6 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -63,4 +62,8 @@ dependencies {
 
     //socketIO
     implementation "io.socket:socket.io-client:1.0.0"
+
+
+    //可展开布局
+    implementation 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
 }

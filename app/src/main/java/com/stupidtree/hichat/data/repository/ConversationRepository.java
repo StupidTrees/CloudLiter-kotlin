@@ -73,6 +73,9 @@ public class ConversationRepository {
         return socketWebSource.getUnreadMessages();
     }
 
+    public LiveData<DataState<Conversation>> queryConversation(@NonNull String token, @Nullable String userId,@NonNull String friendId){
+        return conversationWebSource.queryConversation(token,userId,friendId);
+    }
 
     public void callOnline(@NonNull Context context,@NonNull UserLocal userLocal){
         socketWebSource.callOnline(context,userLocal);

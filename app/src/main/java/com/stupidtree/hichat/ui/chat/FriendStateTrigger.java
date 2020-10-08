@@ -4,9 +4,9 @@ import com.stupidtree.hichat.ui.base.Trigger;
 
 public class FriendStateTrigger extends Trigger {
     String id;
-    Boolean online;
+    String online;
 
-    public static FriendStateTrigger getActioning(String id,boolean online){
+    public static FriendStateTrigger getActioning(String id,String online){
         FriendStateTrigger ft = new FriendStateTrigger();
         ft.online = online;
         ft.id = id;

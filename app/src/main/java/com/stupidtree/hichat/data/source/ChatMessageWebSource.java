@@ -56,8 +56,8 @@ public class ChatMessageWebSource extends BaseWebSource<ChatMessageService> {
      * @param id 对话id
      * @return 获取结果
      */
-    public LiveData<DataState<List<ChatMessage>>> getMessages(@NonNull String token, @Nullable String id) {
-        return Transformations.map(service.getChatMessages(token, id), input -> {
+    public LiveData<DataState<List<ChatMessage>>> getMessages(@NonNull String token, @Nullable String id,int pageSize,int pageNum) {
+        return Transformations.map(service.getChatMessages(token, id, pageSize,pageNum), input -> {
             if(null==input){
                 return new DataState<>(DataState.STATE.FETCH_FAILED);
             }

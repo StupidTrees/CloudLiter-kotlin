@@ -23,10 +23,12 @@ public interface ChatMessageService {
      * 获取消息
      * @param token 令牌
      * @param conversationId 对话id
+     * @param pageSize 分页大小
+     * @param pageNum 页码
      * @return 获取结果
      */
     @GET("/message/get")
-    LiveData<ApiResponse<List<ChatMessage>>> getChatMessages(@Header("token") String token, @Query("conversationId") String conversationId);
+    LiveData<ApiResponse<List<ChatMessage>>> getChatMessages(@Header("token") String token, @Query("conversationId") String conversationId,@Query("pageSize") int pageSize,@Query("pageNum") int pageNum);
 
 
 

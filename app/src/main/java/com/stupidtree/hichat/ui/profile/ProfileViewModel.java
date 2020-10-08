@@ -12,6 +12,7 @@ import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.data.repository.ProfileRepository;
 import com.stupidtree.hichat.data.repository.RelationRepository;
 import com.stupidtree.hichat.ui.base.DataState;
+import com.stupidtree.hichat.ui.base.StringTrigger;
 
 import java.util.Objects;
 
@@ -29,12 +30,12 @@ public class ProfileViewModel extends ViewModel {
     //数据本体：我和这个用户是否是好友
     LiveData<DataState<Boolean>> relationLiveData;
     //Trigger：控制↑两个的刷新
-    MutableLiveData<ProfileTrigger> profileController = new MutableLiveData<>();
+    MutableLiveData<StringTrigger> profileController = new MutableLiveData<>();
 
     //状态数据：添加好友的结果
     LiveData<DataState<Boolean>> makeFriendsResult;
     //Trigger：控制添加好友的请求
-    MutableLiveData<ProfileTrigger> makeFriendsController = new MutableLiveData<>();
+    MutableLiveData<StringTrigger> makeFriendsController = new MutableLiveData<>();
 
 
     /**
@@ -60,7 +61,7 @@ public class ProfileViewModel extends ViewModel {
                 if (input.isActioning()) {
                     if (user.isValid()) {
                         //从用户资料仓库中拉取数据
-                        return repository.getUserProfile(input.getId(), Objects.requireNonNull(user.getToken()));
+                        return repository.getUserProfile(input.getData(), Objects.requireNonNull(user.getToken()));
                     }else{
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     }
@@ -78,7 +79,7 @@ public class ProfileViewModel extends ViewModel {
                 if (input.isActioning()) {
                     if (user.isValid()) {
                         //通知用户资料仓库进行好友判别
-                        return relationRepository.isMyFriend(Objects.requireNonNull(user.getToken()),user.getId(),input.getId());
+                        return relationRepository.isMyFriend(Objects.requireNonNull(user.getToken()),user.getId(),input.getData());
                     }else{
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     }
@@ -96,7 +97,7 @@ public class ProfileViewModel extends ViewModel {
                 if (input.isActioning()) {
                     if (user.isValid()) {
                         //也是通过这个仓库进行好友建立
-                        return relationRepository.makeFriends(Objects.requireNonNull(user.getToken()),input.getId());
+                        return relationRepository.makeFriends(Objects.requireNonNull(user.getToken()),input.getData());
                     }else{
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     }
@@ -113,7 +114,7 @@ public class ProfileViewModel extends ViewModel {
      * @param id 这个页面是谁的资料
      */
     public void startRefresh(String id){
-        profileController.setValue(ProfileTrigger.getActioning(id));
+        profileController.setValue(StringTrigger.getActioning(id));
     }
 
     /**
@@ -121,7 +122,7 @@ public class ProfileViewModel extends ViewModel {
      * @param id 这个页面是谁的
      */
     public void startMakingFriends(String id){
-        makeFriendsController.setValue(ProfileTrigger.getActioning(id));
+        makeFriendsController.setValue(StringTrigger.getActioning(id));
     }
 
     /**

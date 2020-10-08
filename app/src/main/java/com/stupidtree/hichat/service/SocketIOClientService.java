@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
 import android.os.Binder;
@@ -16,11 +17,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.text.Spannable;
+import android.text.style.ImageSpan;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import com.bumptech.glide.request.target.NotificationTarget;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -32,6 +37,7 @@ import com.stupidtree.hichat.data.model.Conversation;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.ui.chat.ChatActivity;
+import com.stupidtree.hichat.utils.ImageUtils;
 
 import java.io.Serializable;
 import java.net.URISyntaxException;
@@ -41,12 +47,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
+import static com.stupidtree.hichat.ui.widgets.EmoticonsTextView.buildPattern;
 
 /**
  * 在后台使用SocketIO保持和服务器长连接的Service
@@ -62,6 +71,8 @@ public class SocketIOClientService extends Service {
     public static final String ACTION_MARK_ALL_READ = "CLOUD_LITER_MARK_ALL_READ";
     public static final String ACTION_MARK_READ = "CLOUD_LITER_MARK_READ";
 
+    //正在与谁进行对话
+    private String currentFriendId = null;
 
     /**
      * 接收到的、未读的消息
@@ -92,12 +103,14 @@ public class SocketIOClientService extends Service {
                         String friendId = intent.getStringExtra("friendId");
                         String conversationId = intent.getStringExtra("conversationId");
                         socket.emit("into_conversation", userId, friendId, conversationId);
-                        socket.emit("query_online", friendId);
+                        socket.emit("query_online", userId, friendId);
+                        currentFriendId = friendId;
                         break;
                     case ACTION_LEFT_CONVERSATION:
                         conversationId = intent.getStringExtra("conversationId");
                         userId = intent.getStringExtra("userId");
                         socket.emit("left_conversation", userId, conversationId);
+                        currentFriendId = null;
                         break;
                     case ACTION_ONLINE:
                         if (intent.getExtras() != null) {
@@ -107,8 +120,8 @@ public class SocketIOClientService extends Service {
                         }
                         break;
                     case ACTION_OFFLINE:
-                        if(intent.getStringExtra("userId")!=null){
-                            socket.emit("logout",intent.getStringExtra("userId"));
+                        if (intent.getStringExtra("userId") != null) {
+                            socket.emit("logout", intent.getStringExtra("userId"));
                         }
                     case ACTION_MARK_ALL_READ:
                         //从新消息队列中把该对话下的所有消息删除
@@ -162,7 +175,6 @@ public class SocketIOClientService extends Service {
     }
 
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -196,7 +208,10 @@ public class SocketIOClientService extends Service {
             b.putSerializable("message", chatMessage);
             i.putExtras(b);
             sendBroadcast(i);
-            sendNotification_NewMessage(chatMessage);
+            //当前聊天的新消息，不发送通知
+            if(!Objects.equals(currentFriendId,chatMessage.getFromId())){
+                sendNotification_NewMessage(chatMessage);
+            }
         });
         socket.on("unread_message", args -> {
             if (args.length > 0) {
@@ -225,7 +240,7 @@ public class SocketIOClientService extends Service {
         socket.on("query_online_result", args -> {
             try {
                 String friendId = args[0].toString();
-                boolean isOnline = Boolean.parseBoolean(args[1].toString());
+                String isOnline = args[1].toString();
                 Log.d("查询好友在线结果", friendId + ":" + isOnline);
                 Intent i = new Intent(ACTION_FRIEND_STATE_CHANGED);
                 i.putExtra("id", friendId);
@@ -255,45 +270,64 @@ public class SocketIOClientService extends Service {
 
     }
 
+    /**
+     * 发送新消息到来的系统通知
+     * @param message 消息对象
+     */
     private void sendNotification_NewMessage(ChatMessage message) {
+        final RemoteViews rv = new RemoteViews(getPackageName(), R.layout.remote_notification);
+        int notificationId = (int) System.currentTimeMillis();
+        rv.setImageViewResource(R.id.logo,R.drawable.logo);
+        //将消息中的表情替换为文字
+        String newContent = message.getContent();
+        Pattern pattern = buildPattern();
+        Matcher matcher = pattern.matcher(message.getContent());
+        while (matcher.find()) {
+            String faceText = matcher.group();
+            newContent = newContent.replaceAll(faceText,getString(R.string.place_holder_yunmoji));
+        }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             Notification.Builder notificationBuilder = new Notification.Builder(this, "cloudLiterMessageChanel");
             notificationBuilder.setSmallIcon(R.drawable.ic_logo_notification)
-                    .setLargeIcon(Icon.createWithResource(getApplicationContext(), R.drawable.logo))
+                     .setLargeIcon(Icon.createWithResource(getApplicationContext(), R.drawable.logo))
                     .setAutoCancel(true);
-
-            notificationBuilder.setContentTitle(message.getContent());
-            notificationBuilder.setContentText("新消息");
-//            notificationBuilder.setSubText("新消息");
+            notificationBuilder.setCustomContentView(rv);
+            rv.setTextViewText(R.id.title,newContent);
+            rv.setTextViewText(R.id.content, message.getFriendRemark());
             UserLocal ul = LocalUserRepository.getInstance().getLoggedInUserDirect();
             if (ul.isValid()) {
                 Intent i = new Intent(this, ChatActivity.class);
-                i.putExtra("friendId",message.getFromId());
+                i.putExtra("friendId", message.getFromId());
                 notificationBuilder.setContentIntent(PendingIntent.getActivity(this, 0, i, FLAG_UPDATE_CURRENT));
                 notificationBuilder.setFullScreenIntent(PendingIntent.getActivity(this, 0, i, FLAG_UPDATE_CURRENT), true);
             }
             Notification n = notificationBuilder.build();
-            notificationManager.notify((int) System.currentTimeMillis(), n);
+            NotificationTarget notificationTarget = new NotificationTarget(this, R.id.avatar, rv, n, notificationId);
+            ImageUtils.loadAvatarIntoNotification(this,message.getFriendAvatar(),notificationTarget);
+            notificationManager.notify(notificationId, n);
+
         } else {
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, "cloudLiterMessageChanel");
             notificationBuilder.setSmallIcon(R.drawable.ic_logo_notification)
                     .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.logo)) //设置通知的大图标
-                    .setAutoCancel(false);//设置通知被点击一次是否自动取消
-            notificationBuilder.setContentTitle(message.getContent());
-            notificationBuilder.setContentText("新消息");
-//            notificationBuilder.setSubText("新消息");
+                    .setAutoCancel(true);//设置通知被点击一次是否自动取消
+            notificationBuilder.setContent(rv);
+            rv.setTextViewText(R.id.title, newContent);
+            rv.setTextViewText(R.id.content, message.getFriendRemark());
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-
             UserLocal ul = LocalUserRepository.getInstance().getLoggedInUserDirect();
             if (ul.isValid()) {
                 Intent i = new Intent(this, ChatActivity.class);
-                i.putExtra("friendId",message.getFromId());
+                i.putExtra("friendId", message.getFromId());
                 notificationBuilder.setContentIntent(PendingIntent.getActivity(this, 0, i, FLAG_UPDATE_CURRENT));
                 notificationBuilder.setFullScreenIntent(PendingIntent.getActivity(this, 0, i, FLAG_UPDATE_CURRENT), true);
             }
-           Notification n = notificationBuilder.build();
-            notificationManager.notify((int) System.currentTimeMillis(), n);
+            Notification n = notificationBuilder.build();
+            NotificationTarget notificationTarget = new NotificationTarget(this, R.id.avatar, rv, n, notificationId);
+            ImageUtils.loadAvatarIntoNotification(this,message.getFriendAvatar(),notificationTarget);
+            notificationManager.notify(notificationId, n);
         }
+
 
     }
 
@@ -364,13 +398,12 @@ public class SocketIOClientService extends Service {
     }
 
 
-
     private static final long HEART_BEAT_RATE = 10 * 1000;//每隔10秒进行一次对长连接的心跳检测
     private Handler mHandler = new Handler();
     private Runnable heartBeatRunnable = new Runnable() {
         @Override
         public void run() {
-            if (socket!=null) {
+            if (socket != null) {
                 if (!socket.connected()) {
                     socket.connect();
                 }

@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/avatar"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         app:srcCompat="@drawable/ic_baseline_emoji_emotions_24" />
 
     <TextView

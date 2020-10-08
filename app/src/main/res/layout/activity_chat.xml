@@ -66,7 +66,7 @@
 
             <TextView
                 android:id="@+id/state"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
@@ -76,58 +76,109 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:background="?attr/backgroundColorBottom"
-        android:overScrollMode="never"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/backgroundColorBottom"
+            android:overScrollMode="never" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="?attr/backgroundColorSecond"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/input"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:autofillHints=""
-            android:background="#00000000"
-            android:imeOptions="actionSearch"
-            android:padding="24dp"
-            android:singleLine="false"
-            android:textColor="?attr/textColorPrimary"
-            android:textColorHint="?attr/textColorSecondary" />
+            android:layout_gravity="bottom"
+            android:background="?attr/backgroundColorSecond"
+            android:orientation="horizontal">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/send"
-            android:layout_width="wrap_content"
+            <com.stupidtree.hichat.ui.widgets.EmoticonsEditText
+                android:id="@+id/input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:autofillHints=""
+                android:background="#00000000"
+                android:imeOptions="actionSearch"
+                android:padding="24dp"
+                android:singleLine="false"
+                android:textColor="?attr/textColorPrimary"
+                android:textColorHint="?attr/textColorSecondary" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/add"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="8dp"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:foregroundTintMode="src_over"
+                app:cardBackgroundColor="@color/colorPrimary"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:background="?attr/backgroundColorBottomAsTint"
+                    android:backgroundTintMode="src_over"
+                    android:padding="4dp"
+                    android:tint="?attr/colorPrimary"
+                    app:srcCompat="@drawable/ic_baseline_emoji_emotions_24" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/send"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="16dp"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                app:cardBackgroundColor="?attr/colorPrimary"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="6dp"
+                    android:text="@string/send"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+        <net.cachapa.expandablelayout.ExpandableLayout
+            android:id="@+id/expand"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginEnd="16dp"
-            android:clickable="true"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
-            app:cardBackgroundColor="?attr/colorPrimary"
-            app:cardCornerRadius="18dp">
+            app:el_expanded="false">
 
-            <TextView
-                android:id="@+id/textView"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/yunmoji_list"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingStart="16dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="8dp"
-                android:text="@string/send"
-                android:textColor="@android:color/white"
-                android:textSize="16sp" />
-        </androidx.cardview.widget.CardView>
-
+                android:layout_height="200dp" />
+        </net.cachapa.expandablelayout.ExpandableLayout>
     </LinearLayout>
 </LinearLayout>

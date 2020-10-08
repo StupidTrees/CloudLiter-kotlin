@@ -357,11 +357,27 @@ public abstract class BaseListAdapter<T, H extends RecyclerView.ViewHolder> exte
     }
 
 
-    public void notifyItemAppended(List<T> newL){
+    public void notifyItemsAppended(List<T> newL){
         mBeans.addAll(newL);
         notifyItemRangeInserted(mBeans.size()-newL.size(),newL.size());
     }
+    public void notifyItemsPushHead(List<T> newL){
+        mBeans.addAll(0,newL);
+        notifyItemRangeInserted(0,newL.size());
+    }
+    public void notifyItemPushHead(T item){
+        mBeans.add(0,item);
+        notifyItemRangeInserted(0,1);
+    }
+    public void notifyItemRemoveFromHead(){
+        mBeans.remove(0);
+        notifyItemRemoved(0);
+    }
 
+    public void notifyItemAppended(T item){
+        mBeans.add(item);
+        notifyItemInserted(mBeans.size()-1);
+    }
     @Override
     public int getItemCount() {
         return mBeans.size() + getIndexBias();

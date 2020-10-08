@@ -1,6 +1,7 @@
 package com.stupidtree.hichat.ui.profile;
 
 import android.app.Activity;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +14,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.lifecycle.Observer;
 
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.model.UserProfile;
@@ -49,8 +51,8 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
     @BindView(R.id.icon_gender)
     ImageView genderIcon;
 
-    @BindView(R.id.button)
-    Button button;
+    @BindView(R.id.fab)
+    ExtendedFloatingActionButton button;
 
     @BindView(R.id.avatar)
     ImageView avatarImageView;
@@ -96,11 +98,13 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                 Toast.makeText(getThis(), R.string.fail,Toast.LENGTH_SHORT).show();
             }
         });
+        button.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.colorPrimary)));
         viewModel.getRelationLiveData().observe(this, booleanDataState -> {
             if(booleanDataState.getState()== DataState.STATE.SUCCESS){
                 if(booleanDataState.getData()){
                     //是好友关系，则提供发消息入口，且提供朋友设置入口
                     button.setText(R.string.send_message);
+                    button.setIconResource(R.drawable.ic_baseline_message_24);
                     button.setEnabled(true);
                     button.setOnClickListener(view -> ActivityUtils.startChatActivity(getThis(),
                             viewModel.getUserId()));
@@ -112,6 +116,7 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                     //不是好友关系，则显示”添加好友“
                     button.setText(R.string.make_friends);
                     button.setEnabled(true);
+                    button.setIconResource(R.drawable.ic_baseline_person_add_24);
                     relationSettingButton.setVisibility(View.GONE);
                     relationSettingButton.setOnClickListener(null);
                     button.setOnClickListener(view -> {
@@ -142,7 +147,7 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
      */
     private void setProfileView(UserProfile userInfo){
         if(userInfo!=null){
-            ImageUtils.loadAvatarInto(getThis(),userInfo.getAvatar(),avatarImageView);
+            ImageUtils.loadAvatarNoCacheInto(getThis(),userInfo.getAvatar(),avatarImageView);
             usernameTextView.setText(userInfo.getUsername());
             nicknameTextView.setText(userInfo.getNickname());
             genderIcon.setVisibility(View.VISIBLE);

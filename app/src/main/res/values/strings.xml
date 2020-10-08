@@ -82,4 +82,19 @@
     <string name="fetch_failed">获取失败</string>
     <string name="no_contact">没有联系人</string>
     <string name="no_conversation">没有会话</string>
+    <string name="date_format_1">yyyy年M月d日</string>
+    <string name="date_format_2">M月d日</string>
+    <string name="date_format_am">上午hh:mm</string>
+    <string name="date_format_pm">下午hh:mm</string>
+    <string name="yesterday">昨天</string>
+    <string name="the_day_before_yesterday">前天</string>
+    <string name="date_format_with_prefix">"%s %s"</string>
+    <string name="new_message">新消息</string>
+    <string name="view_history">查看聊天记录</string>
+    <string name="chat_word_cloud">查看我们的词云</string>
+    <string name="title_conversation">聊天信息</string>
+    <string name="no_more_message">没有更多消息啦</string>
+    <string name="with_you">和你聊天</string>
+    <string name="with_other">和别人聊天</string>
+    <string name="place_holder_yunmoji">[表情]</string>
 </resources>

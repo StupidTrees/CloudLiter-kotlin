@@ -18,8 +18,10 @@ import com.stupidtree.hichat.ui.base.BaseFragment;
 import com.stupidtree.hichat.ui.base.BaseListAdapter;
 import com.stupidtree.hichat.ui.base.BaseViewHolder;
 import com.stupidtree.hichat.ui.base.DataState;
+import com.stupidtree.hichat.ui.widgets.EmoticonsTextView;
 import com.stupidtree.hichat.utils.ActivityUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
+import com.stupidtree.hichat.utils.TextUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -169,7 +171,12 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
             if (data != null) {
                 ImageUtils.loadAvatarInto(mContext, data.getFriendAvatar(), holder.avatar);
                 holder.lastMessage.setText(data.getLastMessage());
-                holder.name.setText(data.getFriendNickname());
+                if(TextUtils.isEmpty(data.getFriendRemark())){
+                    holder.name.setText(data.getFriendNickname());
+                }else{
+                    holder.name.setText(data.getFriendRemark());
+                }
+
                 int unread = viewModel.getUnreadNumber(data);
                 unreadMap.put(data.getId(),unread);
                 if (unread > 0) {
@@ -178,7 +185,7 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
                 } else {
                     holder.unread.setVisibility(View.INVISIBLE);
                 }
-                holder.updatedAt.setText(data.getUpdatedAt().toString());
+                holder.updatedAt.setText(TextUtils.getConversationTimeText(mContext,data.getUpdatedAt()));
                 if (mOnItemClickListener != null) {
                     holder.item.setOnClickListener(view -> mOnItemClickListener.onItemClick(data, view, position));
                 }
@@ -203,7 +210,7 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
             TextView name;
 
             @BindView(R.id.last_message)
-            TextView lastMessage;
+            EmoticonsTextView lastMessage;
 
             @BindView(R.id.avatar)
             ImageView avatar;

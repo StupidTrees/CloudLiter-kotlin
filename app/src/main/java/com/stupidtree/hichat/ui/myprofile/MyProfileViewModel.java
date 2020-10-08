@@ -13,7 +13,7 @@ import com.stupidtree.hichat.data.model.UserProfile;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.data.repository.ProfileRepository;
 import com.stupidtree.hichat.ui.base.DataState;
-import com.stupidtree.hichat.ui.profile.ProfileTrigger;
+import com.stupidtree.hichat.ui.base.StringTrigger;
 
 import java.util.Objects;
 
@@ -29,7 +29,7 @@ public class MyProfileViewModel extends ViewModel {
     //数据本体：我的用户资料
     LiveData<DataState<UserProfile>> userProfileLiveData;
     //Trigger：控制↑的刷新
-    MutableLiveData<ProfileTrigger> profileController = new MutableLiveData<>();
+    MutableLiveData<StringTrigger> profileController = new MutableLiveData<>();
 
     //状态数据：更改头像的结果
     LiveData<DataState<String>> changeAvatarResult;
@@ -230,6 +230,6 @@ public class MyProfileViewModel extends ViewModel {
      */
     public void startRefresh(){
         UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
-        profileController.setValue(ProfileTrigger.getActioning(userLocal.getId()));
+        profileController.setValue(StringTrigger.getActioning(userLocal.getId()));
     }
 }
