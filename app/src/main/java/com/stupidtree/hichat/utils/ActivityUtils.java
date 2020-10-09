@@ -2,16 +2,13 @@ package com.stupidtree.hichat.utils;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
-import com.stupidtree.hichat.data.model.Conversation;
 import com.stupidtree.hichat.ui.chat.ChatActivity;
 import com.stupidtree.hichat.ui.conversation.ConversationActivity;
 import com.stupidtree.hichat.ui.myprofile.MyProfileActivity;
 import com.stupidtree.hichat.ui.profile.ProfileActivity;
-import com.stupidtree.hichat.ui.relation.RelationActivity;
 import com.stupidtree.hichat.ui.relationevent.RelationEventActivity;
 import com.stupidtree.hichat.ui.search.SearchActivity;
 import com.stupidtree.hichat.ui.welcome.WelcomeActivity;
@@ -49,16 +46,6 @@ public class ActivityUtils {
         from.startActivity(i);
     }
 
-    /**
-     * 启动好友设置页
-     * @param from 上下文
-     * @param friendId 好友id
-     */
-    public static void startRelationActivity(@NonNull Context from,@NonNull String friendId){
-        Intent intent = new Intent(from, RelationActivity.class);
-        intent.putExtra("friendId",friendId);
-        from.startActivity(intent);
-    }
 
     /**
      * 启动我的资料页

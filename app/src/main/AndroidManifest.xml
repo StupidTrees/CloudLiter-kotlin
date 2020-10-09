@@ -20,9 +20,6 @@
             android:name=".ui.conversation.ConversationActivity"
             android:launchMode="singleTask" />
         <activity
-            android:name=".ui.relation.RelationActivity"
-            android:launchMode="singleTask" />
-        <activity
             android:name=".ui.myprofile.MyProfileActivity"
             android:launchMode="singleTask" />
         <activity

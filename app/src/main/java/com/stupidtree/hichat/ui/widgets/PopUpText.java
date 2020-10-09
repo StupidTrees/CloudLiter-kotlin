@@ -6,6 +6,7 @@ import android.widget.TextView;
 import androidx.annotation.StringRes;
 
 import com.stupidtree.hichat.R;
+import com.stupidtree.hichat.utils.TextUtils;
 
 import butterknife.BindView;
 
@@ -74,8 +75,11 @@ public class PopUpText extends TransparentBottomSheetDialog {
         if (init_title != null) {
             title.setText(init_title);
         }
-        if (init_text != null) {
+        if (!TextUtils.isEmpty(init_text)) {
             textView.setText(init_text);
+            textView.setVisibility(View.VISIBLE);
+        }else{
+            textView.setVisibility(View.GONE);
         }
         if (isCancelable()) {
             cancel.setVisibility(View.VISIBLE);

@@ -178,7 +178,9 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/yunmoji_list"
                 android:layout_width="match_parent"
-                android:layout_height="200dp" />
+                android:layout_height="200dp"
+                android:layout_margin="16dp"
+                android:overScrollMode="never" />
         </net.cachapa.expandablelayout.ExpandableLayout>
     </LinearLayout>
 </LinearLayout>

@@ -63,9 +63,6 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
     @BindView(R.id.avatar)
     ImageView avatarImageView;
 
-    @BindView(R.id.relation_layout)
-    View relationSettingButton;
-
     @BindView(R.id.icon_color)
     CardView colorIcon;
     @BindView(R.id.icon_color_inner)
@@ -144,10 +141,6 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                 button.setEnabled(true);
                 button.setOnClickListener(view -> ActivityUtils.startChatActivity(getThis(),
                         Objects.requireNonNull(viewModel.getUserId())));
-                relationSettingButton.setVisibility(View.VISIBLE);
-                relationSettingButton.setOnClickListener(view -> {
-                    ActivityUtils.startRelationActivity(getThis(), Objects.requireNonNull(viewModel.getUserId()));
-                });
                 remarkText.setText(userRelationDataState.getData().getRemark());
                 remarkLayout.setOnClickListener(view -> {
                     UserRelation up = viewModel.getUserRelation();
@@ -163,7 +156,7 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                     }
 
                 });
-                deleteLayout.setOnClickListener(view -> new PopUpText().setText(getString(R.string.attention_please))
+                deleteLayout.setOnClickListener(view -> new PopUpText()///.setText(getString(R.string.attention_please))
                         .setTitle(R.string.attention_delete_friend)
                         .setOnConfirmListener(() -> {
                             viewModel.startDeletingFriend(getIntent().getStringExtra("id"));
@@ -174,8 +167,6 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                 button.setText(R.string.make_friends);
                 button.setEnabled(true);
                 button.setIconResource(R.drawable.ic_baseline_person_add_24);
-                relationSettingButton.setVisibility(View.GONE);
-                relationSettingButton.setOnClickListener(null);
                 button.setOnClickListener(view -> {
                     //通知viewModel进行添加好友请求
                     viewModel.startMakingFriends(getIntent().getStringExtra("id"));

@@ -426,40 +426,6 @@
 
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:id="@+id/relation_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:clickable="true"
-                        android:foreground="?attr/selectableItemBackgroundBorderless"
-                        android:orientation="horizontal"
-                        android:paddingStart="16dp"
-                        android:paddingTop="8dp"
-                        android:paddingEnd="16dp"
-                        android:paddingBottom="8dp"
-                        android:focusable="true">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center"
-                            android:background="@drawable/element_round_primary_light"
-                            android:padding="4dp"
-                            app:srcCompat="@drawable/ic_baseline_perm_contact_calendar_24"
-                            app:tint="?attr/colorPrimary" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginStart="16dp"
-                            android:layout_weight="1"
-                            android:text="@string/relation_setting"
-                            android:textColor="?attr/textColorPrimary"
-                            android:textSize="18sp" />
-
-                    </LinearLayout>
-
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
