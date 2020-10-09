@@ -3,13 +3,17 @@ package com.stupidtree.hichat.ui.chat;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +25,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.ChatMessage;
+import com.stupidtree.hichat.data.model.Yunmoji;
 import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.BaseListAdapter;
 import com.stupidtree.hichat.ui.base.BaseViewHolder;
@@ -35,12 +40,14 @@ import com.stupidtree.hichat.utils.TextUtils;
 import net.cachapa.expandablelayout.ExpandableLayout;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
+import butterknife.OnItemClick;
 
 /**
  * 对话窗口
@@ -232,25 +239,64 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
         });
     }
 
+    private List<Yunmoji> ymList = new ArrayList<>();
+
+    public void initYunmoji() {
+        Yunmoji i001 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "001", "drawable", getPackageName()));
+        ymList.add(i001);
+        Yunmoji i002 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "002", "drawable", getPackageName()));
+        ymList.add(i002);
+        Yunmoji i003 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "003", "drawable", getPackageName()));
+        ymList.add(i003);
+        Yunmoji i004 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "004", "drawable", getPackageName()));
+        ymList.add(i004);
+        Yunmoji i005 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "005", "drawable", getPackageName()));
+        ymList.add(i005);
+        Yunmoji i006 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "006", "drawable", getPackageName()));
+        ymList.add(i006);
+        Yunmoji i007 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "007", "drawable", getPackageName()));
+        ymList.add(i007);
+        Yunmoji i008 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "008", "drawable", getPackageName()));
+        ymList.add(i008);
+        Yunmoji i009 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "009", "drawable", getPackageName()));
+        ymList.add(i009);
+        Yunmoji i010 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "010", "drawable", getPackageName()));
+        ymList.add(i010);
+        Yunmoji i011 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "011", "drawable", getPackageName()));
+        ymList.add(i011);
+        Yunmoji i012 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "012", "drawable", getPackageName()));
+        ymList.add(i012);
+        Yunmoji i013 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "013", "drawable", getPackageName()));
+        ymList.add(i013);
+        Yunmoji i014 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "014", "drawable", getPackageName()));
+        ymList.add(i014);
+        Yunmoji i015 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "015", "drawable", getPackageName()));
+        ymList.add(i015);
+        Yunmoji i016 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "016", "drawable", getPackageName()));
+        ymList.add(i016);
+        Yunmoji i017 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "017", "drawable", getPackageName()));
+        ymList.add(i017);
+        Yunmoji i018 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "018", "drawable", getPackageName()));
+        ymList.add(i018);
+        Yunmoji i019 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "019", "drawable", getPackageName()));
+        ymList.add(i019);
+        Yunmoji i020 = new Yunmoji(getResources().getIdentifier("yunmoji_y" + "020", "drawable", getPackageName()));
+        ymList.add(i020);
+
+    }
+
     //初始化表情列表
     private void setUpYunmojiList(){
         yunmojiList.setLayoutManager(new GridLayoutManager(this,7));
-
-        //TODO
         //1：初始化表情资源
-        //首先需要根据文件名取得图片id，方法如下：
-        //int imageId =
-        //        getResources().getIdentifier("yunmoji_" + "001", "drawable",getPackageName());
-        //使用该方法可以通过文件名得到资源id，ImageView可以用setImageResource(id)来显示该图片
+        initYunmoji();
         //2：初始化适配器
-        //TODO
+        yunmojiListAdapter = new YunmojiListAdapter(this, ymList);
         //3：设置适配器
         yunmojiList.setAdapter(yunmojiListAdapter);
         //4：设置点击监听
-
-        //点击某个位置，调用
-        //inputEditText.append("[y0xx]");
-        //在输入框中插入编号为y0xx的表情
+        BaseListAdapter.OnItemClickListener<Yunmoji> yunmojiOnItemClickListener = (data, card, position) -> inputEditText.append(data.getLastname(position));
+        yunmojiListAdapter.setOnItemClickListener(yunmojiOnItemClickListener);
     }
 
 
@@ -453,10 +499,10 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
      * 表情列表的适配器
      */
     //TODO
-    static class YunmojiListAdapter extends BaseListAdapter<Object, YunmojiListAdapter.YunmojiItemHolder>{
+    static class YunmojiListAdapter extends BaseListAdapter<Yunmoji, YunmojiListAdapter.YunmojiItemHolder>{
 
 
-        public YunmojiListAdapter(Context mContext, List<Object> mBeans) {
+        public YunmojiListAdapter(Context mContext, List<Yunmoji> mBeans) {
             super(mContext, mBeans);
         }
 
@@ -467,14 +513,13 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
 
         @Override
         public YunmojiItemHolder createViewHolder(View v, int viewType) {
-            //TODO
-            return null;
+            return new YunmojiItemHolder(v);
         }
 
         @Override
-        protected void bindHolder(@NonNull YunmojiItemHolder holder, @Nullable Object data, int position) {
-            //TODO
-            holder.image.setImageResource(R.drawable.yunmoji_y001);//示例
+        protected void bindHolder(@NonNull YunmojiItemHolder holder, @Nullable Yunmoji data, int position) {
+            Yunmoji yunmoji = mBeans.get(position);
+            holder.image.setImageResource(yunmoji.getImageID());
             //表示当这项的图片点击时调用onItemClickListener
             if(mOnItemClickListener!=null){
                 holder.image.setOnClickListener(new View.OnClickListener() {
