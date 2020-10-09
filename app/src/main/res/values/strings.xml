@@ -97,4 +97,18 @@
     <string name="with_you">和你聊天</string>
     <string name="with_other">和别人聊天</string>
     <string name="place_holder_yunmoji">[表情]</string>
+    <string name="title_relation_event">好友关系</string>
+    <string name="send_request_success">好友申请已发送</string>
+    <string name="relation_requesting">等待同意</string>
+    <string name="relation_rejected">拒绝</string>
+    <string name="relation_accepted">已同意</string>
+    <string name="relation_delete">把你删了</string>
+    <string name="prompt_accept">同意</string>
+    <string name="select_action">选择操作</string>
+    <string name="prompt_reject">拒绝</string>
+    <string name="prompt_select_action">操作</string>
+    <string name="label_user_profile">TA的资料</string>
+    <string name="label_relation_settings">好友选项</string>
+    <string name="attention_delete_friend">确定要结束这段友谊吗？</string>
+    <string name="delete_friend_success">已删除好友</string>
 </resources>

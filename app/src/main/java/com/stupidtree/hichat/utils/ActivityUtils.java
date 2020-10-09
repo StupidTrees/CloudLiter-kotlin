@@ -12,6 +12,7 @@ import com.stupidtree.hichat.ui.conversation.ConversationActivity;
 import com.stupidtree.hichat.ui.myprofile.MyProfileActivity;
 import com.stupidtree.hichat.ui.profile.ProfileActivity;
 import com.stupidtree.hichat.ui.relation.RelationActivity;
+import com.stupidtree.hichat.ui.relationevent.RelationEventActivity;
 import com.stupidtree.hichat.ui.search.SearchActivity;
 import com.stupidtree.hichat.ui.welcome.WelcomeActivity;
 
@@ -90,4 +91,12 @@ public class ActivityUtils {
         from.startActivity(i);
     }
 
+    /**
+     * 启动好友关系事件页面
+     * @param from 上下文
+     */
+    public static void startRelationEventActivity(@NonNull Context from){
+        Intent i = new Intent(from, RelationEventActivity.class);
+        from.startActivity(i);
+    }
 }

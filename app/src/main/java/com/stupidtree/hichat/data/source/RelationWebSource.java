@@ -8,7 +8,7 @@ import androidx.lifecycle.Transformations;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.stupidtree.hichat.data.model.UserLocal;
+import com.stupidtree.hichat.data.model.RelationEvent;
 import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.service.LiveDataCallAdapter;
 import com.stupidtree.hichat.service.RelationService;
@@ -23,6 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.stupidtree.hichat.service.codes.SUCCESS;
 import static com.stupidtree.hichat.ui.base.DataState.STATE.FETCH_FAILED;
+import static com.stupidtree.hichat.ui.base.DataState.STATE.NOT_EXIST;
 import static com.stupidtree.hichat.ui.base.DataState.STATE.TOKEN_INVALID;
 
 /**
@@ -165,6 +166,8 @@ public class RelationWebSource extends BaseWebSource<RelationService> {
                         }
                     case codes.TOKEN_INVALID:
                         return new DataState<>(TOKEN_INVALID);
+                    case codes.RELATION_NOT_EXIST:
+                        return new DataState<>(NOT_EXIST);
                     default:return new DataState<>(FETCH_FAILED,input.getMessage());
                 }
             }
@@ -197,4 +200,97 @@ public class RelationWebSource extends BaseWebSource<RelationService> {
             return new DataState<>(DataState.STATE.FETCH_FAILED);
         });
     }
+
+
+    /**
+     * 发送好友请求
+     *
+     * @param token 登录状态token
+     * @return 操作结果
+     */
+    public LiveData<DataState<?>> sendFriendRequest(@NonNull String token, @NonNull String friendId) {
+        return Transformations.map(service.sendFriendRequest(token, friendId), input -> {
+            if (null == input) {
+                return new DataState<>(FETCH_FAILED);
+            }
+            switch (input.getCode()) {
+                case codes.SUCCESS:
+                    return new DataState<>(DataState.STATE.SUCCESS);
+                case codes.TOKEN_INVALID:
+                    return new DataState<>(TOKEN_INVALID,input.getMessage());
+                case codes.REQUEST_ALREADY_SENT:
+                    return new DataState<>(TOKEN_INVALID,"已经发送过申请啦！");
+                default:
+                    return new DataState<>(FETCH_FAILED,input.getMessage());
+            }
+        });
+    }
+
+
+    /**
+     * 获得所有和我有关的好友请求
+     * @param token 令牌
+     * @return 请求结果
+     */
+    public LiveData<DataState<List<RelationEvent>>> queryMine(@NonNull String token){
+        return Transformations.map(service.queryMine(token), input -> {
+            if (null == input) {
+                return new DataState<>(FETCH_FAILED);
+            }
+            switch (input.getCode()) {
+                case codes.SUCCESS:
+                    return new DataState<>(input.getData());
+                case codes.TOKEN_INVALID:
+                    return new DataState<>(TOKEN_INVALID,input.getMessage());
+                default:
+                    return new DataState<>(FETCH_FAILED,input.getMessage());
+            }
+        });
+    }
+
+
+    /**
+     * 响应好友请求
+     *
+     * @param token 登录状态token
+     * @return 操作结果
+     */
+    public LiveData<DataState<?>> responseFriendRequest(@NonNull String token, @NonNull String eventId,@NonNull RelationEvent.ACTION action) {
+        return Transformations.map(service.responseFriendRequest(token,eventId,action.toString()), input -> {
+            if (null == input) {
+                return new DataState<>(FETCH_FAILED);
+            }
+            switch (input.getCode()) {
+                case codes.SUCCESS:
+                    return new DataState<>(DataState.STATE.SUCCESS);
+                case codes.TOKEN_INVALID:
+                    return new DataState<>(TOKEN_INVALID,input.getMessage());
+                default:
+                    return new DataState<>(FETCH_FAILED,input.getMessage());
+            }
+        });
+    }
+
+    /**
+     * 删除好友
+     * @param token 登录状态token
+     * @param friendId 好友id
+     * @return 操作结果
+     */
+    public LiveData<DataState<?>> deleteFriend(@NonNull String token, @NonNull String friendId) {
+        return Transformations.map(service.deleteFriend(token,friendId), input -> {
+            if (null == input) {
+                return new DataState<>(FETCH_FAILED);
+            }
+            switch (input.getCode()) {
+                case codes.SUCCESS:
+                    return new DataState<>(DataState.STATE.SUCCESS);
+                case codes.TOKEN_INVALID:
+                    return new DataState<>(TOKEN_INVALID,input.getMessage());
+                default:
+                    return new DataState<>(FETCH_FAILED,input.getMessage());
+            }
+        });
+    }
+
 }

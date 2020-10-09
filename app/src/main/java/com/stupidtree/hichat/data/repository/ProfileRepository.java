@@ -31,12 +31,9 @@ public class ProfileRepository {
 
     //数据源1：网络类型数据源，用户网络操作
     private UserWebSource userWebSource;
-    //数据源2：网络类型数据源，关系网络操作
-    private RelationWebSource relationWebSource;
 
     ProfileRepository() {
         userWebSource = UserWebSource.getInstance();
-        relationWebSource = RelationWebSource.getInstance();
     }
 
     /**

@@ -49,6 +49,12 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
     @BindView(R.id.refresh)
     SwipeRefreshLayout refreshLayout;
 
+    @BindView(R.id.search_friend)
+    View searchFriendButton;
+
+    @BindView(R.id.relation_event)
+    View relationEventButton;
+
     /**
      * 适配器区
      */
@@ -67,8 +73,14 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
         return ContactViewModel.class;
     }
 
+
+    private void setUpButtons(){
+        searchFriendButton.setOnClickListener(view -> ActivityUtils.startSearchActivity(requireContext()));
+        relationEventButton.setOnClickListener(view -> ActivityUtils.startRelationEventActivity(requireContext()));
+    }
     @Override
     protected void initViews(View view) {
+        setUpButtons();
         //初始化一下列表的view
         listAdapter = new XListAdapter(getContext(), new LinkedList<>());
         list.setAdapter(listAdapter);
@@ -78,7 +90,7 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
             ActivityUtils.startProfileActivity(requireActivity(), String.valueOf(data.getId()));
         });
         //设置下拉刷新
-        refreshLayout.setColorSchemeResources(R.color.colorPrimary,R.color.colorAccent);
+        refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
         refreshLayout.setOnRefreshListener(() -> viewModel.startFetchData());
 
         //当列表数据变更时，将自动调用本匿名函数
@@ -89,13 +101,13 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
                 listAdapter.notifyItemChangedSmooth(contactListState.getData(), new BaseListAdapter.RefreshJudge<UserRelation>() {
                     @Override
                     public boolean judge(UserRelation oldData, UserRelation newData) {
-                        return !Objects.equals(oldData,newData)||!Objects.equals(oldData.getRemark(),newData.getRemark());
+                        return !Objects.equals(oldData, newData) || !Objects.equals(oldData.getRemark(), newData.getRemark());
                     }
                 });
-                if(contactListState.getData().size()>0){
+                if (contactListState.getData().size() > 0) {
                     list.setVisibility(View.VISIBLE);
                     placeHolder.setVisibility(View.GONE);
-                }else{
+                } else {
                     list.setVisibility(View.GONE);
                     placeHolder.setVisibility(View.VISIBLE);
                     placeHolderText.setText(R.string.no_contact);
@@ -113,7 +125,6 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
                 placeHolderText.setText(R.string.fetch_failed);
             }
         });
-
 
     }
 

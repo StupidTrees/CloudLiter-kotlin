@@ -17,8 +17,9 @@ public class DataState<T> {
      * FETCH_FAILED 请求失败
      * NOT_LOGGED_IN 用户未登录
      * TOKEN_INVALID token已失效
+     * NOR_EXIST 查询数据不存在
      */
-    public enum STATE{NOTHING,NOT_LOGGED_IN,SUCCESS,FETCH_FAILED,TOKEN_INVALID}
+    public enum STATE{NOTHING,NOT_LOGGED_IN,SUCCESS,FETCH_FAILED,TOKEN_INVALID,NOT_EXIST}
 
     public enum LIST_ACTION{REPLACE_ALL,APPEND,PUSH_HEAD,DELETE}
     //表征数据状态

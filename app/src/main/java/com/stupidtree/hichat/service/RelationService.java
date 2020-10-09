@@ -5,6 +5,10 @@ import androidx.lifecycle.LiveData;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.stupidtree.hichat.data.ApiResponse;
+import com.stupidtree.hichat.data.model.RelationEvent;
+
+import java.util.List;
+
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -62,7 +66,6 @@ public interface RelationService {
 
 
 
-
     /**
      * 更换备注
      * @param remark 新备注
@@ -75,9 +78,47 @@ public interface RelationService {
     LiveData<ApiResponse<Object>> changeRemark(@Field("id2")String friend_id,@Field("remark")String remark,@Header("token")String token);
 
 
+    /**
+     * 发送好友申请
+     * @param token 令牌
+     * @param friendId 朋友id
+     * @return 操作结果
+     */
+    @FormUrlEncoded
+    @POST("/relation/event/request")
+    LiveData<ApiResponse<Object>> sendFriendRequest(@Header("token") String token, @Field("friendId") String friendId);
 
 
+    /**
+     * 获得所有和我有关的好友请求
+     * @param token 令牌
+     * @return 请求结果
+     */
+    @GET("relation/event/query_mine")
+    LiveData<ApiResponse<List<RelationEvent>>> queryMine(@Header("token") String token);
 
+
+    /**
+     * 响应好友申请
+     * @param token 令牌
+     * @param eventId 事件id
+     * @param action 操作
+     * @return 操作结果
+     */
+    @FormUrlEncoded
+    @POST("/relation/event/response")
+    LiveData<ApiResponse<Object>> responseFriendRequest(@Header("token")String token, @Field("eventId") String eventId,@Field("action") String action);
+
+
+    /**
+     * 删除好友
+     * @param token 令牌
+     * @param friendId 好友id
+     * @return 删除结果
+     */
+    @FormUrlEncoded
+    @POST("/relation/event/delete_friend")
+    LiveData<ApiResponse<Object>> deleteFriend(@Header("token")String token, @Field("friendId") String friendId);
 }
 
 
