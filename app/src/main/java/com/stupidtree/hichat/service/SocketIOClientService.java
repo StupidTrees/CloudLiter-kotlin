@@ -9,7 +9,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
 import android.os.Binder;
@@ -17,12 +16,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.text.Spannable;
-import android.text.style.ImageSpan;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import com.bumptech.glide.request.target.NotificationTarget;
@@ -33,13 +29,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.ChatMessage;
-import com.stupidtree.hichat.data.model.Conversation;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.ui.chat.ChatActivity;
 import com.stupidtree.hichat.utils.ImageUtils;
 
-import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -294,7 +288,7 @@ public class SocketIOClientService extends Service {
             notificationBuilder.setCustomContentView(rv);
             rv.setTextViewText(R.id.title,newContent);
             rv.setTextViewText(R.id.content, message.getFriendRemark());
-            UserLocal ul = LocalUserRepository.getInstance().getLoggedInUserDirect();
+            UserLocal ul = LocalUserRepository.getInstance().getLoggedInUser();
             if (ul.isValid()) {
                 Intent i = new Intent(this, ChatActivity.class);
                 i.putExtra("friendId", message.getFromId());
@@ -315,7 +309,7 @@ public class SocketIOClientService extends Service {
             rv.setTextViewText(R.id.title, newContent);
             rv.setTextViewText(R.id.content, message.getFriendRemark());
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
-            UserLocal ul = LocalUserRepository.getInstance().getLoggedInUserDirect();
+            UserLocal ul = LocalUserRepository.getInstance().getLoggedInUser();
             if (ul.isValid()) {
                 Intent i = new Intent(this, ChatActivity.class);
                 i.putExtra("friendId", message.getFromId());

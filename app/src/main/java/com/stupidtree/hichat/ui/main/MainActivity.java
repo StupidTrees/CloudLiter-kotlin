@@ -1,29 +1,36 @@
 package com.stupidtree.hichat.ui.main;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.stupidtree.hichat.R;
+import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.service.SocketIOClientService;
 import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.BaseTabAdapter;
 import com.stupidtree.hichat.ui.main.contact.ContactFragment;
 import com.stupidtree.hichat.ui.main.conversations.ConversationsFragment;
-import com.stupidtree.hichat.ui.main.me.MeFragment;
 import com.stupidtree.hichat.utils.ActivityUtils;
+import com.stupidtree.hichat.utils.ImageUtils;
 import com.stupidtree.hichat.utils.NotificationUtils;
+
+import org.jetbrains.annotations.NotNull;
 
 import butterknife.BindView;
 
@@ -31,7 +38,11 @@ import butterknife.BindView;
  * 很显然，这是主界面
  */
 public class MainActivity extends BaseActivity<MainViewModel> {
+    @BindView(R.id.drawer)
+    DrawerLayout drawerLayout;
 
+    @BindView(R.id.drawer_navigationview)
+    NavigationView navigationView;
     @BindView(R.id.pager)
     ViewPager pager;
 
@@ -41,11 +52,22 @@ public class MainActivity extends BaseActivity<MainViewModel> {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    @BindView(R.id.add)
-    ImageView add;
+//    @BindView(R.id.add)
+//    ImageView add;
 
     @BindView(R.id.title)
     TextView title;
+
+    @BindView(R.id.avatar)
+    ImageView avatar;
+
+    /**
+     * 抽屉里的View
+     */
+    ImageView drawerAvatar;
+    TextView drawerNickname;
+    TextView drawerUsername;
+    ViewGroup drawerHeader;
 
 
     @Override
@@ -61,24 +83,65 @@ public class MainActivity extends BaseActivity<MainViewModel> {
     protected void onResume() {
         super.onResume();
         NotificationUtils.checkNotification(this);
+        setUserViews(viewModel.getLocalUser());
+    }
+
+
+    private void setUpDrawer() {
+        View headerView = navigationView.inflateHeaderView(R.layout.activity_main_nav_header);
+        drawerLayout.setStatusBarBackgroundColor(Color.TRANSPARENT);
+        drawerLayout.setScrimColor(getBackgroundColorSecondAsTint());
+        drawerLayout.setDrawerElevation(ImageUtils.dp2px(this,84));
+        drawerAvatar = headerView.findViewById(R.id.avatar);
+        drawerHeader = headerView.findViewById(R.id.drawer_header);
+        drawerNickname = headerView.findViewById(R.id.nickname);
+        drawerUsername = headerView.findViewById(R.id.username);
+        drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NotNull View drawerView, float slideOffset) {
+                //offset 偏移值
+                View mContent = drawerLayout.getChildAt(0);
+                float scale = 1 - slideOffset;
+                float rightScale = 0.8f + scale * 0.2f;
+                mContent.setTranslationX(-drawerView.getMeasuredWidth() * slideOffset);
+                //mContent.setAlpha(0.3f+0.7f*scale);
+                mContent.setPivotX(mContent.getMeasuredWidth());
+                mContent.setPivotY(mContent.getMeasuredHeight() >> 1);
+                mContent.invalidate();
+                mContent.setScaleX(rightScale);
+                mContent.setScaleY(rightScale);
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+                setUserViews(viewModel.getLocalUser());
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
     }
 
     @Override
     protected void initViews() {
         setSupportActionBar(toolbar);
+        setUpDrawer();
         title.setText(navView.getMenu().getItem(0).getTitle());
         //Objects.requireNonNull(getSupportActionBar()).setTitle(navView.getMenu().getItem(0).getTitle());
-        pager.setAdapter(new BaseTabAdapter(getSupportFragmentManager(), 3) {
+        pager.setAdapter(new BaseTabAdapter(getSupportFragmentManager(), 2) {
             @Override
             protected Fragment initItem(int position) {
-                switch (position) {
-                    case 0:
-                        return ConversationsFragment.newInstance();
-                    case 1:
-                        return ContactFragment.newInstance();
-                    default:
-                        return MeFragment.newInstance();
+                if (position == 0) {
+                    return ConversationsFragment.newInstance();
                 }
+                return ContactFragment.newInstance();
             }
 
             @Override
@@ -115,9 +178,6 @@ public class MainActivity extends BaseActivity<MainViewModel> {
                 case R.id.navigation_dashboard:
                     pager.setCurrentItem(1);
                     break;
-                case R.id.navigation_notifications:
-                    pager.setCurrentItem(2);
-                    break;
 
             }
             title.setText(item.getTitle());
@@ -125,46 +185,45 @@ public class MainActivity extends BaseActivity<MainViewModel> {
             return true;
         });
 
-        add.setOnClickListener(view -> {
-            PopupMenu pm = new PopupMenu(getThis(), view);
-            pm.inflate(R.menu.toolbar_more_popup_menu);
-            pm.setOnMenuItemClickListener(item1 -> {
-                if (item1.getItemId() == R.id.menu_action_make_friend) {
-                    ActivityUtils.startSearchActivity(getThis());
-                    return true;
-                }
-                return false;
-            });
-            pm.show();
-        });
-//        toolbar.setOnMenuItemClickListener(item -> {
-//            if (item.getItemId() == R.id.menu_action_add) {
-//                PopupMenu pm = new PopupMenu(getThis(),item.getActionView());
-//                pm.inflate(R.menu.toolbar_more_popup_menu);
-//                pm.setOnMenuItemClickListener(item1 -> {
-//                    if(item1.getItemId()==R.id.menu_action_make_friend){
-//                        ActivityUtils.startSearchActivity(getThis());
-//                        return true;
-//                    }
-//                    return false;
-//                });
-//                pm.show();
-//            }
-//            return true;
-//        });
+        avatar.setOnClickListener(view -> drawerLayout.openDrawer(GravityCompat.END));
+    }
+
+
+    private void setUserViews(UserLocal userLocalInfo) {
+
+        if (userLocalInfo.isValid()) { //如果已登录
+            //装载头像
+            ImageUtils.loadLocalAvatarInto(this, userLocalInfo.getAvatar(), drawerAvatar);
+            ImageUtils.loadLocalAvatarInto(this, userLocalInfo.getAvatar(), avatar);
+            //设置各种文字
+            drawerUsername.setText(userLocalInfo.getUsername());
+            drawerNickname.setText(userLocalInfo.getNickname());
+            drawerHeader.setOnClickListener(view -> ActivityUtils.startMyProfileActivity(getThis()));
+        } else {
+            //未登录的信息显示
+            drawerUsername.setText(R.string.not_logged_in);
+            drawerNickname.setText(R.string.please_log_in);
+            drawerAvatar.setImageResource(R.drawable.place_holder_avatar);
+            avatar.setImageResource(R.drawable.place_holder_avatar);
+            drawerHeader.setOnClickListener(view -> ActivityUtils.startLoginActivity(getThis()));
+
+        }
     }
 
 
     @Override
     public void onBackPressed() {
         //super.onBackPressed();
+        if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
+            drawerLayout.closeDrawer(GravityCompat.END);
+            return;
+        }
         //返回桌面而非退出
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addCategory(Intent.CATEGORY_HOME);
         startActivity(intent);
     }
-
 
 
     @Override

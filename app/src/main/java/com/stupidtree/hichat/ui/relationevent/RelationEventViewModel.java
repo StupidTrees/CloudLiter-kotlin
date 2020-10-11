@@ -2,7 +2,6 @@ package com.stupidtree.hichat.ui.relationevent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -51,7 +50,7 @@ public class RelationEventViewModel extends ViewModel {
                 if(!input.isActioning()){
                     return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
                 }
-                UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                UserLocal userLocal = localUserRepository.getLoggedInUser();
                 if(userLocal.isValid()){
                     return relationRepository.queryMine(Objects.requireNonNull(userLocal.getToken()));
                 }else{
@@ -66,7 +65,7 @@ public class RelationEventViewModel extends ViewModel {
         if(responseResult==null){
             responseResult = Transformations.switchMap(responseFriendTrigger, input -> {
                 if(input.isActioning()){
-                    UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                    UserLocal userLocal = localUserRepository.getLoggedInUser();
                     if(userLocal.isValid()){
                         return relationRepository.responseFriendRequest(Objects.requireNonNull(userLocal.getToken()),input.getEventId(),input.getAction());
                     }else{
@@ -85,7 +84,7 @@ public class RelationEventViewModel extends ViewModel {
 
     @Nullable
     public String getLocalUserId(){
-        return localUserRepository.getLoggedInUserDirect().getId();
+        return localUserRepository.getLoggedInUser().getId();
     }
 
     public void responseFriendRequest(@NonNull String eventId, RelationEvent.ACTION action){

@@ -1,6 +1,7 @@
 package com.stupidtree.hichat.ui.base;
 
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -12,9 +13,12 @@ import androidx.core.graphics.ColorUtils;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.stupidtree.hichat.R;
+
 import java.util.Objects;
 
 import butterknife.ButterKnife;
+
 
 /**
  * 本项目所有Activity的基类
@@ -90,5 +94,24 @@ public abstract class BaseActivity<T extends ViewModel> extends AppCompatActivit
      */
     protected BaseActivity<T> getThis(){
         return this;
+    }
+
+
+
+    public int getColorPrimary(){
+        TypedValue typedValue = new TypedValue();
+        getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+        return typedValue.data;
+    }
+    public int getColorControlNormal(){
+        TypedValue typedValue = new  TypedValue();
+        getTheme().resolveAttribute(R.attr.colorControlNormal, typedValue, true);
+        return typedValue.data;
+    }
+
+    public int getBackgroundColorSecondAsTint(){
+        TypedValue typedValue = new  TypedValue();
+        getTheme().resolveAttribute(R.attr.backgroundColorSecondAsTint, typedValue, true);
+        return typedValue.data;
     }
 }

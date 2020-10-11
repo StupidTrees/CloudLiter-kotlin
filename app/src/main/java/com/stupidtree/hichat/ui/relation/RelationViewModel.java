@@ -6,10 +6,8 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.stupidtree.hichat.data.model.UserLocal;
-import com.stupidtree.hichat.data.model.UserProfile;
 import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
-import com.stupidtree.hichat.data.repository.ProfileRepository;
 import com.stupidtree.hichat.data.repository.RelationRepository;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.ui.myprofile.ChangeInfoTrigger;
@@ -46,7 +44,7 @@ public class RelationViewModel extends ViewModel {
             relationData = Transformations.switchMap(relationQueryController, input -> {
                 if(input.isActioning()){
                     if(localUserRepository.isUserLoggedIn()){
-                        return relationRepository.queryRelation(Objects.requireNonNull(localUserRepository.getLoggedInUserDirect().getToken()),
+                        return relationRepository.queryRelation(Objects.requireNonNull(localUserRepository.getLoggedInUser().getToken()),
                                 input.getFriendId());
                     }else{
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
@@ -65,7 +63,7 @@ public class RelationViewModel extends ViewModel {
             //也是一样的
             changeRemarkResult = Transformations.switchMap(changeRemarkController, input -> {
                 if(input.isActioning()){
-                    UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                    UserLocal userLocal = localUserRepository.getLoggedInUser();
                     if(userLocal.isValid()&&relationData.getValue()!=null){
                         System.out.println("friend id is"+relationData.getValue().getData().getId());
                         return relationRepository.changeRemark(Objects.requireNonNull(userLocal.getToken()),input.getValue(),relationData.getValue().getData().getId());

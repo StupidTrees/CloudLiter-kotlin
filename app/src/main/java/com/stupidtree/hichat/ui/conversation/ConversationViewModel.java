@@ -37,7 +37,7 @@ public class ConversationViewModel extends ViewModel {
         if(conversationLiveData==null){
             conversationLiveData = Transformations.switchMap(conversationTrigger, (Function<StringTrigger, LiveData<DataState<Conversation>>>) input -> {
                 if(input.isActioning()){
-                    UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                    UserLocal userLocal = localUserRepository.getLoggedInUser();
                     if(userLocal.isValid()){
                         return repository.queryConversation(Objects.requireNonNull(userLocal.getToken()),userLocal.getId(),input.getData());
                     }else{

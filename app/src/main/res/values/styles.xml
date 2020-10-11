@@ -8,6 +8,7 @@
         <item name="backgroundColorBottom">#FFFAFAFA</item>
         <item name="backgroundColorBottomAsTint">#CFFAFAFA</item>
         <item name="backgroundColorSecond">#FFFFFFFF</item>
+        <item name="backgroundColorSecondAsTint">#CFFFFFFF</item>
         <item name="textColorPrimary">#FF000000</item>
         <item name="textColorSecondary">#FF808080</item>
         <item name="colorControlDisabled">#FFE0E0E0</item>

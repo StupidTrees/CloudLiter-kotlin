@@ -62,7 +62,7 @@ public class ConversationsViewModel extends ViewModel {
     public LiveData<DataState<List<Conversation>>> getListData() {
         if (listData == null) {
             listData = Transformations.switchMap(listDataController, input -> {
-                UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                UserLocal userLocal = localUserRepository.getLoggedInUser();
                 if (userLocal.isValid()) {
                     return conversationRepository.getConversations(Objects.requireNonNull(userLocal.getToken()), userLocal.getId());
                 } else {
@@ -110,7 +110,7 @@ public class ConversationsViewModel extends ViewModel {
     }
 
     public void callOnline(@NonNull Context context) {
-        UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+        UserLocal userLocal = localUserRepository.getLoggedInUser();
         if (userLocal.isValid()) {
             conversationRepository.callOnline(context,userLocal);
         }

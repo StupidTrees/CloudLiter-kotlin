@@ -52,7 +52,7 @@ public class EmoticonsTextView extends androidx.appcompat.widget.AppCompatTextVi
                 String key = faceText.substring(1);
                 key = key.substring(key.indexOf("[") + 1, key.indexOf("]"));
                 int imageId = getContext().getResources().getIdentifier("yunmoji_" + key, "drawable", getContext().getPackageName());
-                Bitmap bitmap = ImageUtils.getBitmapFromDrawable(getContext(), imageId,getTextSize()*1.4f);
+                Bitmap bitmap = ImageUtils.getBitmapFromDrawable(getContext(), imageId,getTextSize()*1.3f);
                 ImageSpan imageSpan = new ImageSpan(getContext(), bitmap);
                 int startIndex = text.indexOf(faceText, start);
                 int endIndex = startIndex + faceText.length();

@@ -106,8 +106,8 @@ public class ChatViewModel extends ViewModel {
         if (conversationLiveData == null) {
             conversationLiveData = MTransformations.switchMap(conversationController, input -> {
                 if (localUserRepository.isUserLoggedIn()) {
-                    return conversationRepository.queryConversation(Objects.requireNonNull(localUserRepository.getLoggedInUserDirect().getToken()),
-                            localUserRepository.getLoggedInUserDirect().getId(), input.friendId);
+                    return conversationRepository.queryConversation(Objects.requireNonNull(localUserRepository.getLoggedInUser().getToken()),
+                            localUserRepository.getLoggedInUser().getId(), input.friendId);
                 }
                 return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
             });
@@ -127,7 +127,7 @@ public class ChatViewModel extends ViewModel {
                 if (!input.isActioning()) {
                     return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
                 }
-                UserLocal local = localUserRepository.getLoggedInUserDirect();
+                UserLocal local = localUserRepository.getLoggedInUser();
                 if (!local.isValid()) {
                     return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                 }
@@ -180,7 +180,7 @@ public class ChatViewModel extends ViewModel {
      * @param content 消息文本
      */
     public void sendMessage(String content) {
-        UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+        UserLocal userLocal = localUserRepository.getLoggedInUser();
         if (userLocal.isValid() && getFriendId() != null) {
             ChatMessage message = new ChatMessage(userLocal.getId(),
                     getFriendId(), content);
@@ -225,13 +225,13 @@ public class ChatViewModel extends ViewModel {
 
     @Nullable
     public String getMyAvatar() {
-        UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+        UserLocal userLocal = localUserRepository.getLoggedInUser();
         return userLocal.getAvatar();
     }
 
     @Nullable
     public String getMyId() {
-        UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+        UserLocal userLocal = localUserRepository.getLoggedInUser();
         return userLocal.getId();
     }
 
@@ -262,7 +262,7 @@ public class ChatViewModel extends ViewModel {
     public void getIntoConversation(Context context) {
         if (getFriendId() != null && getConversationId() != null && localUserRepository.isUserLoggedIn()
         ) {
-            chatRepository.getIntoConversation(context, Objects.requireNonNull(localUserRepository.getLoggedInUserDirect().getId()),
+            chatRepository.getIntoConversation(context, Objects.requireNonNull(localUserRepository.getLoggedInUser().getId()),
                     getFriendId(), getConversationId());
         }
     }
@@ -273,7 +273,7 @@ public class ChatViewModel extends ViewModel {
     public void leftConversation(@NonNull Context context) {
         if (getConversationId() != null && localUserRepository.isUserLoggedIn()
         ) {
-            chatRepository.leftConversation(context, Objects.requireNonNull(localUserRepository.getLoggedInUserDirect().getId()),
+            chatRepository.leftConversation(context, Objects.requireNonNull(localUserRepository.getLoggedInUser().getId()),
                     getConversationId());
         }
     }

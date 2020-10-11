@@ -1,13 +1,11 @@
 package com.stupidtree.hichat.ui.profile;
 
 import androidx.annotation.Nullable;
-import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
-import com.stupidtree.hichat.data.model.Conversation;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.model.UserProfile;
 import com.stupidtree.hichat.data.model.UserRelation;
@@ -71,7 +69,7 @@ public class ProfileViewModel extends ViewModel {
     public LiveData<DataState<UserProfile>> getUserProfileLiveData() {
         if (profileLiveData == null) {
             profileLiveData = Transformations.switchMap(profileController, input -> {
-                UserLocal user = localUserRepository.getLoggedInUserDirect();
+                UserLocal user = localUserRepository.getLoggedInUser();
                 if (input.isActioning()) {
                     if (user.isValid()) {
                         //从用户资料仓库中拉取数据
@@ -89,7 +87,7 @@ public class ProfileViewModel extends ViewModel {
     public LiveData<DataState<UserRelation>> getRelationLiveData() {
         if (relationLiveData == null) {
             relationLiveData = Transformations.switchMap(profileController, input -> {
-                UserLocal user = localUserRepository.getLoggedInUserDirect();
+                UserLocal user = localUserRepository.getLoggedInUser();
                 if (input.isActioning()) {
                     if (user.isValid()) {
                         //通知用户资料仓库进行好友判别
@@ -108,7 +106,7 @@ public class ProfileViewModel extends ViewModel {
     public LiveData<DataState<?>> getMakeFriendsResult() {
         if (makeFriendsResult == null) {
             makeFriendsResult = Transformations.switchMap(makeFriendsController, input -> {
-                UserLocal user = localUserRepository.getLoggedInUserDirect();
+                UserLocal user = localUserRepository.getLoggedInUser();
                 if (input.isActioning()) {
                     if (user.isValid()) {
                         //也是通过这个仓库进行好友建立
@@ -129,7 +127,7 @@ public class ProfileViewModel extends ViewModel {
             //也是一样的
             changeRemarkResult = Transformations.switchMap(changeRemarkController, input -> {
                 if(input.isActioning()){
-                    UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                    UserLocal userLocal = localUserRepository.getLoggedInUser();
                     if(userLocal.isValid()&&relationLiveData.getValue()!=null){
                         System.out.println("friend id is"+relationLiveData.getValue().getData().getId());
                         return relationRepository.changeRemark(Objects.requireNonNull(userLocal.getToken()),input.getValue(),relationLiveData.getValue().getData().getId());
@@ -147,7 +145,7 @@ public class ProfileViewModel extends ViewModel {
         if(deleteFriendResult==null){
             deleteFriendResult = Transformations.switchMap(deleteFriendController, input -> {
                 if(input.isActioning()){
-                    UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                    UserLocal userLocal = localUserRepository.getLoggedInUser();
                     if(userLocal.isValid()){
                         return relationRepository.deleteFriend(Objects.requireNonNull(userLocal.getToken()),input.getData());
                     }else{

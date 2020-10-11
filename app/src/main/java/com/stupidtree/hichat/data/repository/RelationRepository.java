@@ -120,4 +120,15 @@ public class RelationRepository {
         return relationWebSource.deleteFriend(token,friendId);
     }
 
+
+    /**
+     * 获得未读好友事件数目
+     * @param token 令牌
+     * @return 查询结果
+     */
+    public LiveData<DataState<Integer>> countUnread(@NonNull String token){
+        return relationWebSource.countUnread(token);
+    }
+
+
 }

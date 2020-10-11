@@ -2,6 +2,7 @@ package com.stupidtree.hichat.data.repository;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
@@ -26,7 +27,7 @@ public class LocalUserRepository {
     UserPreferenceSource mePreferenceSource;
 
     //将已登录用户缓存在内存里
-    UserLocal loggedInUser = null;
+    private UserLocal loggedInUser = null;
 
 
 
@@ -56,16 +57,6 @@ public class LocalUserRepository {
         mePreferenceSource.clearLocalUser();
     }
 
-    /**
-     * 获得当时本地缓存的已登录用户
-     * @return LiveData形式
-     */
-    public MutableLiveData<UserLocal> getLoggedInUser(){
-       final MutableLiveData<UserLocal> result = new MutableLiveData<>();
-       loggedInUser = mePreferenceSource.getLocalUser();
-       result.setValue(loggedInUser);
-       return result;
-    }
 
 
     /**
@@ -111,11 +102,11 @@ public class LocalUserRepository {
      * @return 本地用户对象
      */
     @NonNull
-    public UserLocal getLoggedInUserDirect(){
+    public UserLocal getLoggedInUser(){
         //Log.e("get_local_user", String.valueOf(loggedInUser));
-        if(loggedInUser==null){
+        //if(loggedInUser==null){
             loggedInUser = mePreferenceSource.getLocalUser();
-        }
+       // }
         return loggedInUser;
     }
 

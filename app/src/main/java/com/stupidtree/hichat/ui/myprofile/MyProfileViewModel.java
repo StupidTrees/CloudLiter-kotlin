@@ -74,7 +74,7 @@ public class MyProfileViewModel extends ViewModel {
         if(userProfileLiveData==null){
             //controller改变的时候，通知userProfile改变
             userProfileLiveData = Transformations.switchMap(profileController, input -> {
-                UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                UserLocal userLocal = localUserRepository.getLoggedInUser();
                 if(userLocal.isValid()){
                     //从用户资料仓库总取出数据
                     return profileRepository.getUserProfile(userLocal.getId(), Objects.requireNonNull(userLocal.getToken()));
@@ -92,7 +92,7 @@ public class MyProfileViewModel extends ViewModel {
             changeAvatarResult = Transformations.switchMap(changeAvatarController, input -> {
                 if(input.isActioning()){
                     //要先判断本地用户当前是否登录
-                    UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                    UserLocal userLocal = localUserRepository.getLoggedInUser();
                     if(userLocal.isValid()){
                         //通知用户资料仓库，开始更换头像
                         return profileRepository.changeAvatar(Objects.requireNonNull(userLocal.getToken()),input.getValue());
@@ -114,7 +114,7 @@ public class MyProfileViewModel extends ViewModel {
             //也是一样的
             changeNicknameResult = Transformations.switchMap(changeNicknameController, input -> {
                 if(input.isActioning()){
-                    UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                    UserLocal userLocal = localUserRepository.getLoggedInUser();
                     if(userLocal.isValid()){
                         return profileRepository.changeNickname(Objects.requireNonNull(userLocal.getToken()),input.getValue());
                     }else{
@@ -131,7 +131,7 @@ public class MyProfileViewModel extends ViewModel {
         if(changeGenderResult==null){
             changeGenderResult = Transformations.switchMap(changeGenderController, input -> {
                 if(input.isActioning()){
-                    UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                    UserLocal userLocal = localUserRepository.getLoggedInUser();
                     if(userLocal.isValid()){
                         return profileRepository.changeGender(Objects.requireNonNull(userLocal.getToken()),input.getValue());
                     }else{
@@ -148,7 +148,7 @@ public class MyProfileViewModel extends ViewModel {
         if(changeColorResult==null){
             changeColorResult = Transformations.switchMap(changeColorController, input -> {
                if(input.isActioning()){
-                   UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                   UserLocal userLocal = localUserRepository.getLoggedInUser();
                    if(userLocal.isValid()){
                        return profileRepository.changeColor(Objects.requireNonNull(userLocal.getToken()),input.getValue());
                    }else {
@@ -166,7 +166,7 @@ public class MyProfileViewModel extends ViewModel {
             //也是一样的
             changeSignatureResult = Transformations.switchMap(changeSignatureController, input -> {
                 if(input.isActioning()){
-                    UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                    UserLocal userLocal = localUserRepository.getLoggedInUser();
                     if(userLocal.isValid()){
                         return profileRepository.changeSignature(Objects.requireNonNull(userLocal.getToken()),input.getValue());
                     }else{
@@ -229,7 +229,7 @@ public class MyProfileViewModel extends ViewModel {
      * 开始页面刷新（即用户profile的获取）
      */
     public void startRefresh(){
-        UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+        UserLocal userLocal = localUserRepository.getLoggedInUser();
         profileController.setValue(StringTrigger.getActioning(userLocal.getId()));
     }
 }

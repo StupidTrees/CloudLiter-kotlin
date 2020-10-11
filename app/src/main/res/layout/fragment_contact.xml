@@ -34,6 +34,18 @@
                     android:padding="11dp"
                     app:srcCompat="@drawable/ic_friend_button"
                     app:tint="@android:color/white" />
+
+                <TextView
+                    android:id="@+id/unread"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="6dp"
+                    android:background="@drawable/element_round_primary_light"
+                    android:gravity="center"
+                    android:text="12"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="10sp" />
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView

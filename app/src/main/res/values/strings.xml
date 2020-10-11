@@ -111,4 +111,8 @@
     <string name="label_relation_settings">好友选项</string>
     <string name="attention_delete_friend">确定要结束这段友谊吗？</string>
     <string name="delete_friend_success">已删除好友</string>
+    <string name="relation_you_deleted">你删了TA</string>
+    <string name="search">搜索</string>
+    <string name="menu_my_profile">我的资料</string>
+    <string name="menu_setting">设置</string>
 </resources>

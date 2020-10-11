@@ -52,12 +52,13 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
     @BindView(R.id.refresh)
     SwipeRefreshLayout refreshLayout;
 
+    @BindView(R.id.search_bar)
+    ViewGroup searchBar;
+
     /**
      * 适配器区
      */
     CAdapter listAdapter;
-
-
 
 
     public ConversationsFragment() {
@@ -74,8 +75,6 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
     }
 
 
-
-
     @Override
     protected void initViews(View view) {
         listAdapter = new CAdapter(getContext(), new LinkedList<>());
@@ -85,38 +84,44 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
 
         //设置下拉刷新
         //设置下拉刷新
-        refreshLayout.setColorSchemeResources(R.color.colorPrimary,R.color.colorAccent);
+        refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
         refreshLayout.setOnRefreshListener(() -> viewModel.startRefresh());
 
 
+        searchBar.setOnClickListener(view1 -> ActivityUtils.startSearchActivity(requireActivity()));
         viewModel.getListData().observe(this, listDataState -> {
             refreshLayout.setRefreshing(false);
             if (listDataState.getState() == DataState.STATE.SUCCESS) {
                 List<Conversation> listD = listDataState.getData();
                 Collections.sort(listD, (conversation, t1) -> t1.getUpdatedAt().compareTo(conversation.getUpdatedAt()));
-                listAdapter.notifyItemChangedSmooth(listD);
-                if(listD.size()>0){
+                listAdapter.notifyItemChangedSmooth(listD, new BaseListAdapter.RefreshJudge<Conversation>() {
+                    @Override
+                    public boolean judge(Conversation oldData, Conversation newData) {
+                        return !Objects.equals(oldData,newData);
+                    }
+                });
+                if (listD.size() > 0) {
                     list.setVisibility(View.VISIBLE);
                     placeHolder.setVisibility(View.GONE);
-                }else{
+                } else {
                     list.setVisibility(View.GONE);
                     placeHolder.setVisibility(View.VISIBLE);
                     placeHolderText.setText(R.string.no_conversation);
                 }
-            } else if(listDataState.getState()== DataState.STATE.NOT_LOGGED_IN) {
+            } else if (listDataState.getState() == DataState.STATE.NOT_LOGGED_IN) {
                 placeHolder.setVisibility(View.VISIBLE);
                 list.setVisibility(View.GONE);
                 placeHolderText.setText(R.string.not_logged_in);
-            }else{
+            } else {
                 placeHolder.setVisibility(View.VISIBLE);
                 list.setVisibility(View.GONE);
                 placeHolderText.setText(R.string.fetch_failed);
             }
         });
-        viewModel.getUnreadMessageState().observe(this, listDataState ->{
+        viewModel.getUnreadMessageState().observe(this, listDataState -> {
             refreshLayout.setRefreshing(true);
             viewModel.startRefresh();
-        } );
+        });
     }
 
     @Override
@@ -149,7 +154,7 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
         /**
          * 缓存每个对话的未读状态
          */
-        HashMap<String,Integer> unreadMap;
+        HashMap<String, Integer> unreadMap;
 
         public CAdapter(Context mContext, List<Conversation> mBeans) {
             super(mContext, mBeans);
@@ -171,21 +176,21 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
             if (data != null) {
                 ImageUtils.loadAvatarInto(mContext, data.getFriendAvatar(), holder.avatar);
                 holder.lastMessage.setText(data.getLastMessage());
-                if(TextUtils.isEmpty(data.getFriendRemark())){
+                if (TextUtils.isEmpty(data.getFriendRemark())) {
                     holder.name.setText(data.getFriendNickname());
-                }else{
+                } else {
                     holder.name.setText(data.getFriendRemark());
                 }
 
                 int unread = viewModel.getUnreadNumber(data);
-                unreadMap.put(data.getId(),unread);
+                unreadMap.put(data.getId(), unread);
                 if (unread > 0) {
                     holder.unread.setVisibility(View.VISIBLE);
                     holder.unread.setText(String.valueOf(unread));
                 } else {
                     holder.unread.setVisibility(View.INVISIBLE);
                 }
-                holder.updatedAt.setText(TextUtils.getConversationTimeText(mContext,data.getUpdatedAt()));
+                holder.updatedAt.setText(TextUtils.getConversationTimeText(mContext, data.getUpdatedAt()));
                 if (mOnItemClickListener != null) {
                     holder.item.setOnClickListener(view -> mOnItemClickListener.onItemClick(data, view, position));
                 }
@@ -194,13 +199,13 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
         }
 
 
-        public void notifyItemChangedSmooth(List<Conversation> newL){
+        public void notifyItemChangedSmooth(List<Conversation> newL) {
             super.notifyItemChangedSmooth(newL, (oldData, newData) -> {
                 Integer newUnread = viewModel.getUnreadNumber(newData);
                 Integer lastUnread = unreadMap.get(oldData.getId());
                 return !Objects.equals(newData, oldData) || !Objects.equals(lastUnread, newUnread);
             }, (conversation, t1) -> {
-                if(Objects.equals(t1.getId(),conversation.getId())) return 0;
+                if (Objects.equals(t1.getId(), conversation.getId())) return 0;
                 else return conversation.getUpdatedAt().compareTo(t1.getUpdatedAt());
             });
         }

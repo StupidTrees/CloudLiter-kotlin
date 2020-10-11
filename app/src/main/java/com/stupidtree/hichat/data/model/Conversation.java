@@ -151,7 +151,7 @@ public class Conversation implements Serializable {
                 Objects.equals(lastMessage, that.lastMessage) &&
                 friendId.equals(that.friendId) &&
                 Objects.equals(groupId, that.groupId) &&
-                Objects.equals(friendNickname, that.friendNickname) &&
+                Objects.equals(friendRemark, that.friendRemark) &&
                 Objects.equals(friendAvatar, that.friendAvatar) &&
                 Objects.equals(relationId, that.relationId) &&
                 Objects.equals(createdAt, that.createdAt) &&

@@ -88,7 +88,9 @@ public class UserPreferenceSource {
 
     public void clearLocalUser(){
         SharedPreferences preferences = context.getSharedPreferences(SP_NAME_LOCAL_USER, Context.MODE_PRIVATE);
-        preferences.edit().putString("username",null).putString("nickname",null).putString("token",null).apply();
+        preferences.edit().clear().apply();
+//        preferences.edit().putString("username",null)
+//                .putString("nickname",null).putString("token",null).apply();
     }
 
     @NonNull

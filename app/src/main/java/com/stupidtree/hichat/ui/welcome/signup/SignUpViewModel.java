@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.UserLocal;
+import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.data.repository.UserRepository;
 import com.stupidtree.hichat.utils.TextUtils;
 
@@ -35,9 +36,11 @@ public class SignUpViewModel extends ViewModel {
      */
     //用户仓库
     private UserRepository userRepository;
+    private LocalUserRepository localUserRepository;
 
     public SignUpViewModel() {
         this.userRepository = UserRepository.getInstance();
+        this.localUserRepository = LocalUserRepository.getInstance();
     }
 
     @NonNull

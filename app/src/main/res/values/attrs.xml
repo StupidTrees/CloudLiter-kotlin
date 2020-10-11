@@ -9,6 +9,7 @@
     <attr name="backgroundColorBottom" format="color" />
     <attr name="backgroundColorBottomAsTint" format="color" />
     <attr name="backgroundColorSecond" format="color" />
+    <attr name="backgroundColorSecondAsTint" format="color" />
     <attr name="colorControlDisabled" format="color" />
 </resources>
 

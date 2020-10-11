@@ -147,6 +147,8 @@ public class RelationEventActivity extends BaseActivity<RelationEventViewModel> 
                         holder.message.setText(R.string.relation_rejected);
                     }else if(data.getState()== RelationEvent.STATE.ACCEPTED){
                         holder.message.setText(R.string.relation_accepted);
+                    }else if(data.getState()== RelationEvent.STATE.DELETE){
+                        holder.message.setText(R.string.relation_you_deleted);
                     }
                 }else{ //我收到的
                     holder.icon.setImageResource(R.drawable.ic_received);

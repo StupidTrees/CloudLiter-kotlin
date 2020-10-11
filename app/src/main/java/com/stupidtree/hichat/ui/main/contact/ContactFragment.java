@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -55,6 +56,9 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
     @BindView(R.id.relation_event)
     View relationEventButton;
 
+    @BindView(R.id.unread)
+            TextView unreadText;
+
     /**
      * 适配器区
      */
@@ -98,12 +102,7 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
             refreshLayout.setRefreshing(false);
             if (contactListState.getState() == DataState.STATE.SUCCESS) {
                 //状态为”成功“，那么列表设置为可见，并通知列表适配器丝滑地更新列表项
-                listAdapter.notifyItemChangedSmooth(contactListState.getData(), new BaseListAdapter.RefreshJudge<UserRelation>() {
-                    @Override
-                    public boolean judge(UserRelation oldData, UserRelation newData) {
-                        return !Objects.equals(oldData, newData) || !Objects.equals(oldData.getRemark(), newData.getRemark());
-                    }
-                });
+                listAdapter.notifyItemChangedSmooth(contactListState.getData(), (oldData, newData) -> !Objects.equals(oldData, newData) || !Objects.equals(oldData.getRemark(), newData.getRemark()));
                 if (contactListState.getData().size() > 0) {
                     list.setVisibility(View.VISIBLE);
                     placeHolder.setVisibility(View.GONE);
@@ -126,6 +125,16 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
             }
         });
 
+        viewModel.getUnReadLiveData().observe(this, integerDataState -> {
+            if(integerDataState.getState()== DataState.STATE.SUCCESS){
+                unreadText.setVisibility(View.VISIBLE);
+                unreadText.setText(String.valueOf(integerDataState.getData()));
+            }else{
+                unreadText.setVisibility(View.GONE);
+            }
+        });
+
+
     }
 
     @Override
@@ -138,6 +147,7 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
     public void onResume() {
         super.onResume();
         viewModel.startFetchData();
+        viewModel.startFetchUnread();
     }
 
 

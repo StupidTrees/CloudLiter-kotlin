@@ -124,4 +124,16 @@ public class ImageUtils {
         return Bitmap.createBitmap(bitmap, 0, 0, src_w, src_h, matrix,
                 true);
     }
+
+
+    /**
+     * convert dp to its equivalent px
+     *
+     * 将dp转换为与之相等的px
+     */
+    public static int dp2px(Context context, float dipValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dipValue * scale + 0.5f);
+    }
+
 }

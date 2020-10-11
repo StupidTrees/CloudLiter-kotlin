@@ -119,6 +119,15 @@ public interface RelationService {
     @FormUrlEncoded
     @POST("/relation/event/delete_friend")
     LiveData<ApiResponse<Object>> deleteFriend(@Header("token")String token, @Field("friendId") String friendId);
+
+
+    /**
+     * 获得未读好友事件数量
+     * @param token 令牌
+     * @return 删除结果
+     */
+    @GET("/relation/event/count_unread")
+    LiveData<ApiResponse<Integer>> countUnread(@Header("token")String token);
 }
 
 

@@ -47,7 +47,7 @@ public class SearchViewModel extends ViewModel {
     public LiveData<DataState<List<UserSearched>>> getSearchListStateLiveData(){
         if(searchListStateLiveData==null) {
             searchListStateLiveData = Transformations.switchMap(searchTriggerLiveData, input -> {
-                UserLocal userLocal = localUserRepository.getLoggedInUserDirect();
+                UserLocal userLocal = localUserRepository.getLoggedInUser();
                 if(userLocal.isValid()){
                     //通知用户仓库进行搜索，从中获取搜索结果
                     return userRepository.searchUser(input.getSearchText(), userLocal.getToken());
