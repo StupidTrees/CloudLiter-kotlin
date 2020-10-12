@@ -128,6 +128,16 @@ public interface RelationService {
      */
     @GET("/relation/event/count_unread")
     LiveData<ApiResponse<Integer>> countUnread(@Header("token")String token);
+
+
+
+    /**
+     * 标记已读所有好友消息
+     * @param token 令牌
+     * @return 操作结果
+     */
+    @POST("/relation/event/mark_read")
+    LiveData<ApiResponse<Object>> markRead(@Header("token") String token);
 }
 
 

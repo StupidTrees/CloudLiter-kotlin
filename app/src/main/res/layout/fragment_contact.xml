@@ -19,40 +19,54 @@
             android:padding="16dp"
             app:layout_scrollFlags="scroll">
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/relation_event"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                app:cardBackgroundColor="?attr/colorPrimary"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="0dp">
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:padding="11dp"
-                    app:srcCompat="@drawable/ic_friend_button"
-                    app:tint="@android:color/white" />
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/relation_event"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:clickable="true"
+                    android:focusable="auto"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    app:cardBackgroundColor="?attr/colorPrimary"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="0dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:padding="11dp"
+                        app:srcCompat="@drawable/ic_friend_button"
+                        app:tint="@android:color/white" />
+
+                </androidx.cardview.widget.CardView>
 
                 <TextView
                     android:id="@+id/unread"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
                     android:layout_gravity="bottom|end"
-                    android:layout_margin="6dp"
                     android:background="@drawable/element_round_primary_light"
                     android:gravity="center"
-                    android:text="12"
+                    android:text="14"
                     android:textColor="?attr/colorPrimary"
-                    android:textSize="10sp" />
-            </androidx.cardview.widget.CardView>
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+            </FrameLayout>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/search_friend"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginStart="16dp"
+                android:clickable="true"
+                android:focusable="auto"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 app:cardBackgroundColor="?attr/colorPrimary"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="0dp">
@@ -69,6 +83,7 @@
         </LinearLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/refresh"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"

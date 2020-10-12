@@ -312,4 +312,26 @@ public class RelationWebSource extends BaseWebSource<RelationService> {
             }
         });
     }
+
+
+    /**
+     * 标记好友事件全部已读
+     * @param token 登录状态token
+     * @return 操作结果
+     */
+    public LiveData<DataState<Object>> markRead(@NonNull String token) {
+        return Transformations.map(service.markRead(token), input -> {
+            if (null == input) {
+                return new DataState<>(FETCH_FAILED);
+            }
+            switch (input.getCode()) {
+                case codes.SUCCESS:
+                    return new DataState<>(input.getData());
+                case codes.TOKEN_INVALID:
+                    return new DataState<>(TOKEN_INVALID,input.getMessage());
+                default:
+                    return new DataState<>(FETCH_FAILED,input.getMessage());
+            }
+        });
+    }
 }

@@ -15,6 +15,7 @@ public class RelationEvent {
     String otherAvatar;
     String otherNickname;
     STATE state;
+    boolean unread;
     Timestamp createdAt;
     Timestamp updatedAt;
 
@@ -54,6 +55,11 @@ public class RelationEvent {
         return updatedAt;
     }
 
+
+    public boolean isUnread() {
+        return unread;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -64,6 +70,7 @@ public class RelationEvent {
                 Objects.equals(getFriendId(), that.getFriendId()) &&
                 Objects.equals(getOtherAvatar(), that.getOtherAvatar()) &&
                 Objects.equals(getOtherNickname(), that.getOtherNickname()) &&
+                Objects.equals(isUnread(), that.isUnread()) &&
                 getState() == that.getState();
     }
 

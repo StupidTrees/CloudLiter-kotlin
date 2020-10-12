@@ -97,6 +97,10 @@ public class RelationEventActivity extends BaseActivity<RelationEventViewModel> 
             }
             viewModel.startRefresh();
         });
+
+
+        viewModel.getMarkReadResult().observe(this, dataState -> {
+        });
     }
 
 
@@ -104,6 +108,7 @@ public class RelationEventActivity extends BaseActivity<RelationEventViewModel> 
     protected void onResume() {
         super.onResume();
         viewModel.startRefresh();
+        viewModel.startMarkRead();
     }
 
     class RListAdapter extends BaseListAdapter<RelationEvent, RListAdapter.RHolder>{
@@ -132,11 +137,17 @@ public class RelationEventActivity extends BaseActivity<RelationEventViewModel> 
         protected void bindHolder(@NonNull RHolder holder, @Nullable RelationEvent data, int position) {
             if(data!=null){
                 holder.nickname.setText(data.getOtherNickname());
-                holder.time.setText(TextUtils.getChatTimeText(mContext,data.getUpdatedAt()));
+                holder.time.setText(TextUtils.getChatTimeText(mContext,data.getCreatedAt()));
                 ImageUtils.loadAvatarNoCacheInto(mContext,data.getOtherAvatar(),holder.avatar);
                 if(mOnItemClickListener!=null){
                     holder.item.setOnClickListener(view -> mOnItemClickListener.onItemClick(data,view,position));
                 }
+                if(data.isUnread()){
+                    holder.unread.setVisibility(View.VISIBLE);
+                }else{
+                    holder.unread.setVisibility(View.GONE);
+                }
+
                 if(Objects.equals(data.getUserId(),viewModel.getLocalUserId())){ //我发出的
                     holder.accept.setVisibility(View.GONE);
                     holder.message.setVisibility(View.VISIBLE);
@@ -186,6 +197,7 @@ public class RelationEventActivity extends BaseActivity<RelationEventViewModel> 
             TextView message;
             TextView time;
             View accept;
+            ImageView unread;
             public RHolder(@NonNull View itemView) {
                 super(itemView);
                 item = itemView.findViewById(R.id.item);
@@ -195,6 +207,7 @@ public class RelationEventActivity extends BaseActivity<RelationEventViewModel> 
                 icon = itemView.findViewById(R.id.icon);
                 message = itemView.findViewById(R.id.message);
                 time = itemView.findViewById(R.id.time);
+                unread = itemView.findViewById(R.id.unread);
             }
         }
     }

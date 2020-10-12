@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
-import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.data.model.UserLocal;
+import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.data.repository.FriendsRepository;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.data.repository.RelationRepository;
@@ -35,6 +35,7 @@ public class ContactViewModel extends ViewModel {
     private LiveData<DataState<Integer>> unReadLiveData;
     //Trigger：控制↑的获取
     private MutableLiveData<Trigger> unReadController = new MutableLiveData<>();
+
 
     /**
      * 仓库区
@@ -98,6 +99,8 @@ public class ContactViewModel extends ViewModel {
         return unReadLiveData;
     }
 
+
+
     /**
      * 开始刷新列表数据
      */
@@ -106,11 +109,16 @@ public class ContactViewModel extends ViewModel {
     }
 
 
+
+
     /**
      * 开始获取未读事件数目
      */
     public void startFetchUnread(){
         unReadController.setValue(Trigger.getActioning());
     }
+
+
+
 
 }

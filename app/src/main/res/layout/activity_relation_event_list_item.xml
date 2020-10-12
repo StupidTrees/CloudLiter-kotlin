@@ -37,15 +37,30 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/nickname"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:singleLine="true"
-            android:text="TextView"
-            android:textColor="?attr/textColorPrimary"
-            android:textSize="16sp" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/nickname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:singleLine="true"
+                android:text="TextView"
+                android:textColor="?attr/textColorPrimary"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/unread"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                app:srcCompat="@drawable/element_round_primary" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/time"

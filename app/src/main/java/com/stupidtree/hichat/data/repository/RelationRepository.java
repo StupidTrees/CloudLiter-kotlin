@@ -130,5 +130,13 @@ public class RelationRepository {
         return relationWebSource.countUnread(token);
     }
 
+    /**
+     * 将我的所有好友事件标记为已读
+     * @param token 令牌
+     * @return 操作结果
+     */
+    public LiveData<DataState<Object>> markRead(@NonNull String token){
+        return relationWebSource.markRead(token);
+    }
 
 }

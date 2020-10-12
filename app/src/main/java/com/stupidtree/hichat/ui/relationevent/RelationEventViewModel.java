@@ -32,6 +32,11 @@ public class RelationEventViewModel extends ViewModel {
     private LiveData<DataState<?>> responseResult;
     private MutableLiveData<ResponseFriendTrigger> responseFriendTrigger = new MutableLiveData<>();
 
+    //状态数据：标记已读的结果
+    private LiveData<DataState<Object>> markReadResult;
+    //Trigger：控制↑的进行
+    private MutableLiveData<Trigger> markReadController = new MutableLiveData<>();
+
     /**
      * 仓库区
      */
@@ -77,7 +82,29 @@ public class RelationEventViewModel extends ViewModel {
         }
         return responseResult;
     }
+    public LiveData<DataState<Object>> getMarkReadResult() {
+        if(markReadResult==null){
+            return Transformations.switchMap(markReadController, input -> {
+                if(input.isActioning()){
+                    UserLocal userLocal = localUserRepository.getLoggedInUser();
+                    if(userLocal.isValid()){
+                        return relationRepository.markRead(Objects.requireNonNull(userLocal.getToken()));
+                    }else{
+                        return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
+                    }
 
+                }
+                return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
+            });
+        }
+        return markReadResult;
+    }
+    /**
+     * 开始标记已读
+     */
+    public void startMarkRead(){
+        markReadController.setValue(Trigger.getActioning());
+    }
     public void startRefresh(){
         listDataController.setValue(Trigger.getActioning());
     }

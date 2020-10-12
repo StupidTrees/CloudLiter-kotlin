@@ -127,12 +127,18 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
 
         viewModel.getUnReadLiveData().observe(this, integerDataState -> {
             if(integerDataState.getState()== DataState.STATE.SUCCESS){
-                unreadText.setVisibility(View.VISIBLE);
-                unreadText.setText(String.valueOf(integerDataState.getData()));
+                if(integerDataState.getData()>0){
+                    unreadText.setVisibility(View.VISIBLE);
+                    unreadText.setText(String.valueOf(integerDataState.getData()));
+                }else{
+                    unreadText.setVisibility(View.GONE);
+                }
+
             }else{
                 unreadText.setVisibility(View.GONE);
             }
         });
+
 
 
     }
@@ -148,6 +154,7 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
         super.onResume();
         viewModel.startFetchData();
         viewModel.startFetchUnread();
+
     }
 
 
