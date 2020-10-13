@@ -59,7 +59,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider> <!-- 加上他，否则无法从相册选取图片 -->
-        <service android:name=".service.SocketIOClientService" />
+        <service android:name=".socket.SocketIOClientService" />
     </application>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />

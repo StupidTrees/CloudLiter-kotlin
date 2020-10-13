@@ -7,17 +7,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 
-import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.model.Conversation;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.source.ConversationWebSource;
 import com.stupidtree.hichat.data.source.SocketWebSource;
 import com.stupidtree.hichat.ui.base.DataState;
 
+import java.util.HashMap;
 import java.util.List;
 
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_FRIEND_STATE_CHANGED;
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_RECEIVE_MESSAGE;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_FRIEND_STATE_CHANGED;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_RECEIVE_MESSAGE;
 
 /**
  * 层次：Repository
@@ -69,8 +69,8 @@ public class ConversationRepository {
         return conversationWebSource.getConversations(token,id);
     }
 
-    public LiveData<DataState<List<ChatMessage>>> getUnreadMessages(){
-        return socketWebSource.getUnreadMessages();
+    public LiveData<DataState<HashMap<String,Integer>>> getUnreadMessageState(){
+        return socketWebSource.getUnreadMessageState();
     }
 
     public LiveData<DataState<Conversation>> queryConversation(@NonNull String token, @Nullable String userId,@NonNull String friendId){

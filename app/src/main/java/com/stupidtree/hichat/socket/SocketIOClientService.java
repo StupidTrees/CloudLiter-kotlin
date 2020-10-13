@@ -1,4 +1,4 @@
-package com.stupidtree.hichat.service;
+package com.stupidtree.hichat.socket;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -23,11 +23,10 @@ import androidx.core.app.NotificationCompat;
 
 import com.bumptech.glide.request.target.NotificationTarget;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.stupidtree.hichat.R;
+import com.stupidtree.hichat.data.ApiResponse;
 import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
@@ -38,8 +37,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,9 +67,9 @@ public class SocketIOClientService extends Service {
     private String currentFriendId = null;
 
     /**
-     * 接收到的、未读的消息
+     * 各个对话的未读消息数记录
      */
-    private LinkedList<ChatMessage> incomingMessage = new LinkedList<>();
+    private HashMap<String, Integer> incomingMessage = new HashMap<>();
 
     Socket socket;
     BroadcastReceiver receiver;
@@ -79,11 +77,11 @@ public class SocketIOClientService extends Service {
 
 
     public interface OnUnreadFetchedListener {
-        void OnUnreadFetched(List<ChatMessage> unread);
+        void OnUnreadFetched(HashMap<String, Integer> unread);
     }
 
     public interface OnMessageReadListener {
-        void OnMessageRead(String conversationId, List<ChatMessage> toRemove);
+        void OnMessageRead(HashMap<String, Integer> map);
     }
 
     private void initReceiver() {
@@ -121,34 +119,48 @@ public class SocketIOClientService extends Service {
                         //从新消息队列中把该对话下的所有消息删除
                         conversationId = intent.getStringExtra("conversationId");
                         userId = intent.getStringExtra("userId");
-                        LinkedList<ChatMessage> toDelete = new LinkedList<>();
-                        for (ChatMessage cm : incomingMessage) {
-                            if (Objects.equals(cm.getConversationId(), conversationId)) {
-                                toDelete.add(cm);
-                            }
-                        }
+//                        LinkedList<ChatMessage> toDelete = new LinkedList<>();
+//                        for (ChatMessage cm : incomingMessage) {
+//                            if (Objects.equals(cm.getConversationId(), conversationId)) {
+//                                toDelete.add(cm);
+//                            }
+//                        }
+
+//                        incomingMessage.removeAll(toDelete);
+                        Log.e("mark_all_read", String.valueOf(incomingMessage));
                         for (JWebSocketClientBinder binder : binders.values()) {
                             if (binder != null && binder.onMessageReadListener != null) {
-                                binder.onMessageReadListener.OnMessageRead(conversationId, toDelete);
+                                HashMap<String,Integer> map = new HashMap<>();
+                                map.put(conversationId,incomingMessage.get(conversationId));
+                                binder.onMessageReadListener.OnMessageRead(map);
                             }
                         }
-                        incomingMessage.removeAll(toDelete);
+                        incomingMessage.remove(conversationId);
                         socket.emit("mark_all_read", userId, conversationId);
-                        Log.e("mark_all_read", String.valueOf(incomingMessage));
                         break;
                     case ACTION_MARK_READ:
                         String messageId = intent.getStringExtra("messageId");
+                        conversationId = intent.getStringExtra("conversationId");
                         socket.emit("mark_read", messageId);
-                        ChatMessage toRemove = null;
-                        for (ChatMessage cm : incomingMessage) {
-                            if (Objects.equals(cm.getId(), messageId)) {
-                                toRemove = cm;
-                            }
+                        Integer oldCount = incomingMessage.get(conversationId);
+                        if (oldCount != null && oldCount <= 1) {
+                            incomingMessage.remove(conversationId);
+                        } else if (oldCount != null) {
+                            incomingMessage.put(conversationId, oldCount - 1);
                         }
-                        incomingMessage.remove(toRemove);
+
+//                        ChatMessage toRemove = null;
+//                        for (ChatMessage cm : incomingMessage) {
+//                            if (Objects.equals(cm.getId(), messageId)) {
+//                                toRemove = cm;
+//                            }
+//                        }
+//                        incomingMessage.remove(toRemove);
                         for (JWebSocketClientBinder binder : binders.values()) {
-                            if (toRemove != null && binder != null && binder.onMessageReadListener != null) {
-                                binder.onMessageReadListener.OnMessageRead(toRemove.getConversationId(), Collections.singletonList(toRemove));
+                            if (binder != null && binder.onMessageReadListener != null) {
+                                HashMap<String, Integer> map = new HashMap<>();
+                                map.put(conversationId, 1);
+                                binder.onMessageReadListener.OnMessageRead(map);
                             }
                         }
                 }
@@ -195,7 +207,13 @@ public class SocketIOClientService extends Service {
         socket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
         socket.on("message", args -> {
             ChatMessage chatMessage = new Gson().fromJson(args[0].toString(), ChatMessage.class);
-            incomingMessage.add(chatMessage);
+//            incomingMessage.add(chatMessage);
+            Integer oldCount = incomingMessage.get(chatMessage.getConversationId());
+            if (oldCount == null) {
+                incomingMessage.put(chatMessage.getConversationId(), 1);
+            } else {
+                incomingMessage.put(chatMessage.getConversationId(), oldCount + 1);
+            }
             Log.e("收到消息", String.valueOf(chatMessage));
             Intent i = new Intent(ACTION_RECEIVE_MESSAGE);
             Bundle b = new Bundle();
@@ -203,22 +221,24 @@ public class SocketIOClientService extends Service {
             i.putExtras(b);
             sendBroadcast(i);
             //当前聊天的新消息，不发送通知
-            if(!Objects.equals(currentFriendId,chatMessage.getFromId())){
+            if (!Objects.equals(currentFriendId, chatMessage.getFromId())) {
                 sendNotification_NewMessage(chatMessage);
             }
         });
         socket.on("unread_message", args -> {
             if (args.length > 0) {
                 try {
-                    incomingMessage.clear();
-                    JsonObject obj = new Gson().fromJson(args[0].toString(), JsonObject.class);
-                    JsonArray ja = obj.get("data").getAsJsonArray();
-                    for (JsonElement je : ja) {
-                        JsonObject jo = je.getAsJsonObject();
-                        ChatMessage cm = new Gson().fromJson(jo.toString(), ChatMessage.class);
-                        incomingMessage.add(cm);
+                    try {
+                        incomingMessage.clear();
+                        ApiResponse<Object> jo = new Gson().fromJson(args[0].toString(), ApiResponse.class);
+                        Log.e("推送未读消息", String.valueOf(jo));
+                        HashMap<String, Object> m = new Gson().fromJson(jo.getData().toString(), HashMap.class);
+                        for (Map.Entry<String, Object> e : m.entrySet()) {
+                            incomingMessage.put(e.getKey(), (int) Float.parseFloat(String.valueOf(e.getValue())));
+                        }
+                    } catch (JsonSyntaxException | NumberFormatException e) {
+                        e.printStackTrace();
                     }
-
                     for (JWebSocketClientBinder binder : binders.values()) {
                         if (binder != null && binder.onUnreadFetchedListener != null) {
                             binder.onUnreadFetchedListener.OnUnreadFetched(
@@ -266,27 +286,28 @@ public class SocketIOClientService extends Service {
 
     /**
      * 发送新消息到来的系统通知
+     *
      * @param message 消息对象
      */
     private void sendNotification_NewMessage(ChatMessage message) {
         final RemoteViews rv = new RemoteViews(getPackageName(), R.layout.remote_notification);
         int notificationId = (int) System.currentTimeMillis();
-        rv.setImageViewResource(R.id.logo,R.drawable.logo);
+        rv.setImageViewResource(R.id.logo, R.drawable.logo);
         //将消息中的表情替换为文字
         String newContent = message.getContent();
         Pattern pattern = buildPattern();
         Matcher matcher = pattern.matcher(message.getContent());
         while (matcher.find()) {
             String faceText = matcher.group();
-            newContent = newContent.replaceAll(faceText,getString(R.string.place_holder_yunmoji));
+            newContent = newContent.replaceAll(faceText, getString(R.string.place_holder_yunmoji));
         }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             Notification.Builder notificationBuilder = new Notification.Builder(this, "cloudLiterMessageChanel");
             notificationBuilder.setSmallIcon(R.drawable.ic_logo_notification)
-                     .setLargeIcon(Icon.createWithResource(getApplicationContext(), R.drawable.logo))
+                    .setLargeIcon(Icon.createWithResource(getApplicationContext(), R.drawable.logo))
                     .setAutoCancel(true);
             notificationBuilder.setCustomContentView(rv);
-            rv.setTextViewText(R.id.title,newContent);
+            rv.setTextViewText(R.id.title, newContent);
             rv.setTextViewText(R.id.content, message.getFriendRemark());
             UserLocal ul = LocalUserRepository.getInstance().getLoggedInUser();
             if (ul.isValid()) {
@@ -297,7 +318,7 @@ public class SocketIOClientService extends Service {
             }
             Notification n = notificationBuilder.build();
             NotificationTarget notificationTarget = new NotificationTarget(this, R.id.avatar, rv, n, notificationId);
-            ImageUtils.loadAvatarIntoNotification(this,message.getFriendAvatar(),notificationTarget);
+            ImageUtils.loadAvatarIntoNotification(this, message.getFriendAvatar(), notificationTarget);
             notificationManager.notify(notificationId, n);
 
         } else {
@@ -318,7 +339,7 @@ public class SocketIOClientService extends Service {
             }
             Notification n = notificationBuilder.build();
             NotificationTarget notificationTarget = new NotificationTarget(this, R.id.avatar, rv, n, notificationId);
-            ImageUtils.loadAvatarIntoNotification(this,message.getFriendAvatar(),notificationTarget);
+            ImageUtils.loadAvatarIntoNotification(this, message.getFriendAvatar(), notificationTarget);
             notificationManager.notify(notificationId, n);
         }
 

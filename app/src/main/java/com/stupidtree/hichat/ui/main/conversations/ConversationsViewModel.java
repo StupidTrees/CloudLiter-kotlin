@@ -1,6 +1,7 @@
 package com.stupidtree.hichat.ui.main.conversations;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -8,7 +9,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
-import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.model.Conversation;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.repository.ConversationRepository;
@@ -16,7 +16,7 @@ import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.ui.base.Trigger;
 
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,8 +31,8 @@ public class ConversationsViewModel extends ViewModel {
     private MutableLiveData<Trigger> listDataController = new MutableLiveData<>();
 
     //数据本体：未读消息
-    private LiveData<DataState<List<ChatMessage>>> unreadMessageState;
-    private List<ChatMessage> unreadMessages = new LinkedList<>();
+    private LiveData<DataState<HashMap<String, Integer>>> unreadMessageState;
+    private HashMap<String, Integer> unreadMessages = new HashMap<>();
 
     /**
      * 仓库区
@@ -46,17 +46,7 @@ public class ConversationsViewModel extends ViewModel {
     public ConversationsViewModel() {
         conversationRepository = ConversationRepository.getInstance();
         localUserRepository = LocalUserRepository.getInstance();
-        unreadMessageState = Transformations.map(conversationRepository.getUnreadMessages(), input -> {
-            if (input.getListAction() == DataState.LIST_ACTION.APPEND) {
-                unreadMessages.addAll(input.getData());
-            } else if (input.getListAction() == DataState.LIST_ACTION.DELETE) {
-                unreadMessages.removeAll(input.getData());
-            } else if (input.getListAction() == DataState.LIST_ACTION.REPLACE_ALL) {
-                unreadMessages.clear();
-                unreadMessages.addAll(input.getData());
-            }
-            return input;
-        });
+
     }
 
     public LiveData<DataState<List<Conversation>>> getListData() {
@@ -73,7 +63,37 @@ public class ConversationsViewModel extends ViewModel {
         return listData;
     }
 
-    public LiveData<DataState<List<ChatMessage>>> getUnreadMessageState() {
+    public LiveData<DataState<HashMap<String, Integer>>> getUnreadMessageState() {
+        if (unreadMessageState == null) {
+            unreadMessageState = Transformations.map(conversationRepository.getUnreadMessageState(), input -> {
+                Log.e("switch", String.valueOf(input));
+                if (input.getListAction() == DataState.LIST_ACTION.APPEND) {
+                    for (String key : input.getData().keySet()) {
+                        Integer oldValue = unreadMessages.get(key);
+                        if (oldValue == null) {
+                            unreadMessages.put(key, 1);
+                        } else {
+                            unreadMessages.put(key, oldValue + 1);
+                        }
+                    }
+                } else if (input.getListAction() == DataState.LIST_ACTION.DELETE) {
+                    for (String key : input.getData().keySet()) {
+                        Integer oldValue = unreadMessages.get(key);
+                        if (oldValue != null) {
+                            if (oldValue <= 1) {
+                                unreadMessages.remove(key);
+                            } else {
+                                unreadMessages.put(key, oldValue - 1);
+                            }
+                        }
+                    }
+                } else if (input.getListAction() == DataState.LIST_ACTION.REPLACE_ALL) {
+                    unreadMessages.clear();
+                    unreadMessages.putAll(input.getData());
+                }
+                return input;
+            });
+        }
         return unreadMessageState;
     }
 
@@ -100,19 +120,23 @@ public class ConversationsViewModel extends ViewModel {
      * @return 未读消息数目
      */
     public int getUnreadNumber(Conversation conversation) {
-        int res = 0;
-        for(ChatMessage cm:unreadMessages){
-            if(Objects.equals(cm.getConversationId(),conversation.getId())){
-                res++;
-            }
+        Integer res = unreadMessages.get(conversation.getId());
+//        for(ChatMessage cm:unreadMessages){
+//            if(Objects.equals(cm.getConversationId(),conversation.getId())){
+//                res++;
+//            }
+//        }
+        if (res != null) {
+            return res;
+        } else {
+            return 0;
         }
-        return res;
     }
 
     public void callOnline(@NonNull Context context) {
         UserLocal userLocal = localUserRepository.getLoggedInUser();
         if (userLocal.isValid()) {
-            conversationRepository.callOnline(context,userLocal);
+            conversationRepository.callOnline(context, userLocal);
         }
     }
 }

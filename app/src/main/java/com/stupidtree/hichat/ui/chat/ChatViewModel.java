@@ -285,7 +285,7 @@ public class ChatViewModel extends ViewModel {
     }
 
     public void markRead(@NonNull Context context, ChatMessage chatMessage) {
-        chatRepository.markRead(context, chatMessage.getId());
+        chatRepository.markRead(context, chatMessage.getId(),chatMessage.getConversationId());
     }
 
 }

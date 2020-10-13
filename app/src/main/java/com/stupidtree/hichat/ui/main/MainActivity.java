@@ -21,7 +21,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.UserLocal;
-import com.stupidtree.hichat.service.SocketIOClientService;
+import com.stupidtree.hichat.socket.SocketIOClientService;
 import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.BaseTabAdapter;
 import com.stupidtree.hichat.ui.main.contact.ContactFragment;

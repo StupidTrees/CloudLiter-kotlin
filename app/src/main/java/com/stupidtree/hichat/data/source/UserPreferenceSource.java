@@ -13,7 +13,7 @@ import com.stupidtree.hichat.data.model.UserLocal;
 
 import java.util.UUID;
 
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_ONLINE;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_ONLINE;
 
 /**
  * 层次：DataSource

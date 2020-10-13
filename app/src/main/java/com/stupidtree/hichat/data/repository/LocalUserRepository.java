@@ -2,16 +2,14 @@ package com.stupidtree.hichat.data.repository;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
 
 import com.stupidtree.hichat.HiApplication;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.source.UserPreferenceSource;
 
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_OFFLINE;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_OFFLINE;
 
 
 /**

@@ -9,9 +9,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.stupidtree.hichat.data.model.ChatMessage;
-import com.stupidtree.hichat.data.model.Conversation;
 import com.stupidtree.hichat.data.source.ChatMessageWebSource;
-import com.stupidtree.hichat.data.source.ConversationWebSource;
 import com.stupidtree.hichat.data.source.SocketWebSource;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.ui.chat.ChatListTrigger;
@@ -19,8 +17,8 @@ import com.stupidtree.hichat.ui.chat.FriendStateTrigger;
 
 import java.util.List;
 
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_FRIEND_STATE_CHANGED;
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_RECEIVE_MESSAGE;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_FRIEND_STATE_CHANGED;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_RECEIVE_MESSAGE;
 
 /**
  * 层次：Repository
@@ -86,8 +84,8 @@ public class ChatRepository {
         socketWebSource.markAllRead(context,userId,conversationId);
     }
 
-    public void markRead(@NonNull Context context,@NonNull String messageId){
-        socketWebSource.markRead(context,messageId);
+    public void markRead(@NonNull Context context,@NonNull String messageId,@NonNull String conversationId){
+        socketWebSource.markRead(context,messageId,conversationId);
     }
 
     public MutableLiveData<ChatListTrigger> getChatListController(){

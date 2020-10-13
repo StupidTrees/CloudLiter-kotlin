@@ -94,12 +94,7 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
             if (listDataState.getState() == DataState.STATE.SUCCESS) {
                 List<Conversation> listD = listDataState.getData();
                 Collections.sort(listD, (conversation, t1) -> t1.getUpdatedAt().compareTo(conversation.getUpdatedAt()));
-                listAdapter.notifyItemChangedSmooth(listD, new BaseListAdapter.RefreshJudge<Conversation>() {
-                    @Override
-                    public boolean judge(Conversation oldData, Conversation newData) {
-                        return !Objects.equals(oldData,newData);
-                    }
-                });
+                listAdapter.notifyItemChangedSmooth(listD);
                 if (listD.size() > 0) {
                     list.setVisibility(View.VISIBLE);
                     placeHolder.setVisibility(View.GONE);

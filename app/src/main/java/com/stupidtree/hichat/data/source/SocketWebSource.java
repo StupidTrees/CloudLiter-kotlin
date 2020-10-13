@@ -14,22 +14,21 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.model.UserLocal;
-import com.stupidtree.hichat.service.SocketIOClientService;
+import com.stupidtree.hichat.socket.SocketIOClientService;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.ui.chat.ChatListTrigger;
 import com.stupidtree.hichat.ui.chat.FriendStateTrigger;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 
 import static android.content.Context.BIND_AUTO_CREATE;
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_FRIEND_STATE_CHANGED;
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_INTO_CONVERSATION;
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_LEFT_CONVERSATION;
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_MARK_ALL_READ;
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_MARK_READ;
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_ONLINE;
-import static com.stupidtree.hichat.service.SocketIOClientService.ACTION_RECEIVE_MESSAGE;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_FRIEND_STATE_CHANGED;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_INTO_CONVERSATION;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_LEFT_CONVERSATION;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_MARK_ALL_READ;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_MARK_READ;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_ONLINE;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_RECEIVE_MESSAGE;
 
 /**
  * 实时聊天网络资源
@@ -40,7 +39,7 @@ public class SocketWebSource extends BroadcastReceiver {
 
     MutableLiveData<ChatListTrigger> chatListController = new MutableLiveData<>();
     MutableLiveData<FriendStateTrigger> friendStateController = new MutableLiveData<>();
-    MutableLiveData<DataState<List<ChatMessage>>> unreadMessages = new MutableLiveData<>();
+    MutableLiveData<DataState<HashMap<String, Integer>>> unreadMessageState = new MutableLiveData<>();
 
 
     public SocketWebSource() {
@@ -57,7 +56,10 @@ public class SocketWebSource extends BroadcastReceiver {
                     Log.e("unreadMessaged.add", String.valueOf(message));
                     if (message != null) {
                         chatListController.setValue(ChatListTrigger.getActioning(message.getConversationId(), message));
-                        unreadMessages.setValue(new DataState<>(Collections.singletonList(message)).setListAction(DataState.LIST_ACTION.APPEND));
+//                        unreadMessages.setValue(new DataState<>(Collections.singletonList(message)).setListAction(DataState.LIST_ACTION.APPEND));
+                        HashMap<String,Integer> map = new HashMap<>();
+                        map.put(message.getConversationId(),1);
+                        unreadMessageState.setValue(new DataState<>(map).setListAction(DataState.LIST_ACTION.APPEND));
                     }
                 }
                 break;
@@ -82,11 +84,18 @@ public class SocketWebSource extends BroadcastReceiver {
             //服务与活动成功绑定
             Log.e("ChatActivity", "服务与活动成功绑定");
             binder = (SocketIOClientService.JWebSocketClientBinder) iBinder;
-            binder.setOnUnreadFetchedListener(unread -> unreadMessages.postValue(new DataState<>(unread).setListAction(DataState.LIST_ACTION.REPLACE_ALL)));
-            binder.setOnMessageReadListener((conversationId, toRemove) -> {
-                Log.e("已读更新", String.valueOf(toRemove));
-                unreadMessages.postValue(new DataState<>(toRemove).setListAction(DataState.LIST_ACTION.DELETE));
+            binder.setOnUnreadFetchedListener(unread -> {
+                Log.e("获取未读消息", String.valueOf(unread));
+                unreadMessageState.postValue(new DataState<>(unread).setListAction(DataState.LIST_ACTION.REPLACE_ALL));
             });
+            binder.setOnMessageReadListener(map -> {
+                Log.e("已读更新", String.valueOf(map));
+                unreadMessageState.postValue(new DataState<>(map).setListAction(DataState.LIST_ACTION.DELETE));
+            });
+//            binder.setOnMessageReadListener((conversationId, toRemove) -> {
+//                Log.e("已读更新", String.valueOf(toRemove));
+//                unreadMessages.postValue(new DataState<>(toRemove).setListAction(DataState.LIST_ACTION.DELETE));
+//            });
         }
 
         @Override
@@ -131,8 +140,9 @@ public class SocketWebSource extends BroadcastReceiver {
         return friendStateController;
     }
 
-    public MutableLiveData<DataState<List<ChatMessage>>> getUnreadMessages() {
-        return unreadMessages;
+
+    public MutableLiveData<DataState<HashMap<String, Integer>>> getUnreadMessageState() {
+        return unreadMessageState;
     }
 
     public void callOnline(@NonNull Context context, @NonNull UserLocal user) {
@@ -141,11 +151,6 @@ public class SocketWebSource extends BroadcastReceiver {
         b.putSerializable("user", user);
         i.putExtras(b);
         context.sendBroadcast(i);
-//        if(binder!=null){
-//            binder.online(user);
-//        }else{
-//            cachePool.put("callOnline",user);
-//        }
     }
 
     public void markAllRead(@NonNull Context context, String userId, String conversationId) {
@@ -155,9 +160,10 @@ public class SocketWebSource extends BroadcastReceiver {
         context.sendBroadcast(i);
     }
 
-    public void markRead(@NonNull Context context, @NonNull String messageId) {
+    public void markRead(@NonNull Context context, @NonNull String messageId, @NonNull String conversationId) {
         Intent i = new Intent(ACTION_MARK_READ);
         i.putExtra("messageId", messageId);
+        i.putExtra("conversationId", conversationId);
         context.sendBroadcast(i);
     }
 
