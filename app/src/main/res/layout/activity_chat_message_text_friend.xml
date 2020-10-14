@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="-8dp"
     android:gravity="center|start|top"
     android:paddingTop="8dp"
     android:paddingBottom="8dp">
@@ -15,7 +16,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:src="@drawable/ic_baseline_emoji_emotions_24" />
+        android:src="@drawable/ic_baseline_emoji_emotions_24"
+        android:contentDescription="@string/content_description_avatar" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/bubble"
@@ -26,7 +28,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        app:cardBackgroundColor="?attr/colorPrimary"
+        app:cardBackgroundColor="@color/friendBubbleColor"
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp">
 
@@ -41,8 +43,22 @@
             android:lineSpacingExtra="4sp"
             android:maxEms="8"
             android:text="这是一条很长的消息目的只是为了测试一下这个框框的显示效果"
-            android:textColor="@android:color/white"
+            android:textColor="?attr/textColorPrimary"
             android:textSize="16sp" />
     </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/see"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="-16dp"
+        android:alpha="0.6"
+        android:foreground="?attr/selectableItemBackground"
+        android:padding="16dp"
+        android:theme="@style/rippleControl"
+        android:contentDescription="@string/description_switch_sensitive"
+        app:srcCompat="@drawable/ic_baseline_visibility_24"
+        app:tint="?attr/colorControlNormal" />
 
 </LinearLayout>

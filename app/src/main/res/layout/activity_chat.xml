@@ -17,61 +17,81 @@
         android:fitsSystemWindows="true"
         app:elevation="0dp">
 
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="36dp"
             android:layout_marginTop="8dp"
             android:background="#00000000"
+            android:gravity="center"
+            android:visibility="gone"
             app:contentInsetStart="0dp"
             app:contentInsetStartWithNavigation="0dp"
-            app:theme="?attr/toolbarStyle">
+            app:theme="?attr/toolbarStyle"
+            app:title="@string/empty">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="bottom|center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|center"
-                    android:gravity="center"
-                    android:text="标题"
-                    android:textColor="?attr/textColorPrimary"
-                    android:textSize="18sp">
-
-                </TextView>
-
-            </LinearLayout>
 
         </androidx.appcompat.widget.Toolbar>
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="6dp"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/state_icon"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="6dp"
-                app:srcCompat="@drawable/element_round_grey" />
-
-            <TextView
-                android:id="@+id/state"
+                android:id="@+id/back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:padding="16dp"
+                app:srcCompat="@drawable/ic_baseline_arrow_back_ios_24" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="标题"
+                android:textColor="?attr/textColorPrimary"
+                android:textSize="24sp">
+
+            </TextView>
+
+            <LinearLayout
+                android:id="@+id/state_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|start"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/element_rounded_bar_grey"
+                android:backgroundTint="?attr/backgroundColorBottomAsTint"
+                android:backgroundTintMode="src_over"
                 android:gravity="center"
-                android:text="@string/offline"
-                android:textSize="11sp" />
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="4dp">
+
+                <ImageView
+                    android:id="@+id/state_icon"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="6dp"
+                    app:srcCompat="@drawable/element_round_grey" />
+
+                <TextView
+                    android:id="@+id/state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="@string/offline"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
         </LinearLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -88,7 +108,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="?attr/backgroundColorBottom"
             android:overScrollMode="never" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
@@ -183,4 +202,5 @@
                 android:overScrollMode="never" />
         </net.cachapa.expandablelayout.ExpandableLayout>
     </LinearLayout>
+
 </LinearLayout>

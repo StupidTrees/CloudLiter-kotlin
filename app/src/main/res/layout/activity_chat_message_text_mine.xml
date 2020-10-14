@@ -8,6 +8,27 @@
     android:paddingTop="8dp"
     android:paddingBottom="8dp">
 
+    <ImageView
+        android:id="@+id/see"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="-16dp"
+        android:alpha="0.6"
+        android:contentDescription="@string/description_switch_sensitive"
+        android:foreground="?attr/selectableItemBackground"
+        android:padding="16dp"
+        android:theme="@style/rippleControl"
+        app:srcCompat="@drawable/ic_baseline_visibility_24"
+        app:tint="?attr/colorControlNormal" />
+
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/bubble"
         android:layout_width="wrap_content"
@@ -43,5 +64,6 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:src="@drawable/ic_baseline_emoji_emotions_24" />
+        android:src="@drawable/ic_baseline_emoji_emotions_24"
+        android:contentDescription="@string/content_description_avatar" />
 </LinearLayout>

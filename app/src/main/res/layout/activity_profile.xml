@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/backgroundColorBottom"
     tools:context=".ui.profile.ProfileActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -131,22 +132,6 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginEnd="24dp"
-        android:focusable="true"
-        android:text="添加好友"
-        android:textColor="@android:color/white"
-        android:theme="@style/Theme.MaterialComponents"
-        app:icon="@drawable/ic_baseline_message_24"
-        app:iconTint="@android:color/white"
-        app:layout_anchor="@+id/appbar"
-        app:layout_anchorGravity="end|bottom"
-        tools:ignore="RtlHardcoded" />
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -165,7 +150,6 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="24dp"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="?attr/backgroundColorSecond"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">
 
@@ -235,13 +219,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:clickable="true"
+                        android:focusable="true"
                         android:foreground="?attr/selectableItemBackgroundBorderless"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
                         android:paddingTop="8dp"
                         android:paddingEnd="16dp"
-                        android:paddingBottom="8dp"
-                        android:focusable="true">
+                        android:paddingBottom="8dp">
 
                         <ImageView
                             android:layout_width="24dp"
@@ -273,10 +257,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="8dp"
                 android:layout_marginEnd="24dp"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="?attr/backgroundColorSecond"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">
 
@@ -305,13 +287,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:clickable="true"
+                        android:focusable="true"
                         android:foreground="?attr/selectableItemBackgroundBorderless"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
                         android:paddingTop="8dp"
                         android:paddingEnd="16dp"
-                        android:paddingBottom="8dp"
-                        android:focusable="true">
+                        android:paddingBottom="8dp">
 
                         <ImageView
                             android:layout_width="24dp"
@@ -348,13 +330,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:clickable="true"
+                        android:focusable="true"
                         android:foreground="?attr/selectableItemBackgroundBorderless"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
                         android:paddingTop="8dp"
                         android:paddingEnd="16dp"
-                        android:paddingBottom="8dp"
-                        android:focusable="true">
+                        android:paddingBottom="8dp">
 
                         <ImageView
                             android:layout_width="24dp"
@@ -390,13 +372,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:clickable="true"
+                        android:focusable="true"
                         android:foreground="?attr/selectableItemBackgroundBorderless"
                         android:orientation="horizontal"
                         android:paddingStart="16dp"
                         android:paddingTop="8dp"
                         android:paddingEnd="16dp"
-                        android:paddingBottom="8dp"
-                        android:focusable="true">
+                        android:paddingBottom="8dp">
 
                         <ImageView
                             android:layout_width="24dp"
@@ -432,5 +414,21 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="24dp"
+        android:focusable="true"
+        android:text="添加好友"
+        android:textColor="@android:color/white"
+        android:theme="@style/Theme.MaterialComponents"
+        app:icon="@drawable/ic_baseline_message_24"
+        app:iconTint="@android:color/white"
+        app:layout_anchor="@+id/appbar"
+        app:layout_anchorGravity="end|bottom"
+        tools:ignore="RtlHardcoded" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
