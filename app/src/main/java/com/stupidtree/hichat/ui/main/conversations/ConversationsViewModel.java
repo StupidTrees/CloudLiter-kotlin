@@ -66,7 +66,6 @@ public class ConversationsViewModel extends ViewModel {
     public LiveData<DataState<HashMap<String, Integer>>> getUnreadMessageState() {
         if (unreadMessageState == null) {
             unreadMessageState = Transformations.map(conversationRepository.getUnreadMessageState(), input -> {
-                Log.e("switch", String.valueOf(input));
                 if (input.getListAction() == DataState.LIST_ACTION.APPEND) {
                     for (String key : input.getData().keySet()) {
                         Integer oldValue = unreadMessages.get(key);
@@ -79,10 +78,13 @@ public class ConversationsViewModel extends ViewModel {
                 } else if (input.getListAction() == DataState.LIST_ACTION.DELETE) {
                     for (String key : input.getData().keySet()) {
                         Integer oldValue = unreadMessages.get(key);
+                        Integer deleteValue = input.getData().get(key);
                         if (oldValue != null) {
                             if (oldValue <= 1) {
                                 unreadMessages.remove(key);
-                            } else {
+                            } else if(deleteValue!=null){
+                                unreadMessages.put(key, oldValue - deleteValue);
+                            }else{
                                 unreadMessages.put(key, oldValue - 1);
                             }
                         }

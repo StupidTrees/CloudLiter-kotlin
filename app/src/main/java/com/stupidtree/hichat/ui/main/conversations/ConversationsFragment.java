@@ -114,7 +114,7 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
             }
         });
         viewModel.getUnreadMessageState().observe(this, listDataState -> {
-            refreshLayout.setRefreshing(true);
+            //refreshLayout.setRefreshing(true);
             viewModel.startRefresh();
         });
     }

@@ -7,8 +7,12 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.UUID;
 
 public class ChatMessage implements Serializable {
+    /**
+     * 和服务器数据实体一致的属性
+     */
     String id;
     String fromId;
     String toId;
@@ -17,16 +21,25 @@ public class ChatMessage implements Serializable {
     String friendAvatar;
     String conversationId;
     String relationId;
+    boolean read;
+    boolean sensitive;
     Timestamp createdAt;
     Timestamp updatedAt;
-    //long createdTime;
 
+    /**
+     * 服务器上不保存的属性
+     */
+    //是否正在发送
+    boolean progressing;
+    String uuid;
 
     public ChatMessage(String fromId, String toId, String content) {
         this.fromId = fromId;
         this.toId = toId;
         this.content = content;
         createdAt = new Timestamp(System.currentTimeMillis());
+        uuid = UUID.randomUUID().toString();
+        progressing = true;
     }
 
     public static ChatMessage getTimeStampHolderInstance(Timestamp timestamp){
@@ -65,6 +78,10 @@ public class ChatMessage implements Serializable {
         return id;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
     public String getConversationId() {
         return conversationId;
     }
@@ -79,6 +96,23 @@ public class ChatMessage implements Serializable {
 
     public String getFriendAvatar() {
         return friendAvatar;
+    }
+
+    public void setProgressing(boolean progressing) {
+        this.progressing = progressing;
+    }
+
+    public boolean isProgressing() {
+        return progressing;
+    }
+
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public boolean isSensitive() {
+        return sensitive;
     }
 
     @Override

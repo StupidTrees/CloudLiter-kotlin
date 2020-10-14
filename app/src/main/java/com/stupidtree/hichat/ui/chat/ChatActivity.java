@@ -3,17 +3,13 @@ package com.stupidtree.hichat.ui.chat;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,7 +44,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 import butterknife.BindView;
-import butterknife.OnItemClick;
 
 /**
  * 对话窗口
@@ -184,6 +179,12 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
             }
         });
 
+        viewModel.getMessageSentState().observe(this, chatMessageDataState -> {
+
+            if(chatMessageDataState.getState()== DataState.STATE.SUCCESS){
+                listAdapter.messageSent(list,chatMessageDataState.getData());
+            }
+        });
 
 
     }
@@ -344,6 +345,25 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
             }
         }
 
+        public void messageSent(RecyclerView list,@NonNull ChatMessage sentMessage){
+            int index = -1;
+            for(int i=mBeans.size()-1;i>=0;i--){
+                if(Objects.equals(mBeans.get(i).getUuid(),sentMessage.getUuid())){
+                    index = i;
+                    break;
+                }
+            }
+            if(index>=0){
+                mBeans.set(index,sentMessage);
+                CHolder holder = (CHolder) list.findViewHolderForAdapterPosition(index);
+                if(holder!=null){
+                    holder.hideProgress();
+                    holder.bindSensitive(sentMessage);
+                }
+            }
+
+        }
+
         @Override
         public CHolder createViewHolder(View v, int viewType) {
             return new CHolder(v, viewType);
@@ -355,11 +375,21 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                 if (holder.viewType == TYPE_TIME) {
                     holder.content.setText(TextUtils.getChatTimeText(mContext, data.getCreatedTime()));
                 } else {
+
                     if (holder.viewType == TYPE_MINE) {
                         ImageUtils.loadLocalAvatarInto(mContext, viewModel.getMyAvatar(), holder.avatar);
                     } else {
                         ImageUtils.loadAvatarInto(mContext, viewModel.getFriendAvatar(), holder.avatar);
                     }
+                    if(holder.progress!=null){
+                        if(data.isProgressing()){
+                            holder.progress.setVisibility(View.VISIBLE);
+                        }else{
+                            holder.progress.setVisibility(View.GONE);
+                        }
+                    }
+//                    holder.content.setText(data.getContent());
+                    holder.bindSensitive(data);
                     holder.avatar.setOnClickListener(view -> {
                         if (holder.viewType == TYPE_FRIEND) {
                             ActivityUtils.startProfileActivity(mContext, data.getFromId());
@@ -368,7 +398,7 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                         }
 
                     });
-                    holder.content.setText(data.getContent());
+
                 }
 
             }
@@ -448,7 +478,42 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
             EmoticonsTextView content;
             ImageView avatar;
             View bubble;
+            View progress;
+            ImageView see;//点击查看敏感消息
+            boolean isSensitiveExpanded = false;
 
+            //隐藏加载圈圈
+            public void hideProgress(){
+                if(progress!=null){
+                    progress.setVisibility(View.GONE);
+                }
+            }
+
+            //切换敏感消息查看模式
+            public void switchSensitiveMode(@NonNull ChatMessage data){
+                isSensitiveExpanded = !isSensitiveExpanded;
+                if(isSensitiveExpanded){
+                    content.setText(data.getContent());
+                    see.setImageResource(R.drawable.ic_baseline_visibility_off_24);
+                }else if(data.isSensitive()){
+                    content.setText(R.string.hint_sensitive_message);
+                    see.setImageResource(R.drawable.ic_baseline_visibility_24);
+                }
+            }
+
+            //绑定敏感词状态
+            public void bindSensitive(@NonNull ChatMessage data){
+                isSensitiveExpanded = false;
+                if(data.isSensitive()){
+                    see.setVisibility(View.VISIBLE);
+                    see.setImageResource(R.drawable.ic_baseline_visibility_24);
+                    content.setText(R.string.hint_sensitive_message);
+                    see.setOnClickListener(view -> switchSensitiveMode(data));
+                }else{
+                    see.setVisibility(View.GONE);
+                    content.setText(data.getContent());
+                }
+            }
 
             public CHolder(@NonNull View itemView, int viewType) {
                 super(itemView);
@@ -456,6 +521,8 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                 content = itemView.findViewById(R.id.content);
                 avatar = itemView.findViewById(R.id.avatar);
                 bubble = itemView.findViewById(R.id.bubble);
+                progress = itemView.findViewById(R.id.progress);
+                see = itemView.findViewById(R.id.see);
             }
         }
     }

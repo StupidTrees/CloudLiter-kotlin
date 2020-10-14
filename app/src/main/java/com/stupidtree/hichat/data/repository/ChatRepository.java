@@ -18,6 +18,7 @@ import com.stupidtree.hichat.ui.chat.FriendStateTrigger;
 import java.util.List;
 
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_FRIEND_STATE_CHANGED;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_MESSAGE_SENT;
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_RECEIVE_MESSAGE;
 
 /**
@@ -59,6 +60,7 @@ public class ChatRepository {
     public void bindService(Context context){
         IntentFilter IF = new IntentFilter();
         IF.addAction(ACTION_RECEIVE_MESSAGE);
+        IF.addAction(ACTION_MESSAGE_SENT);
         IF.addAction(ACTION_FRIEND_STATE_CHANGED);
         context.registerReceiver(socketWebSource,IF);
         socketWebSource.bindService("Chat",context);
@@ -96,6 +98,9 @@ public class ChatRepository {
         return socketWebSource.getFriendStateController();
     }
 
+    public MutableLiveData<DataState<ChatMessage>> getMessageSentSate(){
+        return socketWebSource.getMessageSentSate();
+    }
 
 
 

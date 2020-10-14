@@ -46,6 +46,8 @@ public class ChatViewModel extends ViewModel {
     //trigger：控制↑的刷新
     private LiveData<FriendStateTrigger> friendStateController;
 
+    //状态数据：消息发送结果
+    private LiveData<DataState<ChatMessage>> messageSentState;
 
     private int pageSize = 15;
     private int topPageNum = 0;
@@ -85,6 +87,8 @@ public class ChatViewModel extends ViewModel {
             }
             return FriendStateTrigger.getStill();
         });
+
+
     }
 
 
@@ -288,4 +292,10 @@ public class ChatViewModel extends ViewModel {
         chatRepository.markRead(context, chatMessage.getId(),chatMessage.getConversationId());
     }
 
+    public LiveData<DataState<ChatMessage>> getMessageSentState() {
+        if(messageSentState==null){
+            messageSentState = Transformations.map(chatRepository.getMessageSentSate(), input -> input);
+        }
+        return messageSentState;
+    }
 }

@@ -55,6 +55,7 @@ import static com.stupidtree.hichat.ui.widgets.EmoticonsTextView.buildPattern;
 public class SocketIOClientService extends Service {
     public static final String ACTION_RECEIVE_MESSAGE = "CLOUD_LITER_RECEIVE_MESSAGE";
     public static final String ACTION_FRIEND_STATE_CHANGED = "CLOUD_LITER_FRIEND_STATE_CHANGE";
+    public static final String ACTION_MESSAGE_SENT = "CLOUD_LITER_MESSAGE_SENT";
 
     public static final String ACTION_INTO_CONVERSATION = "CLOUD_LITER_INTO_CONVERSATION";
     public static final String ACTION_LEFT_CONVERSATION = "CLOUD_LITER_LEFT_CONVERSATION";
@@ -119,19 +120,11 @@ public class SocketIOClientService extends Service {
                         //从新消息队列中把该对话下的所有消息删除
                         conversationId = intent.getStringExtra("conversationId");
                         userId = intent.getStringExtra("userId");
-//                        LinkedList<ChatMessage> toDelete = new LinkedList<>();
-//                        for (ChatMessage cm : incomingMessage) {
-//                            if (Objects.equals(cm.getConversationId(), conversationId)) {
-//                                toDelete.add(cm);
-//                            }
-//                        }
-
-//                        incomingMessage.removeAll(toDelete);
                         Log.e("mark_all_read", String.valueOf(incomingMessage));
                         for (JWebSocketClientBinder binder : binders.values()) {
                             if (binder != null && binder.onMessageReadListener != null) {
-                                HashMap<String,Integer> map = new HashMap<>();
-                                map.put(conversationId,incomingMessage.get(conversationId));
+                                HashMap<String, Integer> map = new HashMap<>();
+                                map.put(conversationId, incomingMessage.get(conversationId));
                                 binder.onMessageReadListener.OnMessageRead(map);
                             }
                         }
@@ -148,14 +141,6 @@ public class SocketIOClientService extends Service {
                         } else if (oldCount != null) {
                             incomingMessage.put(conversationId, oldCount - 1);
                         }
-
-//                        ChatMessage toRemove = null;
-//                        for (ChatMessage cm : incomingMessage) {
-//                            if (Objects.equals(cm.getId(), messageId)) {
-//                                toRemove = cm;
-//                            }
-//                        }
-//                        incomingMessage.remove(toRemove);
                         for (JWebSocketClientBinder binder : binders.values()) {
                             if (binder != null && binder.onMessageReadListener != null) {
                                 HashMap<String, Integer> map = new HashMap<>();
@@ -207,7 +192,6 @@ public class SocketIOClientService extends Service {
         socket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
         socket.on("message", args -> {
             ChatMessage chatMessage = new Gson().fromJson(args[0].toString(), ChatMessage.class);
-//            incomingMessage.add(chatMessage);
             Integer oldCount = incomingMessage.get(chatMessage.getConversationId());
             if (oldCount == null) {
                 incomingMessage.put(chatMessage.getConversationId(), 1);
@@ -223,6 +207,18 @@ public class SocketIOClientService extends Service {
             //当前聊天的新消息，不发送通知
             if (!Objects.equals(currentFriendId, chatMessage.getFromId())) {
                 sendNotification_NewMessage(chatMessage);
+            }
+        });
+        //消息发送成功
+        socket.on("message_sent", args -> {
+            ChatMessage chatMessage = new Gson().fromJson(args[0].toString(), ChatMessage.class);
+            Intent i = new Intent(ACTION_MESSAGE_SENT);
+            Bundle b = new Bundle();
+            b.putSerializable("message", chatMessage);
+            i.putExtras(b);
+            //当前聊天的新消息才发送广播
+            if (Objects.equals(currentFriendId, chatMessage.getToId())) {
+                sendBroadcast(i);
             }
         });
         socket.on("unread_message", args -> {

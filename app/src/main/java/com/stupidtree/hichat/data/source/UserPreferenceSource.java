@@ -104,7 +104,7 @@ public class UserPreferenceSource {
         result.setToken(preferences.getString("token",null));
         result.setGender(preferences.getString("gender","MALE"));
         result.setAvatar(preferences.getString("avatar",null));
-        Log.e("get_local_user", String.valueOf(result));
+       // Log.e("get_local_user", String.valueOf(result));
         return result;
     }
 
