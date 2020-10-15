@@ -1,4 +1,4 @@
-package com.stupidtree.hichat.data;
+package com.stupidtree.hichat.data.model;
 
 import org.jetbrains.annotations.NotNull;
 

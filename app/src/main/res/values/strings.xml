@@ -119,4 +119,8 @@
     <string name="description_switch_sensitive">显示或隐藏敏感词</string>
     <string name="content_description_avatar">用户头像</string>
     <string name="empty" />
+    <string name="back">返回上衣页面</string>
+    <string name="user_state">用户在线状态</string>
+    <string name="select_yunmoji">选择表情</string>
+    <string name="edit_my_profile">编辑资料</string>
 </resources>

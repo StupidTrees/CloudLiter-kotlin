@@ -90,9 +90,14 @@ public class ProfileViewModel extends ViewModel {
                 UserLocal user = localUserRepository.getLoggedInUser();
                 if (input.isActioning()) {
                     if (user.isValid()) {
-                        //通知用户资料仓库进行好友判别
-                        return relationRepository.queryRelation(Objects.requireNonNull(user.getToken()),input.getData());
-                        //return relationRepository.isMyFriend(Objects.requireNonNull(user.getToken()), user.getId(), input.getData());
+
+                        //如果就是自己
+                        if (Objects.equals(user.getId(), input.getData())) {
+                            return new MutableLiveData<>(new DataState<>(DataState.STATE.SPECIAL));
+                        } else {
+                            //通知用户资料仓库进行好友判别
+                            return relationRepository.queryRelation(Objects.requireNonNull(user.getToken()), input.getData());
+                        }
                     } else {
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     }
@@ -123,15 +128,15 @@ public class ProfileViewModel extends ViewModel {
     }
 
     public LiveData<DataState<String>> getChangeRemarkResult() {
-        if(changeRemarkResult==null){
+        if (changeRemarkResult == null) {
             //也是一样的
             changeRemarkResult = Transformations.switchMap(changeRemarkController, input -> {
-                if(input.isActioning()){
+                if (input.isActioning()) {
                     UserLocal userLocal = localUserRepository.getLoggedInUser();
-                    if(userLocal.isValid()&&relationLiveData.getValue()!=null){
-                        System.out.println("friend id is"+relationLiveData.getValue().getData().getId());
-                        return relationRepository.changeRemark(Objects.requireNonNull(userLocal.getToken()),input.getValue(),relationLiveData.getValue().getData().getId());
-                    }else{
+                    if (userLocal.isValid() && relationLiveData.getValue() != null) {
+                        System.out.println("friend id is" + relationLiveData.getValue().getData().getId());
+                        return relationRepository.changeRemark(Objects.requireNonNull(userLocal.getToken()), input.getValue(), relationLiveData.getValue().getData().getId());
+                    } else {
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     }
                 }
@@ -142,13 +147,13 @@ public class ProfileViewModel extends ViewModel {
     }
 
     public LiveData<DataState<?>> getDeleteFriendResult() {
-        if(deleteFriendResult==null){
+        if (deleteFriendResult == null) {
             deleteFriendResult = Transformations.switchMap(deleteFriendController, input -> {
-                if(input.isActioning()){
+                if (input.isActioning()) {
                     UserLocal userLocal = localUserRepository.getLoggedInUser();
-                    if(userLocal.isValid()){
-                        return relationRepository.deleteFriend(Objects.requireNonNull(userLocal.getToken()),input.getData());
-                    }else{
+                    if (userLocal.isValid()) {
+                        return relationRepository.deleteFriend(Objects.requireNonNull(userLocal.getToken()), input.getData());
+                    } else {
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     }
                 }
@@ -178,15 +183,17 @@ public class ProfileViewModel extends ViewModel {
 
     /**
      * 开始删除好友
+     *
      * @param id 好友id
      */
-    public void startDeletingFriend(String id){
+    public void startDeletingFriend(String id) {
         deleteFriendController.setValue(StringTrigger.getActioning(id));
     }
 
 
     /**
      * 获取该用户id
+     *
      * @return
      */
     @Nullable
@@ -200,18 +207,19 @@ public class ProfileViewModel extends ViewModel {
 
     /**
      * 请求更换备注
+     *
      * @param newRemark 备注
      */
-    public void startChangeRemark(String newRemark){
-        if(relationLiveData.getValue()!=null){
+    public void startChangeRemark(String newRemark) {
+        if (relationLiveData.getValue() != null) {
             changeRemarkController.setValue(ChangeInfoTrigger.getActioning(newRemark));
         }
 
     }
 
     @Nullable
-    public UserRelation getUserRelation(){
-        if(relationLiveData.getValue()!=null){
+    public UserRelation getUserRelation() {
+        if (relationLiveData.getValue() != null) {
             return relationLiveData.getValue().getData();
         }
         return null;

@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.ColorUtils;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -49,7 +50,12 @@ public abstract class BaseActivity<T extends ViewModel> extends AppCompatActivit
         ButterKnife.bind(this);
         //对ViewModel进行初始化
         if(getViewModelClass()!=null){
-            viewModel = new ViewModelProvider(this).get(getViewModelClass());
+            if(getViewModelClass().getSuperclass()== AndroidViewModel.class){
+                viewModel = new ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication())).get(getViewModelClass());
+            }else{
+                viewModel = new ViewModelProvider(this).get(getViewModelClass());
+            }
+
         }
         //调用这个函数
         initViews();
@@ -101,6 +107,11 @@ public abstract class BaseActivity<T extends ViewModel> extends AppCompatActivit
     public int getColorPrimary(){
         TypedValue typedValue = new TypedValue();
         getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+        return typedValue.data;
+    }
+    public int getTextColorSecondary(){
+        TypedValue typedValue = new TypedValue();
+        getTheme().resolveAttribute(R.attr.textColorSecondary, typedValue, true);
         return typedValue.data;
     }
     public int getColorControlNormal(){

@@ -16,7 +16,6 @@ import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.socket.SocketIOClientService;
 import com.stupidtree.hichat.ui.base.DataState;
-import com.stupidtree.hichat.ui.chat.ChatListTrigger;
 import com.stupidtree.hichat.ui.chat.FriendStateTrigger;
 
 import java.util.HashMap;
@@ -38,7 +37,7 @@ import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_RECEIVE_
 public class SocketWebSource extends BroadcastReceiver {
 
 
-    MutableLiveData<ChatListTrigger> chatListController = new MutableLiveData<>();
+    MutableLiveData<ChatMessage> newMessageState = new MutableLiveData<>();
     MutableLiveData<FriendStateTrigger> friendStateController = new MutableLiveData<>();
     MutableLiveData<DataState<HashMap<String, Integer>>> unreadMessageState = new MutableLiveData<>();
     //消息发送结果
@@ -57,7 +56,7 @@ public class SocketWebSource extends BroadcastReceiver {
                     ChatMessage message = (ChatMessage) intent.getExtras().getSerializable("message");
                     Log.e("unreadMessaged.add", String.valueOf(message));
                     if (message != null) {
-                        chatListController.setValue(ChatListTrigger.getActioning(message.getConversationId(), message));
+                        newMessageState.setValue(message);
 //                        unreadMessages.setValue(new DataState<>(Collections.singletonList(message)).setListAction(DataState.LIST_ACTION.APPEND));
                         HashMap<String,Integer> map = new HashMap<>();
                         map.put(message.getConversationId(),1);
@@ -139,8 +138,8 @@ public class SocketWebSource extends BroadcastReceiver {
     }
 
 
-    public MutableLiveData<ChatListTrigger> getListController() {
-        return chatListController;
+    public MutableLiveData<ChatMessage> getNewMessageState() {
+        return newMessageState;
     }
 
     public MutableLiveData<FriendStateTrigger> getFriendStateController() {

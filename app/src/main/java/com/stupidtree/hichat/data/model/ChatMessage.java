@@ -1,38 +1,60 @@
 package com.stupidtree.hichat.data.model;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverter;
+import androidx.room.TypeConverters;
+
 import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.UUID;
 
+
+@Entity(tableName = "message")
 public class ChatMessage implements Serializable {
     /**
      * 和服务器数据实体一致的属性
      */
-    String id;
-    String fromId;
-    String toId;
-    String content;
-    String friendRemark;
-    String friendAvatar;
-    String conversationId;
-    String relationId;
-    boolean read;
-    boolean sensitive;
-    Timestamp createdAt;
-    Timestamp updatedAt;
+    @PrimaryKey
+    @NotNull
+    public Long id;
+    public String fromId;
+    public String toId;
+    public String content;
+    @Ignore
+    public String friendRemark;
+    @Ignore
+    public String friendAvatar;
+    public String conversationId;
+    public String relationId;
+    public boolean read;
+    public boolean sensitive;
+    public Timestamp createdAt;
+    public Timestamp updatedAt;
+    //long createdTime;
 
     /**
      * 服务器上不保存的属性
      */
     //是否正在发送
+    @Ignore
     boolean progressing;
+    @Ignore
     String uuid;
 
+    public ChatMessage(){
+        progressing = false;
+    }
+
+    @Ignore
     public ChatMessage(String fromId, String toId, String content) {
         this.fromId = fromId;
         this.toId = toId;
@@ -42,9 +64,9 @@ public class ChatMessage implements Serializable {
         progressing = true;
     }
 
-    public static ChatMessage getTimeStampHolderInstance(Timestamp timestamp){
-        ChatMessage cm = new ChatMessage(null,null,null);
-        cm.id = "TIME";
+    public static ChatMessage getTimeStampHolderInstance(Timestamp timestamp) {
+        ChatMessage cm = new ChatMessage(null, null, null);
+        cm.id = (long) -1;
         cm.createdAt = timestamp;
         return cm;
     }
@@ -61,9 +83,10 @@ public class ChatMessage implements Serializable {
         return content;
     }
 
-    public Timestamp getCreatedTime(){
+    public Timestamp getCreatedTime() {
         return createdAt;
     }
+
     @NotNull
     @Override
     public String toString() {
@@ -74,8 +97,14 @@ public class ChatMessage implements Serializable {
         return friendRemark;
     }
 
-    public String getId() {
+    @NotNull
+    public Long getId() {
         return id;
+    }
+
+    public boolean isTimeStamp(){
+        if(id==null) return false;
+        return id==-1;
     }
 
     public String getUuid() {
@@ -131,4 +160,5 @@ public class ChatMessage implements Serializable {
     public int hashCode() {
         return Objects.hash(id, fromId, toId, conversationId, relationId);
     }
+
 }

@@ -172,6 +172,16 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                     viewModel.startMakingFriends(getIntent().getStringExtra("id"));
                 });
                 remarkLayout.setOnClickListener(null);
+            }else if(userRelationDataState.getState()== DataState.STATE.SPECIAL){
+                //是自己
+                relationCard.setVisibility(View.GONE);
+                button.setText(R.string.edit_my_profile);
+                button.setEnabled(true);
+                button.setIconResource(R.drawable.ic_baseline_edit_24);
+                button.setOnClickListener(view -> {
+                    ActivityUtils.startMyProfileActivity(getThis());
+                });
+                remarkLayout.setOnClickListener(null);
             }
         });
 

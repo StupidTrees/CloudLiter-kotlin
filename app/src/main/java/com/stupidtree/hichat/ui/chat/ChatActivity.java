@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -52,8 +53,11 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
     /**
      * View绑定区
      */
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
+
+    @BindView(R.id.back)
+    View back;
+    @BindView(R.id.menu)
+    View menu;
     @BindView(R.id.input)
     EmoticonsEditText inputEditText;
     @BindView(R.id.title)
@@ -66,6 +70,8 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
     TextView stateText;
     @BindView(R.id.state_icon)
     ImageView stateIcon;
+    @BindView(R.id.state_bar)
+    ViewGroup stateBar;
     @BindView(R.id.refresh)
     SwipeRefreshLayout refreshLayout;
     @BindView(R.id.add)
@@ -100,6 +106,29 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
         super.onStart();
         viewModel.bindService(this);
     }
+
+    boolean firstResume = true;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (firstResume) {
+            firstResume = false;
+            return;
+        }
+        viewModel.getIntoConversation(this);
+        viewModel.fetchNewData();
+        viewModel.markAllRead(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.e("ChatActivity", "onStop");
+        viewModel.leftConversation(this);
+        viewModel.unbindService(this);
+    }
+
 
     @Override
     protected int getLayoutId() {
@@ -161,19 +190,27 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                 switch (friendStateDataState.getData().getState()) {
                     case ONLINE:
                         stateText.setText(R.string.online);
+                        stateText.setTextColor(getColorPrimary());
                         stateIcon.setImageResource(R.drawable.element_round_primary);
+                        stateBar.setBackgroundResource(R.drawable.element_rounded_bar_primary);
                         break;
                     case YOU:
                         stateText.setText(R.string.with_you);
+                        stateText.setTextColor(getColorPrimary());
                         stateIcon.setImageResource(R.drawable.element_round_primary);
+                        stateBar.setBackgroundResource(R.drawable.element_rounded_bar_primary);
                         break;
                     case OTHER:
                         stateText.setText(R.string.with_other);
+                        stateText.setTextColor(getColorPrimary());
                         stateIcon.setImageResource(R.drawable.element_round_primary);
+                        stateBar.setBackgroundResource(R.drawable.element_rounded_bar_primary);
                         break;
                     case OFFLINE:
                         stateText.setText(R.string.offline);
+                        stateText.setTextColor(getTextColorSecondary());
                         stateIcon.setImageResource(R.drawable.element_round_grey);
+                        stateBar.setBackgroundResource(R.drawable.element_rounded_bar_grey);
                         break;
                 }
             }
@@ -181,8 +218,8 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
 
         viewModel.getMessageSentState().observe(this, chatMessageDataState -> {
 
-            if(chatMessageDataState.getState()== DataState.STATE.SUCCESS){
-                listAdapter.messageSent(list,chatMessageDataState.getData());
+            if (chatMessageDataState.getState() == DataState.STATE.SUCCESS) {
+                listAdapter.messageSent(list, chatMessageDataState.getData());
             }
         });
 
@@ -190,27 +227,21 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
     }
 
     //设置toolbar
-    private void setUpToolbar(){
-        toolbar.inflateMenu(R.menu.toolbar_chat_menu);
-        setToolbarActionBack(toolbar);
-        toolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.menu_action_make_friend && viewModel.getFriendId() != null) {
-                ActivityUtils.startConversationActivity(getThis(), viewModel.getFriendId());
-            }
-            return true;
-        });
+    private void setUpToolbar() {
+        back.setOnClickListener(view -> onBackPressed());
+        menu.setOnClickListener(view -> ActivityUtils.startConversationActivity(getThis(), viewModel.getFriendId()));
     }
+
 
     //初始化聊天列表
     @SuppressLint("ClickableViewAccessibility")
-    private void setUpMessageList(){
+    private void setUpMessageList() {
 
         listAdapter = new ChatListAdapter(this, new LinkedList<>());
         list.setAdapter(listAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);  //从底部往上堆
         list.setLayoutManager(layoutManager);
-
         //触摸recyclerView的监听
         list.setOnTouchListener((view, motionEvent) -> {
             //隐藏键盘
@@ -222,8 +253,9 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
         refreshLayout.setOnRefreshListener(() -> viewModel.loadMore());
     }
 
+
     //初始化各种按钮
-    private void setUpButtons(){
+    private void setUpButtons() {
         //点击发送
         send.setOnClickListener(view -> {
             if (!TextUtils.isEmpty(inputEditText.getText().toString())) {
@@ -236,32 +268,23 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
             if (expandableLayout.isExpanded()) {
                 collapseEmotionPanel();
             } else {
-                hideSoftInput(getApplicationContext(),inputEditText);
+                hideSoftInput(getApplicationContext(), inputEditText);
                 expandEmotionPanel();
             }
         });
     }
 
-    private List<Yunmoji> ymList = new ArrayList<>();
-
-    public void initYunmoji() {
-       ;
-        for(int i=1;i<21;i++){
-            Yunmoji item = new Yunmoji(getResources().getIdentifier( String.format(Locale.getDefault(),"yunmoji_y%03d",i) , "drawable", getPackageName()));
-            ymList.add(item);
-        }
-    }
 
     //初始化表情列表
-    private void setUpYunmojiList(){
-        yunmojiList.setLayoutManager(new GridLayoutManager(this,6));
-        //1：初始化表情资源
-        initYunmoji();
-        //2：初始化适配器
+    private void setUpYunmojiList() {
+        ArrayList<Yunmoji> ymList = new ArrayList<>();
+        for (int i = 1; i < 21; i++) {
+            Yunmoji item = new Yunmoji(getResources().getIdentifier(String.format(Locale.getDefault(), "yunmoji_y%03d", i), "drawable", getPackageName()));
+            ymList.add(item);
+        }
+        yunmojiList.setLayoutManager(new GridLayoutManager(this, 6));
         yunmojiListAdapter = new YunmojiListAdapter(this, ymList);
-        //3：设置适配器
         yunmojiList.setAdapter(yunmojiListAdapter);
-        //4：设置点击监听
         BaseListAdapter.OnItemClickListener<Yunmoji> yunmojiOnItemClickListener = (data, card, position) -> inputEditText.append(data.getLastname(position));
         yunmojiListAdapter.setOnItemClickListener(yunmojiOnItemClickListener);
     }
@@ -273,7 +296,6 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
             expandableLayout.collapse();
             AnimationUtils.rotateTo(add, false);
         }
-
     }
 
     //展开表情栏
@@ -290,26 +312,6 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
     public static void hideSoftInput(Context context, View view) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        viewModel.leftConversation(this);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.e("ChatActivity", "destroy");
-        viewModel.unbindService(this);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_chat_menu, menu);
-        return super.onCreateOptionsMenu(menu);
     }
 
 
@@ -336,7 +338,7 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
         public int getItemViewType(int position) {
 
             ChatMessage cm = mBeans.get(position);
-            if (cm != null && Objects.equals(cm.getId(), "TIME")) {
+            if (cm != null && cm.isTimeStamp()) {
                 return TYPE_TIME;
             } else if (cm != null && Objects.equals(cm.getToId(), viewModel.getMyId())) {
                 return TYPE_FRIEND;
@@ -345,18 +347,18 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
             }
         }
 
-        public void messageSent(RecyclerView list,@NonNull ChatMessage sentMessage){
+        public void messageSent(RecyclerView list, @NonNull ChatMessage sentMessage) {
             int index = -1;
-            for(int i=mBeans.size()-1;i>=0;i--){
-                if(Objects.equals(mBeans.get(i).getUuid(),sentMessage.getUuid())){
+            for (int i = mBeans.size() - 1; i >= 0; i--) {
+                if (Objects.equals(mBeans.get(i).getUuid(), sentMessage.getUuid())) {
                     index = i;
                     break;
                 }
             }
-            if(index>=0){
-                mBeans.set(index,sentMessage);
+            if (index >= 0) {
+                mBeans.set(index, sentMessage);
                 CHolder holder = (CHolder) list.findViewHolderForAdapterPosition(index);
-                if(holder!=null){
+                if (holder != null) {
                     holder.hideProgress();
                     holder.bindSensitive(sentMessage);
                 }
@@ -381,22 +383,17 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                     } else {
                         ImageUtils.loadAvatarInto(mContext, viewModel.getFriendAvatar(), holder.avatar);
                     }
-                    if(holder.progress!=null){
-                        if(data.isProgressing()){
+                    if (holder.progress != null) {
+                        if (data.isProgressing()) {
                             holder.progress.setVisibility(View.VISIBLE);
-                        }else{
+                        } else {
                             holder.progress.setVisibility(View.GONE);
                         }
                     }
 //                    holder.content.setText(data.getContent());
                     holder.bindSensitive(data);
                     holder.avatar.setOnClickListener(view -> {
-                        if (holder.viewType == TYPE_FRIEND) {
-                            ActivityUtils.startProfileActivity(mContext, data.getFromId());
-                        } else {
-                            ActivityUtils.startMyProfileActivity(mContext);
-                        }
-
+                        ActivityUtils.startProfileActivity(mContext, data.getFromId());
                     });
 
                 }
@@ -434,7 +431,7 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                 ChatMessage newBottom = newL.get(newL.size() - 1);
                 if (tooFar(top.getCreatedTime(), newBottom.getCreatedTime())) {
                     super.notifyItemPushHead(ChatMessage.getTimeStampHolderInstance(top.getCreatedTime()));
-                } else if (Objects.equals(top.getId(), "TIME")) {
+                } else if (top.isTimeStamp()) {
                     super.notifyItemRemoveFromHead();
                 }
             }
@@ -483,33 +480,33 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
             boolean isSensitiveExpanded = false;
 
             //隐藏加载圈圈
-            public void hideProgress(){
-                if(progress!=null){
+            public void hideProgress() {
+                if (progress != null) {
                     progress.setVisibility(View.GONE);
                 }
             }
 
             //切换敏感消息查看模式
-            public void switchSensitiveMode(@NonNull ChatMessage data){
+            public void switchSensitiveMode(@NonNull ChatMessage data) {
                 isSensitiveExpanded = !isSensitiveExpanded;
-                if(isSensitiveExpanded){
+                if (isSensitiveExpanded) {
                     content.setText(data.getContent());
                     see.setImageResource(R.drawable.ic_baseline_visibility_off_24);
-                }else if(data.isSensitive()){
+                } else if (data.isSensitive()) {
                     content.setText(R.string.hint_sensitive_message);
                     see.setImageResource(R.drawable.ic_baseline_visibility_24);
                 }
             }
 
             //绑定敏感词状态
-            public void bindSensitive(@NonNull ChatMessage data){
+            public void bindSensitive(@NonNull ChatMessage data) {
                 isSensitiveExpanded = false;
-                if(data.isSensitive()){
+                if (data.isSensitive()) {
                     see.setVisibility(View.VISIBLE);
                     see.setImageResource(R.drawable.ic_baseline_visibility_24);
                     content.setText(R.string.hint_sensitive_message);
                     see.setOnClickListener(view -> switchSensitiveMode(data));
-                }else{
+                } else {
                     see.setVisibility(View.GONE);
                     content.setText(data.getContent());
                 }
@@ -531,8 +528,7 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
     /**
      * 表情列表的适配器
      */
-    //TODO
-    static class YunmojiListAdapter extends BaseListAdapter<Yunmoji, YunmojiListAdapter.YunmojiItemHolder>{
+    static class YunmojiListAdapter extends BaseListAdapter<Yunmoji, YunmojiListAdapter.YunmojiItemHolder> {
 
 
         public YunmojiListAdapter(Context mContext, List<Yunmoji> mBeans) {
@@ -554,14 +550,15 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
             Yunmoji yunmoji = mBeans.get(position);
             holder.image.setImageResource(yunmoji.getImageID());
             //表示当这项的图片点击时调用onItemClickListener
-            if(mOnItemClickListener!=null){
+            if (mOnItemClickListener != null) {
                 holder.image.setOnClickListener(view -> mOnItemClickListener.onItemClick(data, view, position));
             }
         }
 
-        static class YunmojiItemHolder extends BaseViewHolder{
+        static class YunmojiItemHolder extends BaseViewHolder {
             @BindView(R.id.image)
             ImageView image;
+
             public YunmojiItemHolder(@NonNull View itemView) {
                 super(itemView);
             }

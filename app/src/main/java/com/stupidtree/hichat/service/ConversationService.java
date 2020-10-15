@@ -2,17 +2,13 @@ package com.stupidtree.hichat.service;
 
 import androidx.lifecycle.LiveData;
 
-import com.google.gson.JsonElement;
-import com.stupidtree.hichat.data.ApiResponse;
+import com.stupidtree.hichat.data.model.ApiResponse;
 import com.stupidtree.hichat.data.model.Conversation;
 
 import java.util.List;
 
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
-import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 /**

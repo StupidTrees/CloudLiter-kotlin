@@ -23,10 +23,9 @@ import androidx.core.app.NotificationCompat;
 
 import com.bumptech.glide.request.target.NotificationTarget;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.stupidtree.hichat.R;
-import com.stupidtree.hichat.data.ApiResponse;
+import com.stupidtree.hichat.data.model.ApiResponse;
 import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
@@ -70,7 +69,7 @@ public class SocketIOClientService extends Service {
     /**
      * 各个对话的未读消息数记录
      */
-    private HashMap<String, Integer> incomingMessage = new HashMap<>();
+    private final HashMap<String, Integer> incomingMessage = new HashMap<>();
 
     Socket socket;
     BroadcastReceiver receiver;
@@ -411,7 +410,7 @@ public class SocketIOClientService extends Service {
 
     private static final long HEART_BEAT_RATE = 10 * 1000;//每隔10秒进行一次对长连接的心跳检测
     private Handler mHandler = new Handler();
-    private Runnable heartBeatRunnable = new Runnable() {
+    private final Runnable heartBeatRunnable = new Runnable() {
         @Override
         public void run() {
             if (socket != null) {
