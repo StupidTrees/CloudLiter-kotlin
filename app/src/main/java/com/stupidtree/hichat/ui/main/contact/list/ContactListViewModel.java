@@ -1,6 +1,5 @@
-package com.stupidtree.hichat.ui.main.contact;
+package com.stupidtree.hichat.ui.main.contact.list;
 
-import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -10,18 +9,16 @@ import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.data.repository.FriendsRepository;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
-import com.stupidtree.hichat.data.repository.RelationRepository;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.ui.base.Trigger;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 层次：ViewModel
  * 联系人页面Fragment所绑定的ViewModel
  */
-public class ContactViewModel extends ViewModel {
+public class ContactListViewModel extends ViewModel {
 
     /**
      * 数据区
@@ -29,12 +26,7 @@ public class ContactViewModel extends ViewModel {
     //数据本体:联系人列表
     private LiveData<DataState<List<UserRelation>>> listData;
     //Trigger：控制↑的刷新动作
-    private MutableLiveData<Trigger> listController = new MutableLiveData<>();
-
-    //数据本体：未读好友事件数
-    private LiveData<DataState<Integer>> unReadLiveData;
-    //Trigger：控制↑的获取
-    private MutableLiveData<Trigger> unReadController = new MutableLiveData<>();
+    private final MutableLiveData<Trigger> listController = new MutableLiveData<>();
 
 
     /**
@@ -42,17 +34,13 @@ public class ContactViewModel extends ViewModel {
      */
     //仓库1：好友仓库
     private final FriendsRepository friendsRepository;
-    //仓库2：关系仓库
-    private RelationRepository relationRepository;
     //仓库2：本地用户仓库
-    private LocalUserRepository localUserRepository;
+    private final LocalUserRepository localUserRepository;
 
 
-    public ContactViewModel() {
+    public ContactListViewModel() {
         friendsRepository = FriendsRepository.getInstance();
         localUserRepository = LocalUserRepository.getInstance();
-        relationRepository = RelationRepository.getInstance();
-
     }
 
 
@@ -81,24 +69,6 @@ public class ContactViewModel extends ViewModel {
     }
 
 
-    /**
-     * 未读好友事件数
-     */
-    public LiveData<DataState<Integer>> getUnReadLiveData() {
-        if(unReadLiveData==null){
-            unReadLiveData = Transformations.switchMap(unReadController, input -> {
-                UserLocal userLocal = localUserRepository.getLoggedInUser();
-                if(userLocal.isValid()){
-                    return relationRepository.countUnread(Objects.requireNonNull(userLocal.getToken()));
-                }else{
-                    return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
-                }
-
-            });
-        }
-        return unReadLiveData;
-    }
-
 
 
     /**
@@ -111,12 +81,6 @@ public class ContactViewModel extends ViewModel {
 
 
 
-    /**
-     * 开始获取未读事件数目
-     */
-    public void startFetchUnread(){
-        unReadController.setValue(Trigger.getActioning());
-    }
 
 
 

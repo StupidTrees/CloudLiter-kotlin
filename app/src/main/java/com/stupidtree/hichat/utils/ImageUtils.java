@@ -48,6 +48,7 @@ public class ImageUtils {
             Glide.with(context).load(glideUrl
             ).apply(RequestOptions.bitmapTransform(new CircleCrop()))
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .placeholder(R.drawable.place_holder_avatar)
                     .into(target);
         }
 
@@ -59,7 +60,7 @@ public class ImageUtils {
             GlideUrl glideUrl = new GlideUrl("http://hita.store:3000/user/profile/avatar?path=" +
                     filename, new LazyHeaders.Builder().addHeader("device-type", "android").build());
             Glide.with(context).load(glideUrl
-            ).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(target);
+            ).apply(RequestOptions.bitmapTransform(new CircleCrop())).placeholder(R.drawable.place_holder_avatar).into(target);
         }
 
     }
@@ -82,6 +83,7 @@ public class ImageUtils {
             Glide.with(context).load(glideUrl
             ).apply(RequestOptions.bitmapTransform(new CircleCrop()))
                     .signature(new ObjectKey(sign))
+                    .placeholder(R.drawable.place_holder_avatar)
                     .diskCacheStrategy(DiskCacheStrategy.NONE).into(target);
            // p.edit().putString("my_avatar","normal").apply();
         }

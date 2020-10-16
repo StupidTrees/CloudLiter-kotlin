@@ -49,7 +49,10 @@
         <item name="android:colorControlHighlight">?attr/colorPrimary</item>
         <item name="android:radius">24dp</item>
     </style>
-
+    <style name="ripplePrimarySmall">
+        <item name="android:colorControlHighlight">?attr/colorPrimary</item>
+        <item name="android:radius">16dp</item>
+    </style>
     <style name="rippleControl">
         <item name="android:radius">24dp</item>
     </style>

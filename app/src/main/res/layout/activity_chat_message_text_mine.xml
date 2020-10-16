@@ -12,7 +12,7 @@
         android:id="@+id/see"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="center|top"
         android:layout_marginEnd="-16dp"
         android:alpha="0.6"
         android:contentDescription="@string/description_switch_sensitive"
@@ -27,43 +27,63 @@
         style="?android:attr/progressBarStyle"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_gravity="center" />
+        android:layout_gravity="center|top"
+        android:layout_marginTop="16dp" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/bubble"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center|end"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        app:cardBackgroundColor="?attr/colorPrimary"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="0dp">
+        android:layout_gravity="center|top|end"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp">
 
-        <com.stupidtree.hichat.ui.widgets.EmoticonsTextView
-            android:id="@+id/content"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/bubble"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp"
-            android:lineSpacingExtra="4sp"
-            android:maxEms="8"
-            android:text="这是一条很长的消息目的只是为了测试一下这个框框的显示效果"
-            android:textColor="@android:color/white"
-            android:textSize="16sp" />
-    </androidx.cardview.widget.CardView>
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            app:cardBackgroundColor="?attr/colorPrimary"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp">
+
+            <com.stupidtree.hichat.ui.widgets.EmoticonsTextView
+                android:id="@+id/content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:lineSpacingExtra="4sp"
+                android:maxEms="8"
+                android:text="这是一条很长的消息"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+        </androidx.cardview.widget.CardView>
+
+        <ImageView
+            android:id="@+id/emotion"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginTop="-6dp"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/ic_emotion_pos_1" />
+
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/avatar"
         android:layout_width="42dp"
         android:layout_height="42dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:src="@drawable/ic_baseline_emoji_emotions_24"
-        android:contentDescription="@string/content_description_avatar" />
+        android:contentDescription="@string/content_description_avatar"
+        android:src="@drawable/ic_baseline_emoji_emotions_24" />
 </LinearLayout>

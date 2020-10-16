@@ -123,4 +123,7 @@
     <string name="user_state">用户在线状态</string>
     <string name="select_yunmoji">选择表情</string>
     <string name="edit_my_profile">编辑资料</string>
+    <string name="title_activity_group">分组管理</string>
+    <string name="contact_friend_list">好友列表</string>
+    <string name="contact_friend_group">分组</string>
 </resources>

@@ -6,6 +6,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.stupidtree.hichat.utils.JsonUtils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 /**
@@ -18,7 +20,7 @@ public class UserRelation {
     //头像链接
     String avatar;
     //分组id
-    Integer group;
+    String group;
     //性别
     UserLocal.GENDER gender;
     //联系人的用户id
@@ -26,6 +28,22 @@ public class UserRelation {
     //联系人用户的备注
     String remark;
 
+    /**
+     * 仅在本地使用的属性
+     */
+    boolean label = false;//是否显示为分组标签
+
+    public static UserRelation getLabelInstance(@NotNull RelationGroup relationGroup){
+        UserRelation res = new UserRelation();
+        res.label = true;
+        res.name = relationGroup.getGroupName();
+        res.group = relationGroup.getId();
+        return res;
+    }
+
+    public boolean isLabel() {
+        return label;
+    }
 
     public String getId() {
         return id;
@@ -49,6 +67,7 @@ public class UserRelation {
         return Objects.equals(name, that.name) &&
                 Objects.equals(id, that.id);
     }
+
 
     @Override
     public int hashCode() {

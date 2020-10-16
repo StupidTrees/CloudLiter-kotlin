@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -14,7 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -360,7 +358,7 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                 CHolder holder = (CHolder) list.findViewHolderForAdapterPosition(index);
                 if (holder != null) {
                     holder.hideProgress();
-                    holder.bindSensitive(sentMessage);
+                    holder.bindSensitiveAndEmotion(sentMessage);
                 }
             }
 
@@ -377,7 +375,6 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                 if (holder.viewType == TYPE_TIME) {
                     holder.content.setText(TextUtils.getChatTimeText(mContext, data.getCreatedTime()));
                 } else {
-
                     if (holder.viewType == TYPE_MINE) {
                         ImageUtils.loadLocalAvatarInto(mContext, viewModel.getMyAvatar(), holder.avatar);
                     } else {
@@ -390,8 +387,9 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                             holder.progress.setVisibility(View.GONE);
                         }
                     }
+
 //                    holder.content.setText(data.getContent());
-                    holder.bindSensitive(data);
+                    holder.bindSensitiveAndEmotion(data);
                     holder.avatar.setOnClickListener(view -> {
                         ActivityUtils.startProfileActivity(mContext, data.getFromId());
                     });
@@ -477,6 +475,7 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
             View bubble;
             View progress;
             ImageView see;//点击查看敏感消息
+            ImageView emotion;
             boolean isSensitiveExpanded = false;
 
             //隐藏加载圈圈
@@ -499,18 +498,38 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
             }
 
             //绑定敏感词状态
-            public void bindSensitive(@NonNull ChatMessage data) {
+            public void bindSensitiveAndEmotion(@NonNull ChatMessage data) {
                 isSensitiveExpanded = false;
                 if (data.isSensitive()) {
                     see.setVisibility(View.VISIBLE);
+                    emotion.setVisibility(View.GONE);
                     see.setImageResource(R.drawable.ic_baseline_visibility_24);
                     content.setText(R.string.hint_sensitive_message);
                     see.setOnClickListener(view -> switchSensitiveMode(data));
                 } else {
                     see.setVisibility(View.GONE);
+                    emotion.setVisibility(View.VISIBLE);
                     content.setText(data.getContent());
+//                    emotion.setAlpha(0.6f*sigmoid(Math.abs(data.getEmotion())/2));
+                    float emotionValue = data.getEmotion();
+                    int iconRes = R.drawable.ic_emotion_normal;
+                    if(emotionValue>=2){
+                        iconRes = R.drawable.ic_emotion_pos_3;
+                    }else if(emotionValue>=1){
+                        iconRes = R.drawable.ic_emotion_pos_2;
+                    }else if(emotionValue>0){
+                        iconRes = R.drawable.ic_emotion_pos_1;
+                    }else if(emotionValue<=-2){
+                        iconRes = R.drawable.ic_emotion_neg_3;
+                    }else if(emotionValue<=-1){
+                        iconRes = R.drawable.ic_emotion_neg_2;
+                    }else if(emotionValue<0){
+                        iconRes = R.drawable.ic_emotion_neg_1;
+                    }
+                    emotion.setImageResource(iconRes);
                 }
             }
+            
 
             public CHolder(@NonNull View itemView, int viewType) {
                 super(itemView);
@@ -520,6 +539,7 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                 bubble = itemView.findViewById(R.id.bubble);
                 progress = itemView.findViewById(R.id.progress);
                 see = itemView.findViewById(R.id.see);
+                emotion = itemView.findViewById(R.id.emotion);
             }
         }
     }

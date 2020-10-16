@@ -37,6 +37,7 @@ public class ChatMessage implements Serializable {
     public String relationId;
     public boolean read;
     public boolean sensitive;
+    public float emotion;
     public Timestamp createdAt;
     public Timestamp updatedAt;
     //long createdTime;
@@ -135,6 +136,9 @@ public class ChatMessage implements Serializable {
         return progressing;
     }
 
+    public float getEmotion() {
+        return emotion;
+    }
 
     public boolean isRead() {
         return read;
@@ -153,7 +157,9 @@ public class ChatMessage implements Serializable {
                 Objects.equals(fromId, message.fromId) &&
                 Objects.equals(toId, message.toId) &&
                 Objects.equals(conversationId, message.conversationId) &&
-                Objects.equals(relationId, message.relationId);
+                Objects.equals(relationId, message.relationId)&&
+                Objects.equals(sensitive,message.sensitive)&&
+                Objects.equals(emotion,message.emotion);
     }
 
     @Override

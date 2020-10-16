@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.stupidtree.hichat.ui.chat.ChatActivity;
 import com.stupidtree.hichat.ui.conversation.ConversationActivity;
+import com.stupidtree.hichat.ui.group.GroupEditorActivity;
 import com.stupidtree.hichat.ui.myprofile.MyProfileActivity;
 import com.stupidtree.hichat.ui.profile.ProfileActivity;
 import com.stupidtree.hichat.ui.relationevent.RelationEventActivity;
@@ -84,6 +85,15 @@ public class ActivityUtils {
      */
     public static void startRelationEventActivity(@NonNull Context from){
         Intent i = new Intent(from, RelationEventActivity.class);
+        from.startActivity(i);
+    }
+
+    /**
+     * 启动分组管理
+     * @param from 上下文
+     */
+    public static void startGroupEditorActivity(@NonNull Context from){
+        Intent i = new Intent(from, GroupEditorActivity.class);
         from.startActivity(i);
     }
 }

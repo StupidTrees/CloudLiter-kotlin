@@ -4,24 +4,33 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.tabs.TabLayout;
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.ui.base.BaseFragment;
 import com.stupidtree.hichat.ui.base.BaseListAdapter;
+import com.stupidtree.hichat.ui.base.BaseTabAdapter;
 import com.stupidtree.hichat.ui.base.BaseViewHolder;
 import com.stupidtree.hichat.ui.base.DataState;
+import com.stupidtree.hichat.ui.main.contact.group.ContactGroupFragment;
+import com.stupidtree.hichat.ui.main.contact.list.ContactListFragment;
 import com.stupidtree.hichat.utils.ActivityUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
 import com.stupidtree.hichat.utils.TextUtils;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -37,18 +46,6 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
     /**
      * View绑定区
      */
-    @BindView(R.id.place_holder)
-    ViewGroup placeHolder;//列表无内容时显示的布局
-
-    @BindView(R.id.place_holder_text)
-    TextView placeHolderText; //不显示列表时显示文字
-
-
-    @BindView(R.id.list)
-    RecyclerView list; //列表
-
-    @BindView(R.id.refresh)
-    SwipeRefreshLayout refreshLayout;
 
     @BindView(R.id.search_friend)
     View searchFriendButton;
@@ -56,13 +53,17 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
     @BindView(R.id.relation_event)
     View relationEventButton;
 
-    @BindView(R.id.unread)
-            TextView unreadText;
+    @BindView(R.id.edit_group)
+    View editGroupButton;
 
-    /**
-     * 适配器区
-     */
-    XListAdapter listAdapter;//列表适配器
+    @BindView(R.id.unread)
+    TextView unreadText;
+
+    @BindView(R.id.pager)
+    ViewPager pager;
+
+    @BindView(R.id.tabs)
+    TabLayout tabs;
 
 
     public ContactFragment() {
@@ -78,69 +79,46 @@ public class ContactFragment extends BaseFragment<ContactViewModel> {
     }
 
 
-    private void setUpButtons(){
+    private void setUpButtons() {
         searchFriendButton.setOnClickListener(view -> ActivityUtils.startSearchActivity(requireContext()));
         relationEventButton.setOnClickListener(view -> ActivityUtils.startRelationEventActivity(requireContext()));
+        editGroupButton.setOnClickListener(view -> ActivityUtils.startGroupEditorActivity(getActivity()));
     }
+
     @Override
     protected void initViews(View view) {
         setUpButtons();
-        //初始化一下列表的view
-        listAdapter = new XListAdapter(getContext(), new LinkedList<>());
-        list.setAdapter(listAdapter);
-        list.setLayoutManager(new LinearLayoutManager(getContext()));
-        listAdapter.setOnItemClickListener((UserRelation data, View card, int position) -> {
-            //点击列表项时，跳转到对应用户的Profile页面
-            ActivityUtils.startProfileActivity(requireActivity(), String.valueOf(data.getId()));
-        });
-        //设置下拉刷新
-        refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
-        refreshLayout.setOnRefreshListener(() -> viewModel.startFetchData());
-
-        //当列表数据变更时，将自动调用本匿名函数
-        viewModel.getListData().observe(this, contactListState -> {
-            refreshLayout.setRefreshing(false);
-            if (contactListState.getState() == DataState.STATE.SUCCESS) {
-                //状态为”成功“，那么列表设置为可见，并通知列表适配器丝滑地更新列表项
-                listAdapter.notifyItemChangedSmooth(contactListState.getData(), (oldData, newData) -> !Objects.equals(oldData, newData) || !Objects.equals(oldData.getRemark(), newData.getRemark()));
-                if (contactListState.getData().size() > 0) {
-                    list.setVisibility(View.VISIBLE);
-                    placeHolder.setVisibility(View.GONE);
-                } else {
-                    list.setVisibility(View.GONE);
-                    placeHolder.setVisibility(View.VISIBLE);
-                    placeHolderText.setText(R.string.no_contact);
-                }
-
-            } else if (contactListState.getState() == DataState.STATE.NOT_LOGGED_IN) {
-                //状态为”未登录“，那么设置”未登录“内东西为可见，隐藏列表
-                list.setVisibility(View.GONE);
-                placeHolder.setVisibility(View.VISIBLE);
-                placeHolderText.setText(R.string.not_logged_in);
-            } else if (contactListState.getState() == DataState.STATE.FETCH_FAILED) {
-                //状态为”获取失败“，那么弹出提示
-                list.setVisibility(View.GONE);
-                placeHolder.setVisibility(View.VISIBLE);
-                placeHolderText.setText(R.string.fetch_failed);
-            }
-        });
-
         viewModel.getUnReadLiveData().observe(this, integerDataState -> {
-            if(integerDataState.getState()== DataState.STATE.SUCCESS){
-                if(integerDataState.getData()>0){
+            if (integerDataState.getState() == DataState.STATE.SUCCESS) {
+                if (integerDataState.getData() > 0) {
                     unreadText.setVisibility(View.VISIBLE);
                     unreadText.setText(String.valueOf(integerDataState.getData()));
-                }else{
+                } else {
                     unreadText.setVisibility(View.GONE);
                 }
 
-            }else{
+            } else {
                 unreadText.setVisibility(View.GONE);
             }
         });
+        pager.setAdapter(new BaseTabAdapter(getChildFragmentManager(),2) {
+            @Override
+            protected Fragment initItem(int position) {
+                if(position==0){
+                    return ContactListFragment.newInstance();
+                }else{
+                    return ContactGroupFragment.newInstance();
+                }
+            }
 
-
-
+            @Nullable
+            @Override
+            public CharSequence getPageTitle(int position) {
+                if(position==0) return getString(R.string.contact_friend_list);
+                else return getString(R.string.contact_friend_group);
+            }
+        });
+        tabs.setupWithViewPager(pager);
     }
 
     @Override
