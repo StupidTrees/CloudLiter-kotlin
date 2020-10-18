@@ -53,14 +53,14 @@ public class ConversationWebSource extends BaseWebSource<ConversationService> {
 
     /**
      * 获取某用户所有的对话
+     *
      * @param token 令牌
-     * @param id 用户id
      * @return 获取结果
      */
-    public LiveData<DataState<List<Conversation>>> getConversations(@NonNull String token, @Nullable String id) {
-        return Transformations.map(service.getConversations(token, id), input -> {
+    public LiveData<DataState<List<Conversation>>> getConversations(@NonNull String token) {
+        return Transformations.map(service.getConversations(token), input -> {
 
-            if(null==input){
+            if (null == input) {
                 return new DataState<>(DataState.STATE.FETCH_FAILED);
             }
             //Log.e("get_conversation",input.toString());
@@ -78,16 +78,17 @@ public class ConversationWebSource extends BaseWebSource<ConversationService> {
 
     /**
      * 查询两用户的对话对象
-     * @param token 令牌
-     * @param userId 我的id
+     *
+     * @param token    令牌
+     * @param userId   我的id
      * @param friendId 朋友的id
      * @return 查询结果
      */
-    public LiveData<DataState<Conversation>> queryConversation(@NonNull String token, @Nullable String userId,@NonNull String friendId) {
+    public LiveData<DataState<Conversation>> queryConversation(@NonNull String token, @Nullable String userId, @NonNull String friendId) {
         return Transformations.map(service.queryConversation(token, userId, friendId), new Function<ApiResponse<Conversation>, DataState<Conversation>>() {
             @Override
             public DataState<Conversation> apply(ApiResponse<Conversation> input) {
-                if(null==input){
+                if (null == input) {
                     return new DataState<>(DataState.STATE.FETCH_FAILED);
                 }
                 switch (input.getCode()) {

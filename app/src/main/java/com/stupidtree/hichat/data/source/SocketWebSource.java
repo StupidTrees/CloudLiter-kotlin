@@ -153,9 +153,7 @@ public class SocketWebSource extends BroadcastReceiver {
 
     public void callOnline(@NonNull Context context, @NonNull UserLocal user) {
         Intent i = new Intent(ACTION_ONLINE);
-        Bundle b = new Bundle();
-        b.putSerializable("user", user);
-        i.putExtras(b);
+        i.putExtra("userId",user.getId());
         context.sendBroadcast(i);
     }
 

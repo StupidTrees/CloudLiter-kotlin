@@ -47,9 +47,7 @@ public class UserPreferenceSource {
     }
     public void saveLocalUser(UserLocal user) {
         Intent i = new Intent(ACTION_ONLINE);
-        Bundle b = new Bundle();
-        b.putSerializable("user",user);
-        i.putExtras(b);
+        i.putExtra("userId",user.getId());
         context.sendBroadcast(i);
         Log.e("save_local_user", String.valueOf(user));
         getPreference().edit()

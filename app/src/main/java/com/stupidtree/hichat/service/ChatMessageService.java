@@ -8,9 +8,13 @@ import com.stupidtree.hichat.data.model.ChatMessage;
 
 import java.util.List;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Multipart;
+import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 /**
@@ -39,13 +43,21 @@ public interface ChatMessageService {
      * @param token 令牌
      * @param conversationId 对话id
      * @param afterId 查询该id之后的消息
-     * @param pageSize 分页大小
      * @return 获取结果
      */
     @GET("/message/pull_latest")
     LiveData<ApiResponse<List<ChatMessage>>> pullLatestChatMessages(@Header("token") String token, @Query("conversationId") String conversationId,@Query("afterId") String afterId);
 
-
+    /**
+     * 发送图片
+     * @param token 令牌
+     * @param toId 朋友id
+     * @param file 文件
+     * @return 返回结果
+     */
+    @Multipart
+    @POST("/message/send_image")
+    LiveData<ApiResponse<ChatMessage>> sendImageMessage(@Header("token") String token,@Query("toId") String toId,@Part MultipartBody.Part file,@Query("uuid") String uuid);
 
 }
 

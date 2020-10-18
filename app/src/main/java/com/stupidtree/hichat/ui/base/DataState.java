@@ -43,6 +43,10 @@ public class DataState<T> {
         this.state = STATE.SUCCESS;
     }
 
+    public DataState(@NonNull T data,STATE state){
+        this.data = data;
+        this.state = state;
+    }
     public DataState(STATE state){
         this.state = state;
     }

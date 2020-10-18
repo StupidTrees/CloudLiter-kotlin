@@ -22,7 +22,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="q">
-        <activity android:name=".ui.group.GroupEditorActivity"></activity>
+        <activity android:name=".ui.group.GroupEditorActivity" />
         <activity android:name=".ui.relationevent.RelationEventActivity" /> <!-- 不加↑这两行，裁剪没法用 -->
         <activity
             android:name=".ui.conversation.ConversationActivity"
@@ -47,6 +47,7 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.chat.ChatActivity"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
             android:name=".ui.welcome.WelcomeActivity"

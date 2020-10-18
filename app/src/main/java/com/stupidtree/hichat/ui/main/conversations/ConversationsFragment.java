@@ -1,6 +1,7 @@
 package com.stupidtree.hichat.ui.main.conversations;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -52,8 +53,8 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
     @BindView(R.id.refresh)
     SwipeRefreshLayout refreshLayout;
 
-    @BindView(R.id.search_bar)
-    ViewGroup searchBar;
+    @BindView(R.id.connection_failed_bar)
+    ViewGroup connectionFailedBar;
 
     /**
      * 适配器区
@@ -80,7 +81,7 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
         listAdapter = new CAdapter(getContext(), new LinkedList<>());
         list.setAdapter(listAdapter);
         list.setLayoutManager(new LinearLayoutManager(getContext()));
-        listAdapter.setOnItemClickListener((data, card, position) -> ActivityUtils.startChatActivity(requireContext(), data.getFriendId()));
+        listAdapter.setOnItemClickListener((data, card, position) -> ActivityUtils.startChatActivity(requireContext(), data));
 
         //设置下拉刷新
         //设置下拉刷新
@@ -88,10 +89,10 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
         refreshLayout.setOnRefreshListener(() -> viewModel.startRefresh());
 
 
-        searchBar.setOnClickListener(view1 -> ActivityUtils.startSearchActivity(requireActivity()));
+        // searchBar.setOnClickListener(view1 -> ActivityUtils.startSearchActivity(requireActivity()));
         viewModel.getListData().observe(this, listDataState -> {
             refreshLayout.setRefreshing(false);
-            if (listDataState.getState() == DataState.STATE.SUCCESS) {
+            if (listDataState.getData() != null && listDataState.getData().size() > 0) {
                 List<Conversation> listD = listDataState.getData();
                 Collections.sort(listD, (conversation, t1) -> t1.getUpdatedAt().compareTo(conversation.getUpdatedAt()));
                 listAdapter.notifyItemChangedSmooth(listD);
@@ -103,13 +104,24 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
                     placeHolder.setVisibility(View.VISIBLE);
                     placeHolderText.setText(R.string.no_conversation);
                 }
-            } else if (listDataState.getState() == DataState.STATE.NOT_LOGGED_IN) {
+            }
+            Log.e("state", String.valueOf(listDataState));
+            if (listDataState.getState() == DataState.STATE.NOT_LOGGED_IN) {
                 placeHolder.setVisibility(View.VISIBLE);
                 list.setVisibility(View.GONE);
                 placeHolderText.setText(R.string.not_logged_in);
-            } else {
+                connectionFailedBar.setVisibility(View.GONE);
+            } else if (listDataState.getState() == DataState.STATE.FETCH_FAILED) {
+                list.setVisibility(View.VISIBLE);
+                placeHolder.setVisibility(View.GONE);
+                connectionFailedBar.setVisibility(View.VISIBLE);
+            }else if(listDataState.getState()== DataState.STATE.SUCCESS){
+                placeHolder.setVisibility(View.GONE);
+                connectionFailedBar.setVisibility(View.GONE);
+            } else if(listDataState.getState()!= DataState.STATE.SUCCESS){
                 placeHolder.setVisibility(View.VISIBLE);
                 list.setVisibility(View.GONE);
+                connectionFailedBar.setVisibility(View.GONE);
                 placeHolderText.setText(R.string.fetch_failed);
             }
         });

@@ -30,6 +30,7 @@ import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.ui.chat.ChatActivity;
+import com.stupidtree.hichat.utils.ActivityUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
 
 import java.net.URISyntaxException;
@@ -105,10 +106,10 @@ public class SocketIOClientService extends Service {
                         currentFriendId = null;
                         break;
                     case ACTION_ONLINE:
-                        if (intent.getExtras() != null) {
-                            UserLocal userLocal = (UserLocal) intent.getExtras().getSerializable("user");
-                            Log.e("请求上线", String.valueOf(userLocal));
-                            socket.emit("login", userLocal);
+                        if (intent.getStringExtra("userId") != null) {
+                            String id = intent.getStringExtra("userId");
+                            Log.e("请求上线", String.valueOf(id));
+                            socket.emit("login", id);
                         }
                         break;
                     case ACTION_OFFLINE:
@@ -211,6 +212,7 @@ public class SocketIOClientService extends Service {
         //消息发送成功
         socket.on("message_sent", args -> {
             ChatMessage chatMessage = new Gson().fromJson(args[0].toString(), ChatMessage.class);
+            Log.e("sent", String.valueOf(chatMessage));
             Intent i = new Intent(ACTION_MESSAGE_SENT);
             Bundle b = new Bundle();
             b.putSerializable("message", chatMessage);
@@ -294,7 +296,10 @@ public class SocketIOClientService extends Service {
         Matcher matcher = pattern.matcher(message.getContent());
         while (matcher.find()) {
             String faceText = matcher.group();
-            newContent = newContent.replaceAll(faceText, getString(R.string.place_holder_yunmoji));
+            newContent = newContent.replace(faceText, getString(R.string.place_holder_yunmoji));
+        }
+        if(message.getType()== ChatMessage.TYPE.IMG){
+            newContent = getString(R.string.place_holder_image);
         }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             Notification.Builder notificationBuilder = new Notification.Builder(this, "cloudLiterMessageChanel");
@@ -302,12 +307,13 @@ public class SocketIOClientService extends Service {
                     .setLargeIcon(Icon.createWithResource(getApplicationContext(), R.drawable.logo))
                     .setAutoCancel(true);
             notificationBuilder.setCustomContentView(rv);
-            rv.setTextViewText(R.id.title, newContent);
+
             rv.setTextViewText(R.id.content, message.getFriendRemark());
+            rv.setTextViewText(R.id.title, newContent);
+
             UserLocal ul = LocalUserRepository.getInstance().getLoggedInUser();
             if (ul.isValid()) {
-                Intent i = new Intent(this, ChatActivity.class);
-                i.putExtra("friendId", message.getFromId());
+                Intent i = ActivityUtils.getIntentForChatActivity(this, message);
                 notificationBuilder.setContentIntent(PendingIntent.getActivity(this, 0, i, FLAG_UPDATE_CURRENT));
                 notificationBuilder.setFullScreenIntent(PendingIntent.getActivity(this, 0, i, FLAG_UPDATE_CURRENT), true);
             }
@@ -327,8 +333,7 @@ public class SocketIOClientService extends Service {
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
             UserLocal ul = LocalUserRepository.getInstance().getLoggedInUser();
             if (ul.isValid()) {
-                Intent i = new Intent(this, ChatActivity.class);
-                i.putExtra("friendId", message.getFromId());
+                Intent i = ActivityUtils.getIntentForChatActivity(this, message);
                 notificationBuilder.setContentIntent(PendingIntent.getActivity(this, 0, i, FLAG_UPDATE_CURRENT));
                 notificationBuilder.setFullScreenIntent(PendingIntent.getActivity(this, 0, i, FLAG_UPDATE_CURRENT), true);
             }

@@ -1,10 +1,12 @@
 package com.stupidtree.hichat.ui.search;
 
+import android.app.Application;
+
 import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModel;
 
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.model.UserSearched;
@@ -18,7 +20,7 @@ import java.util.List;
  * 层次：ViewModel
  * "好友搜索"页面所绑定的ViewModel
  */
-public class SearchViewModel extends ViewModel {
+public class SearchViewModel extends AndroidViewModel {
 
     /**
      * 数据区
@@ -37,8 +39,9 @@ public class SearchViewModel extends ViewModel {
     //本地用户仓库
     LocalUserRepository localUserRepository;
 
-    public SearchViewModel(){
-        userRepository = UserRepository.getInstance();
+    public SearchViewModel(Application application){
+        super(application);
+        userRepository = UserRepository.getInstance(application);
         localUserRepository = LocalUserRepository.getInstance();
     }
 

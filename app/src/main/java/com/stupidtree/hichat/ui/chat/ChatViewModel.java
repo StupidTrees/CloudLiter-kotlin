@@ -6,9 +6,9 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
@@ -16,10 +16,9 @@ import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.model.Conversation;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.repository.ChatRepository;
-import com.stupidtree.hichat.data.repository.ConversationRepository;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.ui.base.DataState;
-import com.stupidtree.hichat.utils.MTransformations;
+import com.stupidtree.hichat.ui.base.StringTrigger;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,9 +30,7 @@ public class ChatViewModel extends AndroidViewModel {
     //数据本体 朋友id
     private String friendId;
     //数据本体：对话对象
-    private MediatorLiveData<DataState<Conversation>> conversationLiveData;
-    //trigger:控制↑的刷新
-    private final MutableLiveData<ConversationTrigger> conversationController = new MutableLiveData<>();
+    private final MutableLiveData<Conversation> conversation = new MutableLiveData<>();
 
     //数据本体：消息列表
     private LiveData<DataState<List<ChatMessage>>> listData;
@@ -47,8 +44,13 @@ public class ChatViewModel extends AndroidViewModel {
     //状态数据：消息发送结果
     private LiveData<DataState<ChatMessage>> messageSentState;
 
+    //状态数据：图片消息发送
+    private LiveData<DataState<ChatMessage>> imageSentResult;
+    //控制↑的刷新
+    private MutableLiveData<StringTrigger> imageSendController = new MutableLiveData<>();
+
+
     private final int pageSize = 15;
-    //    private int topPageNum = 0;
     private Long topId = null;
     private Long bottomId = null;
 
@@ -56,18 +58,18 @@ public class ChatViewModel extends AndroidViewModel {
      * 仓库区
      */
     private final ChatRepository chatRepository;
-    private final ConversationRepository conversationRepository;
     private final LocalUserRepository localUserRepository;
 
 
-    public void setFriendId(String friendId) {
-        this.friendId = friendId;
+
+    public void setConversation(Conversation conversation) {
+       this.conversation.setValue(conversation);
+       this.friendId = conversation.getFriendId();
     }
 
     public ChatViewModel(@NonNull Application application) {
         super(application);
         chatRepository = ChatRepository.getInstance(application);
-        conversationRepository = ConversationRepository.getInstance();
         localUserRepository = LocalUserRepository.getInstance();
         friendStateController = Transformations.map(chatRepository.getFriendsStateController(), input -> {
             Log.e("apply", String.valueOf(input.online));
@@ -84,32 +86,6 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
 
-    /**
-     * 开始获取对话对象
-     *
-     * @param friendId 朋友id
-     */
-    public void startFetchingConversation(String friendId) {
-        conversationController.setValue(ConversationTrigger.getActioning(friendId));
-    }
-
-    /**
-     * 获取页面对应的Conversation对象
-     *
-     * @return 结果
-     */
-    public LiveData<DataState<Conversation>> getConversationLiveData() {
-        if (conversationLiveData == null) {
-            conversationLiveData = MTransformations.switchMap(conversationController, input -> {
-                if (localUserRepository.isUserLoggedIn()) {
-                    return conversationRepository.queryConversation(Objects.requireNonNull(localUserRepository.getLoggedInUser().getToken()),
-                            localUserRepository.getLoggedInUser().getId(), input.friendId);
-                }
-                return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
-            });
-        }
-        return conversationLiveData;
-    }
 
     /**
      * 获取聊天列表状态数据
@@ -123,6 +99,12 @@ public class ChatViewModel extends AndroidViewModel {
                     switch (input2.getListAction()){
                         case APPEND:
                             bottomId = input2.getData().get(0).getId();
+                            if(input2.getData().size()==1){ //某一条新消息到达
+                                //不是这个窗口的消息
+                                if(!Objects.equals(input2.getData().get(0).getConversationId(),getConversationId())){
+                                    return new DataState<>(DataState.STATE.NOTHING);
+                                }
+                            }
                             break;
                         case REPLACE_ALL:
                             topId = input2.getData().get(input2.getData().size()-1).getId();
@@ -158,6 +140,23 @@ public class ChatViewModel extends AndroidViewModel {
         return friendStateLiveData;
     }
 
+    public LiveData<DataState<ChatMessage>> getImageSentResult() {
+        if(imageSentResult==null){
+            imageSentResult = Transformations.switchMap(imageSendController, input -> {
+                if(input.isActioning()){
+                    UserLocal userLocal = localUserRepository.getLoggedInUser();
+                    if(userLocal.isValid()&&getFriendId()!=null){
+                        return chatRepository.ActionSendImageMessage(getApplication(),Objects.requireNonNull(userLocal.getToken()), Objects.requireNonNull(userLocal.getId()),getFriendId(),input.getData());
+                    }else{
+                        return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
+                    }
+                }
+                return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
+            });
+        }
+        return imageSentResult;
+    }
+
     /**
      * 发送消息
      *
@@ -174,6 +173,13 @@ public class ChatViewModel extends AndroidViewModel {
 
     }
 
+    /**
+     * 发送图片
+     * @param path
+     */
+    public void sendImageMessage(String path){
+        imageSendController.setValue(StringTrigger.getActioning(path));
+    }
     public void bindService(Context context) {
         chatRepository.bindService(context);
     }
@@ -228,6 +234,7 @@ public class ChatViewModel extends AndroidViewModel {
 
     }
 
+
     @Nullable
     public String getMyAvatar() {
         UserLocal userLocal = localUserRepository.getLoggedInUser();
@@ -242,18 +249,22 @@ public class ChatViewModel extends AndroidViewModel {
 
     @Nullable
     public String getFriendAvatar() {
-        if (conversationLiveData.getValue() != null && conversationLiveData.getValue().getData() != null) {
-            return conversationLiveData.getValue().getData().getFriendAvatar();
+        if (conversation.getValue()!=null) {
+            return conversation.getValue().getFriendAvatar();
         }
         return null;
     }
 
+    public MutableLiveData<Conversation> getConversation() {
+        return conversation;
+    }
+
     @Nullable
     public String getConversationId() {
-        if (conversationLiveData.getValue() == null || conversationLiveData.getValue().getData() == null) {
+        if (conversation.getValue()==null) {
             return null;
         }
-        return conversationLiveData.getValue().getData().getId();
+        return conversation.getValue().getId();
     }
 
     @Nullable

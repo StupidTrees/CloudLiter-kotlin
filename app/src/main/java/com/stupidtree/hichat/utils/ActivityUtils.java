@@ -2,9 +2,15 @@ package com.stupidtree.hichat.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
+import com.stupidtree.hichat.data.model.ChatMessage;
+import com.stupidtree.hichat.data.model.Conversation;
+import com.stupidtree.hichat.data.model.UserLocal;
+import com.stupidtree.hichat.data.model.UserProfile;
+import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.ui.chat.ChatActivity;
 import com.stupidtree.hichat.ui.conversation.ConversationActivity;
 import com.stupidtree.hichat.ui.group.GroupEditorActivity;
@@ -60,12 +66,31 @@ public class ActivityUtils {
     /**
      * 启动聊天Activity
      * @param from 调用者
-     * @param friendId 朋友id
+     * @param friendProfile 朋友资料对象
      */
-    public static void startChatActivity(@NonNull Context from, @NonNull String friendId){
-        Intent i = new Intent(from, ChatActivity.class);
-        i.putExtra("friendId",friendId);
+    public static void startChatActivity(@NonNull Context from, @NonNull UserProfile friendProfile, @NonNull UserRelation userRelation, @NonNull UserLocal userLocal){
+        Intent i = new Intent(from,ChatActivity.class);
+        Bundle b = new Bundle();
+        b.putSerializable("conversation",Conversation.fromUserRelationAndProfile(friendProfile,userRelation,userLocal));
+        i.putExtras(b);
         from.startActivity(i);
+    }
+    public static void startChatActivity(@NonNull Context from, @NonNull Conversation conversation){
+        Intent i = new Intent(from,ChatActivity.class);
+        Bundle b = new Bundle();
+        b.putSerializable("conversation",conversation);
+        i.putExtras(b);
+        from.startActivity(i);
+    }
+
+
+    public static Intent getIntentForChatActivity(@NonNull Context from,@NonNull ChatMessage message){
+        Conversation conversation = Conversation.fromNewMessage(message);
+        Intent i = new Intent(from,ChatActivity.class);
+        Bundle b = new Bundle();
+        b.putSerializable("conversation",conversation);
+        i.putExtras(b);
+        return i;
     }
 
     /**

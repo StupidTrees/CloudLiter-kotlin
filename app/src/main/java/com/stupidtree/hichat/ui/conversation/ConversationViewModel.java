@@ -1,6 +1,10 @@
 package com.stupidtree.hichat.ui.conversation;
 
+import android.app.Application;
+import android.content.Context;
+
 import androidx.arch.core.util.Function;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -15,7 +19,7 @@ import com.stupidtree.hichat.ui.base.StringTrigger;
 
 import java.util.Objects;
 
-public class ConversationViewModel extends ViewModel {
+public class ConversationViewModel extends AndroidViewModel {
     /**
      * 数据区
      */
@@ -28,8 +32,9 @@ public class ConversationViewModel extends ViewModel {
     private ConversationRepository repository;
     private LocalUserRepository localUserRepository;
 
-    public ConversationViewModel(){
-        repository = ConversationRepository.getInstance();
+    public ConversationViewModel(Application application){
+        super(application);
+        repository = ConversationRepository.getInstance(application);
         localUserRepository = LocalUserRepository.getInstance();
     }
 

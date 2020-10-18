@@ -205,6 +205,7 @@ public class ProfileViewModel extends ViewModel {
     }
 
 
+
     /**
      * 请求更换备注
      *
@@ -222,6 +223,20 @@ public class ProfileViewModel extends ViewModel {
         if (relationLiveData.getValue() != null) {
             return relationLiveData.getValue().getData();
         }
+        return null;
+    }
+
+    @Nullable
+    public UserProfile getUserProfile() {
+        if (profileLiveData.getValue() != null) {
+            return profileLiveData.getValue().getData();
+        }
+        return null;
+    }
+    @Nullable
+    public UserLocal getUserLocal() {
+        UserLocal userLocal = localUserRepository.getLoggedInUser();
+        if(userLocal.isValid()) return userLocal;
         return null;
     }
 

@@ -24,7 +24,7 @@ public interface ConversationService {
      * @return 对话列表
      */
     @GET("/conversation/get")
-    LiveData<ApiResponse<List<Conversation>>> getConversations(@Header("token") String token, @Query("id") String userId);
+    LiveData<ApiResponse<List<Conversation>>> getConversations(@Header("token") String token);
 
     /**
      * 查询两用户的某一对话

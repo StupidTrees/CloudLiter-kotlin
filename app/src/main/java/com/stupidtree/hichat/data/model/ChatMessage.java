@@ -1,25 +1,34 @@
 package com.stupidtree.hichat.data.model;
 
+import android.util.Log;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import androidx.room.TypeConverter;
-import androidx.room.TypeConverters;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
+import com.stupidtree.hichat.utils.TextUtils;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 
 @Entity(tableName = "message")
 public class ChatMessage implements Serializable {
+    public enum TYPE {TXT, IMG}
+
     /**
      * 和服务器数据实体一致的属性
      */
@@ -28,6 +37,8 @@ public class ChatMessage implements Serializable {
     public Long id;
     public String fromId;
     public String toId;
+    @ColumnInfo(defaultValue = "TXT")
+    public String type;
     public String content;
     @Ignore
     public String friendRemark;
@@ -40,6 +51,7 @@ public class ChatMessage implements Serializable {
     public float emotion;
     public Timestamp createdAt;
     public Timestamp updatedAt;
+    public String extra;
     //long createdTime;
 
     /**
@@ -51,7 +63,7 @@ public class ChatMessage implements Serializable {
     @Ignore
     String uuid;
 
-    public ChatMessage(){
+    public ChatMessage() {
         progressing = false;
     }
 
@@ -60,6 +72,12 @@ public class ChatMessage implements Serializable {
         this.fromId = fromId;
         this.toId = toId;
         this.content = content;
+        this.type = "TXT";
+        if (fromId == null || toId == null) {
+            conversationId = null;
+        } else {
+            conversationId = TextUtils.getP2PIdOrdered(fromId, toId);
+        }
         createdAt = new Timestamp(System.currentTimeMillis());
         uuid = UUID.randomUUID().toString();
         progressing = true;
@@ -103,9 +121,20 @@ public class ChatMessage implements Serializable {
         return id;
     }
 
-    public boolean isTimeStamp(){
-        if(id==null) return false;
-        return id==-1;
+    public boolean isTimeStamp() {
+        return Objects.equals(id, (long) -1);
+    }
+
+    public TYPE getType() {
+        return Objects.equals(type, "IMG") ? TYPE.IMG : TYPE.TXT;
+    }
+
+    public void setType(TYPE type) {
+        this.type = type.name();
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public String getUuid() {
@@ -157,14 +186,53 @@ public class ChatMessage implements Serializable {
                 Objects.equals(fromId, message.fromId) &&
                 Objects.equals(toId, message.toId) &&
                 Objects.equals(conversationId, message.conversationId) &&
-                Objects.equals(relationId, message.relationId)&&
-                Objects.equals(sensitive,message.sensitive)&&
-                Objects.equals(emotion,message.emotion);
+                Objects.equals(relationId, message.relationId) &&
+                Objects.equals(sensitive, message.sensitive) &&
+                Objects.equals(emotion, message.emotion);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, fromId, toId, conversationId, relationId);
+    }
+
+
+    /**
+     * 将extra字段解析为分词
+     *
+     * @return 分词列表
+     */
+    @NotNull
+    public List<String> getExtraAsSegmentation() {
+        List<String> result = new ArrayList<>();
+        Log.e("getExtra", String.valueOf(this));
+        try {
+            for (Object s : new Gson().fromJson(extra, List.class)) {
+                result.add(String.valueOf(s));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 将extra字段解析为图片敏感检测结果
+     *
+     * @return 检测结果
+     */
+    @NotNull
+    public HashMap<String, Float> getExtraAsImageAnalyse() {
+        HashMap<String, Float> result = new HashMap<>();
+        try {
+            JsonObject jo = new Gson().fromJson(extra.toString(), JsonObject.class);
+            for (Map.Entry<String, JsonElement> e : jo.entrySet()) {
+                result.put(e.getKey(), Float.valueOf(String.valueOf(e.getValue().getAsFloat())));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
 }

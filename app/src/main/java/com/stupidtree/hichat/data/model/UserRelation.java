@@ -99,4 +99,17 @@ public class UserRelation {
             return null;
         }
     }
+
+    @Override
+    public String toString() {
+        return "UserRelation{" +
+                "name='" + name + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", group='" + group + '\'' +
+                ", gender=" + gender +
+                ", id='" + id + '\'' +
+                ", remark='" + remark + '\'' +
+                ", label=" + label +
+                '}';
+    }
 }

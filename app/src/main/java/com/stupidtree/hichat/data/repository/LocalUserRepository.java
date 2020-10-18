@@ -6,6 +6,7 @@ import android.content.Intent;
 import androidx.annotation.NonNull;
 
 import com.stupidtree.hichat.HiApplication;
+import com.stupidtree.hichat.data.AppDatabase;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.source.UserPreferenceSource;
 
@@ -26,12 +27,13 @@ public class LocalUserRepository {
 
     //将已登录用户缓存在内存里
     private UserLocal loggedInUser = null;
-
+    private final AppDatabase appDatabase;
 
 
     LocalUserRepository(){
         //初始化数据源
         mePreferenceSource = new UserPreferenceSource(HiApplication.getContext());
+        appDatabase = AppDatabase.getDatabase(HiApplication.getContext());
     }
 
     public static LocalUserRepository getInstance(){
@@ -53,6 +55,12 @@ public class LocalUserRepository {
         }
         loggedInUser = null;
         mePreferenceSource.clearLocalUser();
+        //本地缓存清空
+        new Thread(() -> {
+            appDatabase.chatMessageDao().clearTable();
+            appDatabase.conversationDao().clearTable();
+        }).start();
+
     }
 
 

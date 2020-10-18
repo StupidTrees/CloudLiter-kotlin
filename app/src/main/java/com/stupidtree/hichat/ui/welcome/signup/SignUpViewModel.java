@@ -1,6 +1,9 @@
 package com.stupidtree.hichat.ui.welcome.signup;
 
+import android.app.Application;
+
 import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -18,7 +21,7 @@ import java.util.Objects;
  * 层次：ViewModel
  * 登录界面的ViewModel
  */
-public class SignUpViewModel extends ViewModel {
+public class SignUpViewModel extends AndroidViewModel {
 
 
     /**
@@ -38,8 +41,9 @@ public class SignUpViewModel extends ViewModel {
     private UserRepository userRepository;
     private LocalUserRepository localUserRepository;
 
-    public SignUpViewModel() {
-        this.userRepository = UserRepository.getInstance();
+    public SignUpViewModel(Application application) {
+        super(application);
+        this.userRepository = UserRepository.getInstance(application);
         this.localUserRepository = LocalUserRepository.getInstance();
     }
 

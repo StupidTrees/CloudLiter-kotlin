@@ -8,8 +8,8 @@ android {
         applicationId 'com.stupidtree.hichat'
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
+        versionCode 20201017
+        versionName "1.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -74,4 +74,7 @@ dependencies {
     //可展开布局
     implementation 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
     annotationProcessor 'androidx.room:room-compiler:2.2.5'
+
+    //Luban图片压缩
+    implementation 'top.zibin:Luban:1.1.8'
 }

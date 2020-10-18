@@ -1,5 +1,8 @@
 package com.stupidtree.hichat.ui.welcome.login;
 
+import android.app.Application;
+
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -13,26 +16,27 @@ import com.stupidtree.hichat.utils.TextUtils;
  * 层次：ViewModel
  * 登录界面的ViewModel
  */
-public class LoginViewModel extends ViewModel {
+public class LoginViewModel extends AndroidViewModel {
 
 
     /**
      * 数据区
      */
     //数据本体：登录表单
-    private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
+    private final MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
     //状态数据：登录章台
-    private MutableLiveData<LoginTrigger> loginState = new MutableLiveData<>();
+    private final MutableLiveData<LoginTrigger> loginState = new MutableLiveData<>();
 
     /**
      * 仓库区
      */
     //用户仓库
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
 
-    public LoginViewModel() {
-        userRepository = UserRepository.getInstance();
+    public LoginViewModel(Application application) {
+        super(application);
+        userRepository = UserRepository.getInstance(application);
     }
 
     LiveData<LoginFormState> getLoginFormState() {

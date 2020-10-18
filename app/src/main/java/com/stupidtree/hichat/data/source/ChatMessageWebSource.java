@@ -12,12 +12,16 @@ import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.service.ChatMessageService;
 import com.stupidtree.hichat.service.LiveDataCallAdapter;
 import com.stupidtree.hichat.ui.base.DataState;
+import com.stupidtree.hichat.utils.JsonUtils;
 
 import java.util.List;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Multipart;
+import retrofit2.http.POST;
 
 import static com.stupidtree.hichat.service.codes.SUCCESS;
 import static com.stupidtree.hichat.service.codes.TOKEN_INVALID;
@@ -83,9 +87,9 @@ public class ChatMessageWebSource extends BaseWebSource<ChatMessageService> {
     /**
      * 拉取最新消息
      *
-     * @param token    令牌
-     * @param id       对话id
-     * @param afterId  查询该id之后的消息
+     * @param token   令牌
+     * @param id      对话id
+     * @param afterId 查询该id之后的消息
      * @return 获取结果
      */
     public LiveData<DataState<List<ChatMessage>>> pullLatestMessages(@NonNull String token, @Nullable String id, String afterId) {
@@ -103,6 +107,33 @@ public class ChatMessageWebSource extends BaseWebSource<ChatMessageService> {
             }
         });
     }
+
+
+    /**
+     * 发送图片
+     *
+     * @param token 令牌
+     * @param toId  朋友id
+     * @param file  文件
+     * @return 返回结果
+     */
+    public LiveData<DataState<ChatMessage>> sendImageMessage(@NonNull String token, @NonNull String toId, @NonNull MultipartBody.Part file,@NonNull String uuid) {
+        return Transformations.map(service.sendImageMessage(token, toId, file,uuid), input -> {
+            Log.e("发送图片结果", String.valueOf(input));
+            if (input == null) {
+                return new DataState<>(DataState.STATE.FETCH_FAILED);
+            }
+            switch (input.getCode()) {
+                case SUCCESS:
+                    return new DataState<>(input.getData());
+                case TOKEN_INVALID:
+                    return new DataState<>(DataState.STATE.TOKEN_INVALID);
+                default:
+                    return new DataState<>(DataState.STATE.FETCH_FAILED, input.getMessage());
+            }
+        });
+    }
+
 
     @Override
     protected Class<ChatMessageService> getServiceClass() {

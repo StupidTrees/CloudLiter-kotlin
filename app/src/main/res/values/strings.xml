@@ -126,4 +126,6 @@
     <string name="title_activity_group">分组管理</string>
     <string name="contact_friend_list">好友列表</string>
     <string name="contact_friend_group">分组</string>
+    <string name="connection_failed">网络连接失败</string>
+    <string name="place_holder_image">[图片]</string>
 </resources>

@@ -1,8 +1,13 @@
 package com.stupidtree.hichat.data.model;
 
 import android.os.Message;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+import com.stupidtree.hichat.utils.TextUtils;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -11,8 +16,10 @@ import java.util.Objects;
 /**
  * 对话实体类
  */
+@Entity(tableName = "conversation")
 public class Conversation implements Serializable {
     @NonNull
+    @PrimaryKey
     String id;
     String historyId;
     String lastMessage;
@@ -26,33 +33,28 @@ public class Conversation implements Serializable {
     Timestamp createdAt;
     Timestamp updatedAt;
 
-    public static Conversation getFromProfileAndMe(@NonNull UserProfile friend,UserLocal userLocal){
+    public static Conversation fromNewMessage(@NonNull ChatMessage message) {
         Conversation conversation = new Conversation();
-        if(userLocal.getId()!=null&&friend.getId()!=null){
-            conversation.setFriendAvatar(friend.getAvatar());
-            conversation.setFriendId(friend.getId());
-            conversation.setFriendNickname(friend.getNickname());
-            int fi = Integer.parseInt(friend.getId());
-            int mi = Integer.parseInt(userLocal.getId());
-            conversation.setId(Math.min(fi,mi)+"-"+Math.max(fi,mi));
-
-        }
+        conversation.setFriendAvatar(message.getFriendAvatar());
+        conversation.setFriendId(message.getFromId());
+        conversation.setFriendRemark(message.getFriendRemark());
+        conversation.setId(message.getConversationId());
+        conversation.setRelationId(message.getRelationId());
+        return conversation;
+    }
+    public static Conversation fromUserRelationAndProfile(@NonNull UserProfile friendProfile,@NonNull UserRelation userRelation, @NonNull UserLocal userLocal) {
+        Conversation conversation = new Conversation();
+        conversation.setFriendAvatar(friendProfile.getAvatar());
+        conversation.setFriendId(friendProfile.getId());
+        conversation.setFriendRemark(userRelation.getRemark());
+        conversation.setFriendNickname(friendProfile.getNickname());
+        conversation.setId(TextUtils.getP2PIdOrdered(friendProfile.getId(),userLocal.getId()));
+        conversation.setRelationId(userRelation.getId());
+        Log.e("conver_FPF", String.valueOf(friendProfile));
+        Log.e("conver_UR", String.valueOf(userRelation));
         return conversation;
     }
 
-    public static Conversation getFromMessageAndMe(@NonNull ChatMessage message, UserLocal userLocal){
-        Conversation conversation = new Conversation();
-        if(userLocal.getId()!=null&&message.getFromId()!=null){
-//            conversation.setFriendAvatar(friend.getAvatar());
-            conversation.setFriendId(message.getFromId());
-//            conversation.setFriendNickname(friend.getNickname());
-            int fi = Integer.parseInt(message.getFromId());
-            int mi = Integer.parseInt(userLocal.getId());
-            conversation.setId(Math.min(fi,mi)+"-"+Math.max(fi,mi));
-
-        }
-        return conversation;
-    }
 
     @NonNull
     public String getId() {
@@ -65,6 +67,10 @@ public class Conversation implements Serializable {
 
     public String getHistoryId() {
         return historyId;
+    }
+
+    public void setFriendRemark(String friendRemark) {
+        this.friendRemark = friendRemark;
     }
 
     public void setHistoryId(String historyId) {
@@ -161,5 +167,22 @@ public class Conversation implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, historyId, lastMessage, friendId, groupId, friendNickname, friendAvatar, relationId, createdAt, updatedAt);
+    }
+
+    @Override
+    public String toString() {
+        return "Conversation{" +
+                "id='" + id + '\'' +
+                ", historyId='" + historyId + '\'' +
+                ", lastMessage='" + lastMessage + '\'' +
+                ", friendId='" + friendId + '\'' +
+                ", groupId='" + groupId + '\'' +
+                ", friendNickname='" + friendNickname + '\'' +
+                ", friendAvatar='" + friendAvatar + '\'' +
+                ", friendRemark='" + friendRemark + '\'' +
+                ", relationId='" + relationId + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }
