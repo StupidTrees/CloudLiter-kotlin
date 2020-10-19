@@ -6,19 +6,53 @@
     android:background="@drawable/bottom_sheet_rounded_background"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        android:text="TextView"
-        android:textColor="?attr/textColorPrimary"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+<!--    <TextView-->
+<!--        android:id="@+id/title"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_margin="24dp"-->
+<!--        android:text="TextView"-->
+<!--        android:textColor="?attr/textColorPrimary"-->
+<!--        android:textSize="20sp"-->
+<!--        android:textStyle="bold" />-->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            android:tintMode="src_in"
+            app:srcCompat="@drawable/ic_heart"
+            app:tint="?attr/colorPrimary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/label_emotion_analyse" />
+
+        <TextView
+            android:id="@+id/emotion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="8dp"
+            android:text="12.5"
+            android:textColor="?attr/colorPrimary" />
+
+    </LinearLayout>
 
 </LinearLayout>

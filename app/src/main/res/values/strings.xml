@@ -128,4 +128,10 @@
     <string name="contact_friend_group">分组</string>
     <string name="connection_failed">网络连接失败</string>
     <string name="place_holder_image">[图片]</string>
+    <string name="label_emotion_analyse">情绪分析得分</string>
+    <string name="label_emotion_neutral">Neutral</string>
+    <string name="label_drawing">Drawing</string>
+    <string name="label_Porn">Porn</string>
+    <string name="label_sexy">Sexy</string>
+    <string name="label_hentai">Hentai</string>
 </resources>

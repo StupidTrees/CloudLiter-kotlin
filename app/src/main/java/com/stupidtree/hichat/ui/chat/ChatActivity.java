@@ -20,8 +20,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import com.bumptech.glide.Glide;
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.model.Conversation;
@@ -30,6 +28,7 @@ import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.BaseListAdapter;
 import com.stupidtree.hichat.ui.base.BaseViewHolder;
 import com.stupidtree.hichat.ui.base.DataState;
+import com.stupidtree.hichat.ui.chat.detail.PopUpImageMessageDetail;
 import com.stupidtree.hichat.ui.chat.detail.PopUpTextMessageDetail;
 import com.stupidtree.hichat.ui.widgets.EmoticonsEditText;
 import com.stupidtree.hichat.ui.widgets.EmoticonsTextView;
@@ -45,7 +44,6 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -273,18 +271,21 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
         });
         refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
         refreshLayout.setOnRefreshListener(() -> viewModel.loadMore());
-        listAdapter.setOnItemClickListener((data, card, position) -> {
+        listAdapter.setOnItemLongClickListener((view, position) -> {
             //注意，data可能是未更新的已发送对象
             if (position < listAdapter.getBeans().size()) {
                 ChatMessage cm = listAdapter.getBeans().get(position);
                 if (cm.getType() == ChatMessage.TYPE.TXT && !cm.isTimeStamp()) {
-                    new PopUpTextMessageDetail().setListData(cm.getExtraAsSegmentation())
-                            .show(getSupportFragmentManager(), "txt");
+                    new PopUpTextMessageDetail().setChatMessage(cm)
+                            .show(getSupportFragmentManager(), "detail");
+                }else if(cm.getType() == ChatMessage.TYPE.IMG && !cm.isTimeStamp()){
+                    new PopUpImageMessageDetail().setChatMessage(cm)
+                            .show(getSupportFragmentManager(), "detail");
                 }
             }
-
-
+            return true;
         });
+
     }
 
 
@@ -472,12 +473,13 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                     }
 
                 }
-                if (mOnItemClickListener != null && holder.bubble != null) {
-                    holder.bubble.setOnClickListener(view -> mOnItemClickListener.onItemClick(data, view, position));
+                if (mOnItemLongClickListener != null && holder.bubble != null) {
+                    holder.bubble.setOnLongClickListener(view -> mOnItemLongClickListener.onItemLongClick(view,position));
                 }
 
             }
         }
+
 
         /**
          * 判断两时间戳相隔是否太远
@@ -617,6 +619,7 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                         see.setOnClickListener(view -> switchSensitiveModeText(data));
                         image.setVisibility(View.INVISIBLE);
                         imageSensitivePlaceHolder.setVisibility(View.VISIBLE);
+                        content.setText(R.string.hint_sensitive_message);
                     } else {
                         imageSensitivePlaceHolder.setVisibility(View.GONE);
                         image.setVisibility(View.VISIBLE);
@@ -733,5 +736,6 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
             viewModel.sendImageMessage(filePath);
         }
     }
+
 
 }

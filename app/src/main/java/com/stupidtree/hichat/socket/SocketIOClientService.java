@@ -217,10 +217,7 @@ public class SocketIOClientService extends Service {
             Bundle b = new Bundle();
             b.putSerializable("message", chatMessage);
             i.putExtras(b);
-            //当前聊天的新消息才发送广播
-            if (Objects.equals(currentFriendId, chatMessage.getToId())) {
-                sendBroadcast(i);
-            }
+            sendBroadcast(i);
         });
         socket.on("unread_message", args -> {
             if (args.length > 0) {

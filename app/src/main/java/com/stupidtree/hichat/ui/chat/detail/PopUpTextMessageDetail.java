@@ -19,6 +19,7 @@ import com.stupidtree.hichat.ui.widgets.TransparentBottomSheetDialog;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,9 +37,8 @@ public class PopUpTextMessageDetail extends TransparentBottomSheetDialog {
     @BindView(R.id.list)
     RecyclerView list;
 
-    @StringRes
-    Integer init_title;
-
+    @BindView(R.id.emotion)
+    TextView emotion;
 
     /**
      * 适配器区
@@ -52,12 +52,9 @@ public class PopUpTextMessageDetail extends TransparentBottomSheetDialog {
     ChatMessage chatMessage;
 
 
-    public PopUpTextMessageDetail setTitle(@StringRes int title) {
-        this.init_title = title;
-        return this;
-    }
 
-    public PopUpTextMessageDetail setChatMessage(@NotNull ChatMessage chatMessage){
+
+    public PopUpTextMessageDetail setChatMessage(@NotNull ChatMessage chatMessage) {
         this.chatMessage = chatMessage;
         return this;
     }
@@ -76,11 +73,11 @@ public class PopUpTextMessageDetail extends TransparentBottomSheetDialog {
 
     @Override
     protected void initViews(View v) {
-        listAdapter = new LAdapter(getContext(),chatMessage.getExtraAsSegmentation());
+        listAdapter = new LAdapter(getContext(), chatMessage.getExtraAsSegmentation());
         list.setAdapter(listAdapter);
-        list.setLayoutManager(new LinearLayoutManager(requireContext()));
+        list.setLayoutManager(new LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false));
+        emotion.setText(new DecimalFormat("#.###").format(chatMessage.getEmotion()));
     }
-
 
 
     static class LAdapter extends BaseListAdapter<String, LAdapter.LHolder> {
@@ -106,18 +103,19 @@ public class PopUpTextMessageDetail extends TransparentBottomSheetDialog {
                 holder.text.setText(data);
             }
             holder.item.setOnClickListener(view -> {
-                if(mOnItemClickListener!=null){
-                    mOnItemClickListener.onItemClick(data,view,position);
+                if (mOnItemClickListener != null) {
+                    mOnItemClickListener.onItemClick(data, view, position);
                 }
             });
         }
 
 
-        static class LHolder extends BaseViewHolder{
+        static class LHolder extends BaseViewHolder {
             @BindView(R.id.text)
             TextView text;
             @BindView(R.id.item)
             ViewGroup item;
+
             public LHolder(@NonNull View itemView) {
                 super(itemView);
             }
