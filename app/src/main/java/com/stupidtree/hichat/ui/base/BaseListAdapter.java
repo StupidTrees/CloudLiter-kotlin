@@ -32,7 +32,7 @@ public abstract class BaseListAdapter<T, H extends RecyclerView.ViewHolder> exte
      * 提供一个单击的Listener和一个长按的Listener
      */
     protected OnItemClickListener<T> mOnItemClickListener;
-    protected OnItemLongClickListener mOnItemLongClickListener;
+    protected OnItemLongClickListener<T> mOnItemLongClickListener;
 
 
     /**
@@ -58,7 +58,7 @@ public abstract class BaseListAdapter<T, H extends RecyclerView.ViewHolder> exte
         this.mOnItemClickListener = mOnItemClickLitener;
     }
 
-    public void setOnItemLongClickListener(OnItemLongClickListener mOnItemLongClickLitener) {
+    public void setOnItemLongClickListener(OnItemLongClickListener<T> mOnItemLongClickLitener) {
         this.mOnItemLongClickListener = mOnItemLongClickLitener;
     }
 
@@ -399,8 +399,8 @@ public abstract class BaseListAdapter<T, H extends RecyclerView.ViewHolder> exte
         void onItemClick(T data, View card, int position);
     }
 
-    public interface OnItemLongClickListener {
-        boolean onItemLongClick(View view, int position);
+    public interface OnItemLongClickListener<T> {
+        boolean onItemLongClick(T data,View view, int position);
     }
 
     public interface RefreshJudge<T> {

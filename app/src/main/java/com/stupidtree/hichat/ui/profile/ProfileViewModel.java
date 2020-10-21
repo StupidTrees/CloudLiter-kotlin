@@ -1,14 +1,19 @@
 package com.stupidtree.hichat.ui.profile;
 
+import android.content.Context;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
+import com.stupidtree.hichat.data.model.RelationGroup;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.model.UserProfile;
 import com.stupidtree.hichat.data.model.UserRelation;
+import com.stupidtree.hichat.data.repository.GroupRepository;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.data.repository.ProfileRepository;
 import com.stupidtree.hichat.data.repository.RelationRepository;
@@ -49,21 +54,29 @@ public class ProfileViewModel extends ViewModel {
     //Trigger：控制删除好友
     MutableLiveData<StringTrigger> deleteFriendController = new MutableLiveData<>();
 
+    //状态数据：分配好友分组的结果
+    LiveData<DataState<?>> assignGroupResult;
+    //Trigger:控制分配好友分组
+    MutableLiveData<StringTrigger> assignGroupController = new MutableLiveData<>();
+
 
     /**
      * 仓库区
      */
     //用户资料仓库
-    private ProfileRepository repository;
+    private final ProfileRepository repository;
     //用户关系仓库
-    private RelationRepository relationRepository;
+    private final RelationRepository relationRepository;
     //本地用户仓库
-    private LocalUserRepository localUserRepository;
+    private final LocalUserRepository localUserRepository;
+    //好友分组仓库
+    private final GroupRepository groupRepository;
 
     public ProfileViewModel() {
         repository = ProfileRepository.getInstance();
         localUserRepository = LocalUserRepository.getInstance();
         relationRepository = RelationRepository.getInstance();
+        groupRepository = GroupRepository.getInstance();
     }
 
     public LiveData<DataState<UserProfile>> getUserProfileLiveData() {
@@ -134,8 +147,8 @@ public class ProfileViewModel extends ViewModel {
                 if (input.isActioning()) {
                     UserLocal userLocal = localUserRepository.getLoggedInUser();
                     if (userLocal.isValid() && relationLiveData.getValue() != null) {
-                        System.out.println("friend id is" + relationLiveData.getValue().getData().getId());
-                        return relationRepository.changeRemark(Objects.requireNonNull(userLocal.getToken()), input.getValue(), relationLiveData.getValue().getData().getId());
+                        System.out.println("friend id is" + relationLiveData.getValue().getData().getFriendId());
+                        return relationRepository.changeRemark(Objects.requireNonNull(userLocal.getToken()), input.getValue(), relationLiveData.getValue().getData().getFriendId());
                     } else {
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     }
@@ -161,6 +174,23 @@ public class ProfileViewModel extends ViewModel {
             });
         }
         return deleteFriendResult;
+    }
+
+    public LiveData<DataState<?>> getAssignGroupResult() {
+        if(assignGroupResult==null){
+            assignGroupResult = Transformations.switchMap(assignGroupController, input -> {
+                if (input.isActioning()) {
+                    UserLocal userLocal = localUserRepository.getLoggedInUser();
+                    if (userLocal.isValid() && getUserId()!=null) {
+                        return groupRepository.assignGroup(Objects.requireNonNull(userLocal.getToken()),getUserId(),input.getData());
+                    } else {
+                        return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
+                    }
+                }
+                return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
+            });
+        }
+        return assignGroupResult;
     }
 
     /**
@@ -217,6 +247,18 @@ public class ProfileViewModel extends ViewModel {
         }
 
     }
+
+    /**
+     * 请求设置分组
+     * @param group 分组
+     */
+    public void startAssignGroup(@NonNull RelationGroup group){
+        assignGroupController.setValue(StringTrigger.getActioning(group.getId()));
+    }
+    public void logout(@NonNull Context context){
+        localUserRepository.logout(context);
+    }
+
 
     @Nullable
     public UserRelation getUserRelation() {

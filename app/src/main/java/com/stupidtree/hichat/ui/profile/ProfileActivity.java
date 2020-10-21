@@ -1,6 +1,5 @@
 package com.stupidtree.hichat.ui.profile;
 
-import android.app.Activity;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.View;
@@ -13,7 +12,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
-import androidx.lifecycle.Observer;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.stupidtree.hichat.R;
@@ -22,14 +20,13 @@ import com.stupidtree.hichat.data.model.UserProfile;
 import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.DataState;
+import com.stupidtree.hichat.ui.group.pick.PickGroupDialog;
 import com.stupidtree.hichat.ui.widgets.PopUpEditText;
 import com.stupidtree.hichat.ui.widgets.PopUpText;
 import com.stupidtree.hichat.utils.ActivityUtils;
 import com.stupidtree.hichat.utils.ColorUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
 import com.stupidtree.hichat.utils.TextUtils;
-
-import java.util.Objects;
 
 import butterknife.BindView;
 
@@ -71,14 +68,22 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
     @BindView(R.id.remark_layout)
     ViewGroup remarkLayout;
 
+    @BindView(R.id.group_layout)
+    ViewGroup groupLayout;
+
     @BindView(R.id.delete_layout)
     ViewGroup deleteLayout;
 
     @BindView(R.id.remark)
     TextView remarkText;
-
+    @BindView(R.id.groupName)
+    TextView groupName;
     @BindView(R.id.relation_card)
     ViewGroup relationCard;
+
+    @BindView(R.id.logout)
+    Button logoutButton;//登出按钮
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -132,10 +137,20 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                 Toast.makeText(getApplicationContext(), "失败", Toast.LENGTH_SHORT).show();
             }
         });
+
+        viewModel.getAssignGroupResult().observe(this, dataState -> {
+            if (dataState.getState() == DataState.STATE.SUCCESS) {
+                Toast.makeText(getThis(), R.string.assign_group_success, Toast.LENGTH_SHORT).show();
+                viewModel.startRefresh(getIntent().getStringExtra("id"));
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.fail, Toast.LENGTH_SHORT).show();
+            }
+        });
         viewModel.getRelationLiveData().observe(this, userRelationDataState -> {
             if (userRelationDataState.getState() == DataState.STATE.SUCCESS) {
                 //是好友关系，则提供发消息入口
                 relationCard.setVisibility(View.VISIBLE);
+                logoutButton.setVisibility(View.GONE);
                 button.setText(R.string.send_message);
                 button.setIconResource(R.drawable.ic_baseline_message_24);
                 button.setEnabled(true);
@@ -159,6 +174,20 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                     }
 
                 });
+                groupName.setText(userRelationDataState.getData().getGroupName());
+                groupLayout.setOnClickListener(view -> {
+                    if(viewModel.getUserRelation()!=null){
+                        //Log.e("relation", String.valueOf(viewModel.getUserRelation()));
+                        new PickGroupDialog()
+                                .setInitGroupId(viewModel.getUserRelation().getGroupId())
+                                .setOnConfirmListener(group -> {
+                                    if (group != null) {
+                                        viewModel.startAssignGroup(group);
+                                    }
+                                }).show(getSupportFragmentManager(),"pick_group");
+                    }
+
+                });
                 deleteLayout.setOnClickListener(view -> new PopUpText()///.setText(getString(R.string.attention_please))
                         .setTitle(R.string.attention_delete_friend)
                         .setOnConfirmListener(() -> {
@@ -168,6 +197,7 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                 //不是好友关系，则显示”添加好友“
                 relationCard.setVisibility(View.GONE);
                 button.setText(R.string.make_friends);
+                logoutButton.setVisibility(View.GONE);
                 button.setEnabled(true);
                 button.setIconResource(R.drawable.ic_baseline_person_add_24);
                 button.setOnClickListener(view -> {
@@ -177,6 +207,7 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                 remarkLayout.setOnClickListener(null);
             } else if (userRelationDataState.getState() == DataState.STATE.SPECIAL) {
                 //是自己
+                logoutButton.setVisibility(View.VISIBLE);
                 relationCard.setVisibility(View.GONE);
                 button.setText(R.string.edit_my_profile);
                 button.setEnabled(true);
@@ -186,6 +217,11 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                 });
                 remarkLayout.setOnClickListener(null);
             }
+        });
+        logoutButton.setOnClickListener(view1 -> {
+            //通知ViewModel登出
+            viewModel.logout(this);
+            finish();
         });
 
     }

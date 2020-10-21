@@ -73,9 +73,6 @@ public class MyProfileActivity extends BaseActivity<MyProfileViewModel> {
     @BindView(R.id.color)
     TextView colorText;//颜色文本
 
-    @BindView(R.id.logout)
-    Button logoutButton;//登出按钮
-
     @BindView(R.id.username)
     TextView usernameText;//用户名文本
 
@@ -245,11 +242,7 @@ public class MyProfileActivity extends BaseActivity<MyProfileViewModel> {
 
         });
 
-        logoutButton.setOnClickListener(view1 -> {
-            //通知ViewModel登出
-            viewModel.logout(this);
-            finish();
-        });
+
     }
 
     /**

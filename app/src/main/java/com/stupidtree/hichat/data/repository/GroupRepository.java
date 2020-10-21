@@ -1,10 +1,17 @@
 package com.stupidtree.hichat.data.repository;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
+
 import com.stupidtree.hichat.data.model.RelationGroup;
 import com.stupidtree.hichat.data.source.GroupWebSource;
+import com.stupidtree.hichat.service.codes;
 import com.stupidtree.hichat.ui.base.DataState;
 import java.util.List;
+
+import static com.stupidtree.hichat.ui.base.DataState.STATE.FETCH_FAILED;
+import static com.stupidtree.hichat.ui.base.DataState.STATE.TOKEN_INVALID;
 
 /**
  * 层次：Repository
@@ -37,6 +44,18 @@ public class GroupRepository {
      */
     public LiveData<DataState<List<RelationGroup>>> queryMyGroups(String token) {
         return groupWebSource.queryMyGroups(token);
+    }
+
+
+    /**
+     * 为好友分配分组
+     * @param token 令牌
+     * @param friendId 关系id
+     * @param groupId 分组Id
+     * @return 操作结果
+     */
+    public LiveData<DataState<?>> assignGroup(@NonNull String token, @NonNull String friendId, @NonNull String groupId){
+        return groupWebSource.assignGroup(token,friendId,groupId);
     }
 
 }

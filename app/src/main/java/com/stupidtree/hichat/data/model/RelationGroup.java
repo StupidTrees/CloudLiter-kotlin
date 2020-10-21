@@ -52,6 +52,17 @@ public class RelationGroup {
     }
 
     @Override
+    public String toString() {
+        return "RelationGroup{" +
+                "id='" + id + '\'' +
+                ", userId='" + userId + '\'' +
+                ", groupName='" + groupName + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(id, userId, groupName, createdAt, updatedAt);
     }

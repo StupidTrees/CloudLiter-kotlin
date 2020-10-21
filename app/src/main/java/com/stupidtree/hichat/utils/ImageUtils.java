@@ -84,14 +84,17 @@ public class ImageUtils {
         if (TextUtils.isEmpty(filename)) {
             target.setImageResource(R.drawable.place_holder_avatar);
         } else {
-            GlideUrl glideUrl = new GlideUrl("http://hita.store:3000/message/image?path=" +
-                    filename, new LazyHeaders.Builder().addHeader("device-type", "android").build());
+            GlideUrl glideUrl = new GlideUrl(getChatMessageImageUrl(filename), new LazyHeaders.Builder().addHeader("device-type", "android").build());
             Glide.with(context).load(glideUrl)
                     .placeholder(R.drawable.place_holder_loading)
                     //.apply(RequestOptions.bitmapTransform(new CornerTransform(context,dp2px(context,12))))
                     .into(target);
         }
+    }
 
+    public static String getChatMessageImageUrl(String filename){
+        return "http://hita.store:3000/message/image?path=" +
+                filename;
     }
 
     public static void loadAvatarIntoNotification(@NonNull Context context, @NonNull String filename,NotificationTarget target){

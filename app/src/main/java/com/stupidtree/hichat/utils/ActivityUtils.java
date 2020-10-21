@@ -1,10 +1,13 @@
 package com.stupidtree.hichat.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityOptionsCompat;
 
 import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.model.Conversation;
@@ -19,6 +22,9 @@ import com.stupidtree.hichat.ui.profile.ProfileActivity;
 import com.stupidtree.hichat.ui.relationevent.RelationEventActivity;
 import com.stupidtree.hichat.ui.search.SearchActivity;
 import com.stupidtree.hichat.ui.welcome.WelcomeActivity;
+import com.stupidtree.hichat.ui.widgets.PhotoDetailActivity;
+
+import java.util.List;
 
 /**
  * 此类整合了跳转到各个Activity的入口
@@ -121,4 +127,36 @@ public class ActivityUtils {
         Intent i = new Intent(from, GroupEditorActivity.class);
         from.startActivity(i);
     }
+
+    /**
+     * 显示一张大图
+     * @param from 上下文
+     * @param url 图片链接
+     */
+    public static void showOneImage(@NonNull Context from, final String url) {
+        Intent it = new Intent(from, PhotoDetailActivity.class);
+        String[] urlsArr = new String[1];
+        urlsArr[0] = url;
+        it.putExtra("urls", urlsArr);
+        it.putExtra("init_index", 0);
+        from.startActivity(it);
+    }
+
+
+    /**
+     * 显示多张大图
+     * @param from 上下文
+     * @param urls 图片链接
+     * @param index 初始显示的下必
+     */
+    public static void showMultipleImages(@NonNull Activity from,final List<String> urls, final int index) {
+        Intent it = new Intent(from,PhotoDetailActivity.class);
+      //  ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(from,view,"image");
+        String[] urlsArr = new String[urls.size()];
+        for (int i = 0; i < urlsArr.length; i++) urlsArr[i] = urls.get(i);
+        it.putExtra("urls", urlsArr);
+        it.putExtra("init_index", index);
+        from.startActivity(it);//,activityOptionsCompat.toBundle());
+    }
+
 }

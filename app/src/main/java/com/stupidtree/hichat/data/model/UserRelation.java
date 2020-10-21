@@ -16,17 +16,20 @@ import java.util.Objects;
  */
 public class UserRelation {
     //姓名
-    String name;
+    String friendNickname;
     //头像链接
-    String avatar;
+    String friendAvatar;
     //分组id
-    String group;
+    String groupId;
+    //分组名称
+    String groupName;
     //性别
-    UserLocal.GENDER gender;
+    UserLocal.GENDER friendGender;
     //联系人的用户id
-    String id;
+    String friendId;
     //联系人用户的备注
     String remark;
+
 
     /**
      * 仅在本地使用的属性
@@ -36,8 +39,8 @@ public class UserRelation {
     public static UserRelation getLabelInstance(@NotNull RelationGroup relationGroup){
         UserRelation res = new UserRelation();
         res.label = true;
-        res.name = relationGroup.getGroupName();
-        res.group = relationGroup.getId();
+        res.friendNickname = relationGroup.getGroupName();
+        res.groupId = relationGroup.getId();
         return res;
     }
 
@@ -45,18 +48,22 @@ public class UserRelation {
         return label;
     }
 
-    public String getId() {
-        return id;
+    public String getFriendId() {
+        return friendId;
     }
 
-    public String getName() {
-        return name;
+    public String getFriendNickname() {
+        return friendNickname;
+    }
+
+    public String getGroupId() {
+        return groupId;
     }
 
     public String getRemark(){return remark;}
 
-    public String getAvatar() {
-        return avatar;
+    public String getFriendAvatar() {
+        return friendAvatar;
     }
 
     @Override
@@ -64,14 +71,18 @@ public class UserRelation {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UserRelation that = (UserRelation) o;
-        return Objects.equals(name, that.name) &&
-                Objects.equals(id, that.id);
+        return Objects.equals(friendNickname, that.friendNickname) &&
+                Objects.equals(friendId, that.friendId);
     }
 
 
+    public String getGroupName() {
+        return groupName;
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(name, id);
+        return Objects.hash(friendNickname, friendId);
     }
 
 
@@ -87,12 +98,14 @@ public class UserRelation {
             JsonObject userInfo = jo.get("user").getAsJsonObject();
             UserRelation res = new UserRelation();
             //res.group = jo.get("group").getAsInt();
-            res.name = userInfo.get("nickname").getAsString();
-            res.id = userInfo.get("id").getAsString();
-            res.avatar = JsonUtils.getStringData(userInfo,"avatar");
+            res.friendNickname = userInfo.get("friendNickname").getAsString();
+            res.friendId = userInfo.get("friendId").getAsString();
+            res.friendAvatar = JsonUtils.getStringData(userInfo,"friendAvatar");
+            res.groupId = JsonUtils.getStringData(jo,"groupId");
+            res.groupName = JsonUtils.getStringData(jo,"groupName");
             res.remark=JsonUtils.getStringData(jo,"remark");
             String gender = userInfo.get("gender").getAsString();
-            res.gender = Objects.equals(gender,"MALE")? UserLocal.GENDER.MALE: UserLocal.GENDER.FEMALE;
+            res.friendGender = Objects.equals(gender,"MALE")? UserLocal.GENDER.MALE: UserLocal.GENDER.FEMALE;
             return res;
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,11 +116,12 @@ public class UserRelation {
     @Override
     public String toString() {
         return "UserRelation{" +
-                "name='" + name + '\'' +
-                ", avatar='" + avatar + '\'' +
-                ", group='" + group + '\'' +
-                ", gender=" + gender +
-                ", id='" + id + '\'' +
+                "name='" + friendNickname + '\'' +
+                ", avatar='" + friendAvatar + '\'' +
+                ", group='" + groupId + '\'' +
+                ", groupName='" + groupName + '\'' +
+                ", gender=" + friendGender +
+                ", id='" + friendId + '\'' +
                 ", remark='" + remark + '\'' +
                 ", label=" + label +
                 '}';

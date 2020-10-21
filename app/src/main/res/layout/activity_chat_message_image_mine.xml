@@ -57,6 +57,7 @@
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_gravity="center"
+                android:transitionName="image"
                 app:srcCompat="@drawable/place_holder_sensitive_image" />
 
             <com.stupidtree.hichat.ui.widgets.EmoticonsTextView
