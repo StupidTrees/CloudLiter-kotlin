@@ -115,4 +115,5 @@
     <string name="search">搜索</string>
     <string name="menu_my_profile">我的资料</string>
     <string name="menu_setting">设置</string>
+    <string name="empty"></string>
 </resources>
