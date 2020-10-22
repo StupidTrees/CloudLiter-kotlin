@@ -16,7 +16,6 @@ import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.socket.SocketIOClientService;
 import com.stupidtree.hichat.ui.base.DataState;
-import com.stupidtree.hichat.ui.chat.ChatListTrigger;
 import com.stupidtree.hichat.ui.chat.FriendStateTrigger;
 
 import java.util.HashMap;
@@ -27,6 +26,7 @@ import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_INTO_CON
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_LEFT_CONVERSATION;
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_MARK_ALL_READ;
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_MARK_READ;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_MESSAGE_SENT;
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_ONLINE;
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_RECEIVE_MESSAGE;
 
@@ -37,10 +37,11 @@ import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_RECEIVE_
 public class SocketWebSource extends BroadcastReceiver {
 
 
-    MutableLiveData<ChatListTrigger> chatListController = new MutableLiveData<>();
+    MutableLiveData<ChatMessage> newMessageState = new MutableLiveData<>();
     MutableLiveData<FriendStateTrigger> friendStateController = new MutableLiveData<>();
     MutableLiveData<DataState<HashMap<String, Integer>>> unreadMessageState = new MutableLiveData<>();
-
+    //消息发送结果
+    MutableLiveData<DataState<ChatMessage>> messageSentState = new MutableLiveData<>();
 
     public SocketWebSource() {
 
@@ -55,7 +56,7 @@ public class SocketWebSource extends BroadcastReceiver {
                     ChatMessage message = (ChatMessage) intent.getExtras().getSerializable("message");
                     Log.e("unreadMessaged.add", String.valueOf(message));
                     if (message != null) {
-                        chatListController.setValue(ChatListTrigger.getActioning(message.getConversationId(), message));
+                        newMessageState.setValue(message);
 //                        unreadMessages.setValue(new DataState<>(Collections.singletonList(message)).setListAction(DataState.LIST_ACTION.APPEND));
                         HashMap<String,Integer> map = new HashMap<>();
                         map.put(message.getConversationId(),1);
@@ -70,6 +71,15 @@ public class SocketWebSource extends BroadcastReceiver {
                     ));
                 }
                 break;
+
+            case ACTION_MESSAGE_SENT:
+                if(intent.getExtras() != null){
+                    ChatMessage message = (ChatMessage) intent.getExtras().getSerializable("message");
+                    Log.e("SocketWebSource-消息已发送", String.valueOf(message));
+                    if(message!=null){
+                        messageSentState.setValue(new DataState<>(message));
+                    }
+                }
 
         }
     }
@@ -92,10 +102,6 @@ public class SocketWebSource extends BroadcastReceiver {
                 Log.e("已读更新", String.valueOf(map));
                 unreadMessageState.postValue(new DataState<>(map).setListAction(DataState.LIST_ACTION.DELETE));
             });
-//            binder.setOnMessageReadListener((conversationId, toRemove) -> {
-//                Log.e("已读更新", String.valueOf(toRemove));
-//                unreadMessages.postValue(new DataState<>(toRemove).setListAction(DataState.LIST_ACTION.DELETE));
-//            });
         }
 
         @Override
@@ -132,8 +138,8 @@ public class SocketWebSource extends BroadcastReceiver {
     }
 
 
-    public MutableLiveData<ChatListTrigger> getListController() {
-        return chatListController;
+    public MutableLiveData<ChatMessage> getNewMessageState() {
+        return newMessageState;
     }
 
     public MutableLiveData<FriendStateTrigger> getFriendStateController() {
@@ -147,9 +153,7 @@ public class SocketWebSource extends BroadcastReceiver {
 
     public void callOnline(@NonNull Context context, @NonNull UserLocal user) {
         Intent i = new Intent(ACTION_ONLINE);
-        Bundle b = new Bundle();
-        b.putSerializable("user", user);
-        i.putExtras(b);
+        i.putExtra("userId",user.getId());
         context.sendBroadcast(i);
     }
 
@@ -180,5 +184,9 @@ public class SocketWebSource extends BroadcastReceiver {
         i.putExtra("userId", userId);
         i.putExtra("conversationId", conversationId);
         context.sendBroadcast(i);
+    }
+
+    public MutableLiveData<DataState<ChatMessage>> getMessageSentSate(){
+        return messageSentState;
     }
 }

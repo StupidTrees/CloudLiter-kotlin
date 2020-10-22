@@ -3,7 +3,7 @@ package com.stupidtree.hichat.service;
 import androidx.lifecycle.LiveData;
 
 import com.google.gson.JsonObject;
-import com.stupidtree.hichat.data.ApiResponse;
+import com.stupidtree.hichat.data.model.ApiResponse;
 import com.stupidtree.hichat.data.model.UserProfile;
 import com.stupidtree.hichat.data.model.UserSearched;
 

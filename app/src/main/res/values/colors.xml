@@ -12,4 +12,6 @@
     <color name="profileBlue">#00B8FF</color>
     <color name="profilePurple">#7D00FF</color>
 
+    <color name="friendBubbleColor">#11304ffe</color>
+
 </resources>

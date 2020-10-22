@@ -41,7 +41,7 @@ public class ContactViewModel extends ViewModel {
      * 仓库区
      */
     //仓库1：好友仓库
-    private FriendsRepository friendsRepository;
+    private final FriendsRepository friendsRepository;
     //仓库2：关系仓库
     private RelationRepository relationRepository;
     //仓库2：本地用户仓库

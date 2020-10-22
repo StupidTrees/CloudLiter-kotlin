@@ -1,9 +1,12 @@
 package com.stupidtree.hichat.data.repository;
 
+import android.content.Context;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 
 import com.stupidtree.hichat.HiApplication;
+import com.stupidtree.hichat.data.AppDatabase;
 import com.stupidtree.hichat.data.model.UserSearched;
 import com.stupidtree.hichat.data.source.UserPreferenceSource;
 import com.stupidtree.hichat.data.source.UserWebSource;
@@ -23,19 +26,21 @@ public class UserRepository {
     private static volatile UserRepository instance;
 
     //数据源1:网络类型数据，用户网络数据源
-    private UserWebSource userWebSource;
+    private final UserWebSource userWebSource;
     //数据源2：SharedPreference类型数据，本地用户数据源
-    private UserPreferenceSource userPreferenceSource;
+    private final UserPreferenceSource userPreferenceSource;
 
-    private UserRepository() {
+
+
+    private UserRepository(Context context) {
         userWebSource = UserWebSource.getInstance();
-        userPreferenceSource = UserPreferenceSource.getInstance(HiApplication.getContext());
+        userPreferenceSource = UserPreferenceSource.getInstance(context.getApplicationContext());
     }
 
     // public方法：获取单例
-    public static UserRepository getInstance() {
+    public static UserRepository getInstance(Context context) {
         if (instance == null) {
-            instance = new UserRepository();
+            instance = new UserRepository(context);
         }
         return instance;
     }

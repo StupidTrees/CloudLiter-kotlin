@@ -4,7 +4,7 @@
     android:tint="?attr/backgroundColorBottomAsTint"
     android:tintMode="src_over"
     >
-  <solid android:color="?attr/colorAccent"
+  <solid android:color="?attr/colorPrimary"
       />
 
 </shape>

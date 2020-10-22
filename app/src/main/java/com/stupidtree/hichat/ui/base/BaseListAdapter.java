@@ -32,7 +32,7 @@ public abstract class BaseListAdapter<T, H extends RecyclerView.ViewHolder> exte
      * 提供一个单击的Listener和一个长按的Listener
      */
     protected OnItemClickListener<T> mOnItemClickListener;
-    OnItemLongClickListener mOnItemLongClickListener;
+    protected OnItemLongClickListener mOnItemLongClickListener;
 
 
     /**

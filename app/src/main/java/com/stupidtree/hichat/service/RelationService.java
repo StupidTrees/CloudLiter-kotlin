@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.stupidtree.hichat.data.ApiResponse;
+import com.stupidtree.hichat.data.model.ApiResponse;
 import com.stupidtree.hichat.data.model.RelationEvent;
 
 import java.util.List;

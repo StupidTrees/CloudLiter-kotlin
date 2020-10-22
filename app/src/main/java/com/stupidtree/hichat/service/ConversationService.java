@@ -2,17 +2,13 @@ package com.stupidtree.hichat.service;
 
 import androidx.lifecycle.LiveData;
 
-import com.google.gson.JsonElement;
-import com.stupidtree.hichat.data.ApiResponse;
+import com.stupidtree.hichat.data.model.ApiResponse;
 import com.stupidtree.hichat.data.model.Conversation;
 
 import java.util.List;
 
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
-import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 /**
@@ -28,7 +24,7 @@ public interface ConversationService {
      * @return 对话列表
      */
     @GET("/conversation/get")
-    LiveData<ApiResponse<List<Conversation>>> getConversations(@Header("token") String token, @Query("id") String userId);
+    LiveData<ApiResponse<List<Conversation>>> getConversations(@Header("token") String token);
 
     /**
      * 查询两用户的某一对话

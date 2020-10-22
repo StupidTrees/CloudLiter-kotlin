@@ -3,6 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.stupidtree.hichat">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- 解锁屏幕需要的权限 -->
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" /> <!-- 申请电源锁需要的权限 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- 震动权限 -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".HiApplication"
         android:allowBackup="false"
@@ -14,8 +22,8 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="q">
-        <activity android:name=".ui.relationevent.RelationEventActivity"></activity>
-        <!-- 不加↑这两行，裁剪没法用 -->
+        <activity android:name=".ui.group.GroupEditorActivity" />
+        <activity android:name=".ui.relationevent.RelationEventActivity" /> <!-- 不加↑这两行，裁剪没法用 -->
         <activity
             android:name=".ui.conversation.ConversationActivity"
             android:launchMode="singleTask" />
@@ -39,17 +47,17 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.chat.ChatActivity"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
-
         <activity
             android:name=".ui.welcome.WelcomeActivity"
             android:label="@string/title_activity_welcome"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".ui.main.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask" />
+
         <provider
             android:name=".MFileProvider"
             android:authorities="com.stupidtree.hichat.fileprovider"
@@ -61,13 +69,5 @@
         </provider> <!-- 加上他，否则无法从相册选取图片 -->
         <service android:name=".socket.SocketIOClientService" />
     </application>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- 解锁屏幕需要的权限 -->
-    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" /> <!-- 申请电源锁需要的权限 -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- 震动权限 -->
-    <uses-permission android:name="android.permission.VIBRATE" />
-
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.stupidtree.hichat.ui.main;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -37,7 +38,9 @@ import butterknife.BindView;
 /**
  * 很显然，这是主界面
  */
+@SuppressLint("NonConstantResourceId")
 public class MainActivity extends BaseActivity<MainViewModel> {
+
     @BindView(R.id.drawer)
     DrawerLayout drawerLayout;
 
@@ -91,7 +94,7 @@ public class MainActivity extends BaseActivity<MainViewModel> {
         View headerView = navigationView.inflateHeaderView(R.layout.activity_main_nav_header);
         drawerLayout.setStatusBarBackgroundColor(Color.TRANSPARENT);
         drawerLayout.setScrimColor(getBackgroundColorSecondAsTint());
-        drawerLayout.setDrawerElevation(ImageUtils.dp2px(this,84));
+        drawerLayout.setDrawerElevation(ImageUtils.dp2px(this, 84));
         drawerAvatar = headerView.findViewById(R.id.avatar);
         drawerHeader = headerView.findViewById(R.id.drawer_header);
         drawerNickname = headerView.findViewById(R.id.nickname);
@@ -198,7 +201,7 @@ public class MainActivity extends BaseActivity<MainViewModel> {
             //设置各种文字
             drawerUsername.setText(userLocalInfo.getUsername());
             drawerNickname.setText(userLocalInfo.getNickname());
-            drawerHeader.setOnClickListener(view -> ActivityUtils.startMyProfileActivity(getThis()));
+            drawerHeader.setOnClickListener(view -> ActivityUtils.startProfileActivity(getThis(), viewModel.getLocalUser().getId()));
         } else {
             //未登录的信息显示
             drawerUsername.setText(R.string.not_logged_in);

@@ -9,24 +9,33 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
 import android.preference.Preference;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.Px;
 import androidx.core.content.ContextCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.NotificationTarget;
+import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.signature.ObjectKey;
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.source.UserPreferenceSource;
@@ -48,6 +57,7 @@ public class ImageUtils {
             Glide.with(context).load(glideUrl
             ).apply(RequestOptions.bitmapTransform(new CircleCrop()))
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .placeholder(R.drawable.place_holder_avatar)
                     .into(target);
         }
 
@@ -59,7 +69,27 @@ public class ImageUtils {
             GlideUrl glideUrl = new GlideUrl("http://hita.store:3000/user/profile/avatar?path=" +
                     filename, new LazyHeaders.Builder().addHeader("device-type", "android").build());
             Glide.with(context).load(glideUrl
-            ).apply(RequestOptions.bitmapTransform(new CircleCrop())).into(target);
+            ).apply(RequestOptions.bitmapTransform(new CircleCrop())).placeholder(R.drawable.place_holder_avatar).into(target);
+        }
+
+    }
+
+    /**
+     * 加载聊天文件
+     * @param context 上下文
+     * @param filename 图片路径
+     * @param target 目标ImageView
+     */
+    public static void loadChatMessageInto(@NonNull Context context, String filename, @NonNull ImageView target) {
+        if (TextUtils.isEmpty(filename)) {
+            target.setImageResource(R.drawable.place_holder_avatar);
+        } else {
+            GlideUrl glideUrl = new GlideUrl("http://hita.store:3000/message/image?path=" +
+                    filename, new LazyHeaders.Builder().addHeader("device-type", "android").build());
+            Glide.with(context).load(glideUrl)
+                    .placeholder(R.drawable.place_holder_loading)
+                    //.apply(RequestOptions.bitmapTransform(new CornerTransform(context,dp2px(context,12))))
+                    .into(target);
         }
 
     }
@@ -82,9 +112,11 @@ public class ImageUtils {
             Glide.with(context).load(glideUrl
             ).apply(RequestOptions.bitmapTransform(new CircleCrop()))
                     .signature(new ObjectKey(sign))
+                    .placeholder(R.drawable.place_holder_avatar)
                     .diskCacheStrategy(DiskCacheStrategy.NONE).into(target);
            // p.edit().putString("my_avatar","normal").apply();
         }
+
 
     }
 
@@ -136,4 +168,8 @@ public class ImageUtils {
         return (int) (dipValue * scale + 0.5f);
     }
 
+    public static int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
 }

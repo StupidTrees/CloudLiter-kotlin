@@ -2,6 +2,10 @@ package com.stupidtree.hichat.ui.base;
 
 import androidx.annotation.NonNull;
 
+import com.stupidtree.hichat.data.model.ChatMessage;
+
+import java.util.List;
+
 /**
  * 封装了某个UI中数据的状态
  * 例如好友列表界面，应当存放一个”列表数据“，直观上，其应当是一个好友对象的List
@@ -18,8 +22,9 @@ public class DataState<T> {
      * NOT_LOGGED_IN 用户未登录
      * TOKEN_INVALID token已失效
      * NOR_EXIST 查询数据不存在
+     * SPECIAL 特殊状态
      */
-    public enum STATE{NOTHING,NOT_LOGGED_IN,SUCCESS,FETCH_FAILED,TOKEN_INVALID,NOT_EXIST}
+    public enum STATE{NOTHING,NOT_LOGGED_IN,SUCCESS,FETCH_FAILED,TOKEN_INVALID,NOT_EXIST,SPECIAL}
 
     public enum LIST_ACTION{REPLACE_ALL,APPEND,PUSH_HEAD,DELETE}
     //表征数据状态
@@ -38,6 +43,10 @@ public class DataState<T> {
         this.state = STATE.SUCCESS;
     }
 
+    public DataState(@NonNull T data,STATE state){
+        this.data = data;
+        this.state = state;
+    }
     public DataState(STATE state){
         this.state = state;
     }

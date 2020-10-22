@@ -5,10 +5,10 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="backgroundColorBottom">#FFFAFAFA</item>
-        <item name="backgroundColorBottomAsTint">#CFFAFAFA</item>
-        <item name="backgroundColorSecond">#FFFFFFFF</item>
-        <item name="backgroundColorSecondAsTint">#CFFFFFFF</item>
+        <item name="backgroundColorBottom">#FFFFFFFF</item>
+        <item name="backgroundColorBottomAsTint">#CFFFFFFF</item>
+        <item name="backgroundColorSecond">#FFFAFAFA</item>
+        <item name="backgroundColorSecondAsTint">#CFFAFAFA</item>
         <item name="textColorPrimary">#FF000000</item>
         <item name="textColorSecondary">#FF808080</item>
         <item name="colorControlDisabled">#FFE0E0E0</item>
@@ -42,4 +42,20 @@
         <item name="android:background">@android:color/transparent</item>
         <item name="behavior_peekHeight">400dp</item>
     </style>
+
+
+<!--    按钮圆形小水波的效果-->
+    <style name="ripplePrimary">
+        <item name="android:colorControlHighlight">?attr/colorPrimary</item>
+        <item name="android:radius">24dp</item>
+    </style>
+    <style name="ripplePrimarySmall">
+        <item name="android:colorControlHighlight">?attr/colorPrimary</item>
+        <item name="android:radius">16dp</item>
+    </style>
+    <style name="rippleControl">
+        <item name="android:radius">24dp</item>
+    </style>
+
+
 </resources>
