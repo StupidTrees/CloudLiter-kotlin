@@ -66,10 +66,15 @@ public class WordsCloudView extends View {
     }
 
     public void setData(List<String> tags) {
-        if (tags == null || tags.size() == 0) {
+//        if (tags == null || tags.size() == 0) {
+//            throw new IllegalArgumentException("tags can not be null...");
+//        }
+        if (tags == null) {
             throw new IllegalArgumentException("tags can not be null...");
         }
         this.tags = tags;
+        showTags.clear();
+        computeSingleRect(tags, dp2px(30), 0, 0, width, height);
         invalidate();
     }
 

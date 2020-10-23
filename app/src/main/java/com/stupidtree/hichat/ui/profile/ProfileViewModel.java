@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -21,6 +22,8 @@ import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.ui.base.StringTrigger;
 import com.stupidtree.hichat.ui.myprofile.ChangeInfoTrigger;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -36,7 +39,9 @@ public class ProfileViewModel extends ViewModel {
     LiveData<DataState<UserProfile>> profileLiveData;
     //数据本体：我和这个用户的好友关系
     LiveData<DataState<UserRelation>> relationLiveData;
-    //Trigger：控制↑两个的刷新
+    //数据本体：用户词云
+    LiveData<DataState<HashMap<String,Float>>> wordCloudLiveData;
+    //Trigger：控制↑三个的刷新
     MutableLiveData<StringTrigger> profileController = new MutableLiveData<>();
 
     //状态数据：添加好友的结果
@@ -59,7 +64,7 @@ public class ProfileViewModel extends ViewModel {
     //Trigger:控制分配好友分组
     MutableLiveData<StringTrigger> assignGroupController = new MutableLiveData<>();
 
-
+    
     /**
      * 仓库区
      */
@@ -115,10 +120,27 @@ public class ProfileViewModel extends ViewModel {
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     }
                 }
-                return new MutableLiveData<>();
+                return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
             });
         }
         return relationLiveData;
+    }
+
+    public LiveData<DataState<HashMap<String, Float>>> getWordCloudLiveData() {
+        if(wordCloudLiveData==null){
+            wordCloudLiveData = Transformations.switchMap(profileController, input -> {
+                UserLocal user = localUserRepository.getLoggedInUser();
+                if (input.isActioning()) {
+                    if (user.isValid()) {
+                        return repository.getUserWordCloud(user.getToken(),input.getData());
+                    } else {
+                        return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
+                    }
+                }
+                return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));
+            });
+        }
+        return wordCloudLiveData;
     }
 
     public LiveData<DataState<?>> getMakeFriendsResult() {
@@ -139,7 +161,6 @@ public class ProfileViewModel extends ViewModel {
         }
         return makeFriendsResult;
     }
-
     public LiveData<DataState<String>> getChangeRemarkResult() {
         if (changeRemarkResult == null) {
             //也是一样的

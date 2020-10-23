@@ -18,6 +18,7 @@ import com.stupidtree.hichat.ui.welcome.login.LoginResult;
 import com.stupidtree.hichat.ui.welcome.signup.SignUpResult;
 import com.stupidtree.hichat.utils.JsonUtils;
 
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.MultipartBody;
@@ -346,6 +347,29 @@ public class UserWebSource extends BaseWebSource<UserService> {
                 default:
                     return new DataState<>(DataState.STATE.FETCH_FAILED,input.getMessage());
             }
+        });
+    }
+
+
+    /**
+     * 获取用户词云
+     * @param token 用户令牌
+     * @return 词频表
+     */
+    public LiveData<DataState<HashMap<String,Float>>> getUserWordCloud(@Nullable String token, @NonNull String userId){
+        return Transformations.map(service.getWordCloud(token,userId), input -> {
+           // Log.e("getWordCloud", String.valueOf(input));
+            if(input!=null){
+                switch (input.getCode()){
+                    case SUCCESS:
+                        return new DataState<>(input.getData());
+                    case TOKEN_INVALID:
+                        return new DataState<>(DataState.STATE.TOKEN_INVALID);
+                    default:
+                        return new DataState<>(DataState.STATE.FETCH_FAILED);
+                }
+            }
+            return new DataState<>(DataState.STATE.FETCH_FAILED);
         });
     }
 }

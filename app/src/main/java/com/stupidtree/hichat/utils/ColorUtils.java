@@ -3,7 +3,6 @@ package com.stupidtree.hichat.utils;
 import android.content.Context;
 
 import androidx.annotation.ColorInt;
-import androidx.annotation.ColorRes;
 
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.UserProfile;

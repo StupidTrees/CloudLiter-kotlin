@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.lifecycle.Observer;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.stupidtree.hichat.R;
@@ -31,7 +32,10 @@ import com.stupidtree.hichat.utils.ImageUtils;
 import com.stupidtree.hichat.utils.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -99,18 +103,7 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setWindowParams(true, true, false);
         super.onCreate(savedInstanceState);
-        ArrayList<String> tag = new ArrayList<>();
-        tag.add("云升");
-        tag.add("阿中哥爆强滴");
-        tag.add("哈哈哈");
-        tag.add("懒");
-        tag.add("Android");
-        tag.add("哇啦啦啦");
-        tag.add("嘿嘿嘿");
-        tag.add("大刷子");
-        tag.add("你好");
-        tag.add("黄暴信息");
-        wordsCloudView.setData(tag);
+
 
         setToolbarActionBack(toolbar);
     }
@@ -240,6 +233,17 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                 });
                 remarkLayout.setOnClickListener(null);
             }
+        });
+        wordsCloudView.setData(Collections.singletonList(getString(R.string.no_word_cloud_yet)));
+        viewModel.getWordCloudLiveData().observe(this, listDataState -> {
+            if(listDataState.getState()== DataState.STATE.SUCCESS){
+                ArrayList<String> tag = new ArrayList<>();
+                for(Map.Entry<String,Float> wordData:listDataState.getData().entrySet()){
+                    tag.add(wordData.getKey());
+                }
+                wordsCloudView.setData(tag);
+            }
+
         });
         logoutButton.setOnClickListener(view1 -> {
             //通知ViewModel登出

@@ -1,7 +1,5 @@
 package com.stupidtree.hichat.data.model;
 
-import com.stupidtree.hichat.R;
-
 public class Yunmoji {
     private int imageID;
     private String lastStr;

@@ -94,7 +94,10 @@ public class ConversationRepository {
                 listWebData = conversationWebSource.getConversations(token);
                 listLiveData.addSource(listWebData, listDataState -> {
                     if (listDataState.getState() == DataState.STATE.SUCCESS) {
-                        new Thread(() -> conversationDao.saveConversations(listDataState.getData())).start();
+                        new Thread(() -> {
+                            conversationDao.clearTable();
+                            conversationDao.saveConversations(listDataState.getData());
+                        }).start();
                     } else if (listDataState.getState() == DataState.STATE.FETCH_FAILED) {
                         listLiveData.setValue(new DataState<>(conversations, DataState.STATE.FETCH_FAILED));
                     }
@@ -122,5 +125,16 @@ public class ConversationRepository {
 
     public LiveData<DataState<Conversation>> queryConversation(@NonNull String token, @Nullable String userId, @NonNull String friendId) {
         return conversationWebSource.queryConversation(token, userId, friendId);
+    }
+
+
+    /**
+     * 获取聊天词云
+     *
+     * @param token 用户令牌
+     * @return 词频表
+     */
+    public LiveData<DataState<HashMap<String, Float>>> getUserWordCloud(@Nullable String token, @NonNull String userId, @NonNull String friendId) {
+        return conversationWebSource.getWordCloud(token,userId,friendId);
     }
 }
