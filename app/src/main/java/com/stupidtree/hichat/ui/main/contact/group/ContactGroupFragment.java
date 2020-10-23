@@ -78,7 +78,7 @@ public class ContactGroupFragment extends BaseFragment<ContactGroupViewModel> {
         listAdapter.setOnItemClickListener((UserRelation data, View card, int position) -> {
             //点击列表项时，跳转到对应用户的Profile页面
             if (!data.isLabel()) {
-                ActivityUtils.startProfileActivity(requireActivity(), String.valueOf(data.getId()));
+                ActivityUtils.startProfileActivity(requireActivity(), String.valueOf(data.getFriendId()));
             }
 
         });
@@ -161,15 +161,15 @@ public class ContactGroupFragment extends BaseFragment<ContactGroupViewModel> {
         protected void bindHolder(@NonNull XHolder holder, @Nullable UserRelation data, int position) {
             if (data != null) {
                 if (data.isLabel()) {
-                    holder.name.setText(data.getName());
+                    holder.name.setText(data.getFriendNickname());
                 } else {
                     //显示头像
-                    ImageUtils.loadAvatarInto(mContext, data.getAvatar(), holder.avatar);
+                    ImageUtils.loadAvatarInto(mContext, data.getFriendAvatar(), holder.avatar);
                     //显示名称(备注)
                     if (!TextUtils.isEmpty(data.getRemark())) {
                         holder.name.setText(data.getRemark());
                     } else {
-                        holder.name.setText(data.getName());
+                        holder.name.setText(data.getFriendNickname());
                     }
                     //设置点击事件
                     if (mOnItemClickListener != null) {

@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.stupidtree.hichat.data.model.ApiResponse;
 import com.stupidtree.hichat.data.model.RelationEvent;
+import com.stupidtree.hichat.data.model.UserRelation;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public interface RelationService {
      * @return 好友列表
      */
     @GET("/relation/friends")
-    LiveData<ApiResponse<JsonElement>> getFriends(@Header("token") String token, @Query("id") String id);
+    LiveData<ApiResponse<List<UserRelation>>> getFriends(@Header("token") String token, @Query("id") String id);
 
 
     /**
@@ -50,7 +51,7 @@ public interface RelationService {
      * @return 判断结果
      */
     @GET("relation/query")
-    LiveData<ApiResponse<JsonObject>> queryRelation(@Header("token") String token, @Query("friendId") String friendId);
+    LiveData<ApiResponse<UserRelation>> queryRelation(@Header("token") String token, @Query("friendId") String friendId);
 
 
 

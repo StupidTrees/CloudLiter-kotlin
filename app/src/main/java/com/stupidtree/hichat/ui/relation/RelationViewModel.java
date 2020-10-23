@@ -65,8 +65,8 @@ public class RelationViewModel extends ViewModel {
                 if(input.isActioning()){
                     UserLocal userLocal = localUserRepository.getLoggedInUser();
                     if(userLocal.isValid()&&relationData.getValue()!=null){
-                        System.out.println("friend id is"+relationData.getValue().getData().getId());
-                        return relationRepository.changeRemark(Objects.requireNonNull(userLocal.getToken()),input.getValue(),relationData.getValue().getData().getId());
+                        System.out.println("friend id is"+relationData.getValue().getData().getFriendId());
+                        return relationRepository.changeRemark(Objects.requireNonNull(userLocal.getToken()),input.getValue(),relationData.getValue().getData().getFriendId());
                     }else{
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     }

@@ -18,7 +18,6 @@ import com.stupidtree.hichat.ui.base.BaseFragment;
 import com.stupidtree.hichat.ui.base.BaseListAdapter;
 import com.stupidtree.hichat.ui.base.BaseViewHolder;
 import com.stupidtree.hichat.ui.base.DataState;
-import com.stupidtree.hichat.ui.main.contact.ContactViewModel;
 import com.stupidtree.hichat.utils.ActivityUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
 import com.stupidtree.hichat.utils.TextUtils;
@@ -79,7 +78,7 @@ public class ContactListFragment extends BaseFragment<ContactListViewModel> {
         list.setLayoutManager(new LinearLayoutManager(getContext()));
         listAdapter.setOnItemClickListener((UserRelation data, View card, int position) -> {
             //点击列表项时，跳转到对应用户的Profile页面
-            ActivityUtils.startProfileActivity(requireActivity(), String.valueOf(data.getId()));
+            ActivityUtils.startProfileActivity(requireActivity(), String.valueOf(data.getFriendId()));
         });
         //设置下拉刷新
         refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
@@ -146,12 +145,12 @@ public class ContactListFragment extends BaseFragment<ContactListViewModel> {
         protected void bindHolder(@NonNull XHolder holder, @Nullable UserRelation data, int position) {
             if (data != null) {
                 //显示头像
-                ImageUtils.loadAvatarInto(mContext, data.getAvatar(), holder.avatar);
+                ImageUtils.loadAvatarInto(mContext, data.getFriendAvatar(), holder.avatar);
                 //显示名称(备注)
                 if (!TextUtils.isEmpty(data.getRemark())) {
                     holder.name.setText(data.getRemark());
                 } else {
-                    holder.name.setText(data.getName());
+                    holder.name.setText(data.getFriendNickname());
                 }
                 //设置点击事件
                 if (mOnItemClickListener != null) {

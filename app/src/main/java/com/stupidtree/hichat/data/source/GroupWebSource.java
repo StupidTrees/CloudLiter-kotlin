@@ -67,4 +67,28 @@ public class GroupWebSource extends BaseWebSource<GroupService> {
     }
 
 
+    /**
+     * 为好友分配分组
+     * @param token 令牌
+     * @param friendId 关系id
+     * @param groupId 分组Id
+     * @return 操作结果
+     */
+    public LiveData<DataState<?>> assignGroup(String token,String friendId,String groupId){
+        return Transformations.map(service.assignGroup(token, friendId, groupId), input -> {
+            if (input == null) {
+                return new DataState<>(FETCH_FAILED);
+            } else {
+                switch (input.getCode()) {
+                    case codes.SUCCESS:
+                        return new DataState<>(input.getData());
+                    case codes.TOKEN_INVALID:
+                        return new DataState<>(TOKEN_INVALID);
+                    default:
+                        return new DataState<>(FETCH_FAILED, input.getMessage());
+                }
+            }
+        });
+    }
+
 }

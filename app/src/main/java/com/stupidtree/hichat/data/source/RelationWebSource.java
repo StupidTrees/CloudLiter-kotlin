@@ -68,21 +68,22 @@ public class RelationWebSource extends BaseWebSource<RelationService> {
      */
     public LiveData<DataState<List<UserRelation>>> getFriends(String token, String id) {
         return Transformations.map(service.getFriends(token, id), input -> {
+            Log.e("getFriends", String.valueOf(input));
             if (null == input) {
                 return new DataState<>(FETCH_FAILED);
             } else {
                 switch (input.getCode()) {
                     case codes.SUCCESS:
-                        List<UserRelation> res = new LinkedList<>();
-                        if (input.getData().isJsonArray()) {
-                            for (JsonElement je : input.getData().getAsJsonArray()) {
-                                UserRelation fc = UserRelation.getInstanceFromJsonObject(je);
-                                if (null != fc) {
-                                    res.add(fc);
-                                }
-                            }
-                        }
-                        return new DataState<>(res);
+//                        List<UserRelation> res = new LinkedList<>();
+//                        if (input.getData().isJsonArray()) {
+//                            for (JsonElement je : input.getData().getAsJsonArray()) {
+//                                UserRelation fc = UserRelation.getInstanceFromJsonObject(je);
+//                                if (null != fc) {
+//                                    res.add(fc);
+//                                }
+//                            }
+//                        }
+                        return new DataState<>(input.getData());
                     case codes.TOKEN_INVALID:
                         return new DataState<>(TOKEN_INVALID);
                     default:
@@ -156,14 +157,15 @@ public class RelationWebSource extends BaseWebSource<RelationService> {
             }else{
                 switch (input.getCode()){
                     case codes.SUCCESS:
-                        JsonObject jo = input.getData();
-                        UserRelation ur = UserRelation.getInstanceFromJsonObject(jo);
-                        Log.e("获取关系对象", String.valueOf(ur));
-                        if(ur!=null){
-                            return new DataState<>(ur);
-                        }else{
-                            return new DataState<>(FETCH_FAILED);
-                        }
+                        return new DataState<>(input.getData());
+//                        JsonObject jo = input.getData();
+//                        UserRelation ur = UserRelation.getInstanceFromJsonObject(jo);
+//                        Log.e("获取关系对象", String.valueOf(ur));
+//                        if(ur!=null){
+//                            return new DataState<>(ur);
+//                        }else{
+//                            return new DataState<>(FETCH_FAILED);
+//                        }
                     case codes.TOKEN_INVALID:
                         return new DataState<>(TOKEN_INVALID);
                     case codes.RELATION_NOT_EXIST:

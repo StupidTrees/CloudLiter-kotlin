@@ -1,5 +1,6 @@
 package com.stupidtree.hichat.ui.chat.detail;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,13 +28,11 @@ import butterknife.BindView;
 /**
  * 圆角的文本框底部弹窗
  */
+@SuppressLint("NonConstantResourceId")
 public class PopUpImageMessageDetail extends TransparentBottomSheetDialog {
     /**
      * View绑定区
      */
-
-
-
     @BindView(R.id.neutral)
     TextView neutral;
 

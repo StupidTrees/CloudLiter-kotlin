@@ -42,6 +42,7 @@
             android:maxWidth="140dp"
             android:maxHeight="180dp"
             android:scaleType="centerCrop"
+            android:transitionName="image"
             android:visibility="visible"
             app:srcCompat="@drawable/place_holder_loading" />
 

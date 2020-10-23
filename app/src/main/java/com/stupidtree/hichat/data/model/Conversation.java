@@ -1,6 +1,5 @@
 package com.stupidtree.hichat.data.model;
 
-import android.os.Message;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -49,7 +48,7 @@ public class Conversation implements Serializable {
         conversation.setFriendRemark(userRelation.getRemark());
         conversation.setFriendNickname(friendProfile.getNickname());
         conversation.setId(TextUtils.getP2PIdOrdered(friendProfile.getId(),userLocal.getId()));
-        conversation.setRelationId(userRelation.getId());
+        conversation.setRelationId(userRelation.getFriendId());
         Log.e("conver_FPF", String.valueOf(friendProfile));
         Log.e("conver_UR", String.valueOf(userRelation));
         return conversation;

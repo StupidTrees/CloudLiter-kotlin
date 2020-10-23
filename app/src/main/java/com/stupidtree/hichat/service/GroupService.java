@@ -7,8 +7,11 @@ import com.stupidtree.hichat.data.model.RelationGroup;
 
 import java.util.List;
 
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 /**
@@ -25,4 +28,15 @@ public interface GroupService {
     @GET("/group/get")
     LiveData<ApiResponse<List<RelationGroup>>> queryMyGroups(@Header("token") String token);
 
+
+    /**
+     * 为好友分配分组
+     * @param token 令牌
+     * @param friendId 朋友id
+     * @param groupId 分组Id
+     * @return 操作结果
+     */
+    @FormUrlEncoded
+    @POST("group/assign")
+    LiveData<ApiResponse<Object>> assignGroup(@Header("token")String token, @Field("friendId")String friendId,@Field("groupId") String groupId);
 }

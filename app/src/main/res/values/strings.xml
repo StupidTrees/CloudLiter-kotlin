@@ -134,4 +134,6 @@
     <string name="label_Porn">Porn</string>
     <string name="label_sexy">Sexy</string>
     <string name="label_hentai">Hentai</string>
+    <string name="title_pick_group">设置好友分组</string>
+    <string name="assign_group_success">设置分组成功</string>
 </resources>

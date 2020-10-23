@@ -76,7 +76,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginStart="6dp">
+                        android:layout_marginStart="6dp"
+                        android:visibility="gone">
 
                         <androidx.cardview.widget.CardView
                             android:id="@+id/icon_color"
@@ -327,7 +328,7 @@
                         android:layout_gravity="center"
                         android:background="@drawable/element_round_primary_light"
                         android:padding="4dp"
-                        app:srcCompat="@drawable/ic_baseline_group_24"
+                        app:srcCompat="@drawable/ic_baseline_perm_contact_calendar_24"
                         app:tint="?attr/colorPrimary" />
 
                     <TextView
@@ -341,7 +342,7 @@
                         android:textSize="18sp" />
 
                     <TextView
-                        android:id="@+id/group"
+                        android:id="@+id/groupName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -406,28 +407,15 @@
 
             </LinearLayout>
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="24dp"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
-
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
+            <Button
+                android:id="@+id/logout"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginEnd="24dp"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
-
-            </androidx.cardview.widget.CardView>
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="56dp"
+                android:layout_marginEnd="16dp"
+                android:text="@string/logout" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
