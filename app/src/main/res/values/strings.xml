@@ -76,7 +76,7 @@
     <string name="title_profile">" "</string>
     <string name="relation_setting">朋友设置</string>
     <string name="prompt_set_group">设置好友分组</string>
-    <string name="prompt_user_word_cloud">TA的词云</string>
+    <string name="prompt_user_word_cloud">用户词云</string>
     <string name="place_holder_no_signature">这个人很佛系，啥都没写</string>
     <string name="color">颜色</string>
     <string name="fetch_failed">获取失败</string>
@@ -136,4 +136,6 @@
     <string name="label_hentai">Hentai</string>
     <string name="title_pick_group">设置好友分组</string>
     <string name="assign_group_success">设置分组成功</string>
+    <string name="no_word_cloud_yet">还没有词云哟</string>
+    <string name="label_conversation_word_cloud">我们的聊天词云</string>
 </resources>

@@ -1,6 +1,5 @@
 package com.stupidtree.hichat.ui.chat;
 
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -202,7 +201,9 @@ class ChatListAdapter extends BaseListAdapter<ChatMessage, ChatListAdapter.CHold
             ChatMessage top = mBeans.get(0);
             ChatMessage newBottom = newL.get(newL.size() - 1);
             if (tooFar(top.getCreatedTime(), newBottom.getCreatedTime())) {
-                super.notifyItemPushHead(ChatMessage.getTimeStampHolderInstance(top.getCreatedTime()));
+                if(!top.isTimeStamp()){
+                    super.notifyItemPushHead(ChatMessage.getTimeStampHolderInstance(top.getCreatedTime()));
+                }
             } else if (top.isTimeStamp()) {
                 super.notifyItemRemoveFromHead();
             }

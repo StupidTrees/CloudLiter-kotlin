@@ -1,6 +1,5 @@
 package com.stupidtree.hichat.ui.profile;
 
-import android.app.Activity;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,7 +32,10 @@ import com.stupidtree.hichat.utils.ImageUtils;
 import com.stupidtree.hichat.utils.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -90,29 +92,18 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
     @BindView(R.id.relation_card)
     ViewGroup relationCard;
 
-    @BindView(R.id.wordstag_layout)
-    WordsCloudView wordsCloudView;
-
     @BindView(R.id.logout)
     Button logoutButton;//登出按钮
 
+
+    @BindView(R.id.wordstag_layout)
+    WordsCloudView wordsCloudView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setWindowParams(true, true, false);
         super.onCreate(savedInstanceState);
-        ArrayList<String> tag = new ArrayList<>();
-        tag.add("云升");
-        tag.add("阿中哥爆强滴");
-        tag.add("哈哈哈");
-        tag.add("懒");
-        tag.add("Android");
-        tag.add("哇啦啦啦");
-        tag.add("嘿嘿嘿");
-        tag.add("大刷子");
-        tag.add("你好");
-        tag.add("黄暴信息");
-        wordsCloudView.setData(tag);
+
 
         setToolbarActionBack(toolbar);
     }
@@ -175,14 +166,6 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
             if (userRelationDataState.getState() == DataState.STATE.SUCCESS) {
                 //是好友关系，则提供发消息入口
                 relationCard.setVisibility(View.VISIBLE);
-//                ArrayList<String> tag = new ArrayList<>();
-//                tag.add("云升");
-//                tag.add("阿中哥爆强滴");
-//                tag.add("哈哈哈");
-//                tag.add("懒");
-//                tag.add("Android");
-//                tag.add("哇啦啦啦");
-//                wordsCloudView.setData(tag);
                 logoutButton.setVisibility(View.GONE);
                 button.setText(R.string.send_message);
                 button.setIconResource(R.drawable.ic_baseline_message_24);
@@ -229,15 +212,8 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
             } else if (userRelationDataState.getState() == DataState.STATE.NOT_EXIST) {
                 //不是好友关系，则显示”添加好友“
                 relationCard.setVisibility(View.GONE);
-//                ArrayList<String> tag = new ArrayList<>();
-//                tag.add("云升");
-//                tag.add("阿中哥爆强滴");
-//                tag.add("哈哈哈");
-//                tag.add("懒");
-//                tag.add("Android");
-//                tag.add("哇啦啦啦");
-//                wordsCloudView.setData(tag);
                 button.setText(R.string.make_friends);
+                logoutButton.setVisibility(View.GONE);
                 button.setEnabled(true);
                 button.setIconResource(R.drawable.ic_baseline_person_add_24);
                 button.setOnClickListener(view -> {
@@ -257,6 +233,17 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                 });
                 remarkLayout.setOnClickListener(null);
             }
+        });
+        wordsCloudView.setData(Collections.singletonList(getString(R.string.no_word_cloud_yet)));
+        viewModel.getWordCloudLiveData().observe(this, listDataState -> {
+            if(listDataState.getState()== DataState.STATE.SUCCESS){
+                ArrayList<String> tag = new ArrayList<>();
+                for(Map.Entry<String,Float> wordData:listDataState.getData().entrySet()){
+                    tag.add(wordData.getKey());
+                }
+                wordsCloudView.setData(tag);
+            }
+
         });
         logoutButton.setOnClickListener(view1 -> {
             //通知ViewModel登出

@@ -11,6 +11,8 @@ import com.stupidtree.hichat.data.source.UserWebSource;
 import com.stupidtree.hichat.ui.base.DataState;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -30,7 +32,7 @@ public class ProfileRepository {
     }
 
     //数据源1：网络类型数据源，用户网络操作
-    private UserWebSource userWebSource;
+    private final UserWebSource userWebSource;
 
     ProfileRepository() {
         userWebSource = UserWebSource.getInstance();
@@ -61,7 +63,7 @@ public class ProfileRepository {
     public LiveData<DataState<String>> changeAvatar(@NonNull String token, @NonNull String filePath) {
         //读取图片文件
         File file = new File(filePath);
-       // MutableLiveData<DataState<String>> result = new MutableLiveData<>();
+        // MutableLiveData<DataState<String>> result = new MutableLiveData<>();
         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
         //构造一个图片格式的POST表单
         MultipartBody.Part body =
@@ -94,7 +96,6 @@ public class ProfileRepository {
     }
 
 
-
     /**
      * 更改用户性别
      *
@@ -114,13 +115,13 @@ public class ProfileRepository {
     /**
      * 更改用户性别
      *
-     * @param token  令牌
+     * @param token 令牌
      * @param color 新颜色 赤橙黄绿青蓝紫
      * @return 操作结果
      */
-    public LiveData<DataState<String>> changeColor(@NonNull String token,@NonNull String color) {
-        return Transformations.map(userWebSource.changeColor(token,color), input -> {
-            if(input.getState() == DataState.STATE.SUCCESS) {
+    public LiveData<DataState<String>> changeColor(@NonNull String token, @NonNull String color) {
+        return Transformations.map(userWebSource.changeColor(token, color), input -> {
+            if (input.getState() == DataState.STATE.SUCCESS) {
                 //？？？？？？？？？？？？？？
             }
             return input;
@@ -130,7 +131,7 @@ public class ProfileRepository {
     /**
      * 更改用户签名
      *
-     * @param token    令牌
+     * @param token     令牌
      * @param signature 新签名
      * @return 操作结果
      */
@@ -143,6 +144,14 @@ public class ProfileRepository {
         });
     }
 
-
+    /**
+     * 获取用户词云
+     *
+     * @param token 用户令牌
+     * @return 词频表
+     */
+    public LiveData<DataState<HashMap<String, Float>>> getUserWordCloud(@Nullable String token, @NonNull String userId) {
+        return userWebSource.getUserWordCloud(token,userId);
+    }
 
 }

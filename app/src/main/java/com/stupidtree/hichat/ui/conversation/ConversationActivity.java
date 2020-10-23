@@ -15,9 +15,15 @@ import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.Conversation;
 import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.DataState;
+import com.stupidtree.hichat.ui.widgets.WordsCloudView;
 import com.stupidtree.hichat.utils.ActivityUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
 import com.stupidtree.hichat.utils.TextUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 
@@ -35,6 +41,9 @@ public class ConversationActivity extends BaseActivity<ConversationViewModel> {
 
     @BindView(R.id.user_layout)
     ViewGroup userLayout;
+
+    @BindView(R.id.word_cloud)
+    WordsCloudView wordsCloudView;
 
     @Override
     protected int getLayoutId() {
@@ -60,6 +69,14 @@ public class ConversationActivity extends BaseActivity<ConversationViewModel> {
                 setUpPage(conversationDataState.getData());
             }
         });
+        wordsCloudView.setData(Collections.singletonList(getString(R.string.no_word_cloud_yet)));
+        viewModel.getWordCloudLiveData().observe(this, hashMapDataState -> {
+            ArrayList<String> tag = new ArrayList<>();
+            for(Map.Entry<String,Float> wordData:hashMapDataState.getData().entrySet()){
+                tag.add(wordData.getKey());
+            }
+            wordsCloudView.setData(tag);
+        });
         userLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,7 +96,6 @@ public class ConversationActivity extends BaseActivity<ConversationViewModel> {
         if(getIntent().hasExtra("friendId")){
             viewModel.startRefresh(getIntent().getStringExtra("friendId"));
         }
-
     }
 
     private void setUpPage(Conversation conversation){

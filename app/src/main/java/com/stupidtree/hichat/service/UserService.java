@@ -7,6 +7,7 @@ import com.stupidtree.hichat.data.model.ApiResponse;
 import com.stupidtree.hichat.data.model.UserProfile;
 import com.stupidtree.hichat.data.model.UserSearched;
 
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.MultipartBody;
@@ -126,6 +127,15 @@ public interface UserService {
     @POST("/user/profile/change_signature")
     LiveData<ApiResponse<Object>> changeSignature(@Field("signature")String signature,@Header("token")String token);
 
+
+
+    /**
+     * 获取用户词云
+     * @param token 登录状态的token
+     * @return 搜索结果
+     */
+    @GET("/user/profile/word_cloud")
+    LiveData<ApiResponse<HashMap<String,Float>>> getWordCloud( @Header("token") String token,@Query("userId") String userId);
 
 
 }

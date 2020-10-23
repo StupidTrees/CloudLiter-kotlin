@@ -12,6 +12,7 @@ import com.stupidtree.hichat.service.ConversationService;
 import com.stupidtree.hichat.service.LiveDataCallAdapter;
 import com.stupidtree.hichat.ui.base.DataState;
 
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Retrofit;
@@ -102,6 +103,26 @@ public class ConversationWebSource extends BaseWebSource<ConversationService> {
             }
         });
     }
-
+    /**
+     * 获取对话词云
+     * @param token 用户令牌
+     * @return 词频表
+     */
+    public LiveData<DataState<HashMap<String,Float>>> getWordCloud(@Nullable String token, @NonNull String userId, @NonNull String friendId){
+        return Transformations.map(service.getWordCloud(token,userId,friendId), input -> {
+            // Log.e("getWordCloud", String.valueOf(input));
+            if(input!=null){
+                switch (input.getCode()){
+                    case SUCCESS:
+                        return new DataState<>(input.getData());
+                    case TOKEN_INVALID:
+                        return new DataState<>(DataState.STATE.TOKEN_INVALID);
+                    default:
+                        return new DataState<>(DataState.STATE.FETCH_FAILED);
+                }
+            }
+            return new DataState<>(DataState.STATE.FETCH_FAILED);
+        });
+    }
 
 }
