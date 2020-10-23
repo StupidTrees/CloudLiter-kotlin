@@ -2,6 +2,7 @@ package com.stupidtree.hichat.ui.profile;
 
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,10 +24,16 @@ import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.ui.group.pick.PickGroupDialog;
 import com.stupidtree.hichat.ui.widgets.PopUpEditText;
 import com.stupidtree.hichat.ui.widgets.PopUpText;
+import com.stupidtree.hichat.ui.widgets.WordsCloudView;
 import com.stupidtree.hichat.utils.ActivityUtils;
 import com.stupidtree.hichat.utils.ColorUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
 import com.stupidtree.hichat.utils.TextUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import butterknife.BindView;
 
@@ -85,10 +92,26 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
     Button logoutButton;//登出按钮
 
 
+    @BindView(R.id.wordstag_layout)
+    WordsCloudView wordsCloudView;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setWindowParams(true, true, false);
         super.onCreate(savedInstanceState);
+        ArrayList<String> tag = new ArrayList<>();
+        tag.add("云升");
+        tag.add("阿中哥爆强滴");
+        tag.add("哈哈哈");
+        tag.add("懒");
+        tag.add("Android");
+        tag.add("哇啦啦啦");
+        tag.add("嘿嘿嘿");
+        tag.add("大刷子");
+        tag.add("你好");
+        tag.add("黄暴信息");
+        wordsCloudView.setData(tag);
+
         setToolbarActionBack(toolbar);
     }
 

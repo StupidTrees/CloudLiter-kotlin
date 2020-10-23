@@ -391,6 +391,19 @@
                         android:textSize="18sp" />
 
                 </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <com.stupidtree.hichat.ui.widgets.WordsCloudView
+                        android:id="@+id/wordstag_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        >
+                    </com.stupidtree.hichat.ui.widgets.WordsCloudView>
+
+                </LinearLayout>
 
             </LinearLayout>
 
