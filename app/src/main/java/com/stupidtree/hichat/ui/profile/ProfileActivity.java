@@ -3,6 +3,7 @@ package com.stupidtree.hichat.ui.profile;
 import android.app.Activity;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -24,11 +25,15 @@ import com.stupidtree.hichat.ui.base.BaseActivity;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.ui.widgets.PopUpEditText;
 import com.stupidtree.hichat.ui.widgets.PopUpText;
+import com.stupidtree.hichat.ui.widgets.WordsCloudView;
 import com.stupidtree.hichat.utils.ActivityUtils;
 import com.stupidtree.hichat.utils.ColorUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
 import com.stupidtree.hichat.utils.TextUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -80,10 +85,26 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
     @BindView(R.id.relation_card)
     ViewGroup relationCard;
 
+    @BindView(R.id.wordstag_layout)
+    WordsCloudView wordsCloudView;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setWindowParams(true, true, false);
         super.onCreate(savedInstanceState);
+        ArrayList<String> tag = new ArrayList<>();
+        tag.add("云升");
+        tag.add("阿中哥爆强滴");
+        tag.add("哈哈哈");
+        tag.add("懒");
+        tag.add("Android");
+        tag.add("哇啦啦啦");
+        tag.add("嘿嘿嘿");
+        tag.add("大刷子");
+        tag.add("你好");
+        tag.add("黄暴信息");
+        wordsCloudView.setData(tag);
+
         setToolbarActionBack(toolbar);
     }
 
@@ -136,6 +157,14 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
             if (userRelationDataState.getState() == DataState.STATE.SUCCESS) {
                 //是好友关系，则提供发消息入口
                 relationCard.setVisibility(View.VISIBLE);
+//                ArrayList<String> tag = new ArrayList<>();
+//                tag.add("云升");
+//                tag.add("阿中哥爆强滴");
+//                tag.add("哈哈哈");
+//                tag.add("懒");
+//                tag.add("Android");
+//                tag.add("哇啦啦啦");
+//                wordsCloudView.setData(tag);
                 button.setText(R.string.send_message);
                 button.setIconResource(R.drawable.ic_baseline_message_24);
                 button.setEnabled(true);
@@ -167,6 +196,14 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
             } else if (userRelationDataState.getState() == DataState.STATE.NOT_EXIST) {
                 //不是好友关系，则显示”添加好友“
                 relationCard.setVisibility(View.GONE);
+//                ArrayList<String> tag = new ArrayList<>();
+//                tag.add("云升");
+//                tag.add("阿中哥爆强滴");
+//                tag.add("哈哈哈");
+//                tag.add("懒");
+//                tag.add("Android");
+//                tag.add("哇啦啦啦");
+//                wordsCloudView.setData(tag);
                 button.setText(R.string.make_friends);
                 button.setEnabled(true);
                 button.setIconResource(R.drawable.ic_baseline_person_add_24);
