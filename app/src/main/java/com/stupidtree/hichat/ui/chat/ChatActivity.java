@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -325,8 +327,24 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
             if (expandableLayout.isExpanded()) {
                 collapseEmotionPanel();
             } else {
-                hideSoftInput(getApplicationContext(), inputEditText);
-                expandEmotionPanel();
+                //判断键盘状态
+                if (isSoftInputShown()) {
+                    lockContentHeight();
+                    hideSoftInput(getApplicationContext(), inputEditText);
+                    expandEmotionPanel();
+                    unlockContentHeight();
+                } else {
+                    expandEmotionPanel();
+                }
+            }
+        });
+        //输入框的监听，防止表情包和输入法同时出现
+        //每次进入聊天界面，点击表情包后点击输入框，会同时出现（未知 bug）
+        inputEditText.setOnClickListener(view -> {
+            if (expandableLayout.isExpanded()) {
+                lockContentHeight();
+                collapseEmotionPanel();
+                unlockContentHeight();
             }
         });
         imageButton.setOnClickListener(view -> GalleryPicker.choosePhoto(getThis(), false));
@@ -371,6 +389,11 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
 
     //展开表情栏
     private void expandEmotionPanel() {
+        //修改表情包高度 = 输入法高度
+        expandableLayout.getLayoutParams().height = getSupportSoftInputHeight();
+        if (getSupportSoftInputHeight() == 0) {
+            expandableLayout.getLayoutParams().height = getKeyBoardHeight();
+        }
         if (!expandableLayout.isExpanded()) {
             expandableLayout.expand();
             AnimationUtils.rotateTo(add, true);
@@ -383,6 +406,50 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
+
+    //锁定内容高度
+    private void lockContentHeight() {
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) refreshLayout.getLayoutParams();
+        params.height = refreshLayout.getHeight();
+        params.weight = 0.0F;
+    }
+    //释放被锁定内容高度
+    private void unlockContentHeight() {
+        inputEditText.postDelayed(() -> ((LinearLayout.LayoutParams) refreshLayout.getLayoutParams()).weight = 1.0F, 280L);
+    }
+
+    //获取输入法高度
+    private int getSupportSoftInputHeight() {
+        Rect rect = new Rect();
+        getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
+        int screenHeight = getWindow().getDecorView().getRootView().getHeight();
+        return screenHeight - rect.bottom;
+    }
+
+    //输入法是否显示
+    private boolean isSoftInputShown() {
+        return getSupportSoftInputHeight() != 0;
+    }
+
+    //当未获取键盘高度时，设定表情包高度787（貌似也没啥用）
+    public int getKeyBoardHeight() {
+        return 787;
+    }
+
+//   //底部虚拟按键栏的高度（貌似也没啥用）
+//    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+//    private int getSoftButtonsBarHeight() {
+//        DisplayMetrics metrics = new DisplayMetrics();
+//        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+//        int usableHeight = metrics.heightPixels;
+//        getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+//        int realHeight = metrics.heightPixels;
+//        if (realHeight > usableHeight) {
+//            return realHeight - usableHeight;
+//        } else {
+//            return 0;
+//        }
+//    }
 
 
     /**
