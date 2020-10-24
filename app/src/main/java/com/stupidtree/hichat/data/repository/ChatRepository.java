@@ -104,6 +104,7 @@ public class ChatRepository {
         final boolean[] tried = {false};
         listDataState.addSource(localListState, chatMessages -> {
             Log.e("onChanged", chatMessages.size() + "-" + tried[0] + "-" + action + "-" + fromId);
+            listDataState.setValue(new DataState<>(chatMessages).setListAction(action));
             if (!tried[0] && chatMessages.size() < pageSize) {
                 listDataState.removeSource(webListState);
                 webListState = chatMessageWebSource.getMessages(token, conversationId, String.valueOf(fromId), pageSize);
@@ -111,13 +112,9 @@ public class ChatRepository {
                     tried[0] = true;
                     if (result.getState() == DataState.STATE.SUCCESS && result.getData().size() > 0) {
                         saveMessageAsync(result.getData());
-                    } else {
-                        listDataState.setValue(new DataState<>(chatMessages).setListAction(action));
                     }
                 });
             } else if (!tried[0] && fromId == null && chatMessages.size() > 0) { //第一次获取，拉取新消息
-                //先显示本地有的
-                listDataState.setValue(new DataState<>(chatMessages).setListAction(action));
                 //尝试查询本地缺的
                 listDataState.removeSource(webListState);
                 webListState = chatMessageWebSource.pullLatestMessages(token, conversationId, String.valueOf(chatMessages.get(0).getId()));
@@ -132,7 +129,7 @@ public class ChatRepository {
                 });
 
             } else {
-                listDataState.setValue(new DataState<>(chatMessages).setListAction(action));
+
             }
         });
 

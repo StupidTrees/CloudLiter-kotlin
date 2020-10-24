@@ -47,7 +47,7 @@ public class ChatViewModel extends AndroidViewModel {
     //状态数据：图片消息发送
     private LiveData<DataState<ChatMessage>> imageSentResult;
     //控制↑的刷新
-    private MutableLiveData<StringTrigger> imageSendController = new MutableLiveData<>();
+    private final MutableLiveData<StringTrigger> imageSendController = new MutableLiveData<>();
 
 
     private final int pageSize = 15;
@@ -175,7 +175,6 @@ public class ChatViewModel extends AndroidViewModel {
 
     /**
      * 发送图片
-     * @param path
      */
     public void sendImageMessage(String path){
         imageSendController.setValue(StringTrigger.getActioning(path));

@@ -161,12 +161,12 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                 if (viewModel.getConversationId() == null) {
                     viewModel.setConversation(conversation);
                     viewModel.fetchHistoryData(); //初次进入时，重新加载聊天记录
+                }else{
+                    viewModel.fetchNewData();//非第一次进入
                 }
             }
         }
-
         viewModel.getIntoConversation(this);
-        viewModel.fetchNewData();
         viewModel.markAllRead(this);
     }
 
