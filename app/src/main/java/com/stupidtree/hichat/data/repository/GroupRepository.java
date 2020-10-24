@@ -58,4 +58,24 @@ public class GroupRepository {
         return groupWebSource.assignGroup(token,friendId,groupId);
     }
 
+    /**
+     * 获取添加情况
+     * @param token 令牌
+     * @return 查询结果
+     */
+    public LiveData<DataState<String>> addMyGroups(@NonNull String token,@NonNull String groupName) {
+        System.out.println("repository stage:func addMyGroups succeed");
+        return groupWebSource.addMyGroups(token,groupName);
+    }
+
+    /**
+     * 获取删除情况
+     * @param token 令牌
+     * @return 查询结果
+     */
+    public LiveData<DataState<String>> deleteMyGroups(@NonNull String token,@NonNull String groupName) {
+        System.out.println("repository stage:func deleteMyGroups succeed");
+        return groupWebSource.deleteMyGroups(token,groupName);
+    }
+
 }

@@ -39,4 +39,24 @@ public interface GroupService {
     @FormUrlEncoded
     @POST("group/assign")
     LiveData<ApiResponse<Object>> assignGroup(@Header("token")String token, @Field("friendId")String friendId,@Field("groupId") String groupId);
+
+    /**
+     * 添加好友分组
+     * @param token 令牌
+     * @return 对话列表
+     */
+    @FormUrlEncoded
+    @POST("/group/add")
+    LiveData<ApiResponse<String>> addMyGroups(@Header("token") String token, @Field("groupName") String groupName);
+
+
+    /**
+     * 删除好友分组
+     * @param token 令牌
+     * @return 对话列表
+     */
+    @FormUrlEncoded
+    @POST("/group/delete")
+    LiveData<ApiResponse<String>> deleteMyGroups(@Header("token") String token, @Field("groupId") String groupName);
+
 }
