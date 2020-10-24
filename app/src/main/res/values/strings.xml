@@ -134,4 +134,9 @@
     <string name="label_Porn">Porn</string>
     <string name="label_sexy">Sexy</string>
     <string name="label_hentai">Hentai</string>
+    <string name="delete_group">删除好友分组</string>
+    <string name="add_group">添加好友分组</string>
+    <string name="add_ok">添加分组成功</string>
+    <string name="delete_ok">删除分组成功</string>
+    <string name="ensure_delete">确认删除该分组吗</string>
 </resources>
