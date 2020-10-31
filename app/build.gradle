@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId 'com.stupidtree.hichat'
-        minSdkVersion 23
+        minSdkVersion 22
         targetSdkVersion 30
-        versionCode 20201017
-        versionName "1.1"
+        versionCode 20201024
+        versionName "1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -36,9 +36,9 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
-    implementation 'androidx.navigation:navigation-fragment:2.3.0'
-    implementation 'androidx.navigation:navigation-ui:2.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
+    implementation 'androidx.navigation:navigation-fragment:2.3.1'
+    implementation 'androidx.navigation:navigation-ui:2.3.1'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'org.jetbrains:annotations-java5:15.0'
@@ -80,4 +80,9 @@ dependencies {
 
     //可缩放照片
     implementation 'com.bm.photoview:library:1.4.1'
+
+
+    //分组Adapter
+    //implementation 'com.sunfusheng:GroupRecyclerViewAdapter:<latest-version>'
+    implementation 'com.github.donkingliang:GroupedRecyclerViewAdapter:2.3.0'
 }

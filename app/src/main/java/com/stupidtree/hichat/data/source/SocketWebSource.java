@@ -17,7 +17,9 @@ import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.socket.SocketIOClientService;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.ui.chat.FriendStateTrigger;
+import com.stupidtree.hichat.ui.chat.MessageReadNotification;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 
 import static android.content.Context.BIND_AUTO_CREATE;
@@ -26,6 +28,7 @@ import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_INTO_CON
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_LEFT_CONVERSATION;
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_MARK_ALL_READ;
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_MARK_READ;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_MESSAGE_READ;
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_MESSAGE_SENT;
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_ONLINE;
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_RECEIVE_MESSAGE;
@@ -42,6 +45,8 @@ public class SocketWebSource extends BroadcastReceiver {
     MutableLiveData<DataState<HashMap<String, Integer>>> unreadMessageState = new MutableLiveData<>();
     //消息发送结果
     MutableLiveData<DataState<ChatMessage>> messageSentState = new MutableLiveData<>();
+    //消息已读通知
+    MutableLiveData<DataState<MessageReadNotification>> messageReadState = new MutableLiveData<>();
 
     public SocketWebSource() {
 
@@ -80,6 +85,18 @@ public class SocketWebSource extends BroadcastReceiver {
                         messageSentState.setValue(new DataState<>(message));
                     }
                 }
+                break;
+            case ACTION_MESSAGE_READ:
+                if(intent.getExtras()!=null){
+                    MessageReadNotification notification = (MessageReadNotification) intent.getExtras().getSerializable("read");
+                    Log.e("SocketWebSource-消息被读", String.valueOf(notification));
+                    if(notification!=null){
+                        messageReadState.setValue(new DataState<>(notification));
+                    }
+                }
+                break;
+
+
 
         }
     }
@@ -157,15 +174,18 @@ public class SocketWebSource extends BroadcastReceiver {
         context.sendBroadcast(i);
     }
 
-    public void markAllRead(@NonNull Context context, String userId, String conversationId) {
+    public void markAllRead(@NonNull Context context, String userId, String conversationId, Timestamp topTime, int num) {
         Intent i = new Intent(ACTION_MARK_ALL_READ);
         i.putExtra("userId", userId);
+        i.putExtra("topTime",topTime.getTime());
+        i.putExtra("num",num);
         i.putExtra("conversationId", conversationId);
         context.sendBroadcast(i);
     }
 
-    public void markRead(@NonNull Context context, @NonNull String messageId, @NonNull String conversationId) {
+    public void markRead(@NonNull Context context,@NonNull String userId, @NonNull String messageId, @NonNull String conversationId) {
         Intent i = new Intent(ACTION_MARK_READ);
+        i.putExtra("userId",userId);
         i.putExtra("messageId", messageId);
         i.putExtra("conversationId", conversationId);
         context.sendBroadcast(i);
@@ -188,5 +208,9 @@ public class SocketWebSource extends BroadcastReceiver {
 
     public MutableLiveData<DataState<ChatMessage>> getMessageSentSate(){
         return messageSentState;
+    }
+
+    public MutableLiveData<DataState<MessageReadNotification>> getMessageReadState() {
+        return messageReadState;
     }
 }

@@ -30,10 +30,13 @@ import com.stupidtree.hichat.data.model.ChatMessage;
 import com.stupidtree.hichat.data.model.UserLocal;
 import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.ui.chat.ChatActivity;
+import com.stupidtree.hichat.ui.chat.MessageReadNotification;
 import com.stupidtree.hichat.utils.ActivityUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
 
+import java.math.BigInteger;
 import java.net.URISyntaxException;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,6 +59,7 @@ public class SocketIOClientService extends Service {
     public static final String ACTION_RECEIVE_MESSAGE = "CLOUD_LITER_RECEIVE_MESSAGE";
     public static final String ACTION_FRIEND_STATE_CHANGED = "CLOUD_LITER_FRIEND_STATE_CHANGE";
     public static final String ACTION_MESSAGE_SENT = "CLOUD_LITER_MESSAGE_SENT";
+    public static final String ACTION_MESSAGE_READ = "CLOUD_LITER_MESSAGE_READ";
 
     public static final String ACTION_INTO_CONVERSATION = "CLOUD_LITER_INTO_CONVERSATION";
     public static final String ACTION_LEFT_CONVERSATION = "CLOUD_LITER_LEFT_CONVERSATION";
@@ -119,22 +123,35 @@ public class SocketIOClientService extends Service {
                     case ACTION_MARK_ALL_READ:
                         //从新消息队列中把该对话下的所有消息删除
                         conversationId = intent.getStringExtra("conversationId");
+                        long topTime = intent.getLongExtra("topTime",-1);
+                        int num = intent.getIntExtra("num",-1);
                         userId = intent.getStringExtra("userId");
                         Log.e("mark_all_read", String.valueOf(incomingMessage));
                         for (JWebSocketClientBinder binder : binders.values()) {
                             if (binder != null && binder.onMessageReadListener != null) {
                                 HashMap<String, Integer> map = new HashMap<>();
-                                map.put(conversationId, incomingMessage.get(conversationId));
+                                map.put(conversationId, num);
                                 binder.onMessageReadListener.OnMessageRead(map);
                             }
                         }
+                        Integer oldCount0 = incomingMessage.get(conversationId);
+                        if (oldCount0 != null && oldCount0 <= num) {
+                            incomingMessage.remove(conversationId);
+                        } else if (oldCount0 != null) {
+                            incomingMessage.put(conversationId, oldCount0 - num);
+                        }
                         incomingMessage.remove(conversationId);
-                        socket.emit("mark_all_read", userId, conversationId);
+                        if(topTime>0){
+                            socket.emit("mark_all_read", userId, conversationId,topTime);
+                        }
                         break;
                     case ACTION_MARK_READ:
+
                         String messageId = intent.getStringExtra("messageId");
+                        userId = intent.getStringExtra("userId");
                         conversationId = intent.getStringExtra("conversationId");
-                        socket.emit("mark_read", messageId);
+                        Log.e("emit_mark_read",userId+","+conversationId+","+messageId);
+                        socket.emit("mark_read",userId,conversationId, messageId);
                         Integer oldCount = incomingMessage.get(conversationId);
                         if (oldCount != null && oldCount <= 1) {
                             incomingMessage.remove(conversationId);
@@ -218,6 +235,40 @@ public class SocketIOClientService extends Service {
             b.putSerializable("message", chatMessage);
             i.putExtras(b);
             sendBroadcast(i);
+        });
+        socket.on("friend_read_all",args -> {
+            if(args.length==3){
+                try {
+                    String userId = String.valueOf(args[0]);
+                    String conversationId = String.valueOf(args[1]);
+                    Timestamp fromTime = new Timestamp(Long.parseLong(String.valueOf(args[2])));
+                    Log.e("messageAllRead",userId+"-"+fromTime);
+                    Intent i = new Intent(ACTION_MESSAGE_READ);
+                    Bundle b = new Bundle();
+                    b.putSerializable("read", new MessageReadNotification(userId,conversationId,fromTime));
+                    i.putExtras(b);
+                    sendBroadcast(i);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        socket.on("friend_read_one",args -> {
+            if(args.length==3){
+                try {
+                    String userId = String.valueOf(args[0]);
+                    String conversationId = String.valueOf(args[1]);
+                    String id = String.valueOf(args[2]);
+                    Log.e("messageOneRead",userId+"-"+id);
+                    Intent i = new Intent(ACTION_MESSAGE_READ);
+                    Bundle b = new Bundle();
+                    b.putSerializable("read", new MessageReadNotification(userId,conversationId,id));
+                    i.putExtras(b);
+                    sendBroadcast(i);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         });
         socket.on("unread_message", args -> {
             if (args.length > 0) {

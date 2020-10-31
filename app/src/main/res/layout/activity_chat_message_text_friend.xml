@@ -37,7 +37,7 @@
             android:clickable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             app:cardBackgroundColor="@color/friendBubbleColor"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="18dp"
             app:cardElevation="0dp">
 
             <com.stupidtree.hichat.ui.widgets.EmoticonsTextView

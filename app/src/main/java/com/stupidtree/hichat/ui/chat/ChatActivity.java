@@ -163,13 +163,12 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                 if (viewModel.getConversationId() == null) {
                     viewModel.setConversation(conversation);
                     viewModel.fetchHistoryData(); //初次进入时，重新加载聊天记录
-                }else{
+                } else {
                     viewModel.fetchNewData();//非第一次进入
                 }
             }
         }
         viewModel.getIntoConversation(this);
-        viewModel.markAllRead(this);
     }
 
 
@@ -193,25 +192,39 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
         setUpYunmojiList();
         setUpButtons();
         viewModel.getConversation().observe(this, this::setConversationViews);
-        viewModel.getListData().observe(this, listDataState -> {
+        viewModel.getListData(this).observe(this, listDataState -> {
             refreshLayout.setRefreshing(false);
-            //  Log.e("ChatActivity列表变动", String.valueOf(listDataState));
+            Log.e("ChatActivity列表变动", listDataState.getListAction() +"》》"+listDataState.getData().size());
             if (listDataState.getState() == DataState.STATE.SUCCESS) {
-                if (listDataState.getListAction() == DataState.LIST_ACTION.APPEND) {
-                    if (listDataState.getData().size() == 1) {
-                        viewModel.markRead(this, listDataState.getData().get(0));
+                //添加一条消息
+                if (listDataState.getListAction() == DataState.LIST_ACTION.APPEND_ONE) {
+                    ChatMessage theOne =  listDataState.getData().get(0);
+                    //对方发出的，标为已读
+                    if(!Objects.equals(viewModel.getMyId(),theOne.getFromId())){
+                        viewModel.markRead(this,theOne);
                     }
                     listAdapter.notifyItemsAppended(listDataState.getData());
                     if (listAdapter.getItemCount() > 0) {
                         list.smoothScrollToPosition(listAdapter.getItemCount() - 1);
                     }
-                } else if (listDataState.getListAction() == DataState.LIST_ACTION.PUSH_HEAD) {
-                    listAdapter.notifyItemsPushHead(listDataState.getData());
-                    if (listDataState.getData().size() > 0) {
-                        list.smoothScrollBy(0, -150);
+                } else if (listDataState.getListAction() == DataState.LIST_ACTION.APPEND) {
+                    listAdapter.notifyItemsAppended(listDataState.getData());
+                    if (listAdapter.getItemCount() > 0) {
+                        list.smoothScrollToPosition(listAdapter.getItemCount() - 1);
                     }
+                } else if (listDataState.getListAction() == DataState.LIST_ACTION.PUSH_HEAD) {
+                    //下拉加载更多
+                    if(!listDataState.isRetry()){ //第一次获取，本地数据
+                        listAdapter.notifyItemsPushHead(listDataState.getData());
+                        if (listDataState.getData().size() > 0) {
+                            list.smoothScrollBy(0, -150);
+                        }
+                    }else{//获取到网络数据，刷新对应项
+                        listAdapter.notifyHeadItemsUpdated(listDataState.getData());
+                    }
+
                 } else {
-                    listAdapter.notifyItemChangedSmooth(listDataState.getData(), false);
+                    listAdapter.notifyItemChangedSmooth(listDataState.getData());
                     if (listAdapter.getItemCount() > 0) {
                         list.smoothScrollToPosition(listAdapter.getItemCount() - 1);
                     }
@@ -255,6 +268,7 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
 //            }
         });
 
+        //消息成功发送后反馈给列表
         viewModel.getMessageSentState().observe(this, chatMessageDataState -> {
 
             if (chatMessageDataState.getState() == DataState.STATE.SUCCESS) {
@@ -262,7 +276,13 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
             }
         });
 
-
+        //消息被对方读取后反馈给列表
+        viewModel.getMessageReadState().observe(this, messageReadNotificationDataState -> {
+            Log.e("messageRead", String.valueOf(messageReadNotificationDataState.getData()));
+            if (messageReadNotificationDataState.getState() == DataState.STATE.SUCCESS) {
+                listAdapter.messageRead(list, messageReadNotificationDataState.getData());
+            }
+        });
     }
 
     //设置toolbar
@@ -306,7 +326,6 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
                 List<String> urls = listAdapter.getImageUrls();
                 ActivityUtils.showMultipleImages(getThis(), urls, urls.indexOf(ImageUtils.getChatMessageImageUrl(cm.getContent()))
                 );
-                // ActivityUtils.showOneImage(getThis(), ImageUtils.getChatMessageImageUrl(cm.getContent()));
             }
         });
 
@@ -413,6 +432,7 @@ public class ChatActivity extends BaseActivity<ChatViewModel> {
         params.height = refreshLayout.getHeight();
         params.weight = 0.0F;
     }
+
     //释放被锁定内容高度
     private void unlockContentHeight() {
         inputEditText.postDelayed(() -> ((LinearLayout.LayoutParams) refreshLayout.getLayoutParams()).weight = 1.0F, 280L);

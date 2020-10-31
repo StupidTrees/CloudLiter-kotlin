@@ -3,6 +3,7 @@ package com.stupidtree.hichat.utils;
 import android.content.Context;
 
 import androidx.annotation.ColorInt;
+import androidx.core.content.ContextCompat;
 
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.UserProfile;
@@ -27,6 +28,6 @@ public class ColorUtils {
             break;
             default:res =  R.color.profileBlue;
         }
-        return context.getColor(res);
+        return ContextCompat.getColor(context,res);
     }
 }

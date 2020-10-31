@@ -48,7 +48,7 @@ public class PickGroupDialog extends TransparentBottomSheetDialog {
     PickGroupViewModel viewModel;
     LAdapter listAdapter;
     OnConfirmListener onConfirmListener;
-    String initGroupId;
+    String initGroupId = null;
     public interface OnConfirmListener{
         void OnConfirmed(@Nullable RelationGroup group);
     }
@@ -84,9 +84,6 @@ public class PickGroupDialog extends TransparentBottomSheetDialog {
         viewModel.getListData().observe(this, listDataState -> {
             loading.setVisibility(View.INVISIBLE);
             if(listDataState.getState()== DataState.STATE.SUCCESS){
-//                Log.e("selected",initGroupId);
-//                Log.e("data", String.valueOf(listDataState.getData()));
-
                 listAdapter.setSelected(listDataState.getData(),initGroupId);
                 listAdapter.notifyItemChangedSmooth(listDataState.getData());
             }
@@ -143,12 +140,18 @@ public class PickGroupDialog extends TransparentBottomSheetDialog {
         public void setSelected(List<RelationGroup> data,String groupId) {
             mBeans.clear();
             mBeans.addAll(data);
-            for(RelationGroup relationGroup:mBeans){
-                if(Objects.equals(relationGroup.getId(),groupId)){
-                    selectedIndex = mBeans.indexOf(relationGroup);
-                    selectedData = relationGroup;
+            if(groupId==null&&data.size()>0){
+                selectedIndex = 0;
+                selectedData = data.get(0);
+            }else{
+                for(RelationGroup relationGroup:mBeans){
+                    if(Objects.equals(relationGroup.getId(),groupId)){
+                        selectedIndex = mBeans.indexOf(relationGroup);
+                        selectedData = relationGroup;
+                    }
                 }
             }
+
         }
 
 

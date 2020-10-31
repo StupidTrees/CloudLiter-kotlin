@@ -30,6 +30,17 @@
         android:layout_gravity="center|top"
         android:layout_marginTop="16dp" />
 
+    <TextView
+        android:id="@+id/read"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginEnd="-8dp"
+        android:layout_marginBottom="9dp"
+        android:alpha="0.6"
+        android:text="已读"
+        android:textSize="10sp" />
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -47,7 +58,7 @@
             android:clickable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             app:cardBackgroundColor="?attr/colorPrimary"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="18dp"
             app:cardElevation="0dp">
 
             <com.stupidtree.hichat.ui.widgets.EmoticonsTextView
@@ -70,7 +81,8 @@
             android:id="@+id/emotion"
             android:layout_width="16dp"
             android:layout_height="16dp"
-            android:layout_gravity="bottom|end"
+            android:layout_gravity="top|end"
+            android:layout_marginStart="6dp"
             android:layout_marginTop="-6dp"
             android:visibility="invisible"
             app:srcCompat="@drawable/ic_emotion_pos_1" />

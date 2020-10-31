@@ -36,11 +36,11 @@ public class UserRelation {
      */
     boolean label = false;//是否显示为分组标签
 
-    public static UserRelation getLabelInstance(@NotNull RelationGroup relationGroup){
+    public static UserRelation getLabelInstance(String groupId,String groupName){
         UserRelation res = new UserRelation();
         res.label = true;
-        res.friendNickname = relationGroup.getGroupName();
-        res.groupId = relationGroup.getId();
+        res.friendNickname = groupName;
+        res.groupId = groupId;
         return res;
     }
 
@@ -56,6 +56,8 @@ public class UserRelation {
         return friendNickname;
     }
 
+
+    @Nullable
     public String getGroupId() {
         return groupId;
     }

@@ -17,6 +17,7 @@ import com.stupidtree.hichat.ui.base.DataState;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class ConversationsViewModel extends AndroidViewModel {
 
@@ -92,7 +93,7 @@ public class ConversationsViewModel extends AndroidViewModel {
     public void startRefresh() {
         UserLocal userLocal = localUserRepository.getLoggedInUser();
         if (userLocal.isValid()) {
-            conversationRepository.ActionGetConversations(userLocal.getToken());
+            conversationRepository.ActionGetConversations(Objects.requireNonNull(userLocal.getToken()));
         } else{
             listData.setValue(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
         }

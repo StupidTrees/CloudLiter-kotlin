@@ -26,7 +26,7 @@ public class DataState<T> {
      */
     public enum STATE{NOTHING,NOT_LOGGED_IN,SUCCESS,FETCH_FAILED,TOKEN_INVALID,NOT_EXIST,SPECIAL}
 
-    public enum LIST_ACTION{REPLACE_ALL,APPEND,PUSH_HEAD,DELETE}
+    public enum LIST_ACTION{REPLACE_ALL,APPEND,PUSH_HEAD,DELETE,APPEND_ONE}
     //表征数据状态
     STATE state;
     //数据本体
@@ -35,6 +35,8 @@ public class DataState<T> {
     String message;
     //列表数据的动作
     LIST_ACTION listAction = LIST_ACTION.REPLACE_ALL;
+    //是否为重试状态
+    boolean retry;
 
 
 
@@ -61,6 +63,15 @@ public class DataState<T> {
 
     public T getData() {
         return data;
+    }
+
+    public DataState<T> setRetry(boolean retry) {
+        this.retry = retry;
+        return this;
+    }
+
+    public boolean isRetry() {
+        return retry;
     }
 
     public void setData(T data) {

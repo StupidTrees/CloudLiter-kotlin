@@ -54,7 +54,7 @@ public class ConversationActivity extends BaseActivity<ConversationViewModel> {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setToolbarActionBack(toolbar);
-        setWindowParams(true,true,false);
+        setWindowParams(true, true, false);
     }
 
     @Override
@@ -65,24 +65,27 @@ public class ConversationActivity extends BaseActivity<ConversationViewModel> {
     @Override
     protected void initViews() {
         viewModel.getConversationLiveData().observe(this, conversationDataState -> {
-            if(conversationDataState.getState()== DataState.STATE.SUCCESS){
+            if (conversationDataState.getState() == DataState.STATE.SUCCESS) {
                 setUpPage(conversationDataState.getData());
             }
         });
         wordsCloudView.setData(Collections.singletonList(getString(R.string.no_word_cloud_yet)));
         viewModel.getWordCloudLiveData().observe(this, hashMapDataState -> {
-            ArrayList<String> tag = new ArrayList<>();
-            for(Map.Entry<String,Float> wordData:hashMapDataState.getData().entrySet()){
-                tag.add(wordData.getKey());
+            if (hashMapDataState.getState() == DataState.STATE.SUCCESS) {
+                ArrayList<String> tag = new ArrayList<>();
+                for (Map.Entry<String, Float> wordData : hashMapDataState.getData().entrySet()) {
+                    tag.add(wordData.getKey());
+                }
+                wordsCloudView.setData(tag);
             }
-            wordsCloudView.setData(tag);
+
         });
         userLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String id = getIntent().getStringExtra("friendId");
-                if(!TextUtils.isEmpty(id)){
-                    ActivityUtils.startProfileActivity(getThis(),id);
+                if (!TextUtils.isEmpty(id)) {
+                    ActivityUtils.startProfileActivity(getThis(), id);
                 }
 
             }
@@ -93,16 +96,16 @@ public class ConversationActivity extends BaseActivity<ConversationViewModel> {
     @Override
     protected void onResume() {
         super.onResume();
-        if(getIntent().hasExtra("friendId")){
+        if (getIntent().hasExtra("friendId")) {
             viewModel.startRefresh(getIntent().getStringExtra("friendId"));
         }
     }
 
-    private void setUpPage(Conversation conversation){
-        ImageUtils.loadAvatarNoCacheInto(this,conversation.getFriendAvatar(),friendAvatarImage);
-        if(TextUtils.isEmpty(conversation.getFriendRemark())){
+    private void setUpPage(Conversation conversation) {
+        ImageUtils.loadAvatarNoCacheInto(this, conversation.getFriendAvatar(), friendAvatarImage);
+        if (TextUtils.isEmpty(conversation.getFriendRemark())) {
             friendRemarkText.setText(conversation.getFriendNickname());
-        }else{
+        } else {
             friendRemarkText.setText(conversation.getFriendRemark());
         }
     }

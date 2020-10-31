@@ -12,18 +12,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.donkingliang.groupedadapter.adapter.GroupedRecyclerViewAdapter;
+import com.donkingliang.groupedadapter.holder.BaseViewHolder;
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.ui.base.BaseFragment;
 import com.stupidtree.hichat.ui.base.BaseListAdapter;
-import com.stupidtree.hichat.ui.base.BaseViewHolder;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.utils.ActivityUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
 import com.stupidtree.hichat.utils.TextUtils;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -53,7 +56,7 @@ public class ContactGroupFragment extends BaseFragment<ContactGroupViewModel> {
     /**
      * 适配器区
      */
-    XListAdapter listAdapter;//列表适配器
+   GroupListAdapter listAdapter;//列表适配器
 
 
     public ContactGroupFragment() {
@@ -72,26 +75,33 @@ public class ContactGroupFragment extends BaseFragment<ContactGroupViewModel> {
     @Override
     protected void initViews(View view) {
         //初始化一下列表的view
-        listAdapter = new XListAdapter(getContext(), new LinkedList<>());
+        listAdapter = new GroupListAdapter(getContext());
         list.setAdapter(listAdapter);
         list.setLayoutManager(new LinearLayoutManager(getContext()));
-        listAdapter.setOnItemClickListener((UserRelation data, View card, int position) -> {
-            //点击列表项时，跳转到对应用户的Profile页面
-            if (!data.isLabel()) {
-                ActivityUtils.startProfileActivity(requireActivity(), String.valueOf(data.getFriendId()));
+        listAdapter.setOnHeaderClickListener(new GroupedRecyclerViewAdapter.OnHeaderClickListener() {
+            @Override
+            public void onHeaderClick(GroupedRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition) {
+                listAdapter.collapseGroup(groupPosition);
             }
-
         });
+//        listAdapter.setOnItemClickListener((UserRelation data, View card, int position) -> {
+//            //点击列表项时，跳转到对应用户的Profile页面
+//            if (!data.isLabel()) {
+//                ActivityUtils.startProfileActivity(requireActivity(), String.valueOf(data.getFriendId()));
+//            }
+//
+//        });
         //设置下拉刷新
         refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
         refreshLayout.setOnRefreshListener(() -> viewModel.startFetchData());
 
-        //当列表数据变更时，将自动调用本匿名函数
+
         viewModel.getListData().observe(this, contactListState -> {
             refreshLayout.setRefreshing(false);
             if (contactListState.getState() == DataState.STATE.SUCCESS) {
                 //状态为”成功“，那么列表设置为可见，并通知列表适配器丝滑地更新列表项
-                listAdapter.notifyItemChangedSmooth(contactListState.getData(), (oldData, newData) -> !Objects.equals(oldData, newData) || !Objects.equals(oldData.getRemark(), newData.getRemark()));
+                listAdapter.notifyItemChangedSmooth(contactListState.getData());
+                //listAdapter.notifyItemChangedSmooth(contactListState.getData(), (oldData, newData) -> !Objects.equals(oldData, newData) || !Objects.equals(oldData.getRemark(), newData.getRemark()));
                 if (contactListState.getData().size() > 0) {
                     list.setVisibility(View.VISIBLE);
                     placeHolder.setVisibility(View.GONE);
@@ -127,78 +137,146 @@ public class ContactGroupFragment extends BaseFragment<ContactGroupViewModel> {
         viewModel.startFetchData();
     }
 
-
-    /**
-     * 定义本页面的列表适配器
-     */
-    static class XListAdapter extends BaseListAdapter<UserRelation, XListAdapter.XHolder> {
-        private static final int TYPE_LABEL = 69;
-        private static final int TYPE_ITEM = 678;
-
-        public XListAdapter(Context mContext, List<UserRelation> mBeans) {
-            super(mContext, mBeans);
-        }
-
-        @Override
-        protected int getLayoutId(int viewType) {
-            if (viewType == TYPE_ITEM) {
-                return R.layout.fragment_contact_list_item;
-            } else {
-                return R.layout.fragment_contact_group_item_label;
-            }
-        }
-
-        @Override
-        public int getItemViewType(int position) {
-            if (mBeans.get(position).isLabel()) {
-                return TYPE_LABEL;
-            } else {
-                return TYPE_ITEM;
-            }
-        }
-
-        @Override
-        protected void bindHolder(@NonNull XHolder holder, @Nullable UserRelation data, int position) {
-            if (data != null) {
-                if (data.isLabel()) {
-                    holder.name.setText(data.getFriendNickname());
-                } else {
-                    //显示头像
-                    ImageUtils.loadAvatarInto(mContext, data.getFriendAvatar(), holder.avatar);
-                    //显示名称(备注)
-                    if (!TextUtils.isEmpty(data.getRemark())) {
-                        holder.name.setText(data.getRemark());
-                    } else {
-                        holder.name.setText(data.getFriendNickname());
-                    }
-                    //设置点击事件
-                    if (mOnItemClickListener != null) {
-                        holder.item.setOnClickListener(view -> mOnItemClickListener.onItemClick(data, view, position));
-                    }
-                }
-
-            }
-
-        }
-
-        @Override
-        public XHolder createViewHolder(View v, int viewType) {
-            return new XHolder(v);
-        }
-
-        static class XHolder extends BaseViewHolder {
-            @BindView(R.id.name)
-            TextView name;
-            @BindView(R.id.item)
-            ViewGroup item;
-            @Nullable
-            @BindView(R.id.avatar)
-            ImageView avatar;
-
-            public XHolder(@NonNull View itemView) {
-                super(itemView);
-            }
-        }
-
-    }
+//
+//    static class XListAdapter extends BaseListAdapter<UserRelation, XListAdapter.XHolder> {
+//        private static final int TYPE_LABEL = 69;
+//        private static final int TYPE_ITEM = 678;
+//
+//        HashMap<String,Boolean> expanded = new HashMap<>();
+//        HashMap<String,String> id2Name = new HashMap<>();
+//
+//        RecyclerView recyclerView;
+//
+//        public XListAdapter(Context mContext, List<UserRelation> mBeans,RecyclerView recyclerView) {
+//            super(mContext, mBeans);
+//            this.recyclerView = recyclerView;
+//        }
+//
+//        @Override
+//        protected int getLayoutId(int viewType) {
+//            if (viewType == TYPE_ITEM) {
+//                return R.layout.fragment_contact_list_item;
+//            } else {
+//                return R.layout.fragment_contact_group_item_label;
+//            }
+//        }
+//
+//        @Override
+//        public void notifyItemChangedSmooth(List<UserRelation> newL, RefreshJudge<UserRelation> judge) {
+//            HashMap<String,List<UserRelation>> groupSorted = new HashMap<>();
+//            id2Name.clear();
+//            expanded.clear();
+//            for(UserRelation ur:newL){
+//                String tmpId = ur.getGroupId()==null?"null":ur.getGroupId();
+//                if(!groupSorted.containsKey(tmpId)){
+//                    groupSorted.put(tmpId,new LinkedList<>());
+//                    id2Name.put(tmpId,ur.getGroupName()==null?"未分组":ur.getGroupName());
+//                    expanded.put(tmpId,false);
+//                }
+//                List<UserRelation> list = groupSorted.get(tmpId);
+//                if(list!=null){
+//                    list.add(ur);
+//                }
+//            }
+//            List<UserRelation> result = new LinkedList<>();
+//            for(Map.Entry<String,List<UserRelation>> e:groupSorted.entrySet()){
+//                UserRelation group = UserRelation.getLabelInstance(e.getKey(),id2Name.get(e.getKey()));
+//                result.add(group);
+//                result.addAll(e.getValue());
+//            }
+//            super.notifyItemChangedSmooth(result, judge);
+//        }
+//
+//        @Override
+//        public int getItemViewType(int position) {
+//            if (mBeans.get(position).isLabel()) {
+//                return TYPE_LABEL;
+//            } else {
+//                return TYPE_ITEM;
+//            }
+//        }
+//
+//
+//        private void refreshExpanded(){
+////            for(int i=0;i<getItemCount();i++){
+////                if(i<mBeans.size()){
+////                    UserRelation ur = mBeans.get(i);
+////                    XHolder holder = (XHolder) recyclerView.findViewHolderForAdapterPosition(i);
+////                    if(holder!=null){
+////                        holder.bindVisible(expanded,ur);
+////                    }
+////                }
+////            }
+//            notifyDataSetChanged();
+//        }
+//        @Override
+//        protected void bindHolder(@NonNull XHolder holder, @Nullable UserRelation data, int position) {
+//            if (data != null) {
+//                String groupId = data.getGroupId()==null?"null":data.getGroupId();
+//                Boolean visible = expanded.get(groupId);
+//                if (data.isLabel()) {
+//                    holder.itemView.setVisibility(View.VISIBLE);
+//                    holder.name.setText(data.getFriendNickname());
+//                    holder.item.setOnClickListener(view -> {
+//                        expanded.put(groupId,visible!=null&&!visible);
+//                        refreshExpanded();
+//                    });
+//                } else {
+//                    //显示头像
+//                    ImageUtils.loadAvatarInto(mContext, data.getFriendAvatar(), Objects.requireNonNull(holder.avatar));
+//                    //显示名称(备注)
+//                    if (!TextUtils.isEmpty(data.getRemark())) {
+//                        holder.name.setText(data.getRemark());
+//                    } else {
+//                        holder.name.setText(data.getFriendNickname());
+//                    }
+//                    //设置点击事件
+//                    if (mOnItemClickListener != null) {
+//                        holder.item.setOnClickListener(view -> mOnItemClickListener.onItemClick(data, view, position));
+//                    }
+//                    if(visible!=null&&visible){
+//                        holder.item.setVisibility(View.VISIBLE);
+//                    }else{
+//                        holder.item.setVisibility(View.GONE);
+//                    }
+//
+//                }
+//
+//            }
+//
+//        }
+//
+//        @Override
+//        public XHolder createViewHolder(View v, int viewType) {
+//            return new XHolder(v);
+//        }
+//
+//        static class XHolder extends BaseViewHolder {
+//            @BindView(R.id.name)
+//            TextView name;
+//            @BindView(R.id.item)
+//            ViewGroup item;
+//            @Nullable
+//            @BindView(R.id.avatar)
+//            ImageView avatar;
+//
+//            public void bindVisible(HashMap<String,Boolean> expanded,UserRelation data){
+//                if(data.isLabel()){
+//                    itemView.setVisibility(View.VISIBLE);
+//                    return;
+//                }
+//                String groupId = data.getGroupId()==null?"null":data.getGroupId();
+//                Boolean visible = expanded.get(groupId);
+//                if(visible!=null&&visible){
+//                    item.setVisibility(View.VISIBLE);
+//                }else{
+//                    item.setVisibility(View.GONE);
+//                }
+//            }
+//            public XHolder(@NonNull View itemView) {
+//                super(itemView);
+//            }
+//        }
+//
+//    }
 }

@@ -83,17 +83,16 @@ public class ChatMessageWebSource extends BaseWebSource<ChatMessageService> {
         return service.getChatMessagesCall(token, id, fromId, pageSize);
     }
 
-
-    /**
-     * 拉取最新消息
+  /**
+     * 拉取某消息之后的所有消息（包括该消息）
      *
      * @param token   令牌
      * @param id      对话id
      * @param afterId 查询该id之后的消息
      * @return 获取结果
      */
-    public LiveData<DataState<List<ChatMessage>>> pullLatestMessages(@NonNull String token, @Nullable String id, String afterId) {
-        return Transformations.map(service.pullLatestChatMessages(token, id, afterId), input -> {
+    public LiveData<DataState<List<ChatMessage>>> getMessagesAfter(@NonNull String token, @Nullable String id, String afterId,boolean includeBound) {
+        return Transformations.map(service.getMessagesAfter(token, id, afterId,includeBound), input -> {
             if (null == input) {
                 return new DataState<>(DataState.STATE.FETCH_FAILED);
             }
@@ -107,7 +106,6 @@ public class ChatMessageWebSource extends BaseWebSource<ChatMessageService> {
             }
         });
     }
-
 
     /**
      * 发送图片

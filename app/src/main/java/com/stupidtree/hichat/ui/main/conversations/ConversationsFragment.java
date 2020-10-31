@@ -105,7 +105,7 @@ public class ConversationsFragment extends BaseFragment<ConversationsViewModel> 
                     placeHolderText.setText(R.string.no_conversation);
                 }
             }
-            Log.e("state", String.valueOf(listDataState));
+           // Log.e("state", String.valueOf(listDataState));
             if (listDataState.getState() == DataState.STATE.NOT_LOGGED_IN) {
                 placeHolder.setVisibility(View.VISIBLE);
                 list.setVisibility(View.GONE);

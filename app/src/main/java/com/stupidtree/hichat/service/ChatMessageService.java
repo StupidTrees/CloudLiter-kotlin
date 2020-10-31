@@ -45,8 +45,10 @@ public interface ChatMessageService {
      * @param afterId 查询该id之后的消息
      * @return 获取结果
      */
-    @GET("/message/pull_latest")
-    LiveData<ApiResponse<List<ChatMessage>>> pullLatestChatMessages(@Header("token") String token, @Query("conversationId") String conversationId,@Query("afterId") String afterId);
+    @GET("/message/get_message_after")
+    LiveData<ApiResponse<List<ChatMessage>>> getMessagesAfter(@Header("token") String token, @Query("conversationId") String conversationId,@Query("afterId") String afterId,@Query("includeBound") boolean includeBond);
+
+
 
     /**
      * 发送图片

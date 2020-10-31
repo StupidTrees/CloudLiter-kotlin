@@ -1,5 +1,6 @@
 package com.stupidtree.hichat.ui.profile;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
@@ -135,7 +137,7 @@ public class ProfileActivity extends BaseActivity<ProfileViewModel> {
                 Toast.makeText(getThis(), booleanDataState.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-        button.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.colorPrimary)));
+        button.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getThis(),R.color.colorPrimary)));
         viewModel.getChangeRemarkResult().observe(this, stringDataState -> {
             if (stringDataState.getState() == DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show();

@@ -20,6 +20,7 @@ import com.stupidtree.hichat.data.repository.LocalUserRepository;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.ui.base.StringTrigger;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,6 +44,7 @@ public class ChatViewModel extends AndroidViewModel {
 
     //状态数据：消息发送结果
     private LiveData<DataState<ChatMessage>> messageSentState;
+    private LiveData<DataState<MessageReadNotification>> messageReadState;
 
     //状态数据：图片消息发送
     private LiveData<DataState<ChatMessage>> imageSentResult;
@@ -51,8 +53,9 @@ public class ChatViewModel extends AndroidViewModel {
 
 
     private final int pageSize = 15;
-    private Long topId = null;
-    private Long bottomId = null;
+    private String topId = null;
+    private Timestamp topTime = null;
+    private String bottomId = null;
 
     /**
      * 仓库区
@@ -61,10 +64,9 @@ public class ChatViewModel extends AndroidViewModel {
     private final LocalUserRepository localUserRepository;
 
 
-
     public void setConversation(Conversation conversation) {
-       this.conversation.setValue(conversation);
-       this.friendId = conversation.getFriendId();
+        this.conversation.setValue(conversation);
+        this.friendId = conversation.getFriendId();
     }
 
     public ChatViewModel(@NonNull Application application) {
@@ -86,31 +88,44 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
 
-
     /**
      * 获取聊天列表状态数据
      * 注意：并不是存放完整的聊天列表，而是动作，比如插入、删除等
+     *
      * @return 状态数据
      */
-    public LiveData<DataState<List<ChatMessage>>> getListData() {
+    public LiveData<DataState<List<ChatMessage>>> getListData(@NonNull Context context) {
         if (listData == null) {
             listData = Transformations.map(chatRepository.getListDataState(), input2 -> {
-                if(input2.getData() != null && input2.getData().size() > 0){
-                    switch (input2.getListAction()){
-                        case APPEND:
-                            bottomId = input2.getData().get(0).getId();
-                            if(input2.getData().size()==1){ //某一条新消息到达
-                                //不是这个窗口的消息
-                                if(!Objects.equals(input2.getData().get(0).getConversationId(),getConversationId())){
-                                    return new DataState<>(DataState.STATE.NOTHING);
-                                }
+                if (input2.getData() != null && input2.getData().size() > 0) {
+                    switch (input2.getListAction()) {
+                        case APPEND_ONE:
+                            Log.e("listAppendOne", String.valueOf(input2.getData()));
+                            //不是这个窗口的消息
+                            if (!Objects.equals(input2.getData().get(0).getConversationId(), getConversationId())) {
+                                return new DataState<>(DataState.STATE.NOTHING);
                             }
+                            bottomId = input2.getData().get(0).getId();
+                            break;
+                        case APPEND:
+                            //拉取一堆新消息
+                            Log.e("listAppend", String.valueOf(input2.getData()));
+                            bottomId = input2.getData().get(0).getId();
+                            markAllRead(context.getApplicationContext(), input2.getData().get(input2.getData().size() - 1).getId());
                             break;
                         case REPLACE_ALL:
-                            topId = input2.getData().get(input2.getData().size()-1).getId();
+                            //初次进入
+                            topId = input2.getData().get(input2.getData().size() - 1).getId();
+                            topTime = input2.getData().get(input2.getData().size() - 1).getCreatedTime();
                             bottomId = input2.getData().get(0).getId();
+                            markAllRead(context.getApplicationContext(), topId);
+                            break;
                         case PUSH_HEAD:
-                            topId = input2.getData().get(input2.getData().size()-1).getId();
+                            //下拉加载
+                            topId = input2.getData().get(input2.getData().size() - 1).getId();
+                            topTime = input2.getData().get(input2.getData().size() - 1).getCreatedTime();
+                            markAllRead(context.getApplicationContext(), topId);
+                            break;
                     }
                 }
                 return input2;
@@ -141,13 +156,13 @@ public class ChatViewModel extends AndroidViewModel {
     }
 
     public LiveData<DataState<ChatMessage>> getImageSentResult() {
-        if(imageSentResult==null){
+        if (imageSentResult == null) {
             imageSentResult = Transformations.switchMap(imageSendController, input -> {
-                if(input.isActioning()){
+                if (input.isActioning()) {
                     UserLocal userLocal = localUserRepository.getLoggedInUser();
-                    if(userLocal.isValid()&&getFriendId()!=null){
-                        return chatRepository.ActionSendImageMessage(getApplication(),Objects.requireNonNull(userLocal.getToken()), Objects.requireNonNull(userLocal.getId()),getFriendId(),input.getData());
-                    }else{
+                    if (userLocal.isValid() && getFriendId() != null) {
+                        return chatRepository.ActionSendImageMessage(getApplication(), Objects.requireNonNull(userLocal.getToken()), Objects.requireNonNull(userLocal.getId()), getFriendId(), input.getData());
+                    } else {
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     }
                 }
@@ -176,9 +191,10 @@ public class ChatViewModel extends AndroidViewModel {
     /**
      * 发送图片
      */
-    public void sendImageMessage(String path){
+    public void sendImageMessage(String path) {
         imageSendController.setValue(StringTrigger.getActioning(path));
     }
+
     public void bindService(Context context) {
         chatRepository.bindService(context);
     }
@@ -192,11 +208,12 @@ public class ChatViewModel extends AndroidViewModel {
      */
     public void fetchHistoryData() {
         UserLocal userLocal = localUserRepository.getLoggedInUser();
-        if (userLocal.isValid()&&getConversationId()!=null) {
+        if (userLocal.isValid() && getConversationId() != null) {
             chatRepository.ActionFetchMessages(
-                    userLocal.getToken(),
+                    Objects.requireNonNull(userLocal.getToken()),
                     getConversationId(),
                     null,
+                    topTime,
                     pageSize,
                     DataState.LIST_ACTION.REPLACE_ALL
             );
@@ -206,26 +223,28 @@ public class ChatViewModel extends AndroidViewModel {
     /**
      * 手动拉取新消息
      */
-    public void fetchNewData(){
+    public void fetchNewData() {
         UserLocal userLocal = localUserRepository.getLoggedInUser();
-        if (userLocal.isValid()&&getConversationId()!=null) {
+        if (userLocal.isValid() && getConversationId() != null) {
             chatRepository.ActionFetchNewMessages(
-                    userLocal.getToken(),
+                    Objects.requireNonNull(userLocal.getToken()),
                     getConversationId(),
                     bottomId
             );
         }
     }
+
     /**
      * 控制获取完整的消息记录列表
      */
     public void loadMore() {
         UserLocal userLocal = localUserRepository.getLoggedInUser();
-        if (userLocal.isValid()&&getConversationId()!=null) {
+        if (userLocal.isValid() && getConversationId() != null) {
             chatRepository.ActionFetchMessages(
-                    userLocal.getToken(),
+                    Objects.requireNonNull(userLocal.getToken()),
                     getConversationId(),
                     topId,
+                    topTime,
                     pageSize,
                     DataState.LIST_ACTION.PUSH_HEAD
             );
@@ -248,7 +267,7 @@ public class ChatViewModel extends AndroidViewModel {
 
     @Nullable
     public String getFriendAvatar() {
-        if (conversation.getValue()!=null) {
+        if (conversation.getValue() != null) {
             return conversation.getValue().getFriendAvatar();
         }
         return null;
@@ -260,7 +279,7 @@ public class ChatViewModel extends AndroidViewModel {
 
     @Nullable
     public String getConversationId() {
-        if (conversation.getValue()==null) {
+        if (conversation.getValue() == null) {
             return null;
         }
         return conversation.getValue().getId();
@@ -293,14 +312,15 @@ public class ChatViewModel extends AndroidViewModel {
         }
     }
 
-    public void markAllRead(@NonNull Context context) {
+    public void markAllRead(@NonNull Context context, @NonNull String topId) {
         if (getConversationId() != null && localUserRepository.isUserLoggedIn()) {
-            chatRepository.ActionMarkAllRead(context, Objects.requireNonNull(getMyId()), getConversationId());
+            chatRepository.ActionMarkAllRead(context, Objects.requireNonNull(getMyId()), getConversationId(),
+                    topTime, pageSize);
         }
     }
 
     public void markRead(@NonNull Context context, ChatMessage chatMessage) {
-        chatRepository.ActionMarkRead(context, String.valueOf(chatMessage.getId()), chatMessage.getConversationId());
+        chatRepository.ActionMarkRead(context, chatMessage.getToId(), String.valueOf(chatMessage.getId()), chatMessage.getConversationId());
     }
 
     public LiveData<DataState<ChatMessage>> getMessageSentState() {
@@ -308,5 +328,12 @@ public class ChatViewModel extends AndroidViewModel {
             messageSentState = Transformations.map(chatRepository.getMessageSentSate(), input -> input);
         }
         return messageSentState;
+    }
+
+    public LiveData<DataState<MessageReadNotification>> getMessageReadState() {
+        if (messageReadState == null) {
+            messageReadState = Transformations.map(chatRepository.getMessageReadState(), input -> input);
+        }
+        return messageReadState;
     }
 }

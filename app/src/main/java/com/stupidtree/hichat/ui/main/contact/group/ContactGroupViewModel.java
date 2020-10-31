@@ -65,17 +65,17 @@ public class ContactGroupViewModel extends ViewModel {
                     if (!user.isValid()) {
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));
                     } else {
-                        return Transformations.switchMap(groupRepository.queryMyGroups(user.getToken()), input1 -> {
-                            List<UserRelation> res = new LinkedList<>();
-                            if(input1.getState()== DataState.STATE.SUCCESS){
-                                for(RelationGroup rg: input1.getData()){
-                                    res.add(UserRelation.getLabelInstance(rg));
-                                }
-                                return new MutableLiveData<>(new DataState<>(res));
-                            }
-                            return new MutableLiveData<>(new DataState<>(DataState.STATE.FETCH_FAILED));
-                        });
-                        //return friendsRepository.getFriends(user.getToken(), null);
+//                        return Transformations.switchMap(groupRepository.queryMyGroups(user.getToken()), input1 -> {
+//                            List<UserRelation> res = new LinkedList<>();
+//                            if(input1.getState()== DataState.STATE.SUCCESS){
+//                                for(RelationGroup rg: input1.getData()){
+//                                    res.add(UserRelation.getLabelInstance(rg));
+//                                }
+//                                return new MutableLiveData<>(new DataState<>(res));
+//                            }
+//                            return new MutableLiveData<>(new DataState<>(DataState.STATE.FETCH_FAILED));
+//                        });
+                        return friendsRepository.getFriends(user.getToken(), null);
                     }
                 }
                 return new MutableLiveData<>(new DataState<>(DataState.STATE.NOTHING));

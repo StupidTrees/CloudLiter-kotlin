@@ -9,8 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.Transformations;
 
 import com.stupidtree.hichat.data.AppDatabase;
 import com.stupidtree.hichat.data.model.ChatMessage;
@@ -19,11 +17,15 @@ import com.stupidtree.hichat.data.source.ChatMessageWebSource;
 import com.stupidtree.hichat.data.source.SocketWebSource;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.ui.chat.FriendStateTrigger;
+import com.stupidtree.hichat.ui.chat.MessageReadNotification;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -33,6 +35,7 @@ import top.zibin.luban.Luban;
 import top.zibin.luban.OnCompressListener;
 
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_FRIEND_STATE_CHANGED;
+import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_MESSAGE_READ;
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_MESSAGE_SENT;
 import static com.stupidtree.hichat.socket.SocketIOClientService.ACTION_RECEIVE_MESSAGE;
 
@@ -45,7 +48,6 @@ public class ChatRepository {
     public static ChatRepository getInstance(@NonNull Context context) {
         return new ChatRepository(context.getApplicationContext());
     }
-
 
     //数据源1：网络类型数据，消息记录的网络数据源
     ChatMessageWebSource chatMessageWebSource;
@@ -71,7 +73,7 @@ public class ChatRepository {
         listDataState.addSource(socketWebSource.getNewMessageState(), message -> {
             if (message != null) {
                 listDataState.removeSource(localListState);
-                listDataState.setValue(new DataState<>(Collections.singletonList(message)).setListAction(DataState.LIST_ACTION.APPEND));
+                listDataState.setValue(new DataState<>(Collections.singletonList(message)).setListAction(DataState.LIST_ACTION.APPEND_ONE));
                 saveMessageAsync(message);
             }
         });
@@ -79,6 +81,10 @@ public class ChatRepository {
             listDataState.removeSource(localListState);
             ChatMessage sentMessage = chatMessageDataState.getData();
             saveMessageAsync(sentMessage);
+        });
+        listDataState.addSource(getMessageReadState(), messageReadNotificationDataState -> {
+            listDataState.removeSource(localListState);
+            markMessageReadAsync(messageReadNotificationDataState.getData());
         });
         return listDataState;
     }
@@ -89,48 +95,43 @@ public class ChatRepository {
      *
      * @param token          令牌
      * @param conversationId 对话id
-     * @param fromId         现有列表顶部的消息id
+     * @param topId          现有列表顶部的消息id
      * @param pageSize       分页大小
      * @param action         操作：全部刷新或在头部插入
      */
-    public void ActionFetchMessages(@NonNull String token, @Nullable String conversationId, Long fromId, int pageSize, DataState.LIST_ACTION action) {
+    public void ActionFetchMessages(@NonNull String token, @Nullable String conversationId, String topId, Timestamp topTime, int pageSize, DataState.LIST_ACTION action) {
         listDataState.removeSource(localListState);
-        Log.e("fromId", String.valueOf(fromId));
-        if (fromId == null) {
+        Log.e("fromId", String.valueOf(topId));
+        if (topId == null) {
             localListState = chatMessageDao.getMessages(conversationId, pageSize);
         } else {
-            localListState = chatMessageDao.getMessages(conversationId, pageSize, fromId);
+            localListState = chatMessageDao.getMessages(conversationId, pageSize, topTime);
         }
-        final boolean[] tried = {false};
         listDataState.addSource(localListState, chatMessages -> {
-            Log.e("onChanged", chatMessages.size() + "-" + tried[0] + "-" + action + "-" + fromId);
             listDataState.setValue(new DataState<>(chatMessages).setListAction(action));
-            if (!tried[0] && chatMessages.size() < pageSize) {
+            if (action == DataState.LIST_ACTION.REPLACE_ALL && topId == null && chatMessages.size() > 0) { //第一次获取，且本地已有消息
+                //那么从本地的最早消息开始，把消息全部拉取更新
                 listDataState.removeSource(webListState);
-                webListState = chatMessageWebSource.getMessages(token, conversationId, String.valueOf(fromId), pageSize);
+                webListState = chatMessageWebSource.getMessagesAfter(token, conversationId, chatMessages.get(chatMessages.size() - 1).getId(), true);
                 listDataState.addSource(webListState, result -> {
-                    tried[0] = true;
-                    if (result.getState() == DataState.STATE.SUCCESS && result.getData().size() > 0) {
-                        saveMessageAsync(result.getData());
-                    }
-                });
-            } else if (!tried[0] && fromId == null && chatMessages.size() > 0) { //第一次获取，拉取新消息
-                //尝试查询本地缺的
-                listDataState.removeSource(webListState);
-                webListState = chatMessageWebSource.pullLatestMessages(token, conversationId, String.valueOf(chatMessages.get(0).getId()));
-                listDataState.addSource(webListState, result -> {
-                    tried[0] = true;
-                    Log.e("补全本地消息", String.valueOf(result));
                     if (result.getState() == DataState.STATE.SUCCESS && result.getData().size() > 0) {
                         listDataState.removeSource(localListState);
-                        saveMessageAsync(result.getData());
-                        listDataState.setValue(new DataState<>(result.getData()).setListAction(DataState.LIST_ACTION.APPEND));
+                        saveMessageAsync(new LinkedList<>(result.getData()));
+                        listDataState.setValue(result.setRetry(true).setListAction(action));
                     }
                 });
-
-            } else {
-
+            } else {//本地无消息/上拉加载
+                listDataState.removeSource(webListState);
+                webListState = chatMessageWebSource.getMessages(token, conversationId, topId, pageSize);
+                listDataState.addSource(webListState, result -> {
+                    if (result.getState() == DataState.STATE.SUCCESS && result.getData().size() > 0) {
+                        listDataState.removeSource(localListState);
+                        saveMessageAsync(new ArrayList<>(result.getData()));
+                        listDataState.setValue(result.setListAction(action).setRetry(chatMessages.size() > 0));
+                    }
+                });
             }
+
         });
 
 
@@ -143,10 +144,10 @@ public class ChatRepository {
      * @param conversationId 对话id
      * @param afterId        现有列表底部的消息id
      */
-    public void ActionFetchNewMessages(@NonNull String token, @Nullable String conversationId, @NotNull Long afterId) {
+    public void ActionFetchNewMessages(@NonNull String token, @Nullable String conversationId, @NotNull String afterId) {
         //尝试查询本地缺的
         listDataState.removeSource(webListState);
-        webListState = chatMessageWebSource.pullLatestMessages(token, conversationId, String.valueOf(afterId));
+        webListState = chatMessageWebSource.getMessagesAfter(token, conversationId, afterId, false);
         listDataState.addSource(webListState, result -> {
             Log.e("手动拉取本地未存新消息", afterId + "-" + result);
             if (result.getState() == DataState.STATE.SUCCESS && result.getData().size() > 0) {
@@ -164,7 +165,7 @@ public class ChatRepository {
      */
     public void ActionSendMessage(ChatMessage message) {
         socketWebSource.sendMessage(message);
-        listDataState.setValue(new DataState<>(Collections.singletonList(message)).setListAction(DataState.LIST_ACTION.APPEND));
+        listDataState.setValue(new DataState<>(Collections.singletonList(message)).setListAction(DataState.LIST_ACTION.APPEND_ONE));
     }
 
     /**
@@ -174,8 +175,8 @@ public class ChatRepository {
      * @param userId         用户id
      * @param conversationId 对话id
      */
-    public void ActionMarkAllRead(@NonNull Context context, @NonNull String userId, @NonNull String conversationId) {
-        socketWebSource.markAllRead(context, userId, conversationId);
+    public void ActionMarkAllRead(@NonNull Context context, @NonNull String userId, @NonNull String conversationId, @NonNull Timestamp topTime, int num) {
+        socketWebSource.markAllRead(context, userId, conversationId, topTime, num);
     }
 
     /**
@@ -185,8 +186,8 @@ public class ChatRepository {
      * @param messageId      消息id
      * @param conversationId 对话id
      */
-    public void ActionMarkRead(@NonNull Context context, @NonNull String messageId, @NonNull String conversationId) {
-        socketWebSource.markRead(context, messageId, conversationId);
+    public void ActionMarkRead(@NonNull Context context, @NonNull String userId, @NonNull String messageId, @NonNull String conversationId) {
+        socketWebSource.markRead(context, userId, messageId, conversationId);
     }
 
 
@@ -265,6 +266,7 @@ public class ChatRepository {
         IF.addAction(ACTION_RECEIVE_MESSAGE);
         IF.addAction(ACTION_MESSAGE_SENT);
         IF.addAction(ACTION_FRIEND_STATE_CHANGED);
+        IF.addAction(ACTION_MESSAGE_READ);
         context.registerReceiver(socketWebSource, IF);
         socketWebSource.bindService("Chat", context);
     }
@@ -276,6 +278,15 @@ public class ChatRepository {
 
     private void saveMessageAsync(ChatMessage chatMessage) {
         new Thread(() -> chatMessageDao.saveMessage(Collections.singletonList(chatMessage))).start();
+    }
+
+    private void markMessageReadAsync(MessageReadNotification notification) {
+        if (notification.getType() == MessageReadNotification.TYPE.ALL) {
+            new Thread(() -> chatMessageDao.messageAllRead(notification.getConversationId(), notification.getFromTime())).start();
+        } else {
+            new Thread(() -> chatMessageDao.messageRead(notification.getId())).start();
+        }
+        //new Thread(() -> chatMessageDao.saveMessage(Collections.singletonList(chatMessage))).start();
     }
 
     private void saveMessageAsync(List<ChatMessage> chatMessages) {
@@ -292,5 +303,7 @@ public class ChatRepository {
         return socketWebSource.getFriendStateController();
     }
 
-
+    public MutableLiveData<DataState<MessageReadNotification>> getMessageReadState() {
+        return socketWebSource.getMessageReadState();
+    }
 }

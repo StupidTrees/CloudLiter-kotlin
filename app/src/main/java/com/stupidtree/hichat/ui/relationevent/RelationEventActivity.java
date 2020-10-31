@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -180,10 +181,10 @@ public class RelationEventActivity extends BaseActivity<RelationEventViewModel> 
                     }
                 }
                 if(data.getState()== RelationEvent.STATE.REQUESTING){
-                    holder.icon.setImageTintList(ColorStateList.valueOf(getColor(R.color.colorPrimary)));
+                    holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(getThis(),R.color.colorPrimary)));
                     holder.icon.setBackgroundResource(R.drawable.element_round_primary);
                 }else{
-                    holder.icon.setImageTintList(ColorStateList.valueOf(getColor(android.R.color.darker_gray)));
+                    holder.icon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(getThis(),android.R.color.darker_gray)));
                     holder.icon.setBackgroundResource(R.drawable.element_round_grey);
                 }
             }

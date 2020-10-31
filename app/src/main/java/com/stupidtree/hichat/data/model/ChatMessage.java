@@ -16,6 +16,7 @@ import com.stupidtree.hichat.utils.TextUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class ChatMessage implements Serializable {
      */
     @PrimaryKey
     @NotNull
-    public Long id;
+    public String id;
     public String fromId;
     public String toId;
     @ColumnInfo(defaultValue = "TXT")
@@ -85,7 +86,7 @@ public class ChatMessage implements Serializable {
 
     public static ChatMessage getTimeStampHolderInstance(Timestamp timestamp) {
         ChatMessage cm = new ChatMessage(null, null, null);
-        cm.id = (long) -1;
+        cm.id = "time";
         cm.createdAt = timestamp;
         return cm;
     }
@@ -117,12 +118,12 @@ public class ChatMessage implements Serializable {
     }
 
     @NotNull
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
     public boolean isTimeStamp() {
-        return Objects.equals(id, (long) -1);
+        return Objects.equals(id, "time");
     }
 
     public TYPE getType() {
@@ -135,6 +136,10 @@ public class ChatMessage implements Serializable {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
     }
 
     public String getUuid() {
@@ -186,9 +191,9 @@ public class ChatMessage implements Serializable {
                 Objects.equals(fromId, message.fromId) &&
                 Objects.equals(toId, message.toId) &&
                 Objects.equals(conversationId, message.conversationId) &&
-                Objects.equals(relationId, message.relationId) &&
                 Objects.equals(sensitive, message.sensitive) &&
-                Objects.equals(emotion, message.emotion);
+                Objects.equals(emotion, message.emotion)&&
+                Objects.equals(read,message.read);
     }
 
     @Override
@@ -234,5 +239,6 @@ public class ChatMessage implements Serializable {
         }
         return result;
     }
+
 
 }

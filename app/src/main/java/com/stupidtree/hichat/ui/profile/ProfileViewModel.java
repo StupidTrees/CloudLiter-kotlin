@@ -168,7 +168,7 @@ public class ProfileViewModel extends ViewModel {
                 if (input.isActioning()) {
                     UserLocal userLocal = localUserRepository.getLoggedInUser();
                     if (userLocal.isValid() && relationLiveData.getValue() != null) {
-                        System.out.println("friend id is" + relationLiveData.getValue().getData().getFriendId());
+                       // System.out.println("friend id is" + relationLiveData.getValue().getData().getFriendId());
                         return relationRepository.changeRemark(Objects.requireNonNull(userLocal.getToken()), input.getValue(), relationLiveData.getValue().getData().getFriendId());
                     } else {
                         return new MutableLiveData<>(new DataState<>(DataState.STATE.NOT_LOGGED_IN));

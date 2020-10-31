@@ -17,12 +17,18 @@ import com.stupidtree.hichat.utils.ActivityUtils;
 import com.stupidtree.hichat.utils.ImageUtils;
 import com.stupidtree.hichat.utils.TextUtils;
 
+import java.io.Serializable;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import butterknife.BindView;
 
@@ -85,6 +91,9 @@ class ChatListAdapter extends BaseListAdapter<ChatMessage, ChatListAdapter.CHold
     @Override
     protected void bindHolder(@NonNull CHolder holder, @Nullable ChatMessage data, int position) {
         if (data != null) {
+            if (holder.read != null) {
+                holder.read.setVisibility(data.isRead() ? View.VISIBLE : View.GONE);
+            }
             if (holder.viewType == TYPE_TIME && holder.content != null) {
                 holder.content.setText(TextUtils.getChatTimeText(mContext, data.getCreatedTime()));
             } else if (holder.avatar != null) {
@@ -124,12 +133,13 @@ class ChatListAdapter extends BaseListAdapter<ChatMessage, ChatListAdapter.CHold
 
     /**
      * 获取列表中所有图片的url
+     *
      * @return 结果
      */
-    public List<String> getImageUrls(){
+    public List<String> getImageUrls() {
         List<String> res = new ArrayList<>();
-        for(ChatMessage cm:mBeans){
-            if(!cm.isTimeStamp()&&cm.getType()== ChatMessage.TYPE.IMG){
+        for (ChatMessage cm : mBeans) {
+            if (!cm.isTimeStamp() && cm.getType() == ChatMessage.TYPE.IMG) {
                 res.add(ImageUtils.getChatMessageImageUrl(cm.getContent()));
             }
         }
@@ -141,6 +151,34 @@ class ChatListAdapter extends BaseListAdapter<ChatMessage, ChatListAdapter.CHold
      */
     private boolean tooFar(Timestamp t1, Timestamp t2) {
         return Math.abs(t1.getTime() - t2.getTime()) > ((long) 10 * 60 * 1000); //取10分钟
+    }
+
+
+    /**
+     * 当消息被对方阅读后，更新界面
+     *
+     * @param list         列表
+     * @param notification
+     */
+    public void messageRead(RecyclerView list, @NonNull MessageReadNotification notification) {
+        List<Integer> indexes = new ArrayList<>();
+        for (int i = mBeans.size() - 1; i >= 0; i--) {
+            if (notification.getType() == MessageReadNotification.TYPE.ALL) {
+                if (mBeans.get(i).getCreatedTime().after(notification.getFromTime())) {
+                    indexes.add(i);
+                }
+            } else if (Objects.equals(mBeans.get(i).getId(), notification.getId())) {
+                indexes.add(i);
+                break;
+            }
+        }
+        for (Integer index : indexes) {
+            mBeans.get(index).setRead(true);
+            CHolder holder = (CHolder) list.findViewHolderForAdapterPosition(index);
+            if (holder != null) {
+                holder.showRead();
+            }
+        }
     }
 
     /**
@@ -163,7 +201,7 @@ class ChatListAdapter extends BaseListAdapter<ChatMessage, ChatListAdapter.CHold
             if (holder != null) {
                 holder.hideProgress();
                 holder.bindSensitiveAndEmotion(sentMessage);
-                holder.bindClickAction(sentMessage,index);
+                holder.bindClickAction(sentMessage, index);
                 if (sentMessage.getType() == ChatMessage.TYPE.IMG) {
                     holder.updateImage(sentMessage);
                 }
@@ -194,6 +232,30 @@ class ChatListAdapter extends BaseListAdapter<ChatMessage, ChatListAdapter.CHold
 
     }
 
+    /**
+     * 头部数据的更新，存在则更新，其余的插入到头部
+     * @param chatMessages 新的头部消息
+     */
+    public void notifyHeadItemsUpdated(List<ChatMessage> chatMessages){
+        HashMap<String,ChatMessage> ids = new HashMap<>();
+        for(ChatMessage cm:chatMessages){
+            ids.put(cm.getId(),cm);
+        }
+        List<ChatMessage> toDelete = new ArrayList<>();
+        for(int i=mBeans.size()-1;i>=0;i--){
+            ChatMessage cm = mBeans.get(i);
+            if(ids.containsKey(cm.getId())){
+                if(!Objects.equals(ids.get(cm.getId()),cm)){
+                    notifyItemChanged(i);
+                }
+                toDelete.add(ids.get(cm.getId()));
+            }
+        }
+        chatMessages.removeAll(toDelete);
+        //其余的加到头部
+        notifyItemsPushHead(chatMessages);
+    }
+
     @Override
     public void notifyItemsPushHead(List<ChatMessage> newL) {
         Collections.reverse(newL);//取反
@@ -201,7 +263,7 @@ class ChatListAdapter extends BaseListAdapter<ChatMessage, ChatListAdapter.CHold
             ChatMessage top = mBeans.get(0);
             ChatMessage newBottom = newL.get(newL.size() - 1);
             if (tooFar(top.getCreatedTime(), newBottom.getCreatedTime())) {
-                if(!top.isTimeStamp()){
+                if (!top.isTimeStamp()) {
                     super.notifyItemPushHead(ChatMessage.getTimeStampHolderInstance(top.getCreatedTime()));
                 }
             } else if (top.isTimeStamp()) {
@@ -218,10 +280,9 @@ class ChatListAdapter extends BaseListAdapter<ChatMessage, ChatListAdapter.CHold
      * 为了在时间跨度太大的两项间插入时间戳显示
      *
      * @param newL             新的数据List
-     * @param notifyNormalItem 对于那些位置不变的项目，是否原地刷新
      */
     @Override
-    public void notifyItemChangedSmooth(List<ChatMessage> newL, boolean notifyNormalItem) {
+    public void notifyItemChangedSmooth(List<ChatMessage> newL) {
         List<ChatMessage> toAdd = new LinkedList<>();
         if (newL.size() == 1) {
             toAdd.addAll(newL);
@@ -240,7 +301,7 @@ class ChatListAdapter extends BaseListAdapter<ChatMessage, ChatListAdapter.CHold
         if (toAdd.size() > 0) {
             toAdd.add(0, ChatMessage.getTimeStampHolderInstance(toAdd.get(0).getCreatedTime()));
         }
-        super.notifyItemChangedSmooth(toAdd, notifyNormalItem);
+        super.notifyItemChangedSmooth(toAdd, (oldData, newData) -> !Objects.equals(oldData,newData));
     }
 
     class CHolder extends BaseViewHolder {
@@ -265,6 +326,10 @@ class ChatListAdapter extends BaseListAdapter<ChatMessage, ChatListAdapter.CHold
         @BindView(R.id.image)
         @Nullable
         ImageView image;//图片
+
+        @BindView(R.id.read)
+        @Nullable
+        View read;
         @BindView(R.id.image_sensitive)
         @Nullable
         ViewGroup imageSensitivePlaceHolder;
@@ -274,6 +339,12 @@ class ChatListAdapter extends BaseListAdapter<ChatMessage, ChatListAdapter.CHold
         public void hideProgress() {
             if (progress != null) {
                 progress.setVisibility(View.GONE);
+            }
+        }
+
+        public void showRead() {
+            if (read != null) {
+                read.setVisibility(View.VISIBLE);
             }
         }
 
@@ -297,6 +368,7 @@ class ChatListAdapter extends BaseListAdapter<ChatMessage, ChatListAdapter.CHold
                 }
             }
         }
+
 
         //绑定敏感词状态
         public void bindSensitiveAndEmotion(@NonNull ChatMessage data) {
@@ -349,7 +421,7 @@ class ChatListAdapter extends BaseListAdapter<ChatMessage, ChatListAdapter.CHold
         //绑定点击事件
         public void bindClickAction(@NonNull ChatMessage data, int position) {
             if (mOnItemLongClickListener != null && bubble != null) {
-                bubble.setOnLongClickListener(view -> mOnItemLongClickListener.onItemLongClick(data,view, position));
+                bubble.setOnLongClickListener(view -> mOnItemLongClickListener.onItemLongClick(data, view, position));
             }
             if (mOnItemClickListener != null && bubble != null) {
                 bubble.setOnClickListener(view -> mOnItemClickListener.onItemClick(data, view, position));
