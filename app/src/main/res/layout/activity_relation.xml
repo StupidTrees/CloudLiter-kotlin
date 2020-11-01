@@ -73,7 +73,6 @@
             android:paddingBottom="8dp">
 
             <TextView
-                android:id="@+id/set_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -83,7 +82,6 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/group"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -121,7 +119,6 @@
             android:layout_weight="1" />
 
         <Button
-            android:id="@+id/delete_friend"
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

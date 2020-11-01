@@ -3,12 +3,12 @@
 
     <item
         android:id="@+id/navigation_home"
-        android:icon="@drawable/ic_baseline_message_24"
+        android:icon="@drawable/ic_cloudliter_baseline"
         android:title="@string/title_home" />
 
     <item
         android:id="@+id/navigation_dashboard"
-        android:icon="@drawable/ic_contact"
+        android:icon="@drawable/ic_baseline_contact_24"
         android:title="@string/title_contact" />
 
 <!--    <item-->

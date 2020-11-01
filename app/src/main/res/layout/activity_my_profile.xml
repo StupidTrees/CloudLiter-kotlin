@@ -29,7 +29,6 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
-            android:id="@+id/username_layout"
             android:layout_width="match_parent"
             android:layout_height="72dp"
             android:clickable="false"

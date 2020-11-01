@@ -19,8 +19,6 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 
@@ -45,10 +43,6 @@
 
 
 <!--    按钮圆形小水波的效果-->
-    <style name="ripplePrimary">
-        <item name="android:colorControlHighlight">?attr/colorPrimary</item>
-        <item name="android:radius">24dp</item>
-    </style>
     <style name="ripplePrimarySmall">
         <item name="android:colorControlHighlight">?attr/colorPrimary</item>
         <item name="android:radius">16dp</item>

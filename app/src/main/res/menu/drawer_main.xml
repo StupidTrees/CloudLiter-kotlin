@@ -7,7 +7,6 @@
         android:icon="@drawable/ic_baseline_person_24"
         android:title="@string/menu_my_profile" />
     <item
-        android:id="@+id/drawer_nav_setting"
         android:icon="@drawable/ic_baseline_settings_24"
         android:title="@string/menu_setting" />
 

@@ -10,7 +10,6 @@
     tools:context=".ui.search.SearchActivity">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/backgroundColorSecond"
@@ -215,7 +214,6 @@
                 android:focusable="true">
 
                 <TextView
-                    android:id="@+id/textView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:paddingStart="12dp"

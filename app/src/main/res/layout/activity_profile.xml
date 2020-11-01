@@ -15,7 +15,6 @@
         app:elevation="0dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/usercenter_toolbarlayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -166,7 +165,6 @@
                     android:textStyle="bold" />
 
                 <LinearLayout
-                    android:id="@+id/username_layout"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
                     android:clickable="false"
@@ -208,7 +206,6 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/cloud_layout"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
                     android:clickable="true"
@@ -255,7 +252,6 @@
                 android:paddingBottom="8dp">
 
                 <TextView
-                    android:id="@+id/textView4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"

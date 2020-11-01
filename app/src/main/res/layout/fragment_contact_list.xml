@@ -12,7 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <com.donkingliang.groupedadapter.widget.StickyHeaderLayout
-            android:id="@+id/sticky_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <androidx.recyclerview.widget.RecyclerView
@@ -34,7 +33,6 @@
         android:visibility="invisible">
 
         <ImageView
-            android:id="@+id/imageView"
             android:layout_width="140dp"
             android:layout_height="140dp"
             android:src="@drawable/place_holder_contact" />
