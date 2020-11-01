@@ -33,6 +33,8 @@ import com.stupidtree.hichat.utils.NotificationUtils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 import butterknife.BindView;
 
 /**
@@ -54,9 +56,6 @@ public class MainActivity extends BaseActivity<MainViewModel> {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-
-//    @BindView(R.id.add)
-//    ImageView add;
 
     @BindView(R.id.title)
     TextView title;
@@ -99,6 +98,7 @@ public class MainActivity extends BaseActivity<MainViewModel> {
         drawerHeader = headerView.findViewById(R.id.drawer_header);
         drawerNickname = headerView.findViewById(R.id.nickname);
         drawerUsername = headerView.findViewById(R.id.username);
+
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NotNull View drawerView, float slideOffset) {
@@ -202,6 +202,13 @@ public class MainActivity extends BaseActivity<MainViewModel> {
             drawerUsername.setText(userLocalInfo.getUsername());
             drawerNickname.setText(userLocalInfo.getNickname());
             drawerHeader.setOnClickListener(view -> ActivityUtils.startProfileActivity(getThis(), viewModel.getLocalUser().getId()));
+            navigationView.setNavigationItemSelectedListener(item -> {
+                if(item.getItemId()==R.id.drawer_nav_my_profile){
+                    ActivityUtils.startProfileActivity(getThis(), Objects.requireNonNull(viewModel.getLocalUser().getId()));
+                    return true;
+                }
+                return false;
+            });
         } else {
             //未登录的信息显示
             drawerUsername.setText(R.string.not_logged_in);
@@ -209,7 +216,13 @@ public class MainActivity extends BaseActivity<MainViewModel> {
             drawerAvatar.setImageResource(R.drawable.place_holder_avatar);
             avatar.setImageResource(R.drawable.place_holder_avatar);
             drawerHeader.setOnClickListener(view -> ActivityUtils.startLoginActivity(getThis()));
-
+            navigationView.setNavigationItemSelectedListener(item -> {
+                if(item.getItemId()==R.id.drawer_nav_my_profile){
+                    ActivityUtils.startLoginActivity(getThis());
+                    return true;
+                }
+                return false;
+            });
         }
     }
 

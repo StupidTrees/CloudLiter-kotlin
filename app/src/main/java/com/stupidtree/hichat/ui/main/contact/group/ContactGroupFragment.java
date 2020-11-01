@@ -1,13 +1,9 @@
 package com.stupidtree.hichat.ui.main.contact.group;
 
-import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -17,17 +13,8 @@ import com.donkingliang.groupedadapter.holder.BaseViewHolder;
 import com.stupidtree.hichat.R;
 import com.stupidtree.hichat.data.model.UserRelation;
 import com.stupidtree.hichat.ui.base.BaseFragment;
-import com.stupidtree.hichat.ui.base.BaseListAdapter;
 import com.stupidtree.hichat.ui.base.DataState;
 import com.stupidtree.hichat.utils.ActivityUtils;
-import com.stupidtree.hichat.utils.ImageUtils;
-import com.stupidtree.hichat.utils.TextUtils;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 import butterknife.BindView;
 
@@ -56,7 +43,7 @@ public class ContactGroupFragment extends BaseFragment<ContactGroupViewModel> {
     /**
      * 适配器区
      */
-   GroupListAdapter listAdapter;//列表适配器
+   GroupedFriendsListAdapter listAdapter;//列表适配器
 
 
     public ContactGroupFragment() {
@@ -75,22 +62,14 @@ public class ContactGroupFragment extends BaseFragment<ContactGroupViewModel> {
     @Override
     protected void initViews(View view) {
         //初始化一下列表的view
-        listAdapter = new GroupListAdapter(getContext());
+        listAdapter = new GroupedFriendsListAdapter(getContext());
         list.setAdapter(listAdapter);
         list.setLayoutManager(new LinearLayoutManager(getContext()));
-        listAdapter.setOnHeaderClickListener(new GroupedRecyclerViewAdapter.OnHeaderClickListener() {
-            @Override
-            public void onHeaderClick(GroupedRecyclerViewAdapter adapter, BaseViewHolder holder, int groupPosition) {
-                listAdapter.collapseGroup(groupPosition);
-            }
+        listAdapter.setOnHeaderClickListener((adapter, holder, groupPosition) -> listAdapter.toggleGroup(list,groupPosition));
+        listAdapter.setOnChildClickListener((adapter, holder, groupPosition, childPosition) -> {
+            UserRelation ur = listAdapter.groupEntities.get(groupPosition).getChildAt(childPosition);
+            ActivityUtils.startProfileActivity(requireActivity(), String.valueOf(ur.getFriendId()));
         });
-//        listAdapter.setOnItemClickListener((UserRelation data, View card, int position) -> {
-//            //点击列表项时，跳转到对应用户的Profile页面
-//            if (!data.isLabel()) {
-//                ActivityUtils.startProfileActivity(requireActivity(), String.valueOf(data.getFriendId()));
-//            }
-//
-//        });
         //设置下拉刷新
         refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
         refreshLayout.setOnRefreshListener(() -> viewModel.startFetchData());

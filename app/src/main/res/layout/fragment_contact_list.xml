@@ -11,12 +11,17 @@
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/list"
+        <com.donkingliang.groupedadapter.widget.StickyHeaderLayout
+            android:id="@+id/sticky_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:overScrollMode="never" />
+            android:layout_height="match_parent">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never" />
+        </com.donkingliang.groupedadapter.widget.StickyHeaderLayout>
+
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <LinearLayout

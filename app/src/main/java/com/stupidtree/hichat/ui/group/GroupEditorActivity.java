@@ -27,7 +27,7 @@ import java.util.Objects;
 
 import butterknife.BindView;
 
-public class GroupEditorActivity extends BaseActivity<GroupEditorViewModel>{
+public class GroupEditorActivity extends BaseActivity<GroupEditorViewModel> {
 
     /**
      * View绑定区
@@ -39,12 +39,13 @@ public class GroupEditorActivity extends BaseActivity<GroupEditorViewModel>{
     RecyclerView list;
 
     @BindView(R.id.add)//这里是添加按钮
-    FloatingActionButton add;
+            FloatingActionButton add;
 
     /**
      * 适配器
      */
     GroupListAdapter listAdapter;
+
     @Override
     protected int getLayoutId() {
         return R.layout.activity_group_editor;
@@ -58,71 +59,57 @@ public class GroupEditorActivity extends BaseActivity<GroupEditorViewModel>{
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setWindowParams(true,true,false);
+        setWindowParams(true, true, false);
     }
 
     @Override
     protected void initViews() {
         setToolbarActionBack(toolbar);
-        listAdapter = new GroupListAdapter(this,new LinkedList<>());
+        listAdapter = new GroupListAdapter(this, new LinkedList<>());
         list.setAdapter(listAdapter);
         list.setLayoutManager(new LinearLayoutManager(this));
         viewModel.getListData().observe(this, listDataState -> {
-            if(listDataState.getState()== DataState.STATE.SUCCESS){
+            if (listDataState.getState() == DataState.STATE.SUCCESS) {
                 listAdapter.notifyItemChangedSmooth(listDataState.getData(), Objects::equals);
             }
         });
 
 
-
         //点击按钮添加分组
         add.setOnClickListener(view -> {
-            DataState<String> up = viewModel.getAddGroupResult().getValue();
-
-                new PopUpEditText()
-                        .setTitle(R.string.add_group)
-                        .setText("")
-                        .setOnConfirmListener(text -> {
-                            //控制viewModel发起添加分组请求
-                            viewModel.startAddGroup(text);
-                        })
-                        .show(getSupportFragmentManager(), "edit");
-
+            new PopUpEditText()
+                    .setTitle(R.string.add_group)
+                    .setText("")
+                    .setOnConfirmListener(text -> {
+                        //控制viewModel发起添加分组请求
+                        viewModel.startAddGroup(text);
+                    })
+                    .show(getSupportFragmentManager(), "edit");
 
         });
 
         //点击删除分组
-        listAdapter.setOnDeleteClickListener(new GroupListAdapter.OnDeleteClickListener() {
+        listAdapter.setOnDeleteClickListener((button, group, position) -> new PopUpText().setTitle(R.string.ensure_delete).setText("").setOnConfirmListener(new PopUpText.OnConfirmListener() {
             @Override
-            public void OnDeleteClick(View button, @NotNull RelationGroup group, int position) {
-                new PopUpText().setTitle(R.string.ensure_delete).setText("").setOnConfirmListener(new PopUpText.OnConfirmListener() {
-                    @Override
-                    public void OnConfirm() {
-                        viewModel.startDeleteGroup(group.getId());
-                    }
-                }).show(getSupportFragmentManager(),"confirm");
-
+            public void OnConfirm() {
+                viewModel.startDeleteGroup(group.getId());
             }
-        });
+        }).show(getSupportFragmentManager(), "confirm"));
 
         viewModel.getAddGroupResult().observe(this, stringDataState -> {
             if (stringDataState.getState() == DataState.STATE.SUCCESS) {
-                System.out.println("activity stage, func:viewmodel.get succeed");
                 Toast.makeText(getThis(), R.string.add_ok, Toast.LENGTH_SHORT).show();
                 viewModel.startRefresh();
             } else {
-                System.out.println("activity stage, func:viewmodel.get failed");
                 Toast.makeText(getApplicationContext(), "失败", Toast.LENGTH_SHORT).show();
             }
         });
 
         viewModel.getDeleteGroupResult().observe(this, stringDataState -> {
             if (stringDataState.getState() == DataState.STATE.SUCCESS) {
-                System.out.println("activity stage, func:viewmodel.get succeed");
                 Toast.makeText(getThis(), R.string.delete_ok, Toast.LENGTH_SHORT).show();
                 viewModel.startRefresh();
             } else {
-                System.out.println("activity stage, func:viewmodel.get failed");
                 Toast.makeText(getApplicationContext(), "失败", Toast.LENGTH_SHORT).show();
             }
         });

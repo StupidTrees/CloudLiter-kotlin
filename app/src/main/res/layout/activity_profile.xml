@@ -304,6 +304,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:maxEms="12"
+                        android:singleLine="true"
                         android:textColor="?attr/textColorSecondary"
                         android:textSize="18sp"
                         tools:ignore="DuplicateIds" />
@@ -347,8 +349,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:singleLine="true"
                         android:textColor="?attr/textColorSecondary"
-                        android:textSize="18sp" />
+                        android:textSize="18sp"
+                        android:maxEms="12" />
 
                 </LinearLayout>
 
