@@ -31,6 +31,18 @@
         android:layout_gravity="center|top"
         android:layout_marginTop="16dp" />
 
+    <TextView
+        android:id="@+id/read"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="-8dp"
+        android:layout_marginBottom="3dp"
+        android:alpha="0.6"
+        android:text="已读"
+        android:textSize="10sp" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/bubble"
         android:layout_width="wrap_content"
