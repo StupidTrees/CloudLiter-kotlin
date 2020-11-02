@@ -1,11 +1,14 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 30
     buildToolsVersion '30.0.2'
 
     defaultConfig {
-        applicationId 'com.stupidtree.hichat'
+        applicationId 'com.stupidtree.cloudliter'
         minSdkVersion 22
         targetSdkVersion 30
         versionCode 20201024
@@ -32,16 +35,20 @@ android {
     }
 }
 
+
+configurations {
+    cleanedAnnotations
+    compile.exclude group: 'org.jetbrains' , module:'annotations'
+}
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
-    implementation 'androidx.navigation:navigation-fragment:2.3.1'
-    implementation 'androidx.navigation:navigation-ui:2.3.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.1'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.3.1'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.annotation:annotation:1.1.0'
-    implementation 'org.jetbrains:annotations-java5:15.0'
     implementation 'org.jetbrains:annotations-java5:15.0'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     implementation 'androidx.room:room-runtime:2.2.5'
@@ -58,7 +65,7 @@ dependencies {
 
     //ButterKnifeView注入
     implementation 'com.jakewharton:butterknife:10.1.0'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
+    kapt 'com.jakewharton:butterknife-compiler:10.1.0'
 
     //Glide图片加载
     implementation 'com.github.bumptech.glide:glide:4.9.0'
@@ -68,12 +75,14 @@ dependencies {
     implementation "org.java-websocket:Java-WebSocket:1.4.0"
 
     //socketIO
-    implementation "io.socket:socket.io-client:1.0.0"
+    implementation ("io.socket:socket.io-client:1.0.0",{
+        exclude group:'org.json', module:'json'
+    })
 
 
     //可展开布局
     implementation 'net.cachapa.expandablelayout:expandablelayout:2.9.2'
-    annotationProcessor 'androidx.room:room-compiler:2.2.5'
+
 
     //Luban图片压缩
     implementation 'top.zibin:Luban:1.1.8'
@@ -83,6 +92,16 @@ dependencies {
 
 
     //分组Adapter
-    //implementation 'com.sunfusheng:GroupRecyclerViewAdapter:<latest-version>'
     implementation 'com.github.donkingliang:GroupedRecyclerViewAdapter:2.3.0'
+
+
+    implementation "androidx.core:core-ktx:1.3.2"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    kapt "android.arch.persistence.room:compiler:2.2.5"
+    kapt 'androidx.room:room-compiler:2.2.5'
+    implementation 'android.arch.persistence.room:runtime:2.2.5'
+}
+repositories {
+    mavenCentral()
 }

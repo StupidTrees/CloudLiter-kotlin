@@ -416,7 +416,7 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
-                <com.stupidtree.hichat.ui.widgets.WordsCloudView
+                <com.stupidtree.cloudliter.ui.widgets.WordsCloudView
                     android:id="@+id/wordstag_layout"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"

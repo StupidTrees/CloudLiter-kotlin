@@ -102,14 +102,14 @@
 
         </LinearLayout>
 
-        <com.stupidtree.hichat.ui.widgets.WordsCloudView
+        <com.stupidtree.cloudliter.ui.widgets.WordsCloudView
             android:id="@+id/word_cloud"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="24dp"
-            android:layout_marginBottom="8dp"></com.stupidtree.hichat.ui.widgets.WordsCloudView>
+            android:layout_marginBottom="8dp"></com.stupidtree.cloudliter.ui.widgets.WordsCloudView>
 
         <LinearLayout
             android:layout_width="match_parent"

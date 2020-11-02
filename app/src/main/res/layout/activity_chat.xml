@@ -133,7 +133,7 @@
             android:background="?attr/backgroundColorSecond"
             android:orientation="horizontal">
 
-            <com.stupidtree.hichat.ui.widgets.EmoticonsEditText
+            <com.stupidtree.cloudliter.ui.widgets.EmoticonsEditText
                 android:id="@+id/input"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
