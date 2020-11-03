@@ -23,9 +23,9 @@ class ConversationViewModel(application: Application?) : AndroidViewModel(applic
             if (field == null) {
                 field = Transformations.switchMap(conversationTrigger){ input: StringTrigger ->
                     if (input.isActioning) {
-                        val userLocal = localUserRepository.loggedInUser
+                        val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
-                            return@switchMap repository!!.queryConversation(userLocal.token!!, userLocal.id, input.data)
+                            return@switchMap repository!!.queryConversation(userLocal.token!!, userLocal.id, input.data!!)
                         } else {
                             return@switchMap MutableLiveData(DataState<Conversation?>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -43,10 +43,10 @@ class ConversationViewModel(application: Application?) : AndroidViewModel(applic
         get() {
             if (field == null) {
                 field = Transformations.switchMap(conversationTrigger) { input: StringTrigger ->
-                    val user = localUserRepository.loggedInUser
+                    val user = localUserRepository.getLoggedInUser()
                     if (input.isActioning) {
                         if (user.isValid) {
-                            return@switchMap repository!!.getUserWordCloud(user.token, user.id!!, input.data)
+                            return@switchMap repository!!.getUserWordCloud(user.token, user.id!!, input.data!!)
                         } else {
                             return@switchMap MutableLiveData(DataState<HashMap<String, Float>>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -82,6 +82,6 @@ class ConversationViewModel(application: Application?) : AndroidViewModel(applic
 
     init {
         repository = getInstance(application!!)
-        localUserRepository = LocalUserRepository.getInstance()
+        localUserRepository = LocalUserRepository.getInstance(application)
     }
 }

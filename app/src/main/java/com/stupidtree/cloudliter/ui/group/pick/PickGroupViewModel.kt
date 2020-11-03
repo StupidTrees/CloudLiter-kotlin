@@ -18,10 +18,10 @@ class PickGroupViewModel(application: Application) : AndroidViewModel(applicatio
     var listData: LiveData<DataState<List<RelationGroup>?>>? = null
         get() {
             if (field == null) {
-                listData = Transformations.switchMap(listController) { input: Trigger? ->
-                    val userLocal = localUserRepository.loggedInUser
+                listData = Transformations.switchMap(listController) {
+                    val userLocal = localUserRepository.getLoggedInUser()
                     if (userLocal.isValid) {
-                        return@switchMap groupRepository.queryMyGroups(userLocal.token)
+                        return@switchMap groupRepository.queryMyGroups(userLocal.token!!)
                     }
                     MutableLiveData(DataState<List<RelationGroup>?>(DataState.STATE.NOT_LOGGED_IN))
                 }
@@ -44,7 +44,7 @@ class PickGroupViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     init {
-        groupRepository = GroupRepository.getInstance()
-        localUserRepository = LocalUserRepository.getInstance()
+        groupRepository = GroupRepository.instance!!
+        localUserRepository = LocalUserRepository.getInstance(application)
     }
 }

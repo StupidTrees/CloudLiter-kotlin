@@ -1,9 +1,7 @@
 package com.stupidtree.cloudliter.ui.myprofile
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.*
 import com.stupidtree.cloudliter.data.model.UserLocal.GENDER
 import com.stupidtree.cloudliter.data.model.UserProfile
 import com.stupidtree.cloudliter.data.model.UserProfile.COLOR
@@ -18,7 +16,7 @@ import java.util.*
  * 层次：ViewModel
  * 和”我的资料“Activity绑定的ViewModel
  */
-class MyProfileViewModel : ViewModel() {
+class MyProfileViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * 数据区
      */
@@ -28,7 +26,7 @@ class MyProfileViewModel : ViewModel() {
             if (field == null) {
                 //controller改变的时候，通知userProfile改变
                 userProfileLiveData = Transformations.switchMap(profileController) { input ->
-                    val userLocal = localUserRepository.loggedInUser
+                    val userLocal = localUserRepository.getLoggedInUser()
                     if (userLocal.isValid) {
                         //从用户资料仓库总取出数据
                         return@switchMap profileRepository!!.getUserProfile(userLocal.id, userLocal.token!!)
@@ -51,7 +49,7 @@ class MyProfileViewModel : ViewModel() {
                 changeAvatarResult = Transformations.switchMap(changeAvatarController) { input: ChangeInfoTrigger ->
                     if (input.isActioning) {
                         //要先判断本地用户当前是否登录
-                        val userLocal = localUserRepository.loggedInUser
+                        val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
                             //通知用户资料仓库，开始更换头像
                             return@switchMap profileRepository!!.changeAvatar(userLocal.token!!, input.getValue())
@@ -76,7 +74,7 @@ class MyProfileViewModel : ViewModel() {
                 //也是一样的
                 changeNicknameResult = Transformations.switchMap(changeNicknameController) { input: ChangeInfoTrigger ->
                     if (input.isActioning) {
-                        val userLocal = localUserRepository.loggedInUser
+                        val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
                             return@switchMap profileRepository!!.changeNickname(userLocal.token!!, input.getValue())
                         } else {
@@ -99,7 +97,7 @@ class MyProfileViewModel : ViewModel() {
             if (field == null) {
                 changeGenderResult = Transformations.switchMap(changeGenderController) { input: ChangeInfoTrigger ->
                     if (input.isActioning) {
-                        val userLocal = localUserRepository.loggedInUser
+                        val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
                             return@switchMap profileRepository!!.changeGender(userLocal.token!!, input.getValue())
                         } else {
@@ -121,7 +119,7 @@ class MyProfileViewModel : ViewModel() {
             if (field == null) {
                 changeColorResult = Transformations.switchMap(changeColorController) { input: ChangeInfoTrigger ->
                     if (input.isActioning) {
-                        val userLocal = localUserRepository.loggedInUser
+                        val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
                             return@switchMap profileRepository!!.changeColor(userLocal.token!!, input.getValue())
                         } else {
@@ -144,7 +142,7 @@ class MyProfileViewModel : ViewModel() {
                 //也是一样的
                 changeSignatureResult = Transformations.switchMap(changeSignatureController) { input: ChangeInfoTrigger ->
                     if (input.isActioning) {
-                        val userLocal = localUserRepository.loggedInUser
+                        val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
                             return@switchMap profileRepository!!.changeSignature(userLocal.token!!, input.getValue())
                         } else {
@@ -216,12 +214,12 @@ class MyProfileViewModel : ViewModel() {
      * 开始页面刷新（即用户profile的获取）
      */
     fun startRefresh() {
-        val userLocal = localUserRepository.loggedInUser
+        val userLocal = localUserRepository.getLoggedInUser()
         profileController.value = StringTrigger.getActioning(userLocal.id)
     }
 
     init {
         profileRepository = instance
-        localUserRepository = LocalUserRepository.getInstance()
+        localUserRepository = LocalUserRepository.getInstance(application)
     }
 }

@@ -61,6 +61,7 @@ class ChatMessage : Serializable {
 
     @Ignore
     constructor(fromId: String?, toId: String?, content: String?) {
+        this.id = ""
         this.fromId = fromId
         this.toId = toId
         this.content = content

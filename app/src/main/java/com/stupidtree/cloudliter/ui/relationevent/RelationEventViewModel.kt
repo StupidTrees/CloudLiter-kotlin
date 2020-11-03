@@ -1,9 +1,7 @@
 package com.stupidtree.cloudliter.ui.relationevent
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.*
 import com.stupidtree.cloudliter.data.model.RelationEvent
 import com.stupidtree.cloudliter.data.model.RelationEvent.ACTION
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
@@ -13,7 +11,7 @@ import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.base.Trigger
 import java.util.*
 
-class RelationEventViewModel : ViewModel() {
+class RelationEventViewModel(application:Application) : AndroidViewModel(application) {
     /**
      * 数据区
      */
@@ -25,7 +23,7 @@ class RelationEventViewModel : ViewModel() {
                     if (!input.isActioning) {
                         return@switchMap MutableLiveData(DataState<List<RelationEvent>?>(DataState.STATE.NOTHING))
                     }
-                    val userLocal = localUserRepository.loggedInUser
+                    val userLocal = localUserRepository.getLoggedInUser()
                     if (userLocal.isValid) {
                         return@switchMap relationRepository!!.queryMine(userLocal.token!!)
                     } else {
@@ -46,7 +44,7 @@ class RelationEventViewModel : ViewModel() {
             if (field == null) {
                 field = Transformations.switchMap(responseFriendTrigger) { input: ResponseFriendTrigger ->
                     if (input.isActioning) {
-                        val userLocal = localUserRepository.loggedInUser
+                        val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
                             return@switchMap relationRepository!!.responseFriendRequest(userLocal.token!!, input.eventId, input.action)
                         } else {
@@ -66,7 +64,7 @@ class RelationEventViewModel : ViewModel() {
         get() = field
                 ?: Transformations.switchMap(markReadController) { input: Trigger ->
                     if (input.isActioning) {
-                        val userLocal = localUserRepository.loggedInUser
+                        val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
                             return@switchMap relationRepository!!.markRead(userLocal.token!!)
                         } else {
@@ -97,14 +95,14 @@ class RelationEventViewModel : ViewModel() {
     }
 
     val localUserId: String?
-        get() = localUserRepository.loggedInUser.id
+        get() = localUserRepository.getLoggedInUser().id
 
     fun responseFriendRequest(eventId: String, action: ACTION) {
         responseFriendTrigger.value = ResponseFriendTrigger.getActioning(eventId, action)
     }
 
     init {
-        localUserRepository = LocalUserRepository.getInstance()
+        localUserRepository = LocalUserRepository.getInstance(application)
         relationRepository = instance
     }
 }

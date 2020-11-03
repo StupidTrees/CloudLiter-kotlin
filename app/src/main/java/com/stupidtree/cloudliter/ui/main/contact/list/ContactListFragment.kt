@@ -73,7 +73,7 @@ class ContactListFragment : BaseFragment<ContactListViewModel>() {
         refreshLayout!!.setOnRefreshListener { viewModel!!.startFetchData() }
 
         //当列表数据变更时，将自动调用本匿名函数
-        viewModel!!.listData.observe(this, Observer { contactListState: DataState<List<UserRelation>> ->
+        viewModel!!.listData?.observe(this, Observer { contactListState: DataState<List<UserRelation>?> ->
             refreshLayout!!.isRefreshing = false
             if (contactListState.state === DataState.STATE.SUCCESS) {
                 //状态为”成功“，那么列表设置为可见，并通知列表适配器丝滑地更新列表项

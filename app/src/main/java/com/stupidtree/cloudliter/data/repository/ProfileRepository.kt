@@ -1,5 +1,6 @@
 package com.stupidtree.cloudliter.data.repository
 
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.model.UserProfile
@@ -14,9 +15,10 @@ import java.util.*
 /**
  * Repository层：用户资料页面的Repository
  */
-class ProfileRepository internal constructor() {
+class ProfileRepository(application: Application) {
     //数据源1：网络类型数据源，用户网络操作
-    private val userWebSource: UserWebSource = UserWebSource.getInstance()
+    private val userWebSource: UserWebSource = UserWebSource.instance!!
+    private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
 
     /**
      * 获取用户资料
@@ -50,7 +52,7 @@ class ProfileRepository internal constructor() {
         return Transformations.map(userWebSource.changeAvatar(token, body)) { input: DataState<String?> ->
             if (input.state === DataState.STATE.SUCCESS) {
                 //通知本地用户更新资料
-                LocalUserRepository.getInstance().ChangeLocalAvatar(input.data)
+                localUserRepository.ChangeLocalAvatar(input.data)
             }
             input
         }
@@ -66,7 +68,7 @@ class ProfileRepository internal constructor() {
     fun changeNickname(token: String, nickname: String): LiveData<DataState<String?>> {
         return Transformations.map(userWebSource.changeNickname(token, nickname)) { input: DataState<String?> ->
             if (input.state === DataState.STATE.SUCCESS) {
-                LocalUserRepository.getInstance().ChangeLocalNickname(nickname)
+                localUserRepository.ChangeLocalNickname(nickname)
             }
             input
         }
@@ -82,7 +84,7 @@ class ProfileRepository internal constructor() {
     fun changeGender(token: String, gender: String): LiveData<DataState<String?>> {
         return Transformations.map(userWebSource.changeGender(token, gender)) { input: DataState<String?> ->
             if (input.state === DataState.STATE.SUCCESS) {
-                LocalUserRepository.getInstance().ChangeLocalGender(gender)
+                localUserRepository.ChangeLocalGender(gender)
             }
             input
         }
@@ -97,7 +99,7 @@ class ProfileRepository internal constructor() {
      */
     fun changeColor(token: String, color: String): LiveData<DataState<String?>> {
         return Transformations.map(userWebSource.changeColor(token, color)) { input: DataState<String?> ->
-             if (input.state === DataState.STATE.SUCCESS) {
+            if (input.state === DataState.STATE.SUCCESS) {
                 //？？？？？？？？？？？？？？
             }
             input
@@ -114,7 +116,7 @@ class ProfileRepository internal constructor() {
     fun changeSignature(token: String, signature: String): LiveData<DataState<String?>> {
         return Transformations.map(userWebSource.changeSignature(token, signature)) { input: DataState<String?> ->
             if (input.state === DataState.STATE.SUCCESS) {
-                LocalUserRepository.getInstance().ChangeLocalSignature(signature)
+                localUserRepository.ChangeLocalSignature(signature)
             }
             input
         }
@@ -126,20 +128,22 @@ class ProfileRepository internal constructor() {
      * @param token 用户令牌
      * @return 词频表
      */
-    fun getUserWordCloud(token: String?, userId: String): LiveData<DataState<HashMap<String, Float>>> {
+    fun getUserWordCloud(token: String, userId: String): LiveData<DataState<HashMap<String, Float?>?>> {
         return userWebSource.getUserWordCloud(token, userId)
     }
 
     companion object {
         @JvmStatic
         var instance: ProfileRepository? = null
-            get() {
-                if (field == null) {
-                    field = ProfileRepository()
-                }
-                return field
-            }
             private set
+        
+        fun getInstance(application: Application):ProfileRepository {
+            if (instance == null) {
+                instance = ProfileRepository(application)
+            }
+            return instance!!
+        }
+
     }
 
 }

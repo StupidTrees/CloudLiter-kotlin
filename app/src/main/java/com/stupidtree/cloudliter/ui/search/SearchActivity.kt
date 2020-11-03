@@ -82,7 +82,7 @@ class SearchActivity : BaseActivity<SearchViewModel>() {
         })
 
         //为viewModel的各种data设置监听
-        viewModel!!.searchListStateLiveData?.observe(this, Observer { searchListState: DataState<List<UserSearched>> ->
+        viewModel!!.searchListStateLiveData?.observe(this, Observer { searchListState: DataState<List<UserSearched>?> ->
             Log.e("refresh", searchListState.data.toString())
             progressLoading!!.visibility = View.GONE
             if (searchListState.state == DataState.STATE.SUCCESS) {

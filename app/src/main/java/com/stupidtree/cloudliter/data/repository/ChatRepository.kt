@@ -41,8 +41,8 @@ class ChatRepository(context: Context) {
 
     // 动态数据对象：列表状态
     private var listDataState = MediatorLiveData<DataState<List<ChatMessage>?>>()
-    var localListState: LiveData<List<ChatMessage>?>? = null //本地获取数据
-    var webListState: LiveData<DataState<List<ChatMessage>?>>? = null //网络获取数据
+    private var localListState: LiveData<List<ChatMessage>?>? = null //本地获取数据
+    private var webListState: LiveData<DataState<List<ChatMessage>?>>? = null //网络获取数据
     fun getListDataState(): MediatorLiveData<DataState<List<ChatMessage>?>> {
         listDataState.addSource(socketWebSource.newMessageState) { message: ChatMessage? ->
             if (message != null) {
@@ -119,7 +119,6 @@ class ChatRepository(context: Context) {
      * @param afterId        现有列表底部的消息id
      */
     fun ActionFetchNewMessages(token: String, conversationId: String, afterId: String?) {
-        //尝试查询本地缺的
         listDataState.removeSource(webListState!!)
         webListState = chatMessageWebSource.getMessagesAfter(token, conversationId, afterId, false)
         listDataState.addSource(webListState!!) { result ->
@@ -201,7 +200,7 @@ class ChatRepository(context: Context) {
         val f = File(filePath)
         val tempMsg = ChatMessage(fromId, toId, filePath)
         tempMsg.setType(ChatMessage.TYPE.IMG)
-        listDataState.value = DataState(listOf(tempMsg) as List?).setListAction(LIST_ACTION.APPEND)
+        listDataState.value = DataState(listOf(tempMsg) as List?).setListAction(LIST_ACTION.APPEND_ONE)
         Luban.with(context)
                 .setTargetDir(context.getExternalFilesDir("image")!!.absolutePath)
                 .load(f)

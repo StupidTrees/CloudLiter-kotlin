@@ -1,5 +1,6 @@
 package com.stupidtree.cloudliter.ui.profile
 
+import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
@@ -33,6 +34,7 @@ import java.util.*
 /**
  * 其他用户（好友、搜索结果等）的资料页面Activity
  */
+@SuppressLint("NonConstantResourceId")
 class ProfileActivity : BaseActivity<ProfileViewModel>() {
     /**
      * View绑定区
@@ -64,6 +66,7 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
     @JvmField
     @BindView(R.id.avatar)
     var avatarImageView: ImageView? = null
+
 
     @JvmField
     @BindView(R.id.icon_color)
@@ -106,7 +109,7 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
     @BindView(R.id.wordstag_layout)
     var wordsCloudView: WordsCloudView? = null
     override fun onCreate(savedInstanceState: Bundle?) {
-        setWindowParams(true, true, false)
+        setWindowParams(statusBar = true, darkColor = true, navi = false)
         super.onCreate(savedInstanceState)
         setToolbarActionBack(toolbar!!)
     }
@@ -126,7 +129,7 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                 Toast.makeText(getThis(), "获取出错", Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel!!.makeFriendsResult?.observe(this, Observer { booleanDataState->
+        viewModel!!.makeFriendsResult?.observe(this, Observer { booleanDataState ->
             if (booleanDataState?.state === DataState.STATE.SUCCESS) {
                 //状态为成功
                 Toast.makeText(getThis(), R.string.send_request_success, Toast.LENGTH_SHORT).show()
@@ -161,77 +164,81 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
             }
         })
         viewModel!!.relationLiveData?.observe(this, Observer { userRelationDataState ->
-            if (userRelationDataState!!.state== DataState.STATE.SUCCESS) {
-                //是好友关系，则提供发消息入口
-                relationCard!!.visibility = View.VISIBLE
-                logoutButton!!.visibility = View.GONE
-                button!!.setText(R.string.send_message)
-                button!!.setIconResource(R.drawable.ic_baseline_message_24)
-                button!!.isEnabled = true
-                button!!.setOnClickListener { view: View? ->
-                    if (viewModel!!.userRelation != null && viewModel!!.userProfile != null && viewModel!!.userLocal != null) {
-                        ActivityUtils.startChatActivity(getThis(), viewModel!!.userProfile!!, viewModel!!.userRelation!!, viewModel!!.userLocal!!)
+            when {
+                userRelationDataState!!.state == DataState.STATE.SUCCESS -> {
+                    //是好友关系，则提供发消息入口
+                    relationCard!!.visibility = View.VISIBLE
+                    logoutButton!!.visibility = View.GONE
+                    button!!.setText(R.string.send_message)
+                    button!!.setIconResource(R.drawable.ic_baseline_message_24)
+                    button!!.isEnabled = true
+                    button!!.setOnClickListener { view: View? ->
+                        if (viewModel!!.getUserRelation() != null && viewModel!!.getUserProfile() != null && viewModel!!.getUserLocal() != null) {
+                            ActivityUtils.startChatActivity(getThis(), viewModel!!.getUserProfile()!!, viewModel!!.getUserRelation()!!, viewModel!!.getUserLocal()!!)
+                        }
+                    }
+                    remarkText!!.text = userRelationDataState.data!!.remark
+                    remarkLayout!!.setOnClickListener { view: View? ->
+                        val up = viewModel!!.getUserRelation()
+                        if (up != null) {
+                            PopUpEditText()
+                                    .setTitle(R.string.prompt_set_remark)
+                                    .setText(up.remark)
+                                    .setOnConfirmListener(object : PopUpEditText.OnConfirmListener {
+                                        override fun OnConfirm(text: String) {
+                                            //控制viewModel发起更改昵称请求
+                                            viewModel!!.startChangeRemark(text)
+                                        }
+                                    })
+                                    .show(supportFragmentManager, "edit")
+                        }
+                    }
+                    groupName!!.text = userRelationDataState.data!!.groupName
+                    groupLayout!!.setOnClickListener { view: View? ->
+                        if (viewModel!!.getUserRelation() != null) {
+                            //Log.e("relation", String.valueOf(viewModel.getUserRelation()));
+                            PickGroupDialog()
+                                    .setInitGroupId(viewModel!!.getUserRelation()!!.groupId)
+                                    .setOnConfirmListener(object : PickGroupDialog.OnConfirmListener {
+                                        override fun OnConfirmed(group: RelationGroup?) {
+                                            group?.let { viewModel!!.startAssignGroup(it) }
+                                        }
+                                    }).show(supportFragmentManager, "pick_group")
+                        }
+                    }
+                    deleteLayout!!.setOnClickListener { view: View? ->
+                        PopUpText() ///.setText(getString(R.string.attention_please))
+                                .setTitle(R.string.attention_delete_friend)
+                                .setOnConfirmListener { viewModel!!.startDeletingFriend(intent.getStringExtra("id")) }.show(supportFragmentManager, "attention")
                     }
                 }
-                remarkText!!.text = userRelationDataState.data!!.remark
-                remarkLayout!!.setOnClickListener { view: View? ->
-                    val up = viewModel!!.userRelation
-                    if (up != null) {
-                        PopUpEditText()
-                                .setTitle(R.string.prompt_set_remark)
-                                .setText(up.remark)
-                                .setOnConfirmListener (object:PopUpEditText.OnConfirmListener{
-                                    override fun OnConfirm(text: String) {
-                                        //控制viewModel发起更改昵称请求
-                                        viewModel!!.startChangeRemark(text)
-                                    }
-                                })
-                                .show(supportFragmentManager, "edit")
+                userRelationDataState.state === DataState.STATE.NOT_EXIST -> {
+                    //不是好友关系，则显示”添加好友“
+                    relationCard!!.visibility = View.GONE
+                    button!!.setText(R.string.make_friends)
+                    logoutButton!!.visibility = View.GONE
+                    button!!.isEnabled = true
+                    button!!.setIconResource(R.drawable.ic_baseline_person_add_24)
+                    button!!.setOnClickListener { view: View? ->
+                        //通知viewModel进行添加好友请求
+                        viewModel!!.startMakingFriends(intent.getStringExtra("id"))
                     }
+                    remarkLayout!!.setOnClickListener(null)
                 }
-                groupName!!.text = userRelationDataState.data!!.groupName
-                groupLayout!!.setOnClickListener { view: View? ->
-                    if (viewModel!!.userRelation != null) {
-                        //Log.e("relation", String.valueOf(viewModel.getUserRelation()));
-                        PickGroupDialog()
-                                .setInitGroupId(viewModel!!.userRelation!!.groupId)
-                                .setOnConfirmListener(object : PickGroupDialog.OnConfirmListener {
-                                    override fun OnConfirmed(group: RelationGroup?) {
-                                        group?.let { viewModel!!.startAssignGroup(it) }
-                                    }
-                                }).show(supportFragmentManager, "pick_group")
-                    }
+                userRelationDataState.state === DataState.STATE.SPECIAL -> {
+                    //是自己
+                    logoutButton!!.visibility = View.VISIBLE
+                    relationCard!!.visibility = View.GONE
+                    button!!.setText(R.string.edit_my_profile)
+                    button!!.isEnabled = true
+                    button!!.setIconResource(R.drawable.ic_baseline_edit_24)
+                    button!!.setOnClickListener { view: View? -> ActivityUtils.startMyProfileActivity(getThis()) }
+                    remarkLayout!!.setOnClickListener(null)
                 }
-                deleteLayout!!.setOnClickListener { view: View? ->
-                    PopUpText() ///.setText(getString(R.string.attention_please))
-                            .setTitle(R.string.attention_delete_friend)
-                            .setOnConfirmListener { viewModel!!.startDeletingFriend(intent.getStringExtra("id")) }.show(supportFragmentManager, "attention")
-                }
-            } else if (userRelationDataState.state === DataState.STATE.NOT_EXIST) {
-                //不是好友关系，则显示”添加好友“
-                relationCard!!.visibility = View.GONE
-                button!!.setText(R.string.make_friends)
-                logoutButton!!.visibility = View.GONE
-                button!!.isEnabled = true
-                button!!.setIconResource(R.drawable.ic_baseline_person_add_24)
-                button!!.setOnClickListener { view: View? ->
-                    //通知viewModel进行添加好友请求
-                    viewModel!!.startMakingFriends(intent.getStringExtra("id"))
-                }
-                remarkLayout!!.setOnClickListener(null)
-            } else if (userRelationDataState.state === DataState.STATE.SPECIAL) {
-                //是自己
-                logoutButton!!.visibility = View.VISIBLE
-                relationCard!!.visibility = View.GONE
-                button!!.setText(R.string.edit_my_profile)
-                button!!.isEnabled = true
-                button!!.setIconResource(R.drawable.ic_baseline_edit_24)
-                button!!.setOnClickListener { view: View? -> ActivityUtils.startMyProfileActivity(getThis()) }
-                remarkLayout!!.setOnClickListener(null)
             }
         })
         wordsCloudView!!.setData(listOf(getString(R.string.no_word_cloud_yet)))
-        viewModel!!.wordCloudLiveData?.observe(this, Observer { listDataState->
+        viewModel!!.wordCloudLiveData?.observe(this, Observer { listDataState ->
             if (listDataState.state === DataState.STATE.SUCCESS) {
                 val tag = ArrayList<String>()
                 for ((key) in listDataState.data!!) {

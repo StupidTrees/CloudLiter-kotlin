@@ -1,9 +1,7 @@
 package com.stupidtree.cloudliter.ui.main.contact
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.*
 import com.stupidtree.cloudliter.data.model.UserRelation
 import com.stupidtree.cloudliter.data.repository.FriendsRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
@@ -16,7 +14,7 @@ import java.util.*
  * 层次：ViewModel
  * 联系人页面Fragment所绑定的ViewModel
  */
-class ContactViewModel : ViewModel() {//switchMap的作用是
+class ContactViewModel(application: Application) : AndroidViewModel(application) {//switchMap的作用是
     //当ListController发生数据变更时，将用如下定义的方式更新listData的value
     /**
      * 获取联系人列表的LiveData
@@ -34,7 +32,7 @@ class ContactViewModel : ViewModel() {//switchMap的作用是
                 //当ListController发生数据变更时，将用如下定义的方式更新listData的value
                 field = Transformations.switchMap(listController) { input: Trigger ->
                     if (input.isActioning) {
-                        val user = localUserRepository.loggedInUser
+                        val user = localUserRepository.getLoggedInUser()
                         if (!user.isValid) {
                             return@switchMap MutableLiveData(DataState<List<UserRelation>?>(DataState.STATE.NOT_LOGGED_IN))
                         } else {
@@ -59,7 +57,7 @@ class ContactViewModel : ViewModel() {//switchMap的作用是
         get() {
             if (field == null) {
                 field = Transformations.switchMap(unReadController) {
-                    val userLocal = localUserRepository.loggedInUser
+                    val userLocal = localUserRepository.getLoggedInUser()
                     if (userLocal.isValid) {
                         return@switchMap relationRepository!!.countUnread(userLocal.token!!)
                     } else {
@@ -102,7 +100,7 @@ class ContactViewModel : ViewModel() {//switchMap的作用是
 
     init {
         friendsRepository = FriendsRepository.instance
-        localUserRepository = LocalUserRepository.getInstance()
+        localUserRepository = LocalUserRepository.getInstance(application)
         relationRepository = RelationRepository.instance
     }
 }

@@ -13,7 +13,7 @@ import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.ui.base.DataState
 import java.util.*
 
-class ConversationsViewModel(application: Application?) : AndroidViewModel(application!!) {
+class ConversationsViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * 数据区
      */
@@ -73,10 +73,10 @@ class ConversationsViewModel(application: Application?) : AndroidViewModel(appli
     private val conversationRepository: ConversationRepository? = getInstance(application!!)
 
     //本地用户仓库
-    private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance()
+    private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
 
     fun startRefresh() {
-        val userLocal = localUserRepository.loggedInUser
+        val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {
             conversationRepository!!.ActionGetConversations(userLocal.token!!)
         } else {
@@ -113,7 +113,7 @@ class ConversationsViewModel(application: Application?) : AndroidViewModel(appli
     }
 
     fun callOnline(context: Context) {
-        val userLocal = localUserRepository.loggedInUser
+        val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {
             conversationRepository!!.ActionCallOnline(context, userLocal)
         }

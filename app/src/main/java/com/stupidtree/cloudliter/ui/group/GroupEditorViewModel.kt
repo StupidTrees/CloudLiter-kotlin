@@ -1,18 +1,16 @@
 package com.stupidtree.cloudliter.ui.group
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.*
 import com.stupidtree.cloudliter.data.model.RelationGroup
 import com.stupidtree.cloudliter.data.repository.GroupRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.cloudliter.ui.base.StringTrigger
 import com.stupidtree.cloudliter.ui.base.Trigger
-import com.stupidtree.cloudliter.ui.myprofile.ChangeInfoTrigger
 import java.util.*
 
-class GroupEditorViewModel : ViewModel() {
+class GroupEditorViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * 数据区
      */
@@ -22,9 +20,9 @@ class GroupEditorViewModel : ViewModel() {
             if (field == null) {
                 listData = Transformations.switchMap(listDataController) { input: Trigger ->
                     if (input.isActioning) {
-                        val userLocal = localUserRepository.loggedInUser
+                        val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
-                            return@switchMap groupRepository.queryMyGroups(userLocal.token)
+                            return@switchMap groupRepository.queryMyGroups(userLocal.token!!)
                         } else {
                             return@switchMap MutableLiveData(DataState<List<RelationGroup>?>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -43,11 +41,11 @@ class GroupEditorViewModel : ViewModel() {
         get() {
             if (field == null) {
                 //也是一样的
-                addGroupResult = Transformations.switchMap(addGroupController) { input: ChangeInfoTrigger ->
+                addGroupResult = Transformations.switchMap(addGroupController) { input: StringTrigger ->
                     if (input.isActioning) {
-                        val userLocal = localUserRepository.loggedInUser
+                        val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
-                            return@switchMap groupRepository.addMyGroups(userLocal.token!!, input.value)
+                            return@switchMap groupRepository.addMyGroups(userLocal.token!!, input.data!!)
                         } else {
                             return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -59,19 +57,19 @@ class GroupEditorViewModel : ViewModel() {
         }
 
     //Trigger：控制添加请求的发送
-    var addGroupController = MutableLiveData<ChangeInfoTrigger>()
+    var addGroupController = MutableLiveData<StringTrigger>()
 
     //状态数据：删除分组的结果
     var deleteGroupResult: LiveData<DataState<String?>>? = null
         get() {
             if (field == null) {
                 //也是一样的
-                deleteGroupResult = Transformations.switchMap(deleteGroupController) { input: ChangeInfoTrigger ->
+                deleteGroupResult = Transformations.switchMap(deleteGroupController) { input: StringTrigger ->
                     if (input.isActioning) {
-                        val userLocal = localUserRepository.loggedInUser
+                        val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
                             //System.out.println("viewmodel stage:func: getDeleteGroupResult return is "+groupRepository.deleteMyGroups(userLocal.getToken(),input.getValue()));
-                            return@switchMap groupRepository.deleteMyGroups(userLocal.token!!, input.value)
+                            return@switchMap groupRepository.deleteMyGroups(userLocal.token!!, input.data!!)
                         } else {
                             //System.out.println("viewmodel stage: no log in,func: getDeleteGroupResult return is "+groupRepository.deleteMyGroups(userLocal.getToken(),input.getValue()));
                             return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
@@ -84,7 +82,7 @@ class GroupEditorViewModel : ViewModel() {
         }
 
     //Trigger：控制删除请求的发送
-    var deleteGroupController = MutableLiveData<ChangeInfoTrigger>()
+    var deleteGroupController = MutableLiveData<StringTrigger>()
 
     /**
      * 仓库区
@@ -102,7 +100,7 @@ class GroupEditorViewModel : ViewModel() {
      */
     fun startAddGroup(group: String) {
         println("viewmodel stage:func: startAddGroup group is $group")
-        addGroupController.value = ChangeInfoTrigger.getActioning(group)
+        addGroupController.value = StringTrigger.getActioning(group)
     }
 
     /**
@@ -111,7 +109,7 @@ class GroupEditorViewModel : ViewModel() {
      */
     fun startDeleteGroup(group: String) {
         println("viewmodel stage:func: startDeleteGroup group is $group")
-        deleteGroupController.value = ChangeInfoTrigger.getActioning(group)
+        deleteGroupController.value = StringTrigger.getActioning(group)
     }
 
     /**
@@ -124,7 +122,7 @@ class GroupEditorViewModel : ViewModel() {
 
 
     init {
-        groupRepository = GroupRepository.getInstance()
-        localUserRepository = LocalUserRepository.getInstance()
+        groupRepository = GroupRepository.instance!!
+        localUserRepository = LocalUserRepository.getInstance(application)
     }
 }

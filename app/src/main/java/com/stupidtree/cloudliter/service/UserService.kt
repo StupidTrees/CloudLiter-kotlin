@@ -1,33 +1,19 @@
-package com.stupidtree.cloudliter.service;
+package com.stupidtree.cloudliter.service
 
-import androidx.lifecycle.LiveData;
-
-import com.google.gson.JsonObject;
-import com.stupidtree.cloudliter.data.model.ApiResponse;
-import com.stupidtree.cloudliter.data.model.UserProfile;
-import com.stupidtree.cloudliter.data.model.UserSearched;
-
-import java.util.HashMap;
-import java.util.List;
-
-import okhttp3.MultipartBody;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
-import retrofit2.http.GET;
-import retrofit2.http.Header;
-import retrofit2.http.Multipart;
-import retrofit2.http.POST;
-import retrofit2.http.Part;
-import retrofit2.http.Query;
-
+import androidx.lifecycle.LiveData
+import com.google.gson.JsonObject
+import com.stupidtree.cloudliter.data.model.ApiResponse
+import com.stupidtree.cloudliter.data.model.UserProfile
+import com.stupidtree.cloudliter.data.model.UserSearched
+import okhttp3.MultipartBody
+import retrofit2.http.*
+import java.util.*
 
 /**
  * 层次：Service
  * 用户网络服务
  */
-public interface UserService {
-
-
+interface UserService {
     /**
      * 用户登录
      * @param username 用户名
@@ -36,8 +22,8 @@ public interface UserService {
      */
     @FormUrlEncoded
     @POST("/user/login")
-    LiveData<ApiResponse<JsonObject>> login(@Field("username") String username,
-                                            @Field("password") String password);
+    fun login(@Field("username") username: String?,
+              @Field("password") password: String?): LiveData<ApiResponse<JsonObject?>?>
 
     /**
      * 用户注册
@@ -49,10 +35,10 @@ public interface UserService {
      */
     @FormUrlEncoded
     @POST("/user/sign_up")
-    LiveData<ApiResponse<JsonObject>> signUp(@Field("username") String username,
-                           @Field("password") String password,
-                            @Field("gender") String gender,
-                            @Field("nickname") String nickname);
+    fun signUp(@Field("username") username: String?,
+               @Field("password") password: String?,
+               @Field("gender") gender: String?,
+               @Field("nickname") nickname: String?): LiveData<ApiResponse<JsonObject?>?>
 
     /**
      * 用户资料获取
@@ -61,9 +47,8 @@ public interface UserService {
      * @return call，返回的会是用户基本资料
      */
     @GET("/user/profile/get")
-    LiveData<ApiResponse<UserProfile>> getUserProfile(@Query("id") String id,
-                                                  @Header("token") String token);
-
+    fun getUserProfile(@Query("id") id: String?,
+                       @Header("token") token: String?): LiveData<ApiResponse<UserProfile?>?>
 
     /**
      * 根据语句搜索用户
@@ -72,8 +57,8 @@ public interface UserService {
      * @return 搜索结果
      */
     @GET("/user/search")
-    LiveData<ApiResponse<List<UserSearched>>> searchUser(@Query("text") String text,
-                                                     @Header("token") String token);
+    fun searchUser(@Query("text") text: String?,
+                   @Header("token") token: String?): LiveData<ApiResponse<List<UserSearched>?>?>
 
     /**
      * 上传头像
@@ -83,7 +68,7 @@ public interface UserService {
      */
     @Multipart
     @POST("/user/profile/upload_avatar")
-    LiveData<ApiResponse<JsonObject>> uploadAvatar(@Part MultipartBody.Part file,@Header("token") String token);
+    fun uploadAvatar(@Part file: MultipartBody.Part?, @Header("token") token: String?): LiveData<ApiResponse<JsonObject?>?>
 
     /**
      * 更换昵称
@@ -93,8 +78,7 @@ public interface UserService {
      */
     @FormUrlEncoded
     @POST("/user/profile/change_nickname")
-    LiveData<ApiResponse<Object>> changeNickname(@Field("nickname")String nickname,@Header("token")String token);
-
+    fun changeNickname(@Field("nickname") nickname: String?, @Header("token") token: String?): LiveData<ApiResponse<Any?>?>
 
     /**
      * 更换性别
@@ -104,7 +88,7 @@ public interface UserService {
      */
     @FormUrlEncoded
     @POST("/user/profile/change_gender")
-    LiveData<ApiResponse<Object>> changeGender(@Field("gender")String gender,@Header("token")String token);
+    fun changeGender(@Field("gender") gender: String?, @Header("token") token: String?): LiveData<ApiResponse<Any?>?>
 
     /**
      * 更换颜色
@@ -114,8 +98,7 @@ public interface UserService {
      */
     @FormUrlEncoded
     @POST("/user/profile/change_color")
-    LiveData<ApiResponse<Object>> changeColor(@Field("color")String color,@Header("token")String token);
-
+    fun changeColor(@Field("color") color: String?, @Header("token") token: String?): LiveData<ApiResponse<Any?>?>
 
     /**
      * 更换签名
@@ -125,9 +108,7 @@ public interface UserService {
      */
     @FormUrlEncoded
     @POST("/user/profile/change_signature")
-    LiveData<ApiResponse<Object>> changeSignature(@Field("signature")String signature,@Header("token")String token);
-
-
+    fun changeSignature(@Field("signature") signature: String?, @Header("token") token: String?): LiveData<ApiResponse<Any?>?>
 
     /**
      * 获取用户词云
@@ -135,9 +116,5 @@ public interface UserService {
      * @return 搜索结果
      */
     @GET("/user/profile/word_cloud")
-    LiveData<ApiResponse<HashMap<String,Float>>> getWordCloud( @Header("token") String token,@Query("userId") String userId);
-
-
+    fun getWordCloud(@Header("token") token: String?, @Query("userId") userId: String?): LiveData<ApiResponse<HashMap<String, Float?>?>?>
 }
-
-

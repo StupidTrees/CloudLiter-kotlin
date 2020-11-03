@@ -1,16 +1,14 @@
 package com.stupidtree.cloudliter.ui.relation
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.*
 import com.stupidtree.cloudliter.data.model.UserRelation
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.RelationRepository
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.myprofile.ChangeInfoTrigger
 
-class RelationViewModel : ViewModel() {
+class RelationViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * 数据区
      */
@@ -21,7 +19,7 @@ class RelationViewModel : ViewModel() {
                 relationData = Transformations.switchMap(relationQueryController) { input: RelationQueryTrigger ->
                     if (input.isActioning) {
                         if (localUserRepository.isUserLoggedIn) {
-                            return@switchMap relationRepository.queryRelation(localUserRepository.loggedInUser.token!!,
+                            return@switchMap relationRepository.queryRelation(localUserRepository.getLoggedInUser().token!!,
                                     input.friendId)
                         } else {
                             return@switchMap MutableLiveData(DataState<UserRelation?>(DataState.STATE.NOT_LOGGED_IN))
@@ -43,7 +41,7 @@ class RelationViewModel : ViewModel() {
                 //也是一样的
                 changeRemarkResult = Transformations.switchMap(changeRemarkController) { input: ChangeInfoTrigger ->
                     if (input.isActioning) {
-                        val userLocal = localUserRepository.loggedInUser
+                        val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid && relationData!!.value != null) {
                             println("friend id is" + relationData!!.value!!.data!!.friendId)
                             return@switchMap relationRepository.changeRemark(userLocal.token!!, input.value, relationData!!.value!!.data!!.friendId)
@@ -76,7 +74,7 @@ class RelationViewModel : ViewModel() {
     }
 
     init {
-        localUserRepository = LocalUserRepository.getInstance()
+        localUserRepository = LocalUserRepository.getInstance(application)
         relationRepository = RelationRepository.instance!!
     }
 }

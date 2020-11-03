@@ -81,31 +81,31 @@ class SocketIOClientService : Service() {
                         if (intent.getStringExtra("userId") != null) {
                             socket!!.emit("logout", intent.getStringExtra("userId"))
                         }
-                        //从新消息队列中把该对话下的所有消息删除
-                        val conversationId = intent.getStringExtra("conversationId")
-                        val topTime = intent.getLongExtra("topTime", -1)
-                        val num = intent.getIntExtra("num", -1)
-                        val userId = intent.getStringExtra("userId")
-                        Log.e("mark_all_read", incomingMessage.toString())
-                        for (binder in binders.values) {
-                            if (binder.onMessageReadListener != null) {
-                                val map = HashMap<String, Int>()
-                                 map[conversationId!!] = num
-                                binder.onMessageReadListener!!.OnMessageRead(map)
-                            }
-                        }
-                        val oldCount0 = incomingMessage[conversationId]
-                        if (oldCount0 != null && oldCount0 <= num) {
-                            incomingMessage.remove(conversationId)
-                        } else if (oldCount0 != null) {
-                            incomingMessage[conversationId!!] = oldCount0 - num
-                        }
-                        incomingMessage.remove(conversationId)
-                        if (topTime > 0) {
-                            socket!!.emit("mark_all_read", userId, conversationId, topTime)
-                        }
+//                        val conversationId = intent.getStringExtra("conversationId")
+//                        val topTime = intent.getLongExtra("topTime", -1)
+//                        val num = intent.getIntExtra("num", -1)
+//                        val userId = intent.getStringExtra("userId")
+//                        Log.e("mark_all_read", incomingMessage.toString())
+//                        for (binder in binders.values) {
+//                            if (binder.onMessageReadListener != null) {
+//                                val map = HashMap<String, Int>()
+//                                 map[conversationId!!] = num
+//                                binder.onMessageReadListener!!.OnMessageRead(map)
+//                            }
+//                        }
+//                        val oldCount0 = incomingMessage[conversationId]
+//                        if (oldCount0 != null && oldCount0 <= num) {
+//                            incomingMessage.remove(conversationId)
+//                        } else if (oldCount0 != null) {
+//                            incomingMessage[conversationId!!] = oldCount0 - num
+//                        }
+//                        incomingMessage.remove(conversationId)
+//                        if (topTime > 0) {
+//                            socket!!.emit("mark_all_read", userId, conversationId, topTime)
+//                        }
                     }
                     ACTION_MARK_ALL_READ -> {
+                        //从新消息队列中把该对话下的所有消息删除
                         val conversationId = intent.getStringExtra("conversationId")
                         val topTime = intent.getLongExtra("topTime", -1)
                         val num = intent.getIntExtra("num", -1)
@@ -336,7 +336,7 @@ class SocketIOClientService : Service() {
             notificationBuilder.setCustomContentView(rv)
             rv.setTextViewText(R.id.content, message.friendRemark)
             rv.setTextViewText(R.id.title, newContent)
-            val ul = LocalUserRepository.getInstance().loggedInUser
+            val ul = LocalUserRepository.getInstance(application).getLoggedInUser()
             if (ul.isValid) {
                 val i = ActivityUtils.getIntentForChatActivity(this, message)
                 notificationBuilder.setContentIntent(PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT))
@@ -355,7 +355,7 @@ class SocketIOClientService : Service() {
             rv.setTextViewText(R.id.title, newContent)
             rv.setTextViewText(R.id.content, message.friendRemark)
             notificationBuilder.priority = Notification.PRIORITY_HIGH
-            val ul = LocalUserRepository.getInstance().loggedInUser
+            val ul = LocalUserRepository.getInstance(application).getLoggedInUser()
             if (ul.isValid) {
                 val i = ActivityUtils.getIntentForChatActivity(this, message)
                 notificationBuilder.setContentIntent(PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT))
