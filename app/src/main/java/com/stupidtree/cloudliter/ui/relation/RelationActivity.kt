@@ -9,7 +9,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import butterknife.BindView
 import com.stupidtree.cloudliter.R
-import com.stupidtree.cloudliter.data.model.UserRelation
 import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.widgets.PopUpEditText
@@ -47,10 +46,12 @@ class RelationActivity : BaseActivity<RelationViewModel>() {
                 PopUpEditText()
                         .setTitle(R.string.prompt_set_remark)
                         .setText(up.data!!.remark)
-                        .setOnConfirmListener { text: String? ->
-                            //控制viewModel发起更改昵称请求
-                            viewModel!!.startChangeRemark(text)
-                        }
+                        .setOnConfirmListener(object :PopUpEditText.OnConfirmListener{
+                            override fun OnConfirm(text: String) {
+                                //控制viewModel发起更改昵称请求
+                                viewModel!!.startChangeRemark(text)
+                            }
+                        })
                         .show(supportFragmentManager, "edit")
             }
         }

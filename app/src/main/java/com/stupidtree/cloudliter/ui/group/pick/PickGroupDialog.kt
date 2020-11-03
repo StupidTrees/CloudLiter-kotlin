@@ -72,7 +72,7 @@ class PickGroupDialog : TransparentBottomSheetDialog() {
         listAdapter = LAdapter(requireContext(), LinkedList())
         list!!.adapter = listAdapter
         list!!.layoutManager = LinearLayoutManager(requireContext())
-        viewModel!!.getListData().observe(this, Observer { listDataState: DataState<List<RelationGroup>> ->
+        viewModel!!.listData?.observe(this, Observer { listDataState: DataState<List<RelationGroup>?> ->
             loading!!.visibility = View.INVISIBLE
             if (listDataState.state === DataState.STATE.SUCCESS) {
                 listAdapter!!.setSelected(listDataState.data!!, initGroupId)

@@ -7,7 +7,6 @@ import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Parcel
-import android.os.Parcelable
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -197,7 +196,7 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
                 if (listDataState.listAction === DataState.LIST_ACTION.APPEND_ONE) {
                     val theOne = listDataState.data!![0]
                     //对方发出的，标为已读
-                    if (viewModel!!.myId != theOne.getFromId()) {
+                    if (viewModel!!.myId != theOne.fromId) {
                         viewModel!!.markRead(this, theOne)
                     }
                     listAdapter.notifyItemsAppended(listDataState.data!!)
@@ -316,7 +315,7 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
             override fun onItemClick(data: ChatMessage, card: View?, position: Int) {
                 if (data.getType() == ChatMessage.TYPE.IMG && !data.isTimeStamp) {
                     val urls = listAdapter.imageUrls
-                    ActivityUtils.showMultipleImages(getThis(), urls, urls.indexOf(ImageUtils.getChatMessageImageUrl(data.getContent()))
+                    ActivityUtils.showMultipleImages(getThis(), urls, urls.indexOf(ImageUtils.getChatMessageImageUrl(data.content))
                     )
                 }
             }
@@ -373,7 +372,7 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
         val yunmojiOnItemClickListener: BaseListAdapter.OnItemClickListener<Yunmoji> =
                 object : BaseListAdapter.OnItemClickListener<Yunmoji> {
                     override fun onItemClick(data: Yunmoji, card: View?, position: Int) {
-                        inputEditText!!.append(data.getLastname(position))
+                        inputEditText!!.append(data.getLastName(position))
                     }
                 }
         yunmojiListAdapter.setOnItemClickListener(yunmojiOnItemClickListener)

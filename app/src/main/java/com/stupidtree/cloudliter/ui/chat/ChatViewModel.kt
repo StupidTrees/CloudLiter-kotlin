@@ -105,28 +105,28 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                         LIST_ACTION.APPEND_ONE -> {
                             Log.e("listAppendOne", input2.data.toString())
                             //不是这个窗口的消息
-                            if (input2.data!![0].getConversationId() != conversationId) {
+                            if (input2.data!![0].conversationId != conversationId) {
                                 return@map DataState<List<ChatMessage>?>(DataState.STATE.NOTHING)
                             }
-                            bottomId = input2.data!![0].getId()
+                            bottomId = input2.data!![0].id
                         }
                         LIST_ACTION.APPEND -> {
                             //拉取一堆新消息
                             Log.e("listAppend", input2.data.toString())
-                            bottomId = input2.data!![0].getId()
-                            markAllRead(context.applicationContext, input2.data!![input2.data!!.size - 1].getId())
+                            bottomId = input2.data!![0].id
+                            markAllRead(context.applicationContext, input2.data!![input2.data!!.size - 1].id)
                         }
                         LIST_ACTION.REPLACE_ALL -> {
                             //初次进入
-                            topId = input2.data!![input2.data!!.size - 1].getId()
-                            topTime = input2.data!![input2.data!!.size - 1].createdTime
-                            bottomId = input2.data!![0].getId()
+                            topId = input2.data!![input2.data!!.size - 1].id
+                            topTime = input2.data!![input2.data!!.size - 1].createdAt
+                            bottomId = input2.data!![0].id
                             markAllRead(context.applicationContext, topId!!)
                         }
                         LIST_ACTION.PUSH_HEAD -> {
                             //下拉加载
-                            topId = input2.data!![input2.data!!.size - 1].getId()
-                            topTime = input2.data!![input2.data!!.size - 1].createdTime
+                            topId = input2.data!![input2.data!!.size - 1].id
+                            topTime = input2.data!![input2.data!!.size - 1].createdAt
                             markAllRead(context.applicationContext, topId!!)
                         }
                     }
@@ -188,15 +188,17 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun fetchHistoryData() {
         val userLocal = localUserRepository.loggedInUser
-        if (userLocal.isValid && conversationId != null) {
-            chatRepository.ActionFetchMessages(
-                    userLocal.token!!,
-                    conversationId,
-                    null,
-                    topTime,
-                    pageSize,
-                    LIST_ACTION.REPLACE_ALL
-            )
+        if (userLocal.isValid) {
+            conversationId?.let {
+                chatRepository.ActionFetchMessages(
+                        userLocal.token!!,
+                        it,
+                        null,
+                        topTime,
+                        pageSize,
+                        LIST_ACTION.REPLACE_ALL
+                )
+            }
         }
     }
 
@@ -205,12 +207,14 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun fetchNewData() {
         val userLocal = localUserRepository.loggedInUser
-        if (userLocal.isValid && conversationId != null) {
-            chatRepository.ActionFetchNewMessages(
-                    userLocal.token!!,
-                    conversationId,
-                    bottomId
-            )
+        if (userLocal.isValid) {
+            conversationId?.let {
+                chatRepository.ActionFetchNewMessages(
+                        userLocal.token!!,
+                        it,
+                        bottomId
+                )
+            }
         }
     }
 
@@ -219,15 +223,17 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun loadMore() {
         val userLocal = localUserRepository.loggedInUser
-        if (userLocal.isValid && conversationId != null) {
-            chatRepository.ActionFetchMessages(
-                    userLocal.token!!,
-                    conversationId,
-                    topId,
-                    topTime,
-                    pageSize,
-                    LIST_ACTION.PUSH_HEAD
-            )
+        if (userLocal.isValid) {
+            conversationId?.let {
+                chatRepository.ActionFetchMessages(
+                        userLocal.token!!,
+                        it,
+                        topId,
+                        topTime,
+                        pageSize,
+                        LIST_ACTION.PUSH_HEAD
+                )
+            }
         }
     }
 
@@ -281,7 +287,11 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun markRead(context: Context, chatMessage: ChatMessage) {
-        chatRepository.ActionMarkRead(context, chatMessage.getToId(), chatMessage.getId(), chatMessage.getConversationId())
+        chatMessage.toId?.let {
+            chatMessage.conversationId?.let { it1 ->
+                chatRepository.ActionMarkRead(context, it, chatMessage.id, it1)
+            }
+        }
     }
 
     init {

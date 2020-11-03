@@ -41,7 +41,7 @@ class ChatRepository(context: Context) {
 
     // 动态数据对象：列表状态
     private var listDataState = MediatorLiveData<DataState<List<ChatMessage>?>>()
-    var localListState: LiveData<List<ChatMessage>>? = null //本地获取数据
+    var localListState: LiveData<List<ChatMessage>?>? = null //本地获取数据
     var webListState: LiveData<DataState<List<ChatMessage>?>>? = null //网络获取数据
     fun getListDataState(): MediatorLiveData<DataState<List<ChatMessage>?>> {
         listDataState.addSource(socketWebSource.newMessageState) { message: ChatMessage? ->
@@ -54,7 +54,7 @@ class ChatRepository(context: Context) {
         listDataState.addSource(messageSentSate) { chatMessageDataState: DataState<ChatMessage> ->
             listDataState.removeSource(localListState!!)
             val sentMessage = chatMessageDataState.data
-            saveMessageAsync(sentMessage)
+            sentMessage?.let { saveMessageAsync(it) }
         }
         listDataState.addSource(messageReadState) { messageReadNotificationDataState: DataState<MessageReadNotification> ->
             listDataState.removeSource(localListState!!)
@@ -72,7 +72,7 @@ class ChatRepository(context: Context) {
      * @param pageSize       分页大小
      * @param action         操作：全部刷新或在头部插入
      */
-    fun ActionFetchMessages(token: String, conversationId: String?, topId: String?, topTime: Timestamp?, pageSize: Int, action: LIST_ACTION) {
+    fun ActionFetchMessages(token: String, conversationId: String, topId: String?, topTime: Timestamp?, pageSize: Int, action: LIST_ACTION) {
         localListState?.let { listDataState.removeSource(it) }
         Log.e("fromId", topId.toString())
         localListState = if (topId == null) {
@@ -81,12 +81,12 @@ class ChatRepository(context: Context) {
             chatMessageDao.getMessages(conversationId, pageSize, topTime)
         }
 
-        listDataState.addSource(localListState!!) { chatMessages: List<ChatMessage> ->
-            listDataState.value = DataState(chatMessages as List?).setListAction(action)
-            if (action === LIST_ACTION.REPLACE_ALL && topId == null && chatMessages.size > 0) { //第一次获取，且本地已有消息
+        listDataState.addSource(localListState!!) { chatMessages ->
+            listDataState.value = DataState(chatMessages).setListAction(action)
+            if (action === LIST_ACTION.REPLACE_ALL && topId == null && chatMessages != null && chatMessages.isNotEmpty()) { //第一次获取，且本地已有消息
                 //那么从本地的最早消息开始，把消息全部拉取更新
                 webListState?.let { listDataState.removeSource(it) }
-                webListState = chatMessageWebSource.getMessagesAfter(token, conversationId, chatMessages[chatMessages.size - 1].getId(), true)
+                webListState = chatMessageWebSource.getMessagesAfter(token, conversationId, chatMessages[chatMessages.size - 1].id, true)
                 listDataState.addSource(webListState!!) { result ->
                     if (result.state === DataState.STATE.SUCCESS && result.data!!.isNotEmpty()) {
                         listDataState.removeSource(localListState!!)
@@ -101,12 +101,15 @@ class ChatRepository(context: Context) {
                     if (result.state === DataState.STATE.SUCCESS && result.data!!.size > 0) {
                         listDataState.removeSource(localListState!!)
                         saveMessageAsync(ArrayList(result.data))
-                        listDataState.setValue(result.setListAction(action).setRetry(chatMessages.size > 0))
+                        if (chatMessages != null) {
+                            listDataState.value = result.setListAction(action).setRetry(chatMessages.size > 0)
+                        }
                     }
                 }
             }
         }
     }
+
 
     /**
      * 动作：获取新消息
@@ -115,7 +118,7 @@ class ChatRepository(context: Context) {
      * @param conversationId 对话id
      * @param afterId        现有列表底部的消息id
      */
-    fun ActionFetchNewMessages(token: String, conversationId: String?, afterId: String?) {
+    fun ActionFetchNewMessages(token: String, conversationId: String, afterId: String?) {
         //尝试查询本地缺的
         listDataState.removeSource(webListState!!)
         webListState = chatMessageWebSource.getMessagesAfter(token, conversationId, afterId, false)
@@ -242,7 +245,7 @@ class ChatRepository(context: Context) {
         socketWebSource.unbindService(context)
     }
 
-    private fun saveMessageAsync(chatMessage: ChatMessage?) {
+    private fun saveMessageAsync(chatMessage: ChatMessage) {
         Thread(Runnable { chatMessageDao.saveMessage(listOf(chatMessage)) }).start()
     }
 

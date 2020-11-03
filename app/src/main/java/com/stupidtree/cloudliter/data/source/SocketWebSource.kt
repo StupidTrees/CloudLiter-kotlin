@@ -38,7 +38,9 @@ class SocketWebSource : BroadcastReceiver() {
                     newMessageState.value = message
                     //                        unreadMessages.setValue(new DataState<>(Collections.singletonList(message)).setListAction(DataState.LIST_ACTION.APPEND));
                     val map = HashMap<String, Int>()
-                    map[message.getConversationId()] = 1
+                    message.conversationId?.let {
+                        map[it] = 1
+                    }
                     unreadMessageState.value = DataState(map).setListAction(DataState.LIST_ACTION.APPEND)
                 }
             }
@@ -73,14 +75,21 @@ class SocketWebSource : BroadcastReceiver() {
             //服务与活动成功绑定
             Log.e("ChatActivity", "服务与活动成功绑定")
             binder = iBinder as JWebSocketClientBinder
-            binder!!.setOnUnreadFetchedListener { unread: HashMap<String, Int> ->
-                Log.e("获取未读消息", unread.toString())
-                unreadMessageState.postValue(DataState(unread).setListAction(DataState.LIST_ACTION.REPLACE_ALL))
+            binder!!.onUnreadFetchedListener = object : SocketIOClientService.OnUnreadFetchedListener {
+                override fun OnUnreadFetched(unread: HashMap<String, Int>) {
+                    Log.e("获取未读消息", unread.toString())
+                    unreadMessageState.postValue(DataState(unread).setListAction(DataState.LIST_ACTION.REPLACE_ALL))
+
+                }
             }
-            binder!!.setOnMessageReadListener { map: HashMap<String, Int> ->
-                Log.e("已读更新", map.toString())
-                unreadMessageState.postValue(DataState(map).setListAction(DataState.LIST_ACTION.DELETE))
+            binder!!.onMessageReadListener = object :SocketIOClientService.OnMessageReadListener{
+                override fun OnMessageRead(map: HashMap<String, Int>) {
+                    Log.e("已读更新", map.toString())
+                    unreadMessageState.postValue(DataState(map).setListAction(DataState.LIST_ACTION.DELETE))
+
+                }
             }
+
         }
 
         override fun onServiceDisconnected(componentName: ComponentName) {
@@ -107,7 +116,7 @@ class SocketWebSource : BroadcastReceiver() {
         from.unbindService(serviceConnection)
     }
 
-    fun sendMessage(message: ChatMessage?) {
+    fun sendMessage(message: ChatMessage) {
         if (binder != null) {
             binder!!.sendMessage(message)
         }

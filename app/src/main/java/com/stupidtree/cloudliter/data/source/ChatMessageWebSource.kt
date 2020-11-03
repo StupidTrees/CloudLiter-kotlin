@@ -33,7 +33,7 @@ class ChatMessageWebSource : BaseWebSource<ChatMessageService>(Retrofit.Builder(
      * @param id    对话id
      * @return 获取结果
      */
-    fun getMessages(token: String, id: String?, fromId: String?, pageSize: Int): LiveData<DataState<List<ChatMessage>?>> {
+    fun getMessages(token: String, id: String, fromId: String?, pageSize: Int): LiveData<DataState<List<ChatMessage>?>> {
         // Log.e("getMes",token+"-"+fromId+"-"+pageSize);
         return Transformations.map(this.service.getChatMessages(token,id,fromId,pageSize)) { input:ApiResponse<List<ChatMessage>?>?
             ->
@@ -60,7 +60,7 @@ class ChatMessageWebSource : BaseWebSource<ChatMessageService>(Retrofit.Builder(
      * @param afterId 查询该id之后的消息
      * @return 获取结果
      */
-    fun getMessagesAfter(token: String, id: String?, afterId: String?, includeBound: Boolean): LiveData<DataState<List<ChatMessage>?>>? {
+    fun getMessagesAfter(token: String, id: String, afterId: String?, includeBound: Boolean): LiveData<DataState<List<ChatMessage>?>>? {
         return Transformations.map(service.getMessagesAfter(token,id,afterId,includeBound)){
             input: ApiResponse<List<ChatMessage>?>? ->
             if (null == input) {
@@ -83,7 +83,7 @@ class ChatMessageWebSource : BaseWebSource<ChatMessageService>(Retrofit.Builder(
      * @param file  文件
      * @return 返回结果
      */
-    fun sendImageMessage(token: String, toId: String, file: MultipartBody.Part, uuid: String): LiveData<DataState<ChatMessage?>> {
+    fun sendImageMessage(token: String, toId: String, file: MultipartBody.Part, uuid: String?): LiveData<DataState<ChatMessage?>> {
         return Transformations.map(service.sendImageMessage(token, toId, file, uuid)) { input: ApiResponse<ChatMessage?>? ->
             Log.e("发送图片结果", input.toString())
             if (input == null) {

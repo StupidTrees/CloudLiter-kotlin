@@ -50,7 +50,7 @@ public class LocalUserRepository {
     public void logout(@NonNull Context context){
         if(loggedInUser!=null){
             Intent i = new Intent(ACTION_OFFLINE);
-            i.putExtra("userId",loggedInUser.getId());
+            i.putExtra("userId", loggedInUser.getId());
             context.sendBroadcast(i);
         }
         loggedInUser = null;

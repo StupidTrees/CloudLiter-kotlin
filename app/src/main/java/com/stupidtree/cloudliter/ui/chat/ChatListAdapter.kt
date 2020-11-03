@@ -17,6 +17,7 @@ import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils
 import java.sql.Timestamp
 import java.util.*
+import kotlin.math.abs
 
 /**
  * 聊天列表的适配器
@@ -37,7 +38,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         val cm = mBeans[position]
         return if (cm.isTimeStamp) {
             TYPE_TIME
-        } else if (cm.getToId() == chatActivity.viewModel!!.myId) {
+        } else if (cm.toId == chatActivity.viewModel!!.myId) {
             if (cm.getType() == ChatMessage.TYPE.IMG) TYPE_FRIEND_IMAGE else TYPE_FRIEND
         } else {
             if (cm.getType() == ChatMessage.TYPE.IMG) TYPE_MINE_IMAGE else TYPE_MINE
@@ -48,13 +49,13 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         return CHolder(v, viewType)
     }
 
-    protected override fun bindHolder(holder: CHolder, data: ChatMessage?, position: Int) {
+    override fun bindHolder(holder: CHolder, data: ChatMessage?, position: Int) {
         if (data != null) {
             if (holder.read != null) {
-                holder.read!!.visibility = if (data.isRead) View.VISIBLE else View.GONE
+                holder.read!!.visibility = if (data.read) View.VISIBLE else View.GONE
             }
             if (holder.viewType == TYPE_TIME && holder.content != null) {
-                holder.content!!.text = TextUtils.getChatTimeText(chatActivity, data.createdTime)
+                holder.content!!.text = TextUtils.getChatTimeText(chatActivity, data.createdAt)
             } else if (holder.avatar != null) {
                 if (holder.viewType == TYPE_MINE || holder.viewType == TYPE_MINE_IMAGE) {
                     ImageUtils.loadLocalAvatarInto(chatActivity, chatActivity.viewModel!!.myAvatar, holder.avatar!!)
@@ -69,16 +70,16 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                     }
                 }
                 holder.bindSensitiveAndEmotion(data)
-                holder.avatar!!.setOnClickListener { view: View? -> ActivityUtils.startProfileActivity(chatActivity, data.getFromId()) }
+                holder.avatar!!.setOnClickListener { view: View? -> data.fromId?.let { ActivityUtils.startProfileActivity(chatActivity, it) } }
                 if (holder.image != null && holder.progress != null) {
                     if (holder.progress!!.visibility != View.VISIBLE) {
-                        ImageUtils.loadChatMessageInto(chatActivity, data.getContent(), holder.image!!)
+                        ImageUtils.loadChatMessageInto(chatActivity, data.content, holder.image!!)
                     } else {
                         //Glide.with(getThis()).load(data.getContent()).into(holder.image);
                         holder.image!!.setImageResource(R.drawable.place_holder_loading)
                     }
                 } else if (holder.image != null) {
-                    ImageUtils.loadChatMessageInto(chatActivity, data.getContent(), holder.image!!)
+                    ImageUtils.loadChatMessageInto(chatActivity, data.content, holder.image!!)
                 }
             }
             holder.bindClickAction(data, position)
@@ -95,7 +96,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             val res: MutableList<String> = ArrayList()
             for (cm in mBeans) {
                 if (!cm.isTimeStamp && cm.getType() == ChatMessage.TYPE.IMG) {
-                    res.add(ImageUtils.getChatMessageImageUrl(cm.getContent()))
+                    res.add(ImageUtils.getChatMessageImageUrl(cm.content))
                 }
             }
             return res
@@ -104,8 +105,11 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
     /**
      * 判断两时间戳相隔是否太远
      */
-    private fun tooFar(t1: Timestamp, t2: Timestamp): Boolean {
-        return Math.abs(t1.time - t2.time) > 10.toLong() * 60 * 1000 //取10分钟
+    private fun tooFar(t1: Timestamp?, t2: Timestamp?): Boolean {
+        if (t1 != null && t2 != null) {
+            return abs(t1.time - t2.time) > 10.toLong() * 60 * 1000
+        } //取10分钟
+        return false
     }
 
     /**
@@ -118,16 +122,18 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         val indexes: MutableList<Int> = ArrayList()
         for (i in mBeans.indices.reversed()) {
             if (notification.getType() == MessageReadNotification.TYPE.ALL) {
-                if (mBeans[i].createdTime.after(notification.getFromTime())) {
-                    indexes.add(i)
+                mBeans[i].createdAt?.let {
+                    if (it.after(notification.getFromTime())) {
+                        indexes.add(i)
+                    }
                 }
-            } else if (mBeans[i].getId() == notification.getId()) {
+            } else if (mBeans[i].id == notification.getId()) {
                 indexes.add(i)
                 break
             }
         }
         for (index in indexes) {
-            mBeans[index].isRead = true
+            mBeans[index].read = true
             val holder = list.findViewHolderForAdapterPosition(index) as CHolder?
             holder?.showRead()
         }
@@ -171,13 +177,13 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
 
     override fun notifyItemsAppended(newL: List<ChatMessage>) {
         //注意要取反
-        if(newL is MutableList){
+        if (newL is MutableList) {
             newL.reverse()
         }
         if (mBeans.size > 0 && newL.size > 0) {
             val last = mBeans[mBeans.size - 1]
-            if (tooFar(last.createdTime, newL[0].createdTime)) {
-                super.notifyItemAppended(ChatMessage.getTimeStampHolderInstance(newL[0].createdTime))
+            if (tooFar(last.createdAt, newL[0].createdAt)) {
+                super.notifyItemAppended(ChatMessage.getTimeStampHolderInstance(newL[0].createdAt))
             }
         }
         super.notifyItemsAppended(newL)
@@ -187,45 +193,45 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
      * 头部数据的更新，存在则更新，其余的插入到头部
      * @param chatMessages 新的头部消息
      */
-    fun notifyHeadItemsUpdated(chatMessages:  List<ChatMessage>) {
+    fun notifyHeadItemsUpdated(chatMessages: List<ChatMessage>) {
         val ids = HashMap<String, ChatMessage?>()
         for (cm in chatMessages) {
-            ids[cm.getId()] = cm
+            ids[cm.id] = cm
         }
         val toDelete: MutableList<ChatMessage?> = ArrayList()
         for (i in mBeans.indices.reversed()) {
             val cm = mBeans[i]
-            if (ids.containsKey(cm.getId())) {
-                if (ids[cm.getId()] != cm) {
+            if (ids.containsKey(cm.id)) {
+                if (ids[cm.id] != cm) {
                     notifyItemChanged(i)
                 }
-                toDelete.add(ids[cm.getId()])
+                toDelete.add(ids[cm.id])
             }
         }
-        if(chatMessages is MutableList){
+        if (chatMessages is MutableList) {
             chatMessages.removeAll(toDelete)
         }
         //其余的加到头部
         notifyItemsPushHead(chatMessages)
     }
 
-    override fun notifyItemsPushHead(newL:  List<ChatMessage>) {
-        if(newL is MutableList){
+    override fun notifyItemsPushHead(newL: List<ChatMessage>) {
+        if (newL is MutableList) {
             newL.reverse() //取反
         }
         if (mBeans.size > 0 && newL.size > 0) {
             val top = mBeans[0]
             val newBottom = newL[newL.size - 1]
-            if (tooFar(top.createdTime, newBottom.createdTime)) {
+            if (tooFar(top.createdAt, newBottom.createdAt)) {
                 if (!top.isTimeStamp) {
-                    super.notifyItemPushHead(ChatMessage.getTimeStampHolderInstance(top.createdTime))
+                    super.notifyItemPushHead(ChatMessage.getTimeStampHolderInstance(top.createdAt))
                 }
             } else if (top.isTimeStamp) {
                 super.notifyItemRemoveFromHead()
             }
         }
-        if(newL is MutableList && newL.isNotEmpty()){
-            newL.add(0, ChatMessage.getTimeStampHolderInstance(newL[0].createdTime))
+        if (newL is MutableList && newL.isNotEmpty()) {
+            newL.add(0, ChatMessage.getTimeStampHolderInstance(newL[0].createdAt))
         }
         super.notifyItemsPushHead(newL)
     }
@@ -244,15 +250,15 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             val last = newL[i - 1]
             val thi = newL[i]
             toAdd.add(0, last)
-            if (tooFar(last.createdTime, thi.createdTime)) {
-                toAdd.add(0, ChatMessage.getTimeStampHolderInstance(thi.createdTime))
+            if (tooFar(last.createdAt, thi.createdAt)) {
+                toAdd.add(0, ChatMessage.getTimeStampHolderInstance(thi.createdAt))
             }
             if (i == newL.size - 1) {
                 toAdd.add(0, thi)
             }
         }
         if (toAdd.size > 0) {
-            toAdd.add(0, ChatMessage.getTimeStampHolderInstance(toAdd[0].createdTime))
+            toAdd.add(0, ChatMessage.getTimeStampHolderInstance(toAdd[0].createdAt))
         }
         super.notifyItemChangedSmooth(toAdd, object : RefreshJudge<ChatMessage> {
             override fun judge(oldData: ChatMessage, newData: ChatMessage): Boolean {
@@ -301,7 +307,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         @JvmField
         @BindView(R.id.image_sensitive)
         var imageSensitivePlaceHolder: ViewGroup? = null
-        var isSensitiveExpanded = false
+        var sensitiveExpanded = false
 
         //隐藏加载圈圈
         fun hideProgress() {
@@ -318,16 +324,16 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
 
         //切换敏感消息查看模式
         private fun switchSensitiveModeText(data: ChatMessage) {
-            isSensitiveExpanded = !isSensitiveExpanded
+            sensitiveExpanded = !sensitiveExpanded
             if (see == null) return
-            if (isSensitiveExpanded) {
-                content!!.text = data.getContent()
+            if (sensitiveExpanded) {
+                content!!.text = data.content
                 see!!.setImageResource(R.drawable.ic_baseline_visibility_off_24)
                 if (data.getType() == ChatMessage.TYPE.IMG && image != null && imageSensitivePlaceHolder != null) {
                     image!!.visibility = View.VISIBLE
                     imageSensitivePlaceHolder!!.visibility = View.GONE
                 }
-            } else if (data.isSensitive) {
+            } else if (data.sensitive) {
                 see!!.setImageResource(R.drawable.ic_baseline_visibility_24)
                 content!!.setText(R.string.hint_sensitive_message)
                 if (data.getType() == ChatMessage.TYPE.IMG && image != null && imageSensitivePlaceHolder != null) {
@@ -339,9 +345,9 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
 
         //绑定敏感词状态
         fun bindSensitiveAndEmotion(data: ChatMessage) {
-            isSensitiveExpanded = false
+            sensitiveExpanded = false
             if (data.getType() == ChatMessage.TYPE.IMG && see != null && image != null && imageSensitivePlaceHolder != null) {
-                if (data.isSensitive) {
+                if (data.sensitive) {
                     see!!.visibility = View.VISIBLE
                     see!!.setOnClickListener { view: View? -> switchSensitiveModeText(data) }
                     image!!.visibility = View.INVISIBLE
@@ -353,7 +359,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                     see!!.visibility = View.GONE
                 }
             } else if (see != null && emotion != null) {
-                if (data.isSensitive) {
+                if (data.sensitive) {
                     see!!.visibility = View.VISIBLE
                     emotion!!.visibility = View.GONE
                     see!!.setImageResource(R.drawable.ic_baseline_visibility_24)
@@ -361,9 +367,9 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                     content!!.setText(R.string.hint_sensitive_message)
                 } else {
                     see!!.visibility = View.GONE
-                    content!!.text = data.getContent()
+                    content!!.text = data.content
                     emotion!!.visibility = View.VISIBLE
-                    val emotionValue = data.getEmotion()
+                    val emotionValue = data.emotion
                     var iconRes = R.drawable.ic_emotion_normal
                     if (emotionValue >= 2) {
                         iconRes = R.drawable.ic_emotion_pos_3
@@ -395,7 +401,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
 
         fun updateImage(data: ChatMessage) {
             if (image != null) {
-                ImageUtils.loadChatMessageInto(chatActivity, data.getContent(), image!!)
+                ImageUtils.loadChatMessageInto(chatActivity, data.content, image!!)
             }
         }
 

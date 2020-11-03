@@ -65,11 +65,11 @@ class Conversation : Serializable {
         @JvmStatic
         fun fromNewMessage(message: ChatMessage): Conversation {
             val conversation = Conversation()
-            conversation.friendAvatar = message.getFriendAvatar()
-            conversation.friendId = message.getFromId()
-            conversation.friendRemark = message.getFriendRemark()
-            conversation.id = message.getConversationId()
-            conversation.relationId = message.getRelationId()
+            conversation.friendAvatar = message.friendAvatar
+            conversation.friendId = message.fromId
+            conversation.friendRemark = message.friendRemark
+            conversation.id = message.conversationId!!
+            conversation.relationId = message.relationId
             return conversation
         }
 
@@ -80,7 +80,7 @@ class Conversation : Serializable {
             conversation.friendId = friendProfile.getId()
             conversation.friendRemark = userRelation.getRemark()
             conversation.friendNickname = friendProfile.getNickname()
-            conversation.id = TextUtils.getP2PIdOrdered(friendProfile.getId(), userLocal.getId())
+            conversation.id = TextUtils.getP2PIdOrdered(friendProfile.getId(), userLocal.id)
             conversation.relationId = userRelation.getFriendId()
             Log.e("conver_FPF", friendProfile.toString())
             Log.e("conver_UR", userRelation.toString())

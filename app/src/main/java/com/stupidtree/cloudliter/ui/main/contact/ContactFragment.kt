@@ -61,7 +61,7 @@ class ContactFragment : BaseFragment<ContactViewModel>() {
 
     override fun initViews(view: View) {
         setUpButtons()
-        viewModel!!.unReadLiveData.observe(this, Observer { integerDataState: DataState<Int> ->
+        viewModel!!.unReadLiveData?.observe(this, Observer { integerDataState ->
             if (integerDataState.state === DataState.STATE.SUCCESS) {
                 if (integerDataState.data!! > 0) {
                     unreadText!!.visibility = View.VISIBLE

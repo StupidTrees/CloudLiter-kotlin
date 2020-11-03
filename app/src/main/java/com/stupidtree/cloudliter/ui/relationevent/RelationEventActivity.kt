@@ -73,13 +73,13 @@ class RelationEventActivity : BaseActivity<RelationEventViewModel>() {
                                 .setListData(
                                         listOf(getString(R.string.prompt_accept), getString(R.string.prompt_reject)),
                                         listOf(ACTION.ACCEPT, ACTION.REJECT))
-                                .setOnConfirmListener { title: String?, key: ACTION? -> key?.let { viewModel!!.responseFriendRequest(data.id, it) } }
+                                .setOnConfirmListener { _: String?, key: ACTION? -> key?.let { data.id?.let { it1 -> viewModel!!.responseFriendRequest(it1, it) } } }
                                 .show(supportFragmentManager, "select")
                     }
                 })
         listAdapter.setOnItemClickListener(object : BaseListAdapter.OnItemClickListener<RelationEvent> {
             override fun onItemClick(data: RelationEvent, card: View?, position: Int) {
-                ActivityUtils.startProfileActivity(getThis(), data.otherId)
+                data.otherId?.let { ActivityUtils.startProfileActivity(getThis(), it) }
             }
         })
         viewModel!!.listData?.observe(this, Observer { listDataState: DataState<List<RelationEvent>?> ->

@@ -18,7 +18,6 @@ import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.RelationGroup
 import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.data.model.UserProfile
-import com.stupidtree.cloudliter.data.model.UserRelation
 import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.group.pick.PickGroupDialog
@@ -181,10 +180,12 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                         PopUpEditText()
                                 .setTitle(R.string.prompt_set_remark)
                                 .setText(up.remark)
-                                .setOnConfirmListener { text: String? ->
-                                    //控制viewModel发起更改昵称请求
-                                    viewModel!!.startChangeRemark(text)
-                                }
+                                .setOnConfirmListener (object:PopUpEditText.OnConfirmListener{
+                                    override fun OnConfirm(text: String) {
+                                        //控制viewModel发起更改昵称请求
+                                        viewModel!!.startChangeRemark(text)
+                                    }
+                                })
                                 .show(supportFragmentManager, "edit")
                     }
                 }
