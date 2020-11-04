@@ -11,7 +11,7 @@ import com.stupidtree.cloudliter.ui.base.DataState
  */
 class GroupRepository internal constructor() {
     //数据源1：网络数据源，分组网络数据
-    var groupWebSource: GroupWebSource = GroupWebSource.getInstance()
+    var groupWebSource: GroupWebSource = GroupWebSource.instance!!
 
     /**
      * 获取我的所有好友分组

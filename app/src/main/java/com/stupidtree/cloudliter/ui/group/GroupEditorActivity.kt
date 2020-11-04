@@ -57,7 +57,7 @@ class GroupEditorActivity : BaseActivity<GroupEditorViewModel>() {
         listAdapter = GroupListAdapter(this, LinkedList())
         list!!.adapter = listAdapter
         list!!.layoutManager = LinearLayoutManager(this)
-        viewModel!!.listData?.observe(this, Observer { listDataState->
+        viewModel!!.listData?.observe(this, Observer { listDataState ->
             if (listDataState.state === DataState.STATE.SUCCESS) {
                 listAdapter!!.notifyItemChangedSmooth(listDataState.data!!, object : RefreshJudge<RelationGroup> {
                     override fun judge(oldData: RelationGroup, newData: RelationGroup): Boolean {
@@ -73,7 +73,7 @@ class GroupEditorActivity : BaseActivity<GroupEditorViewModel>() {
             PopUpEditText()
                     .setTitle(R.string.add_group)
                     .setText("")
-                    .setOnConfirmListener(object:PopUpEditText.OnConfirmListener{
+                    .setOnConfirmListener(object : PopUpEditText.OnConfirmListener {
                         override fun OnConfirm(text: String) {
                             //控制viewModel发起添加分组请求
                             viewModel!!.startAddGroup(text)
@@ -84,7 +84,13 @@ class GroupEditorActivity : BaseActivity<GroupEditorViewModel>() {
 
         //点击删除分组
         listAdapter!!.setOnDeleteClickListener { button: View?, group: RelationGroup, position: Int ->
-            PopUpText().setTitle(R.string.ensure_delete).setText("").setOnConfirmListener { group.id?.let { viewModel!!.startDeleteGroup(it) } }.show(supportFragmentManager, "confirm")
+            PopUpText().setTitle(R.string.ensure_delete).setText("").setOnConfirmListener(
+                    object : PopUpText.OnConfirmListener {
+                        override fun OnConfirm() {
+                            group.id?.let { viewModel!!.startDeleteGroup(it) }
+                        }
+                    }
+            ).show(supportFragmentManager, "confirm")
         }
         viewModel!!.addGroupResult?.observe(this, Observer { stringDataState: DataState<String?> ->
             if (stringDataState.state === DataState.STATE.SUCCESS) {

@@ -77,9 +77,8 @@ class ConversationActivity : BaseActivity<ConversationViewModel>() {
 
     override fun onResume() {
         super.onResume()
-        if (intent.hasExtra("friendId")) {
-            viewModel!!.startRefresh(intent.getStringExtra("friendId"))
-        }
+        intent.getStringExtra("friendId")?.let { viewModel!!.startRefresh(it) }
+
     }
 
     private fun setUpPage(conversation: Conversation?) {

@@ -88,14 +88,14 @@ class ContactViewModel(application: Application) : AndroidViewModel(application)
      * 开始刷新列表数据
      */
     fun startFetchData() {
-        listController.value = Trigger.getActioning()
+        listController.value = Trigger.actioning
     }
 
     /**
      * 开始获取未读事件数目
      */
     fun startFetchUnread() {
-        unReadController.value = Trigger.getActioning()
+        unReadController.value = Trigger.actioning
     }
 
     init {

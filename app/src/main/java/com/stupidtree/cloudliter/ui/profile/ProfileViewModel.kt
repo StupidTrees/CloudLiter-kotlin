@@ -11,11 +11,9 @@ import com.stupidtree.cloudliter.data.repository.GroupRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository.Companion.getInstance
-import com.stupidtree.cloudliter.data.repository.ProfileRepository.Companion.instance
 import com.stupidtree.cloudliter.data.repository.RelationRepository
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.base.StringTrigger
-import com.stupidtree.cloudliter.ui.myprofile.ChangeInfoTrigger
 import java.util.*
 
 /**
@@ -83,7 +81,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     if (input.isActioning) {
                         if (user.isValid) {
                             //也是通过这个仓库进行好友建立
-                            return@switchMap relationRepository.sendFriendRequest(user.token!!, input.data!!)
+                            return@switchMap relationRepository.sendFriendRequest(user.token!!, input.data)
                             // return relationRepository.makeFriends(Objects.requireNonNull(user.getToken()),input.getData());
                         } else {
                             return@switchMap MutableLiveData<DataState<String?>>(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
@@ -103,12 +101,12 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
         get() {
             if (field == null) {
                 //也是一样的
-                changeRemarkResult = Transformations.switchMap(changeRemarkController) { input: ChangeInfoTrigger ->
+                changeRemarkResult = Transformations.switchMap(changeRemarkController) { input: StringTrigger ->
                     if (input.isActioning) {
                         val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid && relationLiveData!!.value != null) {
                             // System.out.println("friend id is" + relationLiveData.getValue().getData().getFriendId());
-                            return@switchMap relationRepository.changeRemark(userLocal.token!!, input.value, relationLiveData!!.value!!.data!!.friendId)
+                            return@switchMap relationRepository.changeRemark(userLocal.token!!, input.data, relationLiveData!!.value!!.data!!.friendId!!)
                         } else {
                             return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -120,7 +118,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
         }
 
     //Trigger：控制更改签名请求的发送，其中携带了新昵称字符串
-    var changeRemarkController = MutableLiveData<ChangeInfoTrigger>()
+    var changeRemarkController = MutableLiveData<StringTrigger>()
 
     //状态数据：删除好友的结果
     var deleteFriendResult: LiveData<DataState<*>>? = null
@@ -130,7 +128,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     if (input.isActioning) {
                         val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
-                            return@switchMap relationRepository.deleteFriend(userLocal.token!!, input.data!!)
+                            return@switchMap relationRepository.deleteFriend(userLocal.token!!, input.data)
                         } else {
                             return@switchMap MutableLiveData<DataState<*>>(DataState<Any>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -152,7 +150,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     if (input.isActioning) {
                         val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid && userId != null) {
-                            return@switchMap groupRepository.assignGroup(userLocal.token!!, userId!!, input.data!!)
+                            return@switchMap groupRepository.assignGroup(userLocal.token!!, userId!!, input.data)
                         } else {
                             return@switchMap MutableLiveData<DataState<*>>(DataState<Any>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -190,7 +188,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     if (input.isActioning) {
                         if (user.isValid) {
                             //从用户资料仓库中拉取数据
-                            return@switchMap repository!!.getUserProfile(input.data, user.token!!)
+                            return@switchMap repository.getUserProfile(input.data, user.token!!)
                         } else {
                             return@switchMap MutableLiveData(DataState<UserProfile?>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -206,7 +204,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
      *
      * @param id 这个页面是谁的资料
      */
-    fun startRefresh(id: String?) {
+    fun startRefresh(id: String) {
         profileController.value = StringTrigger.getActioning(id)
     }
 
@@ -215,7 +213,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
      *
      * @param id 这个页面是谁的
      */
-    fun startMakingFriends(id: String?) {
+    fun startMakingFriends(id: String) {
         makeFriendsController.value = StringTrigger.getActioning(id)
     }
 
@@ -224,7 +222,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
      *
      * @param id 好友id
      */
-    fun startDeletingFriend(id: String?) {
+    fun startDeletingFriend(id: String) {
         deleteFriendController.value = StringTrigger.getActioning(id)
     }
 
@@ -248,9 +246,9 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
      *
      * @param newRemark 备注
      */
-    fun startChangeRemark(newRemark: String?) {
+    fun startChangeRemark(newRemark: String) {
         if (relationLiveData!!.value != null) {
-            changeRemarkController.value = ChangeInfoTrigger.getActioning(newRemark)
+            changeRemarkController.value = StringTrigger.getActioning(newRemark)
         }
     }
 
@@ -259,7 +257,10 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
      * @param group 分组
      */
     fun startAssignGroup(group: RelationGroup) {
-        assignGroupController.value = StringTrigger.getActioning(group.id)
+        group.id?.let {
+            assignGroupController.value = StringTrigger.getActioning(it)
+        }
+
     }
 
     fun logout(context: Context) {

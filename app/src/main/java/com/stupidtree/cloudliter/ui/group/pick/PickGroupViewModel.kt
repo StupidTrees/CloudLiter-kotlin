@@ -40,7 +40,7 @@ class PickGroupViewModel(application: Application) : AndroidViewModel(applicatio
      * 开始刷新
      */
     fun startRefresh() {
-        listController.value = Trigger.getActioning()
+        listController.value = Trigger.actioning
     }
 
     init {

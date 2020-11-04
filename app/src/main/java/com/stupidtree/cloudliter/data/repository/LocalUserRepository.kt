@@ -17,7 +17,7 @@ import com.stupidtree.cloudliter.socket.SocketIOClientService
 class LocalUserRepository(application: Application) {
 
     //数据源：SharedPreference性质的本地状态数据源
-    var mePreferenceSource: UserPreferenceSource = UserPreferenceSource(HiApplication.getContext())
+    var mePreferenceSource: UserPreferenceSource = UserPreferenceSource(HiApplication.context!!)
 
     //将已登录用户缓存在内存里
     private var loggedInUser: UserLocal? = null

@@ -185,7 +185,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * 发送图片
      */
-    fun sendImageMessage(path: String?) {
+    fun sendImageMessage(path: String) {
         imageSendController.value = StringTrigger.getActioning(path)
     }
 

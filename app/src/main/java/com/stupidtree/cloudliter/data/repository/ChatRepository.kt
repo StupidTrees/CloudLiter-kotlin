@@ -252,7 +252,7 @@ class ChatRepository(context: Context) {
         if (notification!!.type == MessageReadNotification.TYPE.ALL) {
             Thread(Runnable { chatMessageDao.messageAllRead(notification.conversationId, notification.fromTime) }).start()
         } else {
-            Thread(Runnable { chatMessageDao.messageRead(notification.id) }).start()
+            Thread(Runnable { notification.id?.let { chatMessageDao.messageRead(it) } }).start()
         }
         //new Thread(() -> chatMessageDao.saveMessage(Collections.singletonList(chatMessage))).start();
     }

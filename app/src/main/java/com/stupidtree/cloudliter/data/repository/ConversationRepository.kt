@@ -31,7 +31,7 @@ class ConversationRepository(context: Context) {
     var conversationDao: ConversationDao
     var listLiveData = MediatorLiveData<DataState<List<Conversation>?>>()
     var listLocalData: LiveData<MutableList<Conversation>>? = null
-    var listWebData: LiveData<DataState<List<Conversation>>>? = null
+    var listWebData: LiveData<DataState<List<Conversation>?>>? = null
     fun bindService(context: Context) {
         val IF = IntentFilter()
         IF.addAction(SocketIOClientService.ACTION_RECEIVE_MESSAGE)
@@ -98,7 +98,7 @@ class ConversationRepository(context: Context) {
      * @param token 用户令牌
      * @return 词频表
      */
-    fun getUserWordCloud(token: String?, userId: String, friendId: String): LiveData<DataState<HashMap<String, Float>>> {
+    fun getUserWordCloud(token: String?, userId: String, friendId: String): LiveData<DataState<HashMap<String, Float?>?>> {
         return conversationWebSource.getWordCloud(token, userId, friendId)
     }
 
@@ -116,7 +116,7 @@ class ConversationRepository(context: Context) {
     }
 
     init {
-        conversationWebSource = ConversationWebSource.getInstance()
+        conversationWebSource = ConversationWebSource.instance!!
         socketWebSource = SocketWebSource()
         conversationDao = AppDatabase.getDatabase(context).conversationDao()
     }

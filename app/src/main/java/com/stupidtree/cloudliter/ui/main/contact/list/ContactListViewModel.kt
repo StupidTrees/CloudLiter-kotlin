@@ -64,7 +64,7 @@ class ContactListViewModel(application: Application?) : AndroidViewModel(applica
      * 开始刷新列表数据
      */
     fun startFetchData() {
-        listController.value = Trigger.getActioning()
+        listController.value = Trigger.actioning
     }
 
     init {

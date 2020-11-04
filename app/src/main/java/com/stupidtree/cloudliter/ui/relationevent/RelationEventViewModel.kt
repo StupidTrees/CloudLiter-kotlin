@@ -87,11 +87,11 @@ class RelationEventViewModel(application:Application) : AndroidViewModel(applica
      * 开始标记已读
      */
     fun startMarkRead() {
-        markReadController.value = Trigger.getActioning()
+        markReadController.value = Trigger.actioning
     }
 
     fun startRefresh() {
-        listDataController.value = Trigger.getActioning()
+        listDataController.value = Trigger.actioning
     }
 
     val localUserId: String?

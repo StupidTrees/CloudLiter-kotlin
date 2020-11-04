@@ -1,5 +1,6 @@
 package com.stupidtree.cloudliter.ui.myprofile
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -22,16 +23,19 @@ import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.widgets.PopUpEditText
 import com.stupidtree.cloudliter.ui.widgets.PopUpSelectableList
+import com.stupidtree.cloudliter.ui.widgets.PopUpText
 import com.stupidtree.cloudliter.utils.*
 import java.util.*
 
 /**
  * ”我的个人资料“ Activity
  */
+@SuppressLint("NonConstantResourceId")
 class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
     /**
      * View绑定区
      */
+
     @JvmField
     @BindView(R.id.toolbar)
     var toolbar //toolbar
@@ -169,7 +173,7 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
                 PopUpEditText()
                         .setTitle(R.string.set_nickname)
                         .setText(up.data!!.nickname)
-                        .setOnConfirmListener(object :PopUpEditText.OnConfirmListener{
+                        .setOnConfirmListener(object : PopUpEditText.OnConfirmListener {
                             override fun OnConfirm(text: String) {
                                 //控制viewModel发起更改昵称请求
                                 viewModel!!.startChangeNickname(text)
@@ -189,7 +193,12 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
                         .setListData(
                                 Arrays.asList(getString(R.string.male), getString(R.string.female)),
                                 Arrays.asList(GENDER.MALE, GENDER.FEMALE)
-                        ).setOnConfirmListener { title: String?, key: GENDER? -> viewModel!!.startChangeGender(key!!) }.show(supportFragmentManager, "select")
+                        ).setOnConfirmListener(object : PopUpSelectableList.OnConfirmListener<GENDER> {
+                                    override fun OnConfirm(title: String?, key: GENDER) {
+                                        viewModel!!.startChangeGender(key)
+                                    }
+                                })
+                        .show(supportFragmentManager, "select")
             }
         }
 
@@ -215,7 +224,11 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
                                         COLOR.CYAN,
                                         COLOR.BLUE,
                                         COLOR.PURPLE)
-                        ).setOnConfirmListener { title: String?, key: COLOR? -> viewModel!!.startChangeColor(key!!) }.show(supportFragmentManager, "select")
+                        ).setOnConfirmListener(object:PopUpSelectableList.OnConfirmListener<COLOR>{
+                            override fun OnConfirm(title: String?, key: COLOR) {
+                                viewModel!!.startChangeColor(key)
+                            }
+                        }).show(supportFragmentManager, "select")
             }
         }
         signatureLayout!!.setOnClickListener { view: View? ->
@@ -224,7 +237,7 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
                 PopUpEditText()
                         .setTitle(R.string.choose_signature)
                         .setText(up.data!!.signature)
-                        .setOnConfirmListener(object:PopUpEditText.OnConfirmListener{
+                        .setOnConfirmListener(object : PopUpEditText.OnConfirmListener {
                             override fun OnConfirm(text: String) {
                                 //控制viewModel发起更改签名请求
                                 viewModel!!.startChangeSignature(text)

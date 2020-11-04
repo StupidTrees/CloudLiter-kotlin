@@ -116,7 +116,7 @@ class GroupEditorViewModel(application: Application) : AndroidViewModel(applicat
      * 开始刷新页面
      */
     fun startRefresh() {
-        listDataController.value = Trigger.getActioning()
+        listDataController.value = Trigger.actioning
     }
 
 

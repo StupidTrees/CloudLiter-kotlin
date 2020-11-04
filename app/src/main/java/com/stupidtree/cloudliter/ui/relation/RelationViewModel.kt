@@ -6,7 +6,7 @@ import com.stupidtree.cloudliter.data.model.UserRelation
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.RelationRepository
 import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.myprofile.ChangeInfoTrigger
+import com.stupidtree.cloudliter.ui.base.StringTrigger
 
 class RelationViewModel(application: Application) : AndroidViewModel(application) {
     /**
@@ -39,12 +39,12 @@ class RelationViewModel(application: Application) : AndroidViewModel(application
         get() {
             if (field == null) {
                 //也是一样的
-                changeRemarkResult = Transformations.switchMap(changeRemarkController) { input: ChangeInfoTrigger ->
+                changeRemarkResult = Transformations.switchMap(changeRemarkController) { input: StringTrigger ->
                     if (input.isActioning) {
                         val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid && relationData!!.value != null) {
                             println("friend id is" + relationData!!.value!!.data!!.friendId)
-                            return@switchMap relationRepository.changeRemark(userLocal.token!!, input.value, relationData!!.value!!.data!!.friendId)
+                            return@switchMap relationRepository.changeRemark(userLocal.token!!, input.data, relationData!!.value!!.data!!.friendId!!)
                         } else {
                             return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -56,7 +56,7 @@ class RelationViewModel(application: Application) : AndroidViewModel(application
         }
 
     //Trigger：控制更改签名请求的发送，其中携带了新昵称字符串
-    var changeRemarkController = MutableLiveData<ChangeInfoTrigger>()
+    var changeRemarkController = MutableLiveData<StringTrigger>()
 
     /**
      * 仓库区
@@ -69,8 +69,8 @@ class RelationViewModel(application: Application) : AndroidViewModel(application
         relationQueryController.value = RelationQueryTrigger.getActioning(friendId)
     }
 
-    fun startChangeRemark(newRemark: String?) {
-        changeRemarkController.value = ChangeInfoTrigger.getActioning(newRemark)
+    fun startChangeRemark(newRemark: String) {
+        changeRemarkController.value = StringTrigger.getActioning(newRemark)
     }
 
     init {

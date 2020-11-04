@@ -67,7 +67,7 @@ class ContactGroupFragment : BaseFragment<ContactGroupViewModel>() {
             refreshLayout.isRefreshing = false
             if (contactListState.state === DataState.STATE.SUCCESS) {
                 //状态为”成功“，那么列表设置为可见，并通知列表适配器丝滑地更新列表项
-                listAdapter.notifyItemChangedSmooth(contactListState.data)
+                contactListState.data?.let { listAdapter.notifyItemChangedSmooth(it) }
                 //listAdapter.notifyItemChangedSmooth(contactListState.getData(), (oldData, newData) -> !Objects.equals(oldData, newData) || !Objects.equals(oldData.getRemark(), newData.getRemark()));
                 if (contactListState.data!!.isNotEmpty()) {
                     list.visibility = View.VISIBLE

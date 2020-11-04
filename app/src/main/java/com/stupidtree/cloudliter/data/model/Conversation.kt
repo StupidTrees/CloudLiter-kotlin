@@ -76,12 +76,12 @@ class Conversation : Serializable {
         @JvmStatic
         fun fromUserRelationAndProfile(friendProfile: UserProfile, userRelation: UserRelation, userLocal: UserLocal): Conversation {
             val conversation = Conversation()
-            conversation.friendAvatar = friendProfile.getAvatar()
-            conversation.friendId = friendProfile.getId()
-            conversation.friendRemark = userRelation.getRemark()
-            conversation.friendNickname = friendProfile.getNickname()
-            conversation.id = TextUtils.getP2PIdOrdered(friendProfile.getId(), userLocal.id)
-            conversation.relationId = userRelation.getFriendId()
+            conversation.friendAvatar = friendProfile.avatar
+            conversation.friendId = friendProfile.id
+            conversation.friendRemark = userRelation.remark
+            conversation.friendNickname = friendProfile.nickname
+            conversation.id = TextUtils.getP2PIdOrdered(friendProfile.id, userLocal.id)
+            conversation.relationId = userRelation.friendId
             Log.e("conver_FPF", friendProfile.toString())
             Log.e("conver_UR", userRelation.toString())
             return conversation

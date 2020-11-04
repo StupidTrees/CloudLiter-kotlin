@@ -153,7 +153,7 @@ class MainActivity : BaseActivity<MainViewModel>() {
             title!!.text = item.title
             true
         }
-        avatar!!.setOnClickListener { view: View? -> drawerLayout!!.openDrawer(GravityCompat.END) }
+        avatar!!.setOnClickListener { drawerLayout!!.openDrawer(GravityCompat.END) }
     }
 
     private fun setUserViews(userLocalInfo: UserLocal) {
@@ -164,7 +164,7 @@ class MainActivity : BaseActivity<MainViewModel>() {
             //设置各种文字
             drawerUsername!!.text = userLocalInfo.username
             drawerNickname!!.text = userLocalInfo.nickname
-            drawerHeader!!.setOnClickListener { view: View? -> ActivityUtils.startProfileActivity(getThis(), viewModel!!.localUser.id!!) }
+            drawerHeader!!.setOnClickListener { ActivityUtils.startProfileActivity(getThis(), viewModel!!.localUser.id!!) }
             navigationView!!.setNavigationItemSelectedListener { item: MenuItem ->
                 if (item.itemId == R.id.drawer_nav_my_profile) {
                     ActivityUtils.startProfileActivity(getThis(),viewModel!!.localUser.id!!)
@@ -178,7 +178,7 @@ class MainActivity : BaseActivity<MainViewModel>() {
             drawerNickname!!.setText(R.string.please_log_in)
             drawerAvatar!!.setImageResource(R.drawable.place_holder_avatar)
             avatar!!.setImageResource(R.drawable.place_holder_avatar)
-            drawerHeader!!.setOnClickListener { view: View? -> ActivityUtils.startLoginActivity(getThis()) }
+            drawerHeader!!.setOnClickListener { ActivityUtils.startLoginActivity(getThis()) }
             navigationView!!.setNavigationItemSelectedListener { item: MenuItem ->
                 if (item.itemId == R.id.drawer_nav_my_profile) {
                     ActivityUtils.startLoginActivity(getThis())

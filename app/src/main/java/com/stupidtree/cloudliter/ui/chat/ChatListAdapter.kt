@@ -121,13 +121,13 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
     fun messageRead(list: RecyclerView, notification: MessageReadNotification) {
         val indexes: MutableList<Int> = ArrayList()
         for (i in mBeans.indices.reversed()) {
-            if (notification.getType() == MessageReadNotification.TYPE.ALL) {
+            if (notification.type == MessageReadNotification.TYPE.ALL) {
                 mBeans[i].createdAt?.let {
-                    if (it.after(notification.getFromTime())) {
+                    if (it.after(notification.fromTime)) {
                         indexes.add(i)
                     }
                 }
-            } else if (mBeans[i].id == notification.getId()) {
+            } else if (mBeans[i].id == notification.id) {
                 indexes.add(i)
                 break
             }

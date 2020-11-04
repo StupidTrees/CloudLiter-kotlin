@@ -142,7 +142,7 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
         viewModel!!.changeRemarkResult?.observe(this, Observer { stringDataState ->
             if (stringDataState!!.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show()
-                viewModel!!.startRefresh(intent.getStringExtra("id"))
+                intent.getStringExtra("id")?.let { viewModel!!.startRefresh(it) }
             } else {
                 Toast.makeText(applicationContext, "失败", Toast.LENGTH_SHORT).show()
             }
@@ -150,7 +150,7 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
         viewModel!!.deleteFriendResult?.observe(this, Observer { dataState: DataState<*> ->
             if (dataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.delete_friend_success, Toast.LENGTH_SHORT).show()
-                viewModel!!.startRefresh(intent.getStringExtra("id"))
+                intent.getStringExtra("id")?.let { viewModel!!.startRefresh(it) }
             } else {
                 Toast.makeText(applicationContext, "失败", Toast.LENGTH_SHORT).show()
             }
@@ -158,7 +158,7 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
         viewModel!!.assignGroupResult?.observe(this, Observer { dataState: DataState<*> ->
             if (dataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.assign_group_success, Toast.LENGTH_SHORT).show()
-                viewModel!!.startRefresh(intent.getStringExtra("id"))
+                intent.getStringExtra("id")?.let { viewModel!!.startRefresh(it) }
             } else {
                 Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
             }
@@ -209,7 +209,13 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                     deleteLayout!!.setOnClickListener { view: View? ->
                         PopUpText() ///.setText(getString(R.string.attention_please))
                                 .setTitle(R.string.attention_delete_friend)
-                                .setOnConfirmListener { viewModel!!.startDeletingFriend(intent.getStringExtra("id")) }.show(supportFragmentManager, "attention")
+                                .setOnConfirmListener (
+                                        object:PopUpText.OnConfirmListener{
+                                            override fun OnConfirm() {
+                                                intent.getStringExtra("id")?.let { viewModel!!.startDeletingFriend(it) }
+                                            }
+                                        }
+                                ).show(supportFragmentManager, "attention")
                     }
                 }
                 userRelationDataState.state === DataState.STATE.NOT_EXIST -> {
@@ -221,7 +227,7 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                     button!!.setIconResource(R.drawable.ic_baseline_person_add_24)
                     button!!.setOnClickListener { view: View? ->
                         //通知viewModel进行添加好友请求
-                        viewModel!!.startMakingFriends(intent.getStringExtra("id"))
+                        intent.getStringExtra("id")?.let { viewModel!!.startMakingFriends(it) }
                     }
                     remarkLayout!!.setOnClickListener(null)
                 }

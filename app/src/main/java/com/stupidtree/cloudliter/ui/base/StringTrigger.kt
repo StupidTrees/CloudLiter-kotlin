@@ -1,10 +1,10 @@
 package com.stupidtree.cloudliter.ui.base
 
 class StringTrigger : Trigger() {
-    var data: String? = null
+    lateinit var data: String
 
     companion object {
-        fun getActioning(data: String?): StringTrigger {
+        fun getActioning(data: String): StringTrigger {
             val stringTrigger = StringTrigger()
             stringTrigger.setActioning()
             stringTrigger.data = data

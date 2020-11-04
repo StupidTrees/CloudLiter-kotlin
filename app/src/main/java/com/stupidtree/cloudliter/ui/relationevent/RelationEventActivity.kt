@@ -23,6 +23,7 @@ import com.stupidtree.cloudliter.ui.base.BaseListAdapter.RefreshJudge
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.relationevent.RelationEventActivity.RListAdapter.RHolder
 import com.stupidtree.cloudliter.ui.widgets.PopUpCheckableList
+import com.stupidtree.cloudliter.ui.widgets.PopUpText
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils
@@ -73,7 +74,11 @@ class RelationEventActivity : BaseActivity<RelationEventViewModel>() {
                                 .setListData(
                                         listOf(getString(R.string.prompt_accept), getString(R.string.prompt_reject)),
                                         listOf(ACTION.ACCEPT, ACTION.REJECT))
-                                .setOnConfirmListener { _: String?, key: ACTION? -> key?.let { data.id?.let { it1 -> viewModel!!.responseFriendRequest(it1, it) } } }
+                                .setOnConfirmListener (object:PopUpCheckableList.OnConfirmListener<ACTION> {
+                                    override fun OnConfirm(title: String?, key: ACTION) {
+                                        key.let { data.id?.let { it1 -> viewModel!!.responseFriendRequest(it1, it) } }
+                                    }
+                                })
                                 .show(supportFragmentManager, "select")
                     }
                 })
