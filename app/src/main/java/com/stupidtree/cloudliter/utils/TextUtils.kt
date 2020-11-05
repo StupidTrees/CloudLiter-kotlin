@@ -2,10 +2,16 @@ package com.stupidtree.cloudliter.utils
 
 import android.content.Context
 import android.text.TextUtils
+import android.util.Log
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
 import com.stupidtree.cloudliter.R
+import com.stupidtree.cloudliter.data.model.UserLocal
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * 此类整合了一些文本处理有关的函数
@@ -130,5 +136,24 @@ object TextUtils {
         return if (res.size > 1) {
             getP2PIdOrdered(res[0], res[1])
         } else p2pId
+    }
+
+
+    fun encodeUserBusinessCard(userLocal:UserLocal):String{
+        val jo = HashMap<String, Any?>()
+        jo["userId"] = userLocal.id
+        jo["time"] = System.currentTimeMillis()
+        val str = Gson().toJson(jo)
+        return Base64Utils.encode(str);
+    }
+
+    fun decodeUserBusinessCard(encoded:String):HashMap<String, Any?>?{
+        return try {
+            val decoded = Base64Utils.decode(encoded)
+            Gson().fromJson<HashMap<String, Any?>>(decoded,HashMap::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 }

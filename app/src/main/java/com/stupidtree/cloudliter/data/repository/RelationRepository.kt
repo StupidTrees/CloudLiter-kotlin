@@ -1,18 +1,23 @@
 package com.stupidtree.cloudliter.data.repository
 
+import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
+import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.model.RelationEvent
 import com.stupidtree.cloudliter.data.model.RelationEvent.ACTION
 import com.stupidtree.cloudliter.data.model.UserRelation
 import com.stupidtree.cloudliter.data.source.RelationWebSource
 import com.stupidtree.cloudliter.ui.base.DataState
 
-class RelationRepository {
+class RelationRepository(application: Application) {
     /**
      * 数据源
      */
     //数据源：网络类型
     var relationWebSource: RelationWebSource = RelationWebSource.instance!!
+
+    var chatMessageDao = AppDatabase.getDatabase(application).chatMessageDao()
 
     /**
      * 判断某用户是否是本用户的好友
@@ -84,7 +89,15 @@ class RelationRepository {
      * @return 操作结果
      */
     fun deleteFriend(token: String, friendId: String): LiveData<DataState<*>> {
-        return relationWebSource.deleteFriend(token, friendId)
+        return Transformations.map(relationWebSource.deleteFriend(token, friendId)) { input ->
+            //删除成功，则清空本地缓存的聊天记录
+            if (input.state == DataState.STATE.SUCCESS) {
+                Thread {
+                    chatMessageDao.clearConversation(friendId)
+                }.start()
+            }
+            input
+        }
     }
 
     /**
@@ -108,13 +121,12 @@ class RelationRepository {
     companion object {
         @JvmStatic
         var instance: RelationRepository? = null
-            get() {
-                if (field == null) {
-                    field = RelationRepository()
-                }
-                return field
+        fun getInstance(application: Application): RelationRepository {
+            if (instance == null) {
+                instance = RelationRepository(application)
             }
-            private set
+            return instance!!
+        }
     }
 
 }

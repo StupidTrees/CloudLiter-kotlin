@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
-import android.os.Parcel
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -41,7 +40,7 @@ import java.util.*
  * 对话窗口
  */
 @SuppressLint("NonConstantResourceId")
-class ChatActivity() : BaseActivity<ChatViewModel>() {
+class ChatActivity : BaseActivity<ChatViewModel>() {
     /**
      * View绑定区
      */
@@ -119,7 +118,7 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setWindowParams(true, true, false)
+        setWindowParams(statusBar = true, darkColor = true, navi = false)
     }
 
     /**

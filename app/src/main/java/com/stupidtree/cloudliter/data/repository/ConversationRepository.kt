@@ -11,7 +11,7 @@ import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.data.source.ConversationDao
 import com.stupidtree.cloudliter.data.source.ConversationWebSource
 import com.stupidtree.cloudliter.data.source.SocketWebSource
-import com.stupidtree.cloudliter.socket.SocketIOClientService
+import com.stupidtree.cloudliter.service.socket.SocketIOClientService
 import com.stupidtree.cloudliter.ui.base.DataState
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean

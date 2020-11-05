@@ -142,6 +142,7 @@ class ConversationsFragment : BaseFragment<ConversationsViewModel>() {
         super.onResume()
         viewModel!!.startRefresh()
         viewModel!!.callOnline(requireContext())
+
     }
 
     override fun onStart() {

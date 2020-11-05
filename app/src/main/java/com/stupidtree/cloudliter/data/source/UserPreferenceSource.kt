@@ -6,7 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.util.Log
 import com.stupidtree.cloudliter.data.model.UserLocal
-import com.stupidtree.cloudliter.socket.SocketIOClientService
+import com.stupidtree.cloudliter.service.socket.SocketIOClientService
 import java.util.*
 
 /**

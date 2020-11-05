@@ -1,4 +1,4 @@
-package com.stupidtree.cloudliter.socket
+package com.stupidtree.cloudliter.service.socket
 
 import android.app.*
 import android.content.BroadcastReceiver
@@ -18,7 +18,6 @@ import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ApiResponse
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
-import com.stupidtree.cloudliter.socket.SocketIOClientService
 import com.stupidtree.cloudliter.ui.chat.MessageReadNotification
 import com.stupidtree.cloudliter.ui.widgets.EmoticonsTextView
 import com.stupidtree.cloudliter.utils.ActivityUtils
@@ -46,11 +45,11 @@ class SocketIOClientService : Service() {
     private val binders = HashMap<String?, JWebSocketClientBinder>()
 
     interface OnUnreadFetchedListener {
-        fun OnUnreadFetched(unread: HashMap<String, Int>)
+        fun onUnreadFetched(unread: HashMap<String, Int>)
     }
 
     interface OnMessageReadListener {
-        fun OnMessageRead(map: HashMap<String, Int>)
+        fun onMessageRead(map: HashMap<String, Int>)
     }
 
     private fun initReceiver() {
@@ -81,28 +80,6 @@ class SocketIOClientService : Service() {
                         if (intent.getStringExtra("userId") != null) {
                             socket!!.emit("logout", intent.getStringExtra("userId"))
                         }
-//                        val conversationId = intent.getStringExtra("conversationId")
-//                        val topTime = intent.getLongExtra("topTime", -1)
-//                        val num = intent.getIntExtra("num", -1)
-//                        val userId = intent.getStringExtra("userId")
-//                        Log.e("mark_all_read", incomingMessage.toString())
-//                        for (binder in binders.values) {
-//                            if (binder.onMessageReadListener != null) {
-//                                val map = HashMap<String, Int>()
-//                                 map[conversationId!!] = num
-//                                binder.onMessageReadListener!!.OnMessageRead(map)
-//                            }
-//                        }
-//                        val oldCount0 = incomingMessage[conversationId]
-//                        if (oldCount0 != null && oldCount0 <= num) {
-//                            incomingMessage.remove(conversationId)
-//                        } else if (oldCount0 != null) {
-//                            incomingMessage[conversationId!!] = oldCount0 - num
-//                        }
-//                        incomingMessage.remove(conversationId)
-//                        if (topTime > 0) {
-//                            socket!!.emit("mark_all_read", userId, conversationId, topTime)
-//                        }
                     }
                     ACTION_MARK_ALL_READ -> {
                         //从新消息队列中把该对话下的所有消息删除
@@ -115,7 +92,7 @@ class SocketIOClientService : Service() {
                             if (binder.onMessageReadListener != null) {
                                 val map = HashMap<String, Int>()
                                 map[conversationId!!] = num
-                                binder.onMessageReadListener!!.OnMessageRead(map)
+                                binder.onMessageReadListener!!.onMessageRead(map)
                             }
                         }
                         val oldCount0 = incomingMessage[conversationId]
@@ -145,7 +122,7 @@ class SocketIOClientService : Service() {
                             if (binder.onMessageReadListener != null) {
                                 val map = HashMap<String, Int>()
                                 map[conversationId!!] = 1
-                                binder.onMessageReadListener!!.OnMessageRead(map)
+                                binder.onMessageReadListener!!.onMessageRead(map)
                             }
                         }
                     }
@@ -268,7 +245,7 @@ class SocketIOClientService : Service() {
                     }
                     for (binder in binders.values) {
                         if (binder.onUnreadFetchedListener != null) {
-                            binder.onUnreadFetchedListener!!.OnUnreadFetched(
+                            binder.onUnreadFetchedListener!!.onUnreadFetched(
                                     incomingMessage)
                         }
                     }

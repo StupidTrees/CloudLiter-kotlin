@@ -101,6 +101,6 @@ class ContactViewModel(application: Application) : AndroidViewModel(application)
     init {
         friendsRepository = FriendsRepository.instance
         localUserRepository = LocalUserRepository.getInstance(application)
-        relationRepository = RelationRepository.instance
+        relationRepository = RelationRepository.getInstance(application)
     }
 }

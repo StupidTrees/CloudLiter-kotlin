@@ -11,7 +11,7 @@ import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.source.ChatMessageDao
 import com.stupidtree.cloudliter.data.source.ChatMessageWebSource
 import com.stupidtree.cloudliter.data.source.SocketWebSource
-import com.stupidtree.cloudliter.socket.SocketIOClientService
+import com.stupidtree.cloudliter.service.socket.SocketIOClientService
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.base.DataState.LIST_ACTION
 import com.stupidtree.cloudliter.ui.chat.FriendStateTrigger
@@ -23,7 +23,6 @@ import top.zibin.luban.Luban
 import top.zibin.luban.OnCompressListener
 import java.io.File
 import java.sql.Timestamp
-import java.util.*
 
 /**
  * 层次：Repository
@@ -90,7 +89,7 @@ class ChatRepository(context: Context) {
                 listDataState.addSource(webListState!!) { result ->
                     if (result.state === DataState.STATE.SUCCESS && result.data!!.isNotEmpty()) {
                         listDataState.removeSource(localListState!!)
-                        saveMessageAsync(result.data)
+                        saveMessageAsync(ArrayList(result.data))
                         listDataState.value = result.setRetry(true).setListAction(action)
                     }
                 }
@@ -100,7 +99,7 @@ class ChatRepository(context: Context) {
                 listDataState.addSource(webListState!!) { result ->
                     if (result.state === DataState.STATE.SUCCESS && result.data!!.size > 0) {
                         listDataState.removeSource(localListState!!)
-                        saveMessageAsync(result.data)
+                        saveMessageAsync(ArrayList(result.data))
                         if (chatMessages != null) {
                             listDataState.value = result.setListAction(action).setRetry(chatMessages.size > 0)
                         }
@@ -125,7 +124,7 @@ class ChatRepository(context: Context) {
             Log.e("手动拉取本地未存新消息", "$afterId-$result")
             if (result.state === DataState.STATE.SUCCESS && result.data!!.isNotEmpty()) {
                 listDataState.removeSource(localListState!!)
-                saveMessageAsync(result.data!!)
+                saveMessageAsync(ArrayList(result.data!!))
                 listDataState.value = DataState(result.data).setListAction(LIST_ACTION.APPEND)
             }
         }

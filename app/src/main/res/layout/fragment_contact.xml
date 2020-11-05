@@ -42,7 +42,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center"
                         android:padding="11dp"
-                        app:srcCompat="@drawable/ic_friend_button"
+                        app:srcCompat="@drawable/ic_friend_notification_button"
                         app:tint="@android:color/white" />
 
                 </androidx.cardview.widget.CardView>
@@ -79,7 +79,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:padding="12dp"
-                    app:srcCompat="@drawable/ic_group"
+                    app:srcCompat="@drawable/ic_group_button"
                     app:tint="@android:color/white" />
             </androidx.cardview.widget.CardView>
 
@@ -103,7 +103,26 @@
                     app:srcCompat="@drawable/ic_search_button"
                     app:tint="@android:color/white" />
             </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/scan_qr"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:clickable="true"
+                android:focusable="auto"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                app:cardBackgroundColor="?attr/colorPrimary"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp">
 
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:padding="12dp"
+                    app:srcCompat="@drawable/ic_scan"
+                    app:tint="@android:color/white" />
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
 
         <com.google.android.material.tabs.TabLayout

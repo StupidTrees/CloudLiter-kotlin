@@ -171,7 +171,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     private val repository: ProfileRepository = getInstance(application)
 
     //用户关系仓库
-    private val relationRepository: RelationRepository = RelationRepository.instance!!
+    private val relationRepository: RelationRepository = RelationRepository.getInstance(application)!!
 
     //本地用户仓库
     private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)

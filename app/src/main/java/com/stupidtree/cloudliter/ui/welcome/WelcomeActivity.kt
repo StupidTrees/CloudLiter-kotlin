@@ -49,12 +49,12 @@ class WelcomeActivity : BaseActivity<ViewModel?>() {
         supportActionBar?.title = ""
         //设置两个fragment，一个登录一个注册
         pager!!.adapter = object : BaseTabAdapter(supportFragmentManager, 2) {
-            override fun initItem(position: Int): Fragment? {
-                when (position) {
-                    0 -> return LoginFragment.newInstance()
-                    1 -> return SignUpFragment.newInstance()
+            override fun initItem(position: Int): Fragment {
+                if(position==0){
+                    return LoginFragment.newInstance()
+                }else{
+                    return SignUpFragment.newInstance()
                 }
-                return null
             }
 
             override fun getPageTitle(position: Int): CharSequence {

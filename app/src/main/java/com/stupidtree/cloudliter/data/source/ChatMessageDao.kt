@@ -27,4 +27,7 @@ interface ChatMessageDao {
 
     @Query("DELETE FROM message")
     fun clearTable()
+
+    @Query("DELETE FROM message WHERE fromId IS:friendId OR toId IS:friendId")
+    fun clearConversation(friendId:String)
 }

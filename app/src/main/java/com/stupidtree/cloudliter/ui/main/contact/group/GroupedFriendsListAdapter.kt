@@ -49,7 +49,6 @@ class GroupedFriendsListAdapter(context: Context?) : GroupedRecyclerViewAdapter(
 
     override fun onBindHeaderViewHolder(holder: BaseViewHolder, groupPosition: Int) {
         holder.get<View>(R.id.icon).rotation = if (groupEntities[groupPosition].isExpanded) 90f else 0f
-        Log.e("rotation", groupPosition.toString() + ":" + holder.get<View>(R.id.icon).rotation)
         if (groupEntities[groupPosition].groupId == "null") {
             holder.setText(R.id.name, mContext.getString(R.string.not_assigned_group))
         } else {
@@ -120,7 +119,7 @@ class GroupedFriendsListAdapter(context: Context?) : GroupedRecyclerViewAdapter(
         for (ur in newL) {
             val tmpId = if (ur.groupId == null) "null" else ur.groupId!!
             if (!groupMap.containsKey(tmpId)) {
-                val e = ur.groupName?.let { ExpandableGroupEntity(tmpId, it) }
+                val e = ExpandableGroupEntity(tmpId, ur.groupName)
                 val expanded = oldExpanded[tmpId]
                 e?.isExpanded = expanded ?: false
                 groupMap[tmpId] = e
@@ -133,7 +132,7 @@ class GroupedFriendsListAdapter(context: Context?) : GroupedRecyclerViewAdapter(
         notifyDataChanged()
     }
 
-    class ExpandableGroupEntity(var groupId: String, var groupName: String) {
+    class ExpandableGroupEntity(var groupId: String, var groupName: String?) {
         var children: MutableList<UserRelation> = LinkedList()
         var isExpanded = false
         val childrenCount: Int

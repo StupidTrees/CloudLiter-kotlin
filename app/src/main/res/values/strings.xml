@@ -129,4 +129,6 @@
     <string name="delete_ok">删除分组成功</string>
     <string name="ensure_delete">确认删除该分组吗</string>
     <string name="not_assigned_group">未分组</string>
+    <string name="qrcode_title">二维码</string>
+    <string name="invalid_business_card">无效的名片！</string>
 </resources>

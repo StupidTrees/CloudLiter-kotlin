@@ -38,6 +38,9 @@ class ContactFragment : BaseFragment<ContactViewModel>() {
     @BindView(R.id.edit_group)
     var editGroupButton: View? = null
 
+    @BindView(R.id.scan_qr)
+    lateinit var scanQRButton: View
+
     @JvmField
     @BindView(R.id.unread)
     var unreadText: TextView? = null
@@ -54,9 +57,10 @@ class ContactFragment : BaseFragment<ContactViewModel>() {
     }
 
     private fun setUpButtons() {
-        searchFriendButton!!.setOnClickListener { view: View? -> ActivityUtils.startSearchActivity(requireContext()) }
-        relationEventButton!!.setOnClickListener { view: View? -> ActivityUtils.startRelationEventActivity(requireContext()) }
-        editGroupButton!!.setOnClickListener { view: View? -> ActivityUtils.startGroupEditorActivity(requireActivity()) }
+        searchFriendButton!!.setOnClickListener { ActivityUtils.startSearchActivity(requireActivity()) }
+        relationEventButton!!.setOnClickListener { ActivityUtils.startRelationEventActivity(requireContext()) }
+        editGroupButton!!.setOnClickListener { ActivityUtils.startGroupEditorActivity(requireActivity()) }
+        scanQRButton.setOnClickListener { ActivityUtils.startQRCodeActivity(requireContext()) }
     }
 
     override fun initViews(view: View) {
@@ -102,7 +106,7 @@ class ContactFragment : BaseFragment<ContactViewModel>() {
     /**
      * 定义本页面的列表适配器
      */
-    internal class XListAdapter(mContext: Context, mBeans:MutableList<UserRelation>) : BaseListAdapter<UserRelation, XListAdapter.XHolder>(mContext, mBeans) {
+    internal class XListAdapter(mContext: Context, mBeans: MutableList<UserRelation>) : BaseListAdapter<UserRelation, XListAdapter.XHolder>(mContext, mBeans) {
         override fun getLayoutId(viewType: Int): Int {
             return R.layout.fragment_contact_list_item
         }

@@ -12,6 +12,7 @@ import com.stupidtree.cloudliter.ui.conversation.ConversationActivity
 import com.stupidtree.cloudliter.ui.group.GroupEditorActivity
 import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
 import com.stupidtree.cloudliter.ui.profile.ProfileActivity
+import com.stupidtree.cloudliter.ui.qrcode.QRCodeActivity
 import com.stupidtree.cloudliter.ui.relationevent.RelationEventActivity
 import com.stupidtree.cloudliter.ui.search.SearchActivity
 import com.stupidtree.cloudliter.ui.welcome.WelcomeActivity
@@ -146,5 +147,13 @@ object ActivityUtils {
         it.putExtra("urls", urlsArr)
         it.putExtra("init_index", index)
         from.startActivity(it) //,activityOptionsCompat.toBundle());
+    }
+
+    /**
+     * 进入二维码页面
+     */
+    fun startQRCodeActivity(from:Context){
+        val it = Intent(from, QRCodeActivity::class.java)
+        from.startActivity(it)
     }
 }

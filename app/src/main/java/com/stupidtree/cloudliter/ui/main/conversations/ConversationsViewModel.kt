@@ -70,7 +70,7 @@ class ConversationsViewModel(application: Application) : AndroidViewModel(applic
      * 仓库区
      */
     //对话仓库
-    private val conversationRepository: ConversationRepository? = getInstance(application!!)
+    private val conversationRepository: ConversationRepository? = getInstance(application)
 
     //本地用户仓库
     private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)

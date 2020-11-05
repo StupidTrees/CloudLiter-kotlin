@@ -8,7 +8,7 @@ import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.AppDatabase.Companion.getDatabase
 import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.data.source.UserPreferenceSource
-import com.stupidtree.cloudliter.socket.SocketIOClientService
+import com.stupidtree.cloudliter.service.socket.SocketIOClientService
 
 /**
  * 层次：Repository
@@ -17,7 +17,7 @@ import com.stupidtree.cloudliter.socket.SocketIOClientService
 class LocalUserRepository(application: Application) {
 
     //数据源：SharedPreference性质的本地状态数据源
-    var mePreferenceSource: UserPreferenceSource = UserPreferenceSource(HiApplication.context!!)
+    var mePreferenceSource: UserPreferenceSource = UserPreferenceSource(application)
 
     //将已登录用户缓存在内存里
     private var loggedInUser: UserLocal? = null
@@ -35,10 +35,10 @@ class LocalUserRepository(application: Application) {
         loggedInUser = null
         mePreferenceSource.clearLocalUser()
         //本地缓存清空
-        Thread(Runnable {
+        Thread {
             appDatabase.chatMessageDao().clearTable()
             appDatabase.conversationDao().clearTable()
-        }).start()
+        }.start()
     }
 
     /**
@@ -100,7 +100,7 @@ class LocalUserRepository(application: Application) {
     companion object {
         //也是单例模式
         @Volatile
-        var instance: LocalUserRepository? = null
+        private var instance: LocalUserRepository? = null
         fun getInstance(application: Application):LocalUserRepository {
             if (null == instance) {
                 instance = LocalUserRepository(application)

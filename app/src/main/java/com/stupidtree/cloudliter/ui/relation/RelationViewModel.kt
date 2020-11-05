@@ -75,6 +75,6 @@ class RelationViewModel(application: Application) : AndroidViewModel(application
 
     init {
         localUserRepository = LocalUserRepository.getInstance(application)
-        relationRepository = RelationRepository.instance!!
+        relationRepository = RelationRepository.getInstance(application)!!
     }
 }

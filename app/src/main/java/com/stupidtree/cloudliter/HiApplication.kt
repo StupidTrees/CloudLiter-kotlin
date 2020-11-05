@@ -10,12 +10,6 @@ import android.content.Context
 class HiApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        context = applicationContext
     }
 
-    companion object {
-        @SuppressLint("StaticFieldLeak")
-        var context: Context? = null
-            private set
-    }
 }

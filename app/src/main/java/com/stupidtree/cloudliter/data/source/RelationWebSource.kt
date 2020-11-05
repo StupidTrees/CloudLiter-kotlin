@@ -32,7 +32,6 @@ class RelationWebSource : BaseWebSource<RelationService>(Retrofit.Builder()
      * 获取好友列表
      *
      * @param token 登录状态token
-     * @param id    此用户id（可选）
      * @return 朋友列表的LiveData
      */
     fun getFriends(token: String): LiveData<DataState<List<UserRelation>?>> {
@@ -51,28 +50,6 @@ class RelationWebSource : BaseWebSource<RelationService>(Retrofit.Builder()
     }
 
     /**
-     * 建立好友关系
-     *
-     * @param token  用户登陆状态的token
-     * @param friend 目标的用户id
-     * @return 操作结果
-     */
-    fun makeFriends(token: String, friend: String): LiveData<DataState<Boolean>> {
-        return Transformations.map(service.makeFriends(token, friend)) { input: ApiResponse<Boolean?>? ->
-            if (null == input) {
-                return@map DataState<Boolean>(DataState.STATE.FETCH_FAILED)
-            } else {
-                Log.e("result", input.code.toString() + ",," + input.message)
-                when (input.code) {
-                    codes.TOKEN_INVALID -> return@map DataState<Boolean>(DataState.STATE.TOKEN_INVALID)
-                    codes.SUCCESS -> return@map DataState(true)
-                    else -> return@map DataState<Boolean>(DataState.STATE.FETCH_FAILED)
-                }
-            }
-        }
-    }
-
-    /**
      * 判断是否为好友
      * @param token 令牌
      * @param userId 我的id
@@ -85,7 +62,7 @@ class RelationWebSource : BaseWebSource<RelationService>(Retrofit.Builder()
                 return@map DataState<Boolean?>(DataState.STATE.FETCH_FAILED)
             } else {
                 when (input.code) {
-                    codes.SUCCESS -> return@map DataState<Boolean?>(input.data)
+                    codes.SUCCESS -> return@map DataState(input.data)
                     codes.TOKEN_INVALID -> return@map DataState<Boolean?>(DataState.STATE.TOKEN_INVALID)
                     else -> return@map DataState<Boolean?>(DataState.STATE.FETCH_FAILED, input.message)
                 }
@@ -122,7 +99,6 @@ class RelationWebSource : BaseWebSource<RelationService>(Retrofit.Builder()
      */
     fun changeRemark(token: String, remark: String, friend_id: String): LiveData<DataState<String?>> {
         return Transformations.map(service.changeRemark(friend_id, remark, token)) { input->
-            //Log.e( "changeRemark: ", input.toString());
             if (input != null) {
                 println("input remark is $input")
                 when (input.code) {

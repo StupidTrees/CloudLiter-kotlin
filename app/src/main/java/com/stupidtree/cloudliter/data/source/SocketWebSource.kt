@@ -6,8 +6,8 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.model.UserLocal
-import com.stupidtree.cloudliter.socket.SocketIOClientService
-import com.stupidtree.cloudliter.socket.SocketIOClientService.JWebSocketClientBinder
+import com.stupidtree.cloudliter.service.socket.SocketIOClientService
+import com.stupidtree.cloudliter.service.socket.SocketIOClientService.JWebSocketClientBinder
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.chat.FriendStateTrigger
 import com.stupidtree.cloudliter.ui.chat.MessageReadNotification
@@ -76,14 +76,14 @@ class SocketWebSource : BroadcastReceiver() {
             Log.e("ChatActivity", "服务与活动成功绑定")
             binder = iBinder as JWebSocketClientBinder
             binder!!.onUnreadFetchedListener = object : SocketIOClientService.OnUnreadFetchedListener {
-                override fun OnUnreadFetched(unread: HashMap<String, Int>) {
+                override fun onUnreadFetched(unread: HashMap<String, Int>) {
                     Log.e("获取未读消息", unread.toString())
                     unreadMessageState.postValue(DataState(unread).setListAction(DataState.LIST_ACTION.REPLACE_ALL))
 
                 }
             }
             binder!!.onMessageReadListener = object :SocketIOClientService.OnMessageReadListener{
-                override fun OnMessageRead(map: HashMap<String, Int>) {
+                override fun onMessageRead(map: HashMap<String, Int>) {
                     Log.e("已读更新", map.toString())
                     unreadMessageState.postValue(DataState(map).setListAction(DataState.LIST_ACTION.DELETE))
 

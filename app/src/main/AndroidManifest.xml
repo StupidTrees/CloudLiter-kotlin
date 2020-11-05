@@ -10,9 +10,10 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- 震动权限 -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
-        android:name="com.stupidtree.cloudliter.HiApplication"
+        android:name=".HiApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -22,16 +23,17 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="q">
-        <activity android:name="com.stupidtree.cloudliter.ui.group.GroupEditorActivity" />
-        <activity android:name="com.stupidtree.cloudliter.ui.relationevent.RelationEventActivity" /> <!-- 不加↑这两行，裁剪没法用 -->
+        <activity android:name=".ui.qrcode.QRCodeActivity"></activity>
+        <activity android:name=".ui.group.GroupEditorActivity" />
+        <activity android:name=".ui.relationevent.RelationEventActivity" /> <!-- 不加↑这两行，裁剪没法用 -->
         <activity
-            android:name="com.stupidtree.cloudliter.ui.conversation.ConversationActivity"
+            android:name=".ui.conversation.ConversationActivity"
             android:launchMode="singleTask" />
         <activity
-            android:name="com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity"
+            android:name=".ui.myprofile.MyProfileActivity"
             android:launchMode="singleTask" />
         <activity
-            android:name="com.stupidtree.cloudliter.ui.SplashActivity"
+            android:name=".ui.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,28 +41,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.stupidtree.cloudliter.ui.widgets.PhotoDetailActivity" />
+        <activity android:name=".ui.widgets.PhotoDetailActivity" />
         <activity
-            android:name="com.stupidtree.cloudliter.ui.profile.ProfileActivity"
+            android:name=".ui.profile.ProfileActivity"
             android:launchMode="singleTask" />
         <activity
-            android:name="com.stupidtree.cloudliter.ui.search.SearchActivity"
+            android:name=".ui.search.SearchActivity"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name="com.stupidtree.cloudliter.ui.chat.ChatActivity"
+            android:name=".ui.chat.ChatActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
-            android:name="com.stupidtree.cloudliter.ui.welcome.WelcomeActivity"
+            android:name=".ui.welcome.WelcomeActivity"
             android:label="@string/title_activity_welcome"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.stupidtree.cloudliter.ui.main.MainActivity"
+            android:name=".ui.main.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask" />
-
         <provider
-            android:name="com.stupidtree.cloudliter.MFileProvider"
+            android:name=".MFileProvider"
             android:authorities="com.stupidtree.cloudliter.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -68,7 +69,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider> <!-- 加上他，否则无法从相册选取图片 -->
-        <service android:name="com.stupidtree.cloudliter.socket.SocketIOClientService" />
+        <service android:name=".service.socket.SocketIOClientService" />
     </application>
 
 </manifest>
