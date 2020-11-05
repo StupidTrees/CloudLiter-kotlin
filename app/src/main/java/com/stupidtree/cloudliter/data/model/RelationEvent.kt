@@ -23,10 +23,10 @@ class RelationEvent {
     var createdAt: Timestamp? = null
     var updatedAt: Timestamp? = null
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
-        val that = o as RelationEvent
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
+        val that = other as RelationEvent
         return id == that.id &&
                 userId == that.userId &&
                 friendId == that.friendId &&

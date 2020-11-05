@@ -418,7 +418,8 @@ class SocketIOClientService : Service() {
         }
     }
 
-    private val mHandler = Handler()
+    //重连调用可以在主线程中进行
+    private val mHandler = Handler(Looper.getMainLooper())
     private val heartBeatRunnable: Runnable = object : Runnable {
         override fun run() {
             if (socket != null) {

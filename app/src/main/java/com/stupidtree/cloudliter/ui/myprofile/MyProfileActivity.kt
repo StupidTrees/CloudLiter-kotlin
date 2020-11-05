@@ -305,9 +305,9 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
             }
             RC_CROP_PHOTO ->                 //裁剪图片返回，此时通知viewModel请求更改头像
                 if (cropImgUri != null) {
-                    val path = FileProviderUtils.getFilePathByUri(this, cropImgUri)
+                    val path = FileProviderUtils.getFilePathByUri(this, cropImgUri!!)
                     // create RequestBody instance from file
-                    viewModel!!.startChangeAvatar(path)
+                    path?.let { viewModel!!.startChangeAvatar(it) }
                 }
         }
     }

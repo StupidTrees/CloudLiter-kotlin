@@ -1,0 +1,94 @@
+package com.stupidtree.cloudliter.utils
+
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
+import com.stupidtree.cloudliter.utils.FileProviderUtils.getUriForFile
+import com.stupidtree.cloudliter.utils.FileProviderUtils.setIntentDataAndType
+import java.io.File
+
+/**
+ * 此类封装了跳转到系统相册选取、裁剪图片的过程
+ * 不必关心
+ */
+class GalleryPicker {
+    /**
+     * 拍照输出真实路径
+     */
+    var tempPhotoPath: String? = null
+
+    companion object {
+        /**
+         * 打开相机
+         */
+        fun takePhoto(mContext: Activity) {
+            if ((ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA)
+                            != PackageManager.PERMISSION_GRANTED)) {
+                // 未授权，申请授权
+                ActivityCompat.requestPermissions(mContext, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA),
+                        MyProfileActivity.RC_TAKE_PHOTO)
+                return
+            }
+            // 已授权
+            val intentToTakePhoto = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            // 设置照片输出位置
+            val photoFile = File(Environment.getExternalStorageDirectory(), "photo.jpg")
+            //  tempPhotoPath = photoFile.getAbsolutePath();
+            val tempImgUri = getUriForFile(mContext, photoFile)
+            intentToTakePhoto.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
+            mContext.startActivityForResult(intentToTakePhoto, MyProfileActivity.RC_TAKE_PHOTO)
+        }
+
+        /**
+         * 选图
+         */
+        fun choosePhoto(mContext: Activity, multiple: Boolean) {
+            if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // 未授权，申请授权(从相册选择图片需要读取存储卡的权限)
+                ActivityCompat.requestPermissions(mContext, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                        MyProfileActivity.RC_CHOOSE_PHOTO)
+                return
+            }
+            // 已授权，获取照片
+            val intentToPickPic = Intent(Intent.ACTION_PICK, null)
+            if (multiple) intentToPickPic.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            intentToPickPic.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
+            mContext.startActivityForResult(intentToPickPic, MyProfileActivity.RC_CHOOSE_PHOTO)
+        }
+
+        /**
+         * 剪裁图片
+         */
+        fun cropPhoto(mContext: Activity, path: String?, toPath: Uri?, size: Int) {
+            if(path==null||toPath==null){
+                return
+            }
+            val intent = Intent("com.android.camera.action.CROP")
+            setIntentDataAndType(mContext, intent, File(path))
+            intent.putExtra("crop", "true")
+            intent.putExtra("aspectX", 1)
+            intent.putExtra("aspectY", 1)
+            intent.putExtra("outputX", size)
+            intent.putExtra("outputY", size)
+            intent.putExtra("scale", true)
+            intent.putExtra("return-data", false)
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, toPath)
+            intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString())
+            mContext.startActivityForResult(intent, MyProfileActivity.RC_CROP_PHOTO)
+        }
+    }
+}

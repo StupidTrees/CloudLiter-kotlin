@@ -172,13 +172,13 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                     button!!.setText(R.string.send_message)
                     button!!.setIconResource(R.drawable.ic_baseline_message_24)
                     button!!.isEnabled = true
-                    button!!.setOnClickListener { view: View? ->
+                    button!!.setOnClickListener {
                         if (viewModel!!.getUserRelation() != null && viewModel!!.getUserProfile() != null && viewModel!!.getUserLocal() != null) {
                             ActivityUtils.startChatActivity(getThis(), viewModel!!.getUserProfile()!!, viewModel!!.getUserRelation()!!, viewModel!!.getUserLocal()!!)
                         }
                     }
                     remarkText!!.text = userRelationDataState.data!!.remark
-                    remarkLayout!!.setOnClickListener { view: View? ->
+                    remarkLayout!!.setOnClickListener {
                         val up = viewModel!!.getUserRelation()
                         if (up != null) {
                             PopUpEditText()
@@ -194,7 +194,7 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                         }
                     }
                     groupName!!.text = userRelationDataState.data!!.groupName
-                    groupLayout!!.setOnClickListener { view: View? ->
+                    groupLayout!!.setOnClickListener {
                         if (viewModel!!.getUserRelation() != null) {
                             //Log.e("relation", String.valueOf(viewModel.getUserRelation()));
                             PickGroupDialog()
@@ -206,7 +206,7 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                                     }).show(supportFragmentManager, "pick_group")
                         }
                     }
-                    deleteLayout!!.setOnClickListener { view: View? ->
+                    deleteLayout!!.setOnClickListener {
                         PopUpText() ///.setText(getString(R.string.attention_please))
                                 .setTitle(R.string.attention_delete_friend)
                                 .setOnConfirmListener (
@@ -225,7 +225,7 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                     logoutButton!!.visibility = View.GONE
                     button!!.isEnabled = true
                     button!!.setIconResource(R.drawable.ic_baseline_person_add_24)
-                    button!!.setOnClickListener { view: View? ->
+                    button!!.setOnClickListener {
                         //通知viewModel进行添加好友请求
                         intent.getStringExtra("id")?.let { viewModel!!.startMakingFriends(it) }
                     }
@@ -238,7 +238,7 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                     button!!.setText(R.string.edit_my_profile)
                     button!!.isEnabled = true
                     button!!.setIconResource(R.drawable.ic_baseline_edit_24)
-                    button!!.setOnClickListener { view: View? -> ActivityUtils.startMyProfileActivity(getThis()) }
+                    button!!.setOnClickListener { ActivityUtils.startMyProfileActivity(getThis()) }
                     remarkLayout!!.setOnClickListener(null)
                 }
             }
@@ -253,7 +253,7 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                 wordsCloudView!!.setData(tag)
             }
         })
-        logoutButton!!.setOnClickListener { view1: View? ->
+        logoutButton!!.setOnClickListener {
             //通知ViewModel登出
             viewModel!!.logout(this)
             finish()

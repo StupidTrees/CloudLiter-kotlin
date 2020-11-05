@@ -90,7 +90,7 @@ class ChatRepository(context: Context) {
                 listDataState.addSource(webListState!!) { result ->
                     if (result.state === DataState.STATE.SUCCESS && result.data!!.isNotEmpty()) {
                         listDataState.removeSource(localListState!!)
-                        saveMessageAsync(LinkedList(result.data))
+                        saveMessageAsync(result.data)
                         listDataState.value = result.setRetry(true).setListAction(action)
                     }
                 }
@@ -100,7 +100,7 @@ class ChatRepository(context: Context) {
                 listDataState.addSource(webListState!!) { result ->
                     if (result.state === DataState.STATE.SUCCESS && result.data!!.size > 0) {
                         listDataState.removeSource(localListState!!)
-                        saveMessageAsync(ArrayList(result.data))
+                        saveMessageAsync(result.data)
                         if (chatMessages != null) {
                             listDataState.value = result.setListAction(action).setRetry(chatMessages.size > 0)
                         }
@@ -257,8 +257,9 @@ class ChatRepository(context: Context) {
         //new Thread(() -> chatMessageDao.saveMessage(Collections.singletonList(chatMessage))).start();
     }
 
-    private fun saveMessageAsync(chatMessages: List<ChatMessage>) {
-        Thread(Runnable { chatMessageDao.saveMessage(chatMessages) }).start()
+    private fun saveMessageAsync(chatMessages: List<ChatMessage>?) {
+
+        Thread { chatMessages?.let { chatMessageDao.saveMessage(it) } }.start()
     }
 
     val messageSentSate: MutableLiveData<DataState<ChatMessage>>

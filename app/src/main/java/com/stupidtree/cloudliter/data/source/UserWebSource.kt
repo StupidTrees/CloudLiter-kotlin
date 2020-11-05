@@ -46,7 +46,7 @@ class UserWebSource : BaseWebSource<UserService>(Retrofit.Builder()
      * @return 登录结果
      */
     fun login(username: String?, password: String?): LiveData<LoginResult> {
-        return Transformations.map(service!!.login(username, password)) { input: ApiResponse<JsonObject?>? ->
+        return Transformations.map(service.login(username, password)) { input: ApiResponse<JsonObject?>? ->
             val loginResult = LoginResult()
             if (null == input) {
                 loginResult[LoginResult.STATES.ERROR] = R.string.login_failed
@@ -54,8 +54,10 @@ class UserWebSource : BaseWebSource<UserService>(Retrofit.Builder()
                 when (input.code) {
                     SUCCESS -> {
                         Log.e("RESPONSE", "登录成功")
-                        val token = JsonUtils.getStringData(
-                                input.data, "token")
+                        val token = input.data?.let {
+                            JsonUtils.getStringData(
+                                    it, "token")
+                        }
                         if (null == token) {
                             Log.e("RESPONSE", "没有找到token")
                             loginResult[LoginResult.STATES.ERROR] = R.string.login_failed
@@ -96,8 +98,10 @@ class UserWebSource : BaseWebSource<UserService>(Retrofit.Builder()
                 when (input.code) {
                     SUCCESS -> {
                         Log.e("RESPONSE", "注册成功")
-                        val token = JsonUtils.getStringData(
-                                input.data, "token")
+                        val token = input.data?.let {
+                            JsonUtils.getStringData(
+                                    it, "token")
+                        }
                         if (null == token) {
                             Log.e("RESPONSE", "没有找到token")
                             signUpResult[SignUpResult.STATES.ERROR] = R.string.sign_up_failed
@@ -247,9 +251,9 @@ class UserWebSource : BaseWebSource<UserService>(Retrofit.Builder()
             }
             when (input.code) {
                 SUCCESS -> {
-                    val file1 = JsonUtils.getStringData(input.data, "file")
+                    val file1 = input.data?.let { JsonUtils.getStringData(it, "file") }
                     if (file1 != null) {
-                        return@map DataState(file1)
+                        return@map DataState<String?>(file1)
                     } else {
                         return@map DataState<String?>(DataState.STATE.FETCH_FAILED)
                     }

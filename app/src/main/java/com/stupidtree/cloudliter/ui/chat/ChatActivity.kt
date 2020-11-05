@@ -81,21 +81,17 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
     @BindView(R.id.state_bar)
     var stateBar: ViewGroup? = null
 
-    @JvmField
     @BindView(R.id.refresh)
-    var refreshLayout: SwipeRefreshLayout? = null
+    lateinit var refreshLayout: SwipeRefreshLayout
 
-    @JvmField
     @BindView(R.id.add)
-    var add: View? = null
+    lateinit var add: View
 
-    @JvmField
     @BindView(R.id.image)
-    var imageButton: View? = null
+    lateinit var imageButton: View
 
-    @JvmField
     @BindView(R.id.expand)
-    var expandableLayout: ExpandableLayout? = null
+    lateinit var expandableLayout: ExpandableLayout
 
     @JvmField
     @BindView(R.id.yunmoji_list)
@@ -189,7 +185,7 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
             conversation?.let { setConversationViews(it) }
         })
         viewModel?.getListData(this)!!.observe(this, Observer { listDataState: DataState<List<ChatMessage>?> ->
-            refreshLayout!!.isRefreshing = false
+            refreshLayout.isRefreshing = false
             Log.e("ChatActivity列表变动", listDataState.listAction.toString() + "》》" + listDataState.data!!.size)
             if (listDataState.state === DataState.STATE.SUCCESS) {
                 //添加一条消息
@@ -200,13 +196,13 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
                         viewModel!!.markRead(this, theOne)
                     }
                     listAdapter.notifyItemsAppended(listDataState.data!!)
-                    if (listAdapter!!.itemCount > 0) {
+                    if (listAdapter.itemCount > 0) {
                         list!!.smoothScrollToPosition(listAdapter.itemCount - 1)
                     }
                 } else if (listDataState.listAction === DataState.LIST_ACTION.APPEND) {
-                    listAdapter!!.notifyItemsAppended(listDataState.data!!)
-                    if (listAdapter!!.itemCount > 0) {
-                        list!!.smoothScrollToPosition(listAdapter!!.itemCount - 1)
+                    listAdapter.notifyItemsAppended(listDataState.data!!)
+                    if (listAdapter.itemCount > 0) {
+                        list!!.smoothScrollToPosition(listAdapter.itemCount - 1)
                     }
                 } else if (listDataState.listAction === DataState.LIST_ACTION.PUSH_HEAD) {
                     //下拉加载更多
@@ -223,7 +219,7 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
                 } else {
                     listAdapter.notifyItemChangedSmooth(listDataState.data!!)
                     if (listAdapter.itemCount > 0) {
-                        list!!.smoothScrollToPosition(listAdapter!!.itemCount - 1)
+                        list!!.smoothScrollToPosition(listAdapter.itemCount - 1)
                     }
                 }
             }
@@ -258,7 +254,7 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
                 }
             }
         })
-        viewModel!!.getImageSentResult().observe(this, Observer { chatMessageDataState -> })
+        viewModel!!.getImageSentResult().observe(this, Observer { })
 
         //消息成功发送后反馈给列表
         viewModel!!.messageSentState!!.observe(this, Observer { chatMessageDataState ->
@@ -268,7 +264,7 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
         })
 
         //消息被对方读取后反馈给列表
-        viewModel!!.messageReadState!!.observe(this, Observer { messageReadNotificationDataState->
+        viewModel!!.messageReadState!!.observe(this, Observer { messageReadNotificationDataState ->
             Log.e("messageRead", messageReadNotificationDataState!!.data.toString())
             if (messageReadNotificationDataState.state === DataState.STATE.SUCCESS) {
                 list?.let { listAdapter.messageRead(it, messageReadNotificationDataState.data!!) }
@@ -291,14 +287,14 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
         layoutManager.stackFromEnd = true //从底部往上堆
         list!!.layoutManager = layoutManager
         //触摸recyclerView的监听
-        list!!.setOnTouchListener { view: View?, motionEvent: MotionEvent? ->
+        list!!.setOnTouchListener { _: View?, _: MotionEvent? ->
             //隐藏键盘
             hideSoftInput(getThis(), inputEditText)
             collapseEmotionPanel()
             false
         }
-        refreshLayout!!.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent)
-        refreshLayout!!.setOnRefreshListener { viewModel?.loadMore() }
+        refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent)
+        refreshLayout.setOnRefreshListener { viewModel?.loadMore() }
         listAdapter.setOnItemLongClickListener(object : BaseListAdapter.OnItemLongClickListener<ChatMessage> {
             override fun onItemLongClick(data: ChatMessage, view: View?, position: Int): Boolean {
                 if (data.getType() == ChatMessage.TYPE.TXT && !data.isTimeStamp) {
@@ -315,7 +311,7 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
             override fun onItemClick(data: ChatMessage, card: View?, position: Int) {
                 if (data.getType() == ChatMessage.TYPE.IMG && !data.isTimeStamp) {
                     val urls = listAdapter.imageUrls
-                    ActivityUtils.showMultipleImages(getThis(), urls, urls.indexOf(ImageUtils.getChatMessageImageUrl(data.content))
+                    ActivityUtils.showMultipleImages(getThis(), urls, urls.indexOf(data.content?.let { ImageUtils.getChatMessageImageUrl(it) })
                     )
                 }
             }
@@ -326,14 +322,14 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
     //初始化各种按钮
     private fun setUpButtons() {
         //点击发送
-        send!!.setOnClickListener { view: View? ->
+        send!!.setOnClickListener {
             if (!TextUtils.isEmpty(inputEditText!!.text.toString())) {
                 viewModel?.sendMessage(inputEditText!!.text.toString())
                 inputEditText!!.setText("")
             }
         }
-        add!!.setOnClickListener { view: View? ->
-            if (expandableLayout!!.isExpanded) {
+        add.setOnClickListener {
+            if (expandableLayout.isExpanded) {
                 collapseEmotionPanel()
             } else {
                 //判断键盘状态
@@ -349,14 +345,14 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
         }
         //输入框的监听，防止表情包和输入法同时出现
         //每次进入聊天界面，点击表情包后点击输入框，会同时出现（未知 bug）
-        inputEditText!!.setOnClickListener { view: View? ->
-            if (expandableLayout!!.isExpanded) {
+        inputEditText!!.setOnClickListener {
+            if (expandableLayout.isExpanded) {
                 lockContentHeight()
                 collapseEmotionPanel()
                 unlockContentHeight()
             }
         }
-        imageButton!!.setOnClickListener { view: View? -> GalleryPicker.choosePhoto(getThis(), false) }
+        imageButton.setOnClickListener { GalleryPicker.choosePhoto(getThis(), false) }
     }
 
     //初始化表情列表
@@ -392,8 +388,8 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
 
     //收起表情栏
     private fun collapseEmotionPanel() {
-        if (expandableLayout!!.isExpanded) {
-            expandableLayout!!.collapse()
+        if (expandableLayout.isExpanded) {
+            expandableLayout.collapse()
             AnimationUtils.rotateTo(add, false)
         }
     }
@@ -401,26 +397,26 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
     //展开表情栏
     private fun expandEmotionPanel() {
         //修改表情包高度 = 输入法高度
-        expandableLayout!!.layoutParams.height = getSupportSoftInputHeight()
+        expandableLayout.layoutParams.height = getSupportSoftInputHeight()
         if (getSupportSoftInputHeight() == 0) {
-            expandableLayout!!.layoutParams.height = keyBoardHeight
+            expandableLayout.layoutParams.height = keyBoardHeight
         }
-        if (!expandableLayout!!.isExpanded) {
-            expandableLayout!!.expand()
+        if (!expandableLayout.isExpanded) {
+            expandableLayout.expand()
             AnimationUtils.rotateTo(add, true)
         }
     }
 
     //锁定内容高度
     private fun lockContentHeight() {
-        val params = refreshLayout!!.layoutParams as LinearLayout.LayoutParams
-        params.height = refreshLayout!!.height
+        val params = refreshLayout.layoutParams as LinearLayout.LayoutParams
+        params.height = refreshLayout.height
         params.weight = 0.0f
     }
 
     //释放被锁定内容高度
     private fun unlockContentHeight() {
-        inputEditText!!.postDelayed({ (refreshLayout!!.layoutParams as LinearLayout.LayoutParams).weight = 1.0f }, 280L)
+        inputEditText!!.postDelayed({ (refreshLayout.layoutParams as LinearLayout.LayoutParams).weight = 1.0f }, 280L)
     }
 
     //获取输入法高度
@@ -439,12 +435,10 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
 
 
     //当未获取键盘高度时，设定表情包高度787（貌似也没啥用）
-    val keyBoardHeight: Int
+    private val keyBoardHeight: Int
         get() = 787
 
-    constructor(parcel: Parcel) : this() {
 
-    }
 
 
     //   //底部虚拟按键栏的高度（貌似也没啥用）
@@ -480,16 +474,15 @@ class ChatActivity() : BaseActivity<ChatViewModel>() {
                 return
             }
             val filePath = FileProviderUtils.getFilePathByUri(getThis(), uri)
-            viewModel?.sendImageMessage(filePath)
+            filePath?.let { viewModel?.sendImageMessage(it) }
         }
     }
 
-    companion object {
-        //隐藏键盘
-        fun hideSoftInput(context: Context, view: View?) {
-            val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(view!!.windowToken, 0)
-        }
+
+    //隐藏键盘
+    private fun hideSoftInput(context: Context, view: View?) {
+        val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view!!.windowToken, 0)
     }
 
 

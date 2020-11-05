@@ -54,7 +54,7 @@ class ConversationActivity : BaseActivity<ConversationViewModel>() {
     override fun initViews() {
         viewModel!!.conversationLiveData?.observe(this, Observer { conversationDataState: DataState<Conversation?> ->
             if (conversationDataState.state === DataState.STATE.SUCCESS) {
-                setUpPage(conversationDataState.data)
+                conversationDataState.data?.let { setUpPage(it) }
             }
         })
         wordsCloudView!!.setData(listOf(getString(R.string.no_word_cloud_yet)))
@@ -81,8 +81,8 @@ class ConversationActivity : BaseActivity<ConversationViewModel>() {
 
     }
 
-    private fun setUpPage(conversation: Conversation?) {
-        ImageUtils.loadAvatarNoCacheInto(this, conversation!!.friendAvatar, friendAvatarImage!!)
+    private fun setUpPage(conversation: Conversation) {
+        conversation.friendAvatar?.let { ImageUtils.loadAvatarNoCacheInto(this, it, friendAvatarImage!!) }
         if (TextUtils.isEmpty(conversation.friendRemark)) {
             friendRemarkText!!.text = conversation.friendNickname
         } else {

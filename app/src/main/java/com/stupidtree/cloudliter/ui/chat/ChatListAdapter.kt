@@ -55,12 +55,12 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                 holder.read!!.visibility = if (data.read) View.VISIBLE else View.GONE
             }
             if (holder.viewType == TYPE_TIME && holder.content != null) {
-                holder.content!!.text = TextUtils.getChatTimeText(chatActivity, data.createdAt)
+                holder.content!!.text = data.createdAt?.let { TextUtils.getChatTimeText(chatActivity, it) }
             } else if (holder.avatar != null) {
                 if (holder.viewType == TYPE_MINE || holder.viewType == TYPE_MINE_IMAGE) {
-                    ImageUtils.loadLocalAvatarInto(chatActivity, chatActivity.viewModel!!.myAvatar, holder.avatar!!)
+                    chatActivity.viewModel!!.myAvatar?.let { ImageUtils.loadLocalAvatarInto(chatActivity, it, holder.avatar!!) }
                 } else {
-                    ImageUtils.loadAvatarInto(chatActivity, chatActivity.viewModel!!.friendAvatar, holder.avatar!!)
+                    chatActivity.viewModel!!.friendAvatar?.let { ImageUtils.loadAvatarInto(chatActivity, it, holder.avatar!!) }
                 }
                 if (holder.progress != null) {
                     if (data.isProgressing) {
@@ -73,13 +73,13 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                 holder.avatar!!.setOnClickListener { view: View? -> data.fromId?.let { ActivityUtils.startProfileActivity(chatActivity, it) } }
                 if (holder.image != null && holder.progress != null) {
                     if (holder.progress!!.visibility != View.VISIBLE) {
-                        ImageUtils.loadChatMessageInto(chatActivity, data.content, holder.image!!)
+                        data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
                     } else {
                         //Glide.with(getThis()).load(data.getContent()).into(holder.image);
                         holder.image!!.setImageResource(R.drawable.place_holder_loading)
                     }
                 } else if (holder.image != null) {
-                    ImageUtils.loadChatMessageInto(chatActivity, data.content, holder.image!!)
+                    data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
                 }
             }
             holder.bindClickAction(data, position)
@@ -96,7 +96,10 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             val res: MutableList<String> = ArrayList()
             for (cm in mBeans) {
                 if (!cm.isTimeStamp && cm.getType() == ChatMessage.TYPE.IMG) {
-                    res.add(ImageUtils.getChatMessageImageUrl(cm.content))
+                    cm.content?.let {
+                        res.add(ImageUtils.getChatMessageImageUrl(it))
+                    }
+
                 }
             }
             return res
@@ -401,7 +404,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
 
         fun updateImage(data: ChatMessage) {
             if (image != null) {
-                ImageUtils.loadChatMessageInto(chatActivity, data.content, image!!)
+                data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, image!!) }
             }
         }
 

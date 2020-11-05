@@ -18,7 +18,7 @@ import java.util.*
 class UserPreferenceSource(private val context: Context) {
     private var sharedPreferences: SharedPreferences? = null
     private val preference: SharedPreferences?
-        private get() {
+        get() {
             if (sharedPreferences == null) {
                 sharedPreferences = context.getSharedPreferences(SP_NAME_LOCAL_USER, Context.MODE_PRIVATE)
             }

@@ -58,7 +58,7 @@ class RelationWebSource : BaseWebSource<RelationService>(Retrofit.Builder()
      * @return 操作结果
      */
     fun makeFriends(token: String, friend: String): LiveData<DataState<Boolean>> {
-        return Transformations.map(service!!.makeFriends(token, friend)) { input: ApiResponse<Boolean?>? ->
+        return Transformations.map(service.makeFriends(token, friend)) { input: ApiResponse<Boolean?>? ->
             if (null == input) {
                 return@map DataState<Boolean>(DataState.STATE.FETCH_FAILED)
             } else {
@@ -80,7 +80,7 @@ class RelationWebSource : BaseWebSource<RelationService>(Retrofit.Builder()
      * @return 操作结果
      */
     fun isFriends(token: String, userId: String, friend: String): LiveData<DataState<Boolean?>> {
-        return Transformations.map(service!!.isFriends(token, userId, friend)) { input ->
+        return Transformations.map(service.isFriends(token, userId, friend)) { input ->
             if (input == null) {
                 return@map DataState<Boolean?>(DataState.STATE.FETCH_FAILED)
             } else {
@@ -100,7 +100,7 @@ class RelationWebSource : BaseWebSource<RelationService>(Retrofit.Builder()
      * @return 操作结果
      */
     fun queryRelation(token: String, friendId: String): LiveData<DataState<UserRelation?>> {
-        return Transformations.map(service!!.queryRelation(token, friendId)) { input ->
+        return Transformations.map(service.queryRelation(token, friendId)) { input ->
             if (input == null) {
                 return@map DataState<UserRelation?>(DataState.STATE.FETCH_FAILED)
             } else {
@@ -121,7 +121,7 @@ class RelationWebSource : BaseWebSource<RelationService>(Retrofit.Builder()
      * @return 操作结果
      */
     fun changeRemark(token: String, remark: String, friend_id: String): LiveData<DataState<String?>> {
-        return Transformations.map(service!!.changeRemark(friend_id, remark, token)) { input->
+        return Transformations.map(service.changeRemark(friend_id, remark, token)) { input->
             //Log.e( "changeRemark: ", input.toString());
             if (input != null) {
                 println("input remark is $input")
@@ -164,7 +164,7 @@ class RelationWebSource : BaseWebSource<RelationService>(Retrofit.Builder()
      * @return 请求结果
      */
     fun queryMine(token: String): LiveData<DataState<List<RelationEvent>?>> {
-        return Transformations.map(service!!.queryMine(token)) { input->
+        return Transformations.map(service.queryMine(token)) { input->
             if (null == input) {
                 return@map DataState<List<RelationEvent>?>(DataState.STATE.FETCH_FAILED)
             }
@@ -183,7 +183,7 @@ class RelationWebSource : BaseWebSource<RelationService>(Retrofit.Builder()
      * @return 操作结果
      */
     fun responseFriendRequest(token: String, eventId: String, action: ACTION): LiveData<DataState<*>> {
-        return Transformations.map(service!!.responseFriendRequest(token, eventId, action.toString())) { input: ApiResponse<Any?>? ->
+        return Transformations.map(service.responseFriendRequest(token, eventId, action.toString())) { input: ApiResponse<Any?>? ->
             if (null == input) {
                 return@map DataState<Any>(DataState.STATE.FETCH_FAILED)
             }
@@ -202,7 +202,7 @@ class RelationWebSource : BaseWebSource<RelationService>(Retrofit.Builder()
      * @return 操作结果
      */
     fun deleteFriend(token: String, friendId: String): LiveData<DataState<*>> {
-        return Transformations.map(service!!.deleteFriend(token, friendId)) { input: ApiResponse<Any?>? ->
+        return Transformations.map(service.deleteFriend(token, friendId)) { input: ApiResponse<Any?>? ->
             if (null == input) {
                 return@map DataState<Any>(DataState.STATE.FETCH_FAILED)
             }
@@ -220,7 +220,7 @@ class RelationWebSource : BaseWebSource<RelationService>(Retrofit.Builder()
      * @return 操作结果
      */
     fun countUnread(token: String): LiveData<DataState<Int?>> {
-        return Transformations.map(service!!.countUnread(token)) { input  ->
+        return Transformations.map(service.countUnread(token)) { input  ->
             if (null == input) {
                 return@map DataState<Int?>(DataState.STATE.FETCH_FAILED)
             }
@@ -238,7 +238,7 @@ class RelationWebSource : BaseWebSource<RelationService>(Retrofit.Builder()
      * @return 操作结果
      */
     fun markRead(token: String): LiveData<DataState<Any?>> {
-        return Transformations.map(service!!.markRead(token)) { input  ->
+        return Transformations.map(service.markRead(token)) { input  ->
             if (null == input) {
                 return@map DataState<Any?>(DataState.STATE.FETCH_FAILED)
             }

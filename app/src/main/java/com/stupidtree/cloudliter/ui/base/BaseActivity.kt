@@ -82,7 +82,7 @@ abstract class BaseActivity<T : ViewModel?> : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true) //左侧添加一个默认的返回图标
         supportActionBar!!.setHomeButtonEnabled(true) //设置返回键可用
-        toolbar.setNavigationOnClickListener { v: View? -> onBackPressed() }
+        toolbar.setNavigationOnClickListener { onBackPressed() }
     }
 
     private fun isLightColor(@ColorInt color: Int): Boolean {

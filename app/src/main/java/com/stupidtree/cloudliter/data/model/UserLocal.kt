@@ -56,8 +56,8 @@ class UserLocal : Serializable {
         @JvmStatic
         fun getFromResponseData(responseData: JsonObject?): UserLocal {
             val userLocal = UserLocal()
-            val info = JsonUtils.getObjectData(responseData, "info")
-            val token = JsonUtils.getStringData(responseData, "token")
+            val info = responseData?.let { JsonUtils.getObjectData(it, "info") }
+            val token = responseData?.let { JsonUtils.getStringData(it, "token") }
             if (info != null) {
                 val id = JsonUtils.getStringData(info, "id")
                 val username = JsonUtils.getStringData(info, "username")
