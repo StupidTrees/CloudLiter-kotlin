@@ -21,19 +21,12 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="center"
-            android:background="@drawable/element_round_primary_lighter"
-            android:scaleType="centerInside" />
+            android:background="@drawable/element_round_grey_light"
+            android:src="@drawable/ic_group_button"
+            android:scaleType="centerInside"
+            android:padding="5dp"
+            app:tint="?attr/colorControlNormal" />
 
-        <ImageView
-            android:id="@+id/icon"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:scaleType="centerCrop"
-            android:alpha="0.6"
-            android:theme="@style/ripplePrimarySmall"
-            app:srcCompat="@drawable/ic_baseline_arrow_right_24"
-            app:tint="?attr/colorPrimary" />
     </FrameLayout>
 
     <TextView
@@ -46,8 +39,8 @@
         android:layout_weight="1"
         android:maxLines="1"
         android:singleLine="true"
-        android:text="TextView"
-        android:textColor="?attr/textColorPrimary"
+        android:text="分组管理"
+        android:textColor="?attr/textColorSecondary"
         android:textSize="18sp" />
 
 </LinearLayout>

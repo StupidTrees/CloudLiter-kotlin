@@ -107,12 +107,12 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
         return MyProfileViewModel::class.java
     }
 
-    var cropImgUri: Uri? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setWindowParams(true, true, false)
         setToolbarActionBack(toolbar!!)
-        cropImgUri = Uri.parse("file:///" + Environment.getExternalStorageDirectory() + "/avatar_cropped.jpg")
+
+        // cropImgUri = Uri.parse("file:///" + Environment.getExternalStorageDirectory() + "/avatar_cropped.jpg")
     }
 
     override fun initViews() {
@@ -194,10 +194,10 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
                                 Arrays.asList(getString(R.string.male), getString(R.string.female)),
                                 Arrays.asList(GENDER.MALE, GENDER.FEMALE)
                         ).setOnConfirmListener(object : PopUpSelectableList.OnConfirmListener<GENDER> {
-                                    override fun OnConfirm(title: String?, key: GENDER) {
-                                        viewModel!!.startChangeGender(key)
-                                    }
-                                })
+                            override fun OnConfirm(title: String?, key: GENDER) {
+                                viewModel!!.startChangeGender(key)
+                            }
+                        })
                         .show(supportFragmentManager, "select")
             }
         }
@@ -224,7 +224,7 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
                                         COLOR.CYAN,
                                         COLOR.BLUE,
                                         COLOR.PURPLE)
-                        ).setOnConfirmListener(object:PopUpSelectableList.OnConfirmListener<COLOR>{
+                        ).setOnConfirmListener(object : PopUpSelectableList.OnConfirmListener<COLOR> {
                             override fun OnConfirm(title: String?, key: COLOR) {
                                 viewModel!!.startChangeColor(key)
                             }
@@ -301,14 +301,13 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
                     return
                 }
                 // 剪裁图片
-                GalleryPicker.cropPhoto(getThis(), FileProviderUtils.getFilePathByUri(getThis(), uri), cropImgUri, 200)
+                GalleryPicker.cropPhoto(getThis(), FileProviderUtils.getFilePathByUri(getThis(), uri), 200)
             }
-            RC_CROP_PHOTO ->                 //裁剪图片返回，此时通知viewModel请求更改头像
-                if (cropImgUri != null) {
-                    val path = FileProviderUtils.getFilePathByUri(this, cropImgUri!!)
-                    // create RequestBody instance from file
-                    path?.let { viewModel!!.startChangeAvatar(it) }
-                }
+            RC_CROP_PHOTO -> {                //裁剪图片返回，此时通知viewModel请求更改头像
+                val path = GalleryPicker.getCroppedCacheDir(this)?.let { FileProviderUtils.getFilePathByUri(this, it) }
+                // create RequestBody instance from file
+                path?.let { viewModel!!.startChangeAvatar(it) }
+            }
         }
     }
 

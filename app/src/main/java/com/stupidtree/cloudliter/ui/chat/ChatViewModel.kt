@@ -17,7 +17,6 @@ import com.stupidtree.cloudliter.ui.base.DataState.LIST_ACTION
 import com.stupidtree.cloudliter.ui.base.StringTrigger
 import com.stupidtree.cloudliter.utils.TextUtils
 import java.sql.Timestamp
-import java.util.*
 
 class ChatViewModel(application: Application) : AndroidViewModel(application) {
     /**
@@ -84,6 +83,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     //控制↑的刷新
     private val imageSendController = MutableLiveData<StringTrigger>()
+    private val voiceSendController = MutableLiveData<VoiceMessageTrigger>()
     private val pageSize = 15
     private var topId: String? = null
     private var topTime: Timestamp? = null
@@ -154,11 +154,27 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     //状态数据：图片消息发送
     fun getImageSentResult(): LiveData<DataState<ChatMessage?>> {
-        return Transformations.switchMap<StringTrigger, DataState<ChatMessage?>>(imageSendController) { input: StringTrigger ->
+        return Transformations.switchMap(imageSendController) { input: StringTrigger ->
             if (input.isActioning) {
                 val userLocal = localUserRepository.getLoggedInUser()
                 if (userLocal.isValid && friendId != null) {
-                    return@switchMap chatRepository.ActionSendImageMessage(getApplication(), userLocal.token!!, userLocal.id!!, friendId!!, input.data!!)
+                    return@switchMap chatRepository.ActionSendImageMessage(getApplication(), userLocal.token!!, userLocal.id!!, friendId!!, input.data)
+                } else {
+                    return@switchMap MutableLiveData(DataState<ChatMessage?>(DataState.STATE.NOT_LOGGED_IN))
+                }
+            }
+            MutableLiveData(DataState(DataState.STATE.NOTHING))
+        }
+    }
+
+
+    //状态数据：语音消息发送
+    fun getVoiceSentResult(): LiveData<DataState<ChatMessage?>> {
+        return Transformations.switchMap(voiceSendController) { input: VoiceMessageTrigger ->
+            if (input.isActioning) {
+                val userLocal = localUserRepository.getLoggedInUser()
+                if (userLocal.isValid && friendId != null) {
+                    return@switchMap chatRepository.ActionSendVoiceMessage(getApplication(), userLocal.token!!, userLocal.id!!, friendId!!, input.path!!,input.seconds)
                 } else {
                     return@switchMap MutableLiveData(DataState<ChatMessage?>(DataState.STATE.NOT_LOGGED_IN))
                 }
@@ -187,6 +203,13 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun sendImageMessage(path: String) {
         imageSendController.value = StringTrigger.getActioning(path)
+    }
+
+    /**
+     * 发送语音
+     */
+    fun sendVoiceMessage(path: String,time:Int) {
+        voiceSendController.value = VoiceMessageTrigger.getActioning(path,time)
     }
 
     fun bindService(context: Context?) {

@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activityRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/backgroundColorSecond"
@@ -28,12 +29,12 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:clickable="true"
+                android:contentDescription="@string/back"
+                android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
                 android:padding="16dp"
                 android:theme="@style/rippleControl"
-                app:srcCompat="@drawable/ic_baseline_arrow_back_ios_24"
-                android:focusable="true"
-                android:contentDescription="@string/back" />
+                app:srcCompat="@drawable/ic_baseline_arrow_back_ios_24" />
 
             <TextView
                 android:id="@+id/title"
@@ -124,6 +125,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:elevation="2dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -133,18 +135,117 @@
             android:background="?attr/backgroundColorSecond"
             android:orientation="horizontal">
 
-            <com.stupidtree.cloudliter.ui.widgets.EmoticonsEditText
-                android:id="@+id/input"
-                android:layout_width="0dp"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/switch_button"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                android:clickable="true"
+                android:contentDescription="@string/select_yunmoji"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:foregroundTintMode="src_over"
+                app:cardBackgroundColor="@color/colorPrimary"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp">
+
+                <ImageView
+                    android:id="@+id/switch_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:background="?attr/backgroundColorBottomAsTint"
+                    android:backgroundTintMode="src_over"
+                    android:padding="4dp"
+                    app:srcCompat="@drawable/ic_voice_wave"
+                    app:tint="?attr/colorPrimary"
+                    tools:ignore="ContentDescription" />
+            </androidx.cardview.widget.CardView>
+
+            <FrameLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:autofillHints=""
-                android:background="#00000000"
-                android:imeOptions="actionSearch"
-                android:padding="24dp"
-                android:singleLine="false"
-                android:textColor="?attr/textColorPrimary"
-                android:textColorHint="?attr/textColorSecondary" />
+                android:layout_weight="1">
+
+                <com.stupidtree.cloudliter.ui.widgets.EmoticonsEditText
+                    android:id="@+id/input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_weight="1"
+                    android:autofillHints=""
+                    android:background="@drawable/element_chat_edit_background"
+                    android:backgroundTint="?attr/backgroundColorBottomAsTint"
+                    android:backgroundTintMode="src_over"
+                    android:imeOptions="actionSearch"
+                    android:paddingStart="16dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="5dp"
+                    android:singleLine="false"
+                    android:textColor="?attr/textColorPrimary"
+                    android:textColorHint="?attr/textColorSecondary" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/voice_bubble"
+                    android:layout_width="wrap_content"
+                    android:layout_height="34dp"
+                    android:layout_gravity="center|start"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone"
+                    app:cardCornerRadius="17dp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/friendBubbleColor"
+                        android:orientation="horizontal"
+                        android:paddingStart="10dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            app:srcCompat="@drawable/ic_voice_wave"
+                            app:tint="@color/colorPrimary" />
+
+                        <TextView
+                            android:id="@+id/recorfing_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="12dp"
+                            android:text="00:32"
+                            android:textColor="?attr/textColorSecondary" />
+
+                        <ImageView
+                            android:id="@+id/voice_cancel"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="-12dp"
+                            android:layout_marginEnd="2dp"
+                            android:clickable="true"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:padding="6dp"
+                            android:theme="@style/ripplePrimaryTiny"
+                            android:tintMode="src_in"
+                            app:srcCompat="@drawable/ic_cancel" />
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+            </FrameLayout>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/image"
@@ -174,19 +275,19 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:contentDescription="@string/select_yunmoji"
                 android:id="@+id/add"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
                 android:layout_marginEnd="8dp"
                 android:clickable="true"
+                android:contentDescription="@string/select_yunmoji"
+                android:focusable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:foregroundTintMode="src_over"
                 app:cardBackgroundColor="@color/colorPrimary"
                 app:cardCornerRadius="18dp"
-                app:cardElevation="0dp"
-                android:focusable="true">
+                app:cardElevation="0dp">
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -196,8 +297,8 @@
                     android:backgroundTintMode="src_over"
                     android:padding="4dp"
                     app:srcCompat="@drawable/ic_baseline_emoji_emotions_24"
-                    tools:ignore="ContentDescription"
-                    app:tint="?attr/colorPrimary" />
+                    app:tint="?attr/colorPrimary"
+                    tools:ignore="ContentDescription" />
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -207,11 +308,11 @@
                 android:layout_gravity="center"
                 android:layout_marginEnd="16dp"
                 android:clickable="true"
+                android:focusable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 app:cardBackgroundColor="?attr/colorPrimary"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                android:focusable="true">
+                app:cardElevation="0dp">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -231,14 +332,68 @@
             android:id="@+id/expand"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:el_expanded="false">
+            app:el_expanded="false"
+            app:el_parallax="1">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/yunmoji_list"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_margin="16dp"
-                android:overScrollMode="never" />
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/voice_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center"
+                    android:layout_margin="16dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/voice_button_hint"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:alpha="0.6"
+                        android:text="@string/voice_button_hint_pressed"
+                        android:textColor="?attr/textColorSecondary"
+                        android:textSize="17sp" />
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/voice_button"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        app:cardBackgroundColor="?attr/colorPrimary"
+                        app:cardCornerRadius="50dp"
+                        app:cardElevation="8dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:clickable="false"
+                            android:contextClickable="false"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:padding="16dp"
+                            app:srcCompat="@drawable/ic_voice_record_button" />
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/yunmoji_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:layout_margin="16dp"
+                    android:overScrollMode="never" />
+            </FrameLayout>
+
         </net.cachapa.expandablelayout.ExpandableLayout>
     </LinearLayout>
 

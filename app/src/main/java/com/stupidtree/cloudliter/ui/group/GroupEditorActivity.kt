@@ -83,14 +83,16 @@ class GroupEditorActivity : BaseActivity<GroupEditorViewModel>() {
         }
 
         //点击删除分组
-        listAdapter!!.setOnDeleteClickListener { button: View?, group: RelationGroup, position: Int ->
-            PopUpText().setTitle(R.string.ensure_delete).setText("").setOnConfirmListener(
-                    object : PopUpText.OnConfirmListener {
-                        override fun OnConfirm() {
-                            group.id?.let { viewModel!!.startDeleteGroup(it) }
+        listAdapter!!.onDeleteClickListener = object:GroupListAdapter.OnDeleteClickListener {
+            override fun OnDeleteClick(button: View?, group: RelationGroup, position: Int) {
+                PopUpText().setTitle(R.string.ensure_delete).setText("").setOnConfirmListener(
+                        object : PopUpText.OnConfirmListener {
+                            override fun OnConfirm() {
+                                group.id?.let { viewModel!!.startDeleteGroup(it) }
+                            }
                         }
-                    }
-            ).show(supportFragmentManager, "confirm")
+                ).show(supportFragmentManager, "confirm")
+            }
         }
         viewModel!!.addGroupResult?.observe(this, Observer { stringDataState: DataState<String?> ->
             if (stringDataState.state === DataState.STATE.SUCCESS) {

@@ -228,6 +228,35 @@ class ChatRepository(context: Context) {
         return result
     }
 
+
+    /**
+     * 发送图片
+     *
+     * @param token    令牌
+     * @param toId     朋友id
+     * @param filePath 文件
+     * @return 返回结果
+     */
+    fun ActionSendVoiceMessage(context: Context, token: String, fromId: String, toId: String, filePath: String,voiceSeconds:Int): LiveData<DataState<ChatMessage?>> {
+        val result = MediatorLiveData<DataState<ChatMessage?>>()
+        //读取图片文件
+        val f = File(filePath)
+        val tempMsg = ChatMessage(fromId, toId, filePath)
+        tempMsg.setType(ChatMessage.TYPE.VOICE)
+        tempMsg.extra = voiceSeconds.toString()
+        listDataState.value = DataState(listOf(tempMsg) as List?).setListAction(LIST_ACTION.APPEND_ONE)
+        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), f)
+        //构造一个图片格式的POST表单
+        val body = MultipartBody.Part.createFormData("upload", f.name, requestFile)
+        val sendResult = chatMessageWebSource.sendVoiceMessage(token, toId, body, tempMsg.uuid, voiceSeconds)
+        result.addSource(sendResult) { value ->
+            result.setValue(value)
+        }
+        return result
+    }
+
+
+
     fun bindService(context: Context) {
         val IF = IntentFilter()
         IF.addAction(SocketIOClientService.ACTION_RECEIVE_MESSAGE)
@@ -244,7 +273,7 @@ class ChatRepository(context: Context) {
     }
 
     private fun saveMessageAsync(chatMessage: ChatMessage) {
-        Thread(Runnable { chatMessageDao.saveMessage(listOf(chatMessage)) }).start()
+        Thread({ chatMessageDao.saveMessage(listOf(chatMessage)) }).start()
     }
 
     private fun markMessageReadAsync(notification: MessageReadNotification?) {

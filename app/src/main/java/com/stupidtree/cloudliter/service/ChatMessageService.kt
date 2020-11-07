@@ -46,4 +46,11 @@ interface ChatMessageService {
     @Multipart
     @POST("/message/send_image")
     fun sendImageMessage(@Header("token") token: String, @Query("toId") toId: String, @Part file: MultipartBody.Part, @Query("uuid") uuid: String?): LiveData<ApiResponse<ChatMessage?>?>
+
+    @Multipart
+    @POST("/message/send_voice")
+    fun sendVoiceMessage(@Header("token") token: String, @Query("toId") toId: String, @Part file: MultipartBody.Part, @Query("uuid") uuid: String?,@Query("seconds")seconds:Int): LiveData<ApiResponse<ChatMessage?>?>
+
 }
+
+

@@ -16,13 +16,26 @@ import com.stupidtree.cloudliter.utils.TextUtils
 import java.util.*
 
 class GroupedFriendsListAdapter(context: Context?) : GroupedRecyclerViewAdapter(context) {
+
+    val TYPE_LABEL = 0
+    val TYPE_ADD = 1
+
     var groupEntities: MutableList<ExpandableGroupEntity> = ArrayList()
     override fun getGroupCount(): Int {
-        return groupEntities.size
+        return groupEntities.size+1
+    }
+
+    override fun getHeaderViewType(groupPosition: Int): Int {
+        return if(groupPosition>=groupEntities.size){
+            TYPE_ADD
+        }else{
+            TYPE_LABEL
+        }
     }
 
     override fun getChildrenCount(groupPosition: Int): Int {
-        return if (!groupEntities[groupPosition].isExpanded) {
+
+        return if (groupPosition>=groupEntities.size||!groupEntities[groupPosition].isExpanded) {
             0
         } else groupEntities[groupPosition].childrenCount
     }
@@ -36,7 +49,8 @@ class GroupedFriendsListAdapter(context: Context?) : GroupedRecyclerViewAdapter(
     }
 
     override fun getHeaderLayout(viewType: Int): Int {
-        return R.layout.fragment_contact_group_item_label
+        return if(viewType==TYPE_LABEL) R.layout.fragment_contact_group_item_label
+        else R.layout.fragment_contact_group_item_add
     }
 
     override fun getFooterLayout(viewType: Int): Int {
@@ -48,11 +62,13 @@ class GroupedFriendsListAdapter(context: Context?) : GroupedRecyclerViewAdapter(
     }
 
     override fun onBindHeaderViewHolder(holder: BaseViewHolder, groupPosition: Int) {
-        holder.get<View>(R.id.icon).rotation = if (groupEntities[groupPosition].isExpanded) 90f else 0f
-        if (groupEntities[groupPosition].groupId == "null") {
-            holder.setText(R.id.name, mContext.getString(R.string.not_assigned_group))
-        } else {
-            holder.setText(R.id.name, groupEntities[groupPosition].groupName)
+        if(groupPosition<groupEntities.size){
+            holder.get<View>(R.id.icon).rotation = if (groupEntities[groupPosition].isExpanded) 90f else 0f
+            if (groupEntities[groupPosition].groupId == "null") {
+                holder.setText(R.id.name, mContext.getString(R.string.not_assigned_group))
+            } else {
+                holder.setText(R.id.name, groupEntities[groupPosition].groupName)
+            }
         }
     }
 
@@ -121,7 +137,7 @@ class GroupedFriendsListAdapter(context: Context?) : GroupedRecyclerViewAdapter(
             if (!groupMap.containsKey(tmpId)) {
                 val e = ExpandableGroupEntity(tmpId, ur.groupName)
                 val expanded = oldExpanded[tmpId]
-                e?.isExpanded = expanded ?: false
+                e.isExpanded = expanded ?: false
                 groupMap[tmpId] = e
             }
             groupMap[tmpId]?.addChild(ur)

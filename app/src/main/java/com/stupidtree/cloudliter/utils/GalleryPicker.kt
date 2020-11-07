@@ -2,13 +2,13 @@ package com.stupidtree.cloudliter.utils
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
@@ -56,13 +56,7 @@ class GalleryPicker {
          * 选图
          */
         fun choosePhoto(mContext: Activity, multiple: Boolean) {
-            if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                // 未授权，申请授权(从相册选择图片需要读取存储卡的权限)
-                ActivityCompat.requestPermissions(mContext, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                        MyProfileActivity.RC_CHOOSE_PHOTO)
-                return
-            }
+            PermissionUtils.grantExternalStoragePermissions(mContext)
             // 已授权，获取照片
             val intentToPickPic = Intent(Intent.ACTION_PICK, null)
             if (multiple) intentToPickPic.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
@@ -70,11 +64,15 @@ class GalleryPicker {
             mContext.startActivityForResult(intentToPickPic, MyProfileActivity.RC_CHOOSE_PHOTO)
         }
 
+        fun getCroppedCacheDir(context: Context):Uri?{
+            return  Uri.parse("file:///" +context.getExternalFilesDir(null) + "/cropped.jpg")
+        }
         /**
          * 剪裁图片
          */
-        fun cropPhoto(mContext: Activity, path: String?, toPath: Uri?, size: Int) {
-            if(path==null||toPath==null){
+        fun cropPhoto(mContext: Activity, path: String?, size: Int) {
+
+            if(path==null|| getCroppedCacheDir(mContext)==null){
                 return
             }
             val intent = Intent("com.android.camera.action.CROP")
@@ -86,7 +84,7 @@ class GalleryPicker {
             intent.putExtra("outputY", size)
             intent.putExtra("scale", true)
             intent.putExtra("return-data", false)
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, toPath)
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, getCroppedCacheDir(mContext))
             intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString())
             mContext.startActivityForResult(intent, MyProfileActivity.RC_CROP_PHOTO)
         }

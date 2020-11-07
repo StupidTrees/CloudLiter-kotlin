@@ -15,14 +15,14 @@ import java.util.*
 @Entity(tableName = "message")
 class ChatMessage : Serializable {
     enum class TYPE {
-        TXT, IMG
+        TXT, IMG, VOICE
     }
 
     /**
      * 和服务器数据实体一致的属性
      */
     @PrimaryKey
-    lateinit var id: String
+    var id: String = ""
     var fromId: String? = null
     var toId: String? = null
 
@@ -52,6 +52,11 @@ class ChatMessage : Serializable {
     @Ignore
     var isProgressing: Boolean
 
+    enum class VOICE_STATE { PLAYING, PAUSED, STOPPED }
+
+    @Ignore
+    var playing: VOICE_STATE = VOICE_STATE.STOPPED
+
     @Ignore
     var uuid: String? = null
 
@@ -61,7 +66,6 @@ class ChatMessage : Serializable {
 
     @Ignore
     constructor(fromId: String?, toId: String?, content: String?) {
-        this.id = ""
         this.fromId = fromId
         this.toId = toId
         this.content = content
@@ -84,7 +88,12 @@ class ChatMessage : Serializable {
         get() = id == "time"
 
     fun getType(): TYPE {
-        return if (type == "IMG") TYPE.IMG else TYPE.TXT
+
+        return when (type) {
+            "IMG" -> TYPE.IMG
+            "VOICE" -> TYPE.VOICE
+            else -> TYPE.TXT
+        }
     }
 
     fun setType(type: TYPE) {
@@ -113,36 +122,36 @@ class ChatMessage : Serializable {
      *
      * @return 分词列表
      */
-    fun getExtraAsSegmentation(): MutableList<String>{
-            val result: MutableList<String> = ArrayList()
-            Log.e("getExtra", this.toString())
-            try {
-                for (s in Gson().fromJson<List<*>>(extra, MutableList::class.java)) {
-                    result.add(s.toString())
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+    fun getExtraAsSegmentation(): MutableList<String> {
+        val result: MutableList<String> = ArrayList()
+        Log.e("getExtra", this.toString())
+        try {
+            for (s in Gson().fromJson<List<*>>(extra, MutableList::class.java)) {
+                result.add(s.toString())
             }
-            return result
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
+        return result
+    }
 
     /**
      * 将extra字段解析为图片敏感检测结果
      *
      * @return 检测结果
      */
-    fun getExtraAsImageAnalyse(): HashMap<String, Float>{
-            val result = HashMap<String, Float>()
-            try {
-                val jo = Gson().fromJson(extra.toString(), JsonObject::class.java)
-                for ((key, value) in jo.entrySet()) {
-                    result[key] = java.lang.Float.valueOf(value.asFloat.toString())
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+    fun getExtraAsImageAnalyse(): HashMap<String, Float> {
+        val result = HashMap<String, Float>()
+        try {
+            val jo = Gson().fromJson(extra.toString(), JsonObject::class.java)
+            for ((key, value) in jo.entrySet()) {
+                result[key] = java.lang.Float.valueOf(value.asFloat.toString())
             }
-            return result
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
+        return result
+    }
 
     companion object {
         fun getTimeStampHolderInstance(timestamp: Timestamp?): ChatMessage {

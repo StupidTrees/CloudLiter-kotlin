@@ -131,4 +131,7 @@
     <string name="not_assigned_group">未分组</string>
     <string name="qrcode_title">二维码</string>
     <string name="invalid_business_card">无效的名片！</string>
+    <string name="voice_duration_text">%02d:%02d</string>
+    <string name="voice_button_hint_press">按住说话</string>
+    <string name="voice_button_hint_pressed">松开结束</string>
 </resources>

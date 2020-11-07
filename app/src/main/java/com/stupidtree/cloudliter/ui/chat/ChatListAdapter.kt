@@ -29,6 +29,8 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             TYPE_MINE -> R.layout.activity_chat_message_text_mine
             TYPE_FRIEND -> R.layout.activity_chat_message_text_friend
             TYPE_FRIEND_IMAGE -> R.layout.activity_chat_message_image_friend
+            TYPE_FRIEND_VOICE -> R.layout.activity_chat_message_voice_friend
+            TYPE_MINE_VOICE -> R.layout.activity_chat_message_voice_mine
             TYPE_MINE_IMAGE -> R.layout.activity_chat_message_image_mine
             else -> R.layout.activity_chat_message_time
         }
@@ -36,13 +38,26 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
 
     override fun getItemViewType(position: Int): Int {
         val cm = mBeans[position]
-        return if (cm.isTimeStamp) {
-            TYPE_TIME
-        } else if (cm.toId == chatActivity.viewModel!!.myId) {
-            if (cm.getType() == ChatMessage.TYPE.IMG) TYPE_FRIEND_IMAGE else TYPE_FRIEND
-        } else {
-            if (cm.getType() == ChatMessage.TYPE.IMG) TYPE_MINE_IMAGE else TYPE_MINE
+        return when {
+            cm.isTimeStamp -> {
+                TYPE_TIME
+            }
+            cm.toId == chatActivity.viewModel!!.myId -> {
+                when {
+                    cm.getType()==ChatMessage.TYPE.IMG -> TYPE_FRIEND_IMAGE
+                    cm.getType()==ChatMessage.TYPE.TXT -> TYPE_FRIEND
+                    else -> TYPE_FRIEND_VOICE
+                }
+            }
+            else -> {
+                when {
+                    cm.getType()==ChatMessage.TYPE.IMG -> TYPE_MINE_IMAGE
+                    cm.getType()==ChatMessage.TYPE.VOICE -> TYPE_MINE_VOICE
+                    else -> TYPE_MINE
+                }
+            }
         }
+
     }
 
     override fun createViewHolder(v: View, viewType: Int): CHolder {
@@ -52,16 +67,18 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
     override fun bindHolder(holder: CHolder, data: ChatMessage?, position: Int) {
         if (data != null) {
             if (holder.read != null) {
-                holder.read!!.visibility = if (data.read) View.VISIBLE else View.GONE
+                holder.read!!.visibility = if (data.read&&!data.sensitive) View.VISIBLE else View.GONE
             }
-            if (holder.viewType == TYPE_TIME && holder.content != null) {
-                holder.content!!.text = data.createdAt?.let { TextUtils.getChatTimeText(chatActivity, it) }
-            } else if (holder.avatar != null) {
-                if (holder.viewType == TYPE_MINE || holder.viewType == TYPE_MINE_IMAGE) {
+            if (holder.viewType == TYPE_TIME) {
+                bindTimestamp(holder, data)
+            } else {
+                holder.bindSensitiveAndEmotion(data)
+                if (holder.viewType == TYPE_MINE || holder.viewType == TYPE_MINE_IMAGE  || holder.viewType == TYPE_MINE_VOICE) {
                     chatActivity.viewModel!!.myAvatar?.let { ImageUtils.loadLocalAvatarInto(chatActivity, it, holder.avatar!!) }
                 } else {
                     chatActivity.viewModel!!.friendAvatar?.let { ImageUtils.loadAvatarInto(chatActivity, it, holder.avatar!!) }
                 }
+                holder.avatar!!.setOnClickListener { view: View? -> data.fromId?.let { ActivityUtils.startProfileActivity(chatActivity, it) } }
                 if (holder.progress != null) {
                     if (data.isProgressing) {
                         holder.progress!!.visibility = View.VISIBLE
@@ -69,20 +86,31 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                         holder.progress!!.visibility = View.GONE
                     }
                 }
-                holder.bindSensitiveAndEmotion(data)
-                holder.avatar!!.setOnClickListener { view: View? -> data.fromId?.let { ActivityUtils.startProfileActivity(chatActivity, it) } }
-                if (holder.image != null && holder.progress != null) {
-                    if (holder.progress!!.visibility != View.VISIBLE) {
-                        data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
+                //图片消息
+                if (data.getType() == ChatMessage.TYPE.IMG) {
+                    if (holder.progress != null) {
+                        if (holder.progress!!.visibility != View.VISIBLE) {
+                            data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
+                        } else {
+                            holder.image!!.setImageResource(R.drawable.place_holder_loading)
+                        }
                     } else {
-                        //Glide.with(getThis()).load(data.getContent()).into(holder.image);
-                        holder.image!!.setImageResource(R.drawable.place_holder_loading)
+                        data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
                     }
-                } else if (holder.image != null) {
-                    data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
+                }else if(data.getType()==ChatMessage.TYPE.VOICE){
+                    holder.bindVoiceState(data)
                 }
             }
             holder.bindClickAction(data, position)
+        }
+    }
+
+
+    private fun bindTimestamp(holder: CHolder, data: ChatMessage) {
+        holder.content?.let {
+            it.text = data.createdAt?.let { it1 ->
+                TextUtils.getChatTimeText(chatActivity, it1)
+            }
         }
     }
 
@@ -169,6 +197,29 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             }
         }
     }
+
+
+    /**
+     * 语音开始播放
+     */
+    fun changeAudioState(list:RecyclerView,id:String,action:ChatMessage.VOICE_STATE){
+        var index = -1
+        for (i in mBeans.indices.reversed()) {
+            if (mBeans[i].id == id) {
+                index = i
+                break
+            }
+        }
+        if (index >= 0) {
+            mBeans[index].playing = action
+            val holder = list.findViewHolderForAdapterPosition(index) as CHolder?
+            holder?.bindVoiceState(mBeans[index])
+        }
+    }
+
+
+
+
 
     /**
      * 清空列表
@@ -312,6 +363,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         var imageSensitivePlaceHolder: ViewGroup? = null
         var sensitiveExpanded = false
 
+
         //隐藏加载圈圈
         fun hideProgress() {
             if (progress != null) {
@@ -349,7 +401,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         //绑定敏感词状态
         fun bindSensitiveAndEmotion(data: ChatMessage) {
             sensitiveExpanded = false
-            if (data.getType() == ChatMessage.TYPE.IMG && see != null && image != null && imageSensitivePlaceHolder != null) {
+            if (data.getType() == ChatMessage.TYPE.IMG) {
                 if (data.sensitive) {
                     see!!.visibility = View.VISIBLE
                     see!!.setOnClickListener { view: View? -> switchSensitiveModeText(data) }
@@ -361,7 +413,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                     image!!.visibility = View.VISIBLE
                     see!!.visibility = View.GONE
                 }
-            } else if (see != null && emotion != null) {
+            } else if (data.getType() == ChatMessage.TYPE.TXT) {
                 if (data.sensitive) {
                     see!!.visibility = View.VISIBLE
                     emotion!!.visibility = View.GONE
@@ -374,22 +426,50 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                     emotion!!.visibility = View.VISIBLE
                     val emotionValue = data.emotion
                     var iconRes = R.drawable.ic_emotion_normal
-                    if (emotionValue >= 2) {
-                        iconRes = R.drawable.ic_emotion_pos_3
-                    } else if (emotionValue >= 1) {
-                        iconRes = R.drawable.ic_emotion_pos_2
-                    } else if (emotionValue > 0) {
-                        iconRes = R.drawable.ic_emotion_pos_1
-                    } else if (emotionValue <= -2) {
-                        iconRes = R.drawable.ic_emotion_neg_3
-                    } else if (emotionValue <= -1) {
-                        iconRes = R.drawable.ic_emotion_neg_2
-                    } else if (emotionValue < 0) {
-                        iconRes = R.drawable.ic_emotion_neg_1
+                    when {
+                        emotionValue >= 2 -> {
+                            iconRes = R.drawable.ic_emotion_pos_3
+                        }
+                        emotionValue >= 1 -> {
+                            iconRes = R.drawable.ic_emotion_pos_2
+                        }
+                        emotionValue > 0 -> {
+                            iconRes = R.drawable.ic_emotion_pos_1
+                        }
+                        emotionValue <= -2 -> {
+                            iconRes = R.drawable.ic_emotion_neg_3
+                        }
+                        emotionValue <= -1 -> {
+                            iconRes = R.drawable.ic_emotion_neg_2
+                        }
+                        emotionValue < 0 -> {
+                            iconRes = R.drawable.ic_emotion_neg_1
+                        }
                     }
                     emotion!!.setImageResource(iconRes)
                 }
+            } else {
+                data.extra?.let {
+                    content!!.text = TextUtils.getVoiceTimeText(mContext,Integer.parseInt(it.replace("\"","")))
+                }
             }
+        }
+
+        fun bindVoiceState(data:ChatMessage){
+            if(image!=null){
+                when (data.playing) {
+                    ChatMessage.VOICE_STATE.STOPPED -> {
+                        image!!.setImageResource(R.drawable.ic_voice_wave)
+                    }
+                    ChatMessage.VOICE_STATE.PAUSED -> {
+                        image!!.setImageResource(R.drawable.ic_baseline_play_circle_outline_24)
+                    }
+                    else -> {
+                        image!!.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24)
+                    }
+                }
+            }
+
         }
 
         //绑定点击事件
@@ -415,6 +495,8 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         private const val TYPE_FRIEND = 509
         private const val TYPE_MINE_IMAGE = 944
         private const val TYPE_FRIEND_IMAGE = 598
+        private const val TYPE_MINE_VOICE = 333
+        private const val TYPE_FRIEND_VOICE = 444
         private const val TYPE_TIME = 774
     }
 

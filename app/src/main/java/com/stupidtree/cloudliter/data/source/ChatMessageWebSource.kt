@@ -97,6 +97,28 @@ class ChatMessageWebSource : BaseWebSource<ChatMessageService>(Retrofit.Builder(
         }
     }
 
+    /**
+     * 发送语音
+     *
+     * @param token 令牌
+     * @param toId  朋友id
+     * @param file  文件
+     * @return 返回结果
+     */
+    fun sendVoiceMessage(token: String, toId: String, file: MultipartBody.Part, uuid: String?,seconds:Int): LiveData<DataState<ChatMessage?>> {
+        return Transformations.map(service.sendVoiceMessage(token, toId, file, uuid,seconds)) { input: ApiResponse<ChatMessage?>? ->
+            Log.e("发送语音结果", input.toString())
+            if (input == null) {
+                return@map DataState<ChatMessage?>(DataState.STATE.FETCH_FAILED)
+            }
+            when (input.code) {
+                codes.SUCCESS -> return@map DataState(input.data)
+                codes.TOKEN_INVALID -> return@map DataState<ChatMessage?>(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState<ChatMessage?>(DataState.STATE.FETCH_FAILED, input.message)
+            }
+        }
+    }
+
 
     override fun getServiceClass(): Class<ChatMessageService> {
         return ChatMessageService::class.java

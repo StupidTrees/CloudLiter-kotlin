@@ -110,11 +110,22 @@ object TextUtils {
         }
     }
 
+
+    /**
+     * 获取聊天语音的时长文本
+     */
+    fun getVoiceTimeText(context: Context,seconds:Int):String{
+        val min = seconds/60
+        val sec = seconds%60
+        return context.getString(R.string.voice_duration_text,min,sec)
+    }
+
     private fun getDateAddedCalendar(c: Calendar, day: Int): Calendar {
         val n = c.clone() as Calendar
         n.add(Calendar.DATE, day)
         return n
     }
+
 
     private fun isSameDay(a: Calendar, b: Calendar): Boolean {
         return a[Calendar.YEAR] == b[Calendar.YEAR] && a[Calendar.MONTH] == b[Calendar.MONTH] && a[Calendar.DAY_OF_MONTH] == b[Calendar.DAY_OF_MONTH]

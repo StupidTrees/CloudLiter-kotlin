@@ -19,6 +19,7 @@ import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
+import com.stupidtree.cloudliter.utils.PermissionUtils
 import com.stupidtree.cloudliter.utils.TextUtils
 
 
@@ -55,10 +56,7 @@ class QRCodeActivity : BaseActivity<QRCodeViewModel>() {
 
     override fun onStart() {
         super.onStart()
-        //动态申请相机权限
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
-        }
+        PermissionUtils.grantCameraPermission(this)
         captureFragment.captureHelper.setOnCaptureCallback { result ->
             val jo = TextUtils.decodeUserBusinessCard(result)
             if(jo==null||!jo.containsKey("userId")||!jo.containsKey("time")){

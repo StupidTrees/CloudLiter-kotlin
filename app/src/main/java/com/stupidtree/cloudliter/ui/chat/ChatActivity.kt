@@ -10,12 +10,12 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -52,17 +52,16 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
     @BindView(R.id.menu)
     var menu: View? = null
 
-    @JvmField
     @BindView(R.id.input)
-    var inputEditText: EmoticonsEditText? = null
+    lateinit var inputEditText: EmoticonsEditText
 
     @JvmField
     @BindView(R.id.title)
     var titleText: TextView? = null
 
-    @JvmField
+
     @BindView(R.id.list)
-    var list: RecyclerView? = null
+    lateinit var list: RecyclerView
 
     @JvmField
     @BindView(R.id.send)
@@ -84,7 +83,7 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
     lateinit var refreshLayout: SwipeRefreshLayout
 
     @BindView(R.id.add)
-    lateinit var add: View
+    lateinit var emotion: View
 
     @BindView(R.id.image)
     lateinit var imageButton: View
@@ -92,10 +91,41 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
     @BindView(R.id.expand)
     lateinit var expandableLayout: ExpandableLayout
 
-    @JvmField
     @BindView(R.id.yunmoji_list)
-    var yunmojiList //表情列表
-            : RecyclerView? = null
+    lateinit var yunmojiList //表情列表
+            : RecyclerView
+
+    @BindView(R.id.voice_button)
+    lateinit var voiceButton: View
+
+    @BindView(R.id.voice_button_hint)
+    lateinit var voiceButtonHint: TextView
+
+    @BindView(R.id.voice_layout)
+    lateinit var voiceLayout: ViewGroup
+
+    @BindView(R.id.switch_button)
+    lateinit var switchButton: View
+
+    @BindView(R.id.switch_icon)
+    lateinit var switchIcon: ImageView
+
+    @BindView(R.id.voice_bubble)
+    lateinit var voiceBubble: View
+
+    @BindView(R.id.voice_cancel)
+    lateinit var voiceCancel: View
+
+    @BindView(R.id.recorfing_text)
+    lateinit var recordingText: TextView
+
+    //输入状态：语音或文字
+    private var textInput: Boolean = true
+
+    enum class PANEL { EMOTION, VOICE, COLLAPSE }
+
+    //底部展开栏状态
+    var bottomPanelState: PANEL = PANEL.COLLAPSE
 
     /**
      * 适配器
@@ -103,6 +133,12 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
     private lateinit var listAdapter: ChatListAdapter
     private lateinit var yunmojiListAdapter: YunmojiListAdapter //表情列表适配器
 
+
+    /**
+     * 语音控制
+     */
+    lateinit var voiceHelper: AudioRecordHelper
+    lateinit var audioPlayHelper: AudioPlayHelper
 
     /**
      * 常规操作区
@@ -121,6 +157,8 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
         setWindowParams(statusBar = true, darkColor = true, navi = false)
     }
 
+
+
     /**
      * 生命周期事件区
      */
@@ -128,6 +166,7 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
     override fun onStart() {
         super.onStart()
         viewModel!!.bindService(this)
+        refreshInputLayout()
     }
 
     //更新Intent时（更换聊天对象），刷新列表
@@ -172,18 +211,62 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
         viewModel?.unbindService(this)
     }
 
+    // 初始化语音输入与播放
+    private fun setUpAudio() {
+        voiceHelper = AudioRecordHelper.getInstance(this, object : AudioRecordHelper.OnRecordListener {
+            override fun onRecordStart(exception: Exception?) {
+                if (exception == null) {
+                    voiceRecordingStarted()
+                } else {
+                    refreshVoiceBubble()
+                    //Toast.makeText(getThis(), "录音失败", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onRecordStop(path: String?, seconds: Int, exception: Exception?) {
+                if (exception == null) {
+                    voiceMessageReady()
+                } else {
+                    refreshVoiceBubble()
+                    // Toast.makeText(getThis(), "录音结束失败", Toast.LENGTH_SHORT).show()
+                }
+
+            }
+
+            override fun onRecordTimeTick(count: Int, exception: Exception?) {
+                // exception?.printStackTrace()
+                recordingText.text = TextUtils.getVoiceTimeText(getThis(), count)
+            }
+        })
+        audioPlayHelper = AudioPlayHelper(this, object : AudioPlayHelper.VoicePlayListener {
+            override fun onStartPlaying(playingId: String) {
+                listAdapter.changeAudioState(list, playingId, ChatMessage.VOICE_STATE.PLAYING)
+            }
+
+            override fun onToggle(playingId: String, toStart: Boolean) {
+                listAdapter.changeAudioState(list, playingId, if (toStart) ChatMessage.VOICE_STATE.PLAYING else ChatMessage.VOICE_STATE.PAUSED)
+            }
+
+            override fun onPlayingFinished(playingId: String) {
+                listAdapter.changeAudioState(list, playingId, ChatMessage.VOICE_STATE.STOPPED)
+            }
+
+        })
+    }
+
     /**
      * 初始化View区
      */
     override fun initViews() {
+        setUpAudio()
         setUpToolbar()
         setUpMessageList()
         setUpYunmojiList()
         setUpButtons()
-        viewModel?.conversation!!.observe(this, Observer { conversation: Conversation? ->
+        viewModel?.conversation!!.observe(this, { conversation: Conversation? ->
             conversation?.let { setConversationViews(it) }
         })
-        viewModel?.getListData(this)!!.observe(this, Observer { listDataState: DataState<List<ChatMessage>?> ->
+        viewModel?.getListData(this)!!.observe(this, { listDataState: DataState<List<ChatMessage>?> ->
             refreshLayout.isRefreshing = false
             Log.e("ChatActivity列表变动", listDataState.listAction.toString() + "》》" + listDataState.data!!.size)
             if (listDataState.state === DataState.STATE.SUCCESS) {
@@ -196,19 +279,19 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
                     }
                     listAdapter.notifyItemsAppended(listDataState.data!!)
                     if (listAdapter.itemCount > 0) {
-                        list!!.smoothScrollToPosition(listAdapter.itemCount - 1)
+                        list.smoothScrollToPosition(listAdapter.itemCount - 1)
                     }
                 } else if (listDataState.listAction === DataState.LIST_ACTION.APPEND) {
                     listAdapter.notifyItemsAppended(listDataState.data!!)
                     if (listAdapter.itemCount > 0) {
-                        list!!.smoothScrollToPosition(listAdapter.itemCount - 1)
+                        list.smoothScrollToPosition(listAdapter.itemCount - 1)
                     }
                 } else if (listDataState.listAction === DataState.LIST_ACTION.PUSH_HEAD) {
                     //下拉加载更多
                     if (!listDataState.isRetry) { //第一次获取，本地数据
                         listAdapter.notifyItemsPushHead(listDataState.data!!)
                         if (listDataState.data!!.isNotEmpty()) {
-                            list!!.smoothScrollBy(0, -150)
+                            list.smoothScrollBy(0, -150)
                         }
                     } else { //获取到网络数据，刷新对应项
                         listDataState.data.let {
@@ -218,12 +301,12 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
                 } else {
                     listAdapter.notifyItemChangedSmooth(listDataState.data!!)
                     if (listAdapter.itemCount > 0) {
-                        list!!.smoothScrollToPosition(listAdapter.itemCount - 1)
+                        list.smoothScrollToPosition(listAdapter.itemCount - 1)
                     }
                 }
             }
         })
-        viewModel!!.friendStateLiveData!!.observe(this, Observer { friendStateDataState: DataState<FriendState> ->
+        viewModel!!.friendStateLiveData!!.observe(this, { friendStateDataState: DataState<FriendState> ->
             if (friendStateDataState.state === DataState.STATE.SUCCESS) {
                 when (friendStateDataState.data!!.state) {
                     FriendState.STATE.ONLINE -> {
@@ -253,23 +336,23 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
                 }
             }
         })
-        viewModel!!.getImageSentResult().observe(this, Observer { })
-
+        viewModel!!.getImageSentResult().observe(this, { })
+        viewModel!!.getVoiceSentResult().observe(this, { })
         //消息成功发送后反馈给列表
-        viewModel!!.messageSentState!!.observe(this, Observer { chatMessageDataState ->
+        viewModel!!.messageSentState!!.observe(this, { chatMessageDataState ->
             if (chatMessageDataState!!.state === DataState.STATE.SUCCESS) {
-                list?.let { listAdapter.messageSent(it, chatMessageDataState!!.data!!) }
+                list.let { listAdapter.messageSent(it, chatMessageDataState!!.data!!) }
             }
         })
-
         //消息被对方读取后反馈给列表
-        viewModel!!.messageReadState!!.observe(this, Observer { messageReadNotificationDataState ->
+        viewModel!!.messageReadState!!.observe(this, { messageReadNotificationDataState ->
             Log.e("messageRead", messageReadNotificationDataState!!.data.toString())
             if (messageReadNotificationDataState.state === DataState.STATE.SUCCESS) {
-                list?.let { listAdapter.messageRead(it, messageReadNotificationDataState.data!!) }
+                list.let { listAdapter.messageRead(it, messageReadNotificationDataState.data!!) }
             }
         })
     }
+
 
     //设置toolbar
     private fun setUpToolbar() {
@@ -281,15 +364,13 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
     @SuppressLint("ClickableViewAccessibility")
     private fun setUpMessageList() {
         listAdapter = ChatListAdapter(this, LinkedList())
-        list!!.adapter = listAdapter
+        list.adapter = listAdapter
         val layoutManager = LinearLayoutManager(this)
         layoutManager.stackFromEnd = true //从底部往上堆
-        list!!.layoutManager = layoutManager
+        list.layoutManager = layoutManager
         //触摸recyclerView的监听
-        list!!.setOnTouchListener { _: View?, _: MotionEvent? ->
-            //隐藏键盘
-            hideSoftInput(getThis(), inputEditText)
-            collapseEmotionPanel()
+        list.setOnTouchListener { _: View?, _: MotionEvent? ->
+            collapseBottomPanel(collapseKeyboard = true, animate = true)
             false
         }
         refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent)
@@ -312,6 +393,18 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
                     val urls = listAdapter.imageUrls
                     ActivityUtils.showMultipleImages(getThis(), urls, urls.indexOf(data.content?.let { ImageUtils.getChatMessageImageUrl(it) })
                     )
+                } else if (data.getType() == ChatMessage.TYPE.VOICE && !data.isTimeStamp) {
+                    if (audioPlayHelper.playingId != null) {
+                        if (audioPlayHelper.playingId != data.id) {//有其他消息正在播放
+                            listAdapter.changeAudioState(list, audioPlayHelper.playingId!!, ChatMessage.VOICE_STATE.STOPPED)
+                            data.content?.let { audioPlayHelper.play(data.id, data.content!!) }
+                        } else {//正是在下在播放
+                            audioPlayHelper.toggle()
+                        }
+                    } else {
+                        data.content?.let { audioPlayHelper.play(data.id, data.content!!) }
+                    }
+
                 }
             }
 
@@ -319,40 +412,75 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
     }
 
     //初始化各种按钮
+    @SuppressLint("ClickableViewAccessibility")
     private fun setUpButtons() {
         //点击发送
         send!!.setOnClickListener {
-            if (!TextUtils.isEmpty(inputEditText!!.text.toString())) {
-                viewModel?.sendMessage(inputEditText!!.text.toString())
-                inputEditText!!.setText("")
-            }
-        }
-        add.setOnClickListener {
-            if (expandableLayout.isExpanded) {
-                collapseEmotionPanel()
+            if (voiceHelper.state == AudioRecordHelper.STATE.DONE && !textInput) {
+                voiceMessageSend()
             } else {
-                //判断键盘状态
-                if (isSoftInputShown()) {
-                    lockContentHeight()
-                    hideSoftInput(applicationContext, inputEditText)
-                    expandEmotionPanel()
-                    unlockContentHeight()
-                } else {
-                    expandEmotionPanel()
+                if (!TextUtils.isEmpty(inputEditText.text.toString())) {
+                    viewModel?.sendMessage(inputEditText.text.toString())
+                    inputEditText.setText("")
                 }
+
             }
         }
-        //输入框的监听，防止表情包和输入法同时出现
-        //每次进入聊天界面，点击表情包后点击输入框，会同时出现（未知 bug）
-        inputEditText!!.setOnClickListener {
-            if (expandableLayout.isExpanded) {
-                lockContentHeight()
-                collapseEmotionPanel()
-                unlockContentHeight()
+        emotion.setOnClickListener {
+            if (bottomPanelState == PANEL.EMOTION) {
+                collapseBottomPanel(true, true)
+            } else {
+                expandBottomPanel(PANEL.EMOTION)
             }
         }
+
+
         imageButton.setOnClickListener { GalleryPicker.choosePhoto(getThis(), false) }
+
+        switchButton.setOnClickListener {
+            textInput = !textInput
+            refreshInputLayout()
+        }
+        voiceButton.setOnTouchListener(object : View.OnTouchListener {
+            override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
+                if (p1 != null) {
+                    //Log.e("action",p1.action.toString())
+                    if (p1.action == MotionEvent.ACTION_DOWN) {
+                        voiceHelper.startRecord()
+                        voiceButtonHint.setText(R.string.voice_button_hint_pressed)
+                    } else if (p1.action == MotionEvent.ACTION_UP || p1.action == 3) {
+                        voiceHelper.stopRecord()
+                        voiceButtonHint.setText(R.string.voice_button_hint_press)
+                    }
+                }
+                return false
+
+            }
+
+        })
+
+        voiceCancel.setOnClickListener {
+            cancelVoiceMessage()
+        }
+
+        inputEditText.setOnTouchListener { _, motionEvent ->
+            if (motionEvent.action == MotionEvent.ACTION_UP) {
+                if (bottomPanelState != PANEL.COLLAPSE) {
+                    lockContentHeight()
+                    collapseBottomPanel(collapseKeyboard = false, animate = true)
+                    unlockContentHeight()
+                }
+
+            }
+            false
+        }
+//        inputEditText.setOnClickListener {
+//            lockContentHeight()
+//            collapseBottomPanel()
+//            unlockContentHeight()
+//        }
     }
+
 
     //初始化表情列表
     private fun setUpYunmojiList() {
@@ -361,13 +489,13 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
             val item = Yunmoji(resources.getIdentifier(String.format(Locale.getDefault(), "yunmoji_y%03d", i), "drawable", packageName))
             ymList.add(item)
         }
-        yunmojiList!!.layoutManager = GridLayoutManager(this, 6)
+        yunmojiList.layoutManager = GridLayoutManager(this, 6)
         yunmojiListAdapter = YunmojiListAdapter(this, ymList)
-        yunmojiList!!.adapter = yunmojiListAdapter
+        yunmojiList.adapter = yunmojiListAdapter
         val yunmojiOnItemClickListener: BaseListAdapter.OnItemClickListener<Yunmoji> =
                 object : BaseListAdapter.OnItemClickListener<Yunmoji> {
                     override fun onItemClick(data: Yunmoji, card: View?, position: Int) {
-                        inputEditText!!.append(data.getLastName(position))
+                        inputEditText.append(data.getLastName(position))
                     }
                 }
         yunmojiListAdapter.setOnItemClickListener(yunmojiOnItemClickListener)
@@ -385,25 +513,130 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
         }
     }
 
-    //收起表情栏
-    private fun collapseEmotionPanel() {
-        if (expandableLayout.isExpanded) {
-            expandableLayout.collapse()
-            AnimationUtils.rotateTo(add, false)
+
+    //刷新输入区状态
+    private fun refreshInputLayout() {
+        if (textInput) {
+            collapseBottomPanel(true, true)
+            refreshVoiceBubble()
+            switchIcon.setImageResource(R.drawable.ic_voice_wave)
+            inputEditText.visibility = View.VISIBLE
+        } else {
+            expandBottomPanel(PANEL.VOICE)
+            voiceButtonHint.setText(R.string.voice_button_hint_press)
+            switchIcon.setImageResource(R.drawable.ic_baseline_keyboard_24)
+            refreshVoiceBubble()
         }
     }
 
-    //展开表情栏
-    private fun expandEmotionPanel() {
-        //修改表情包高度 = 输入法高度
+
+    //语音消息已经开始录制
+    private fun voiceRecordingStarted() {
+        voiceBubble.visibility = View.VISIBLE
+        voiceCancel.visibility = View.GONE
+        inputEditText.visibility = View.GONE
+    }
+
+    //语音消息录制完成，准备发送
+    private fun voiceMessageReady() {
+        if (!TextUtils.isEmpty(voiceHelper.filePath)) {
+            voiceCancel.visibility = View.VISIBLE
+        } else {
+            refreshVoiceBubble()
+        }
+
+    }
+
+    //发送语音消息
+    private fun voiceMessageSend() {
+        if (!TextUtils.isEmpty(voiceHelper.filePath)) {
+            viewModel?.sendVoiceMessage(voiceHelper.filePath, voiceHelper.timeCount)
+        }
+        voiceHelper.sendRecord()
+        voiceCancel.visibility = View.GONE
+        refreshVoiceBubble()
+    }
+
+    //取消发送语音消息
+    private fun cancelVoiceMessage() {
+        if (voiceHelper.state == AudioRecordHelper.STATE.DONE) {
+            voiceHelper.cancelRecord()
+            refreshVoiceBubble()
+        }
+    }
+
+    //重置语音输入气泡状态
+    private fun refreshVoiceBubble() {
+//
+        recordingText.text = TextUtils.getVoiceTimeText(this, voiceHelper.timeCount)
+        if (voiceHelper.state == AudioRecordHelper.STATE.DONE && voiceHelper.timeCount > 0) {
+            voiceCancel.visibility = View.VISIBLE
+            if (textInput) {
+                voiceBubble.visibility = View.GONE
+            } else {
+                voiceBubble.visibility = View.VISIBLE
+                inputEditText.visibility = View.GONE
+            }
+        } else {
+            voiceBubble.visibility = View.GONE
+            voiceCancel.visibility = View.GONE
+            inputEditText.visibility = View.VISIBLE
+        }
+    }
+
+
+    //收起底部
+    private fun collapseBottomPanel(collapseKeyboard: Boolean, animate: Boolean) {
+        if (!textInput) {
+            textInput = true
+            refreshInputLayout()
+            return
+        }
+        //隐藏键盘
+        if (collapseKeyboard) {
+            hideSoftInput(getThis(), inputEditText)
+        }
+        if (expandableLayout.isExpanded) {
+            if (bottomPanelState == PANEL.EMOTION) {
+                AnimationUtils.rotateTo(emotion, false)
+            }
+            expandableLayout.collapse(animate)
+        }
+        bottomPanelState = PANEL.COLLAPSE
+
+    }
+
+    //展开底部
+    private fun expandBottomPanel(panel: PANEL) {
+        // 判断键盘状态
+        if (isSoftInputShown()) {
+            lockContentHeight()
+            hideSoftInput(applicationContext, inputEditText)
+            unlockContentHeight()
+        }
+        //修改底部栏高度 = 输入法高度
         expandableLayout.layoutParams.height = getSupportSoftInputHeight()
         if (getSupportSoftInputHeight() == 0) {
             expandableLayout.layoutParams.height = keyBoardHeight
         }
-        if (!expandableLayout.isExpanded) {
-            expandableLayout.expand()
-            AnimationUtils.rotateTo(add, true)
+        expandableLayout.expand()
+        if (panel == PANEL.EMOTION) {
+            AnimationUtils.rotateTo(emotion, true)
+            textInput = true
+            switchIcon.setImageResource(R.drawable.ic_voice_wave)
+            yunmojiList.visibility = View.VISIBLE
+            voiceBubble.visibility = View.GONE
+            voiceLayout.visibility = View.GONE
+            inputEditText.visibility = View.VISIBLE
+        } else if (panel == PANEL.VOICE) {
+            if (bottomPanelState == PANEL.EMOTION) {
+                AnimationUtils.rotateTo(emotion, false)
+            }
+            refreshVoiceBubble()
+            voiceLayout.visibility = View.VISIBLE
+            yunmojiList.visibility = View.GONE
         }
+        bottomPanelState = panel
     }
 
     //锁定内容高度
@@ -415,7 +648,7 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
 
     //释放被锁定内容高度
     private fun unlockContentHeight() {
-        inputEditText!!.postDelayed({ (refreshLayout.layoutParams as LinearLayout.LayoutParams).weight = 1.0f }, 280L)
+        inputEditText.postDelayed({ (refreshLayout.layoutParams as LinearLayout.LayoutParams).weight = 1.0f }, 280L)
     }
 
     //获取输入法高度
@@ -434,26 +667,11 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
 
 
     //当未获取键盘高度时，设定表情包高度787（貌似也没啥用）
-    private val keyBoardHeight: Int
+    private
+    val keyBoardHeight: Int
         get() = 787
 
 
-
-
-    //   //底部虚拟按键栏的高度（貌似也没啥用）
-    //    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    //    private int getSoftButtonsBarHeight() {
-    //        DisplayMetrics metrics = new DisplayMetrics();
-    //        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-    //        int usableHeight = metrics.heightPixels;
-    //        getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-    //        int realHeight = metrics.heightPixels;
-    //        if (realHeight > usableHeight) {
-    //            return realHeight - usableHeight;
-    //        } else {
-    //            return 0;
-    //        }
-    //    }
     /**
      * 当用户通过系统相册选择图片返回时，将调用本函数
      */
@@ -477,6 +695,12 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
         }
     }
 
+
+    override fun onDestroy() {
+        super.onDestroy()
+        audioPlayHelper.destroy()
+        voiceHelper.destroy()
+    }
 
     //隐藏键盘
     private fun hideSoftInput(context: Context, view: View?) {

@@ -55,7 +55,13 @@ class ContactGroupFragment : BaseFragment<ContactGroupViewModel>() {
         listAdapter = GroupedFriendsListAdapter(context)
         list.adapter = listAdapter
         list.layoutManager = LinearLayoutManager(context)
-        listAdapter.setOnHeaderClickListener { _: GroupedRecyclerViewAdapter?, _: BaseViewHolder?, groupPosition: Int -> listAdapter.toggleGroup(list, groupPosition) }
+        listAdapter.setOnHeaderClickListener { _: GroupedRecyclerViewAdapter?, _: BaseViewHolder?, groupPosition: Int ->
+            if(groupPosition>=listAdapter.groupEntities.size){
+                ActivityUtils.startGroupEditorActivity(requireContext())
+            }else{
+                listAdapter.toggleGroup(list, groupPosition)
+            }
+            }
         listAdapter.setOnChildClickListener { _: GroupedRecyclerViewAdapter?, _: BaseViewHolder?, groupPosition: Int, childPosition: Int ->
             val ur = listAdapter.groupEntities[groupPosition].getChildAt(childPosition)
             ActivityUtils.startProfileActivity(requireActivity(), ur.friendId.toString())
