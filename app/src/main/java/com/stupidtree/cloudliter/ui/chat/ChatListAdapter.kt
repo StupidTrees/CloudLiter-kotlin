@@ -44,15 +44,15 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             }
             cm.toId == chatActivity.viewModel!!.myId -> {
                 when {
-                    cm.getType()==ChatMessage.TYPE.IMG -> TYPE_FRIEND_IMAGE
-                    cm.getType()==ChatMessage.TYPE.TXT -> TYPE_FRIEND
+                    cm.getType() == ChatMessage.TYPE.IMG -> TYPE_FRIEND_IMAGE
+                    cm.getType() == ChatMessage.TYPE.TXT -> TYPE_FRIEND
                     else -> TYPE_FRIEND_VOICE
                 }
             }
             else -> {
                 when {
-                    cm.getType()==ChatMessage.TYPE.IMG -> TYPE_MINE_IMAGE
-                    cm.getType()==ChatMessage.TYPE.VOICE -> TYPE_MINE_VOICE
+                    cm.getType() == ChatMessage.TYPE.IMG -> TYPE_MINE_IMAGE
+                    cm.getType() == ChatMessage.TYPE.VOICE -> TYPE_MINE_VOICE
                     else -> TYPE_MINE
                 }
             }
@@ -67,13 +67,13 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
     override fun bindHolder(holder: CHolder, data: ChatMessage?, position: Int) {
         if (data != null) {
             if (holder.read != null) {
-                holder.read!!.visibility = if (data.read&&!data.sensitive) View.VISIBLE else View.GONE
+                holder.read!!.visibility = if (data.read && !data.sensitive) View.VISIBLE else View.GONE
             }
             if (holder.viewType == TYPE_TIME) {
                 bindTimestamp(holder, data)
             } else {
                 holder.bindSensitiveAndEmotion(data)
-                if (holder.viewType == TYPE_MINE || holder.viewType == TYPE_MINE_IMAGE  || holder.viewType == TYPE_MINE_VOICE) {
+                if (holder.viewType == TYPE_MINE || holder.viewType == TYPE_MINE_IMAGE || holder.viewType == TYPE_MINE_VOICE) {
                     chatActivity.viewModel!!.myAvatar?.let { ImageUtils.loadLocalAvatarInto(chatActivity, it, holder.avatar!!) }
                 } else {
                     chatActivity.viewModel!!.friendAvatar?.let { ImageUtils.loadAvatarInto(chatActivity, it, holder.avatar!!) }
@@ -97,7 +97,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                     } else {
                         data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
                     }
-                }else if(data.getType()==ChatMessage.TYPE.VOICE){
+                } else if (data.getType() == ChatMessage.TYPE.VOICE) {
                     holder.bindVoiceState(data)
                 }
             }
@@ -202,7 +202,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
     /**
      * 语音开始播放
      */
-    fun changeAudioState(list:RecyclerView,id:String,action:ChatMessage.VOICE_STATE){
+    fun changeAudioState(list: RecyclerView, id: String, action: ChatMessage.VOICE_STATE) {
         var index = -1
         for (i in mBeans.indices.reversed()) {
             if (mBeans[i].id == id) {
@@ -218,9 +218,6 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
     }
 
 
-
-
-
     /**
      * 清空列表
      */
@@ -229,16 +226,18 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         notifyDataSetChanged()
     }
 
-    override fun notifyItemsAppended(newL: List<ChatMessage>) {
+    override fun notifyItemsAppended(list: List<ChatMessage>) {
+        val newL = mutableListOf<ChatMessage>()
+        newL.addAll(list)
         //注意要取反
-        if (newL is MutableList) {
-            newL.reverse()
-        }
-        if (mBeans.size > 0 && newL.size > 0) {
+        newL.reverse()
+        if (mBeans.size > 0 && newL.isNotEmpty()) {
             val last = mBeans[mBeans.size - 1]
             if (tooFar(last.createdAt, newL[0].createdAt)) {
                 super.notifyItemAppended(ChatMessage.getTimeStampHolderInstance(newL[0].createdAt))
             }
+        } else if (mBeans.size == 0 && newL.isNotEmpty()) {
+            newL.add(0, ChatMessage.getTimeStampHolderInstance(newL[0].createdAt))
         }
         super.notifyItemsAppended(newL)
     }
@@ -273,7 +272,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         if (newL is MutableList) {
             newL.reverse() //取反
         }
-        if (mBeans.size > 0 && newL.size > 0) {
+        if (mBeans.size > 0 && newL.isNotEmpty()) {
             val top = mBeans[0]
             val newBottom = newL[newL.size - 1]
             if (tooFar(top.createdAt, newBottom.createdAt)) {
@@ -450,13 +449,13 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                 }
             } else {
                 data.extra?.let {
-                    content!!.text = TextUtils.getVoiceTimeText(mContext,Integer.parseInt(it.replace("\"","")))
+                    content!!.text = TextUtils.getVoiceTimeText(mContext, Integer.parseInt(it.replace("\"", "")))
                 }
             }
         }
 
-        fun bindVoiceState(data:ChatMessage){
-            if(image!=null){
+        fun bindVoiceState(data: ChatMessage) {
+            if (image != null) {
                 when (data.playing) {
                     ChatMessage.VOICE_STATE.STOPPED -> {
                         image!!.setImageResource(R.drawable.ic_voice_wave)

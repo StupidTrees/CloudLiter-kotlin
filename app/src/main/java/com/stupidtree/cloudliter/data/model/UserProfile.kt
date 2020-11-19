@@ -1,6 +1,8 @@
 package com.stupidtree.cloudliter.data.model
 
 import androidx.annotation.StringRes
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserLocal.GENDER
 
@@ -8,13 +10,15 @@ import com.stupidtree.cloudliter.data.model.UserLocal.GENDER
  * 显示在用户资料页的用户资料Model
  * 和服务器返回数据匹配，无需适配函数
  */
+@Entity(tableName = "profile")
 class UserProfile {
     enum class COLOR {
         RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, PURPLE
     }
 
+    @PrimaryKey
     var id //用户id
-            : String? = null
+            : String = ""
     var username //用户名
             : String? = null
     var nickname //昵称

@@ -1,4 +1,4 @@
-package com.stupidtree.cloudliter.data.source
+package com.stupidtree.cloudliter.data.source.websource
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -9,13 +9,13 @@ import com.stupidtree.cloudliter.data.model.ApiResponse
 import com.stupidtree.cloudliter.data.model.UserLocal.Companion.getFromResponseData
 import com.stupidtree.cloudliter.data.model.UserProfile
 import com.stupidtree.cloudliter.data.model.UserSearched
-import com.stupidtree.cloudliter.service.LiveDataCallAdapter
-import com.stupidtree.cloudliter.service.UserService
-import com.stupidtree.cloudliter.service.codes.SUCCESS
-import com.stupidtree.cloudliter.service.codes.TOKEN_INVALID
-import com.stupidtree.cloudliter.service.codes.USER_ALREADY_EXISTS
-import com.stupidtree.cloudliter.service.codes.WRONG_PASSWORD
-import com.stupidtree.cloudliter.service.codes.WRONG_USERNAME
+import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
+import com.stupidtree.cloudliter.data.source.websource.service.UserService
+import com.stupidtree.cloudliter.data.source.websource.service.codes.SUCCESS
+import com.stupidtree.cloudliter.data.source.websource.service.codes.TOKEN_INVALID
+import com.stupidtree.cloudliter.data.source.websource.service.codes.USER_ALREADY_EXISTS
+import com.stupidtree.cloudliter.data.source.websource.service.codes.WRONG_PASSWORD
+import com.stupidtree.cloudliter.data.source.websource.service.codes.WRONG_USERNAME
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.welcome.login.LoginResult
 import com.stupidtree.cloudliter.ui.welcome.signup.SignUpResult

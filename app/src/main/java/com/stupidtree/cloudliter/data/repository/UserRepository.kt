@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.model.UserSearched
-import com.stupidtree.cloudliter.data.source.UserPreferenceSource
-import com.stupidtree.cloudliter.data.source.UserWebSource
+import com.stupidtree.cloudliter.data.source.websource.UserPreferenceSource
+import com.stupidtree.cloudliter.data.source.websource.UserWebSource
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.welcome.login.LoginResult
 import com.stupidtree.cloudliter.ui.welcome.signup.SignUpResult

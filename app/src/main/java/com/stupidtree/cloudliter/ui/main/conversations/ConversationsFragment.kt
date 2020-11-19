@@ -2,6 +2,7 @@ package com.stupidtree.cloudliter.ui.main.conversations
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -67,7 +68,7 @@ class ConversationsFragment : BaseFragment<ConversationsViewModel>() {
         list!!.layoutManager = LinearLayoutManager(context)
         listAdapter!!.setOnItemClickListener(object : BaseListAdapter.OnItemClickListener<Conversation> {
             override fun onItemClick(data: Conversation, card: View?, position: Int) {
-                ActivityUtils.startChatActivity(requireContext(), data!!)
+                ActivityUtils.startChatActivity(requireContext(), data)
             }
         })
 
@@ -78,15 +79,15 @@ class ConversationsFragment : BaseFragment<ConversationsViewModel>() {
 
 
         // searchBar.setOnClickListener(view1 -> ActivityUtils.startSearchActivity(requireActivity()));
-        viewModel!!.listData?.observe(this, Observer { listDataState ->
+        viewModel!!.listData?.observe(this, { listDataState ->
             refreshLayout!!.isRefreshing = false
             if (listDataState.data != null && listDataState.data!!.isNotEmpty()) {
                 val listD = listDataState.data!!
-                Collections.sort(listD) { conversation: Conversation, t1: Conversation ->
+                listD.sortWith { conversation: Conversation, t1: Conversation ->
                     t1.updatedAt!!.compareTo(conversation.updatedAt)
                 }
                 listAdapter!!.notifyItemChangedSmooth(listD)
-                if (listD.size > 0) {
+                if (listD.isNotEmpty()) {
                     list!!.visibility = View.VISIBLE
                     placeHolder!!.visibility = View.GONE
                 } else {
@@ -95,7 +96,6 @@ class ConversationsFragment : BaseFragment<ConversationsViewModel>() {
                     placeHolderText!!.setText(R.string.no_conversation)
                 }
             }
-            // Log.e("state", String.valueOf(listDataState));
             when {
                 listDataState.state === DataState.STATE.NOT_LOGGED_IN -> {
                     placeHolder!!.visibility = View.VISIBLE
@@ -105,14 +105,14 @@ class ConversationsFragment : BaseFragment<ConversationsViewModel>() {
                         connectionFailedBar!!.visibility = View.GONE
                     }
                 }
-                listDataState.state === DataState.STATE.FETCH_FAILED -> {
+                listDataState.isRetry&&listDataState.stateRetried === DataState.STATE.FETCH_FAILED -> {
                     list!!.visibility = View.VISIBLE
                     placeHolder!!.visibility = View.GONE
                     if (listDataState.isRetry) {
                         connectionFailedBar!!.visibility = View.VISIBLE
                     }
                 }
-                listDataState.state === DataState.STATE.SUCCESS -> {
+                listDataState.isRetry&&listDataState.stateRetried===DataState.STATE.SUCCESS-> {
                     placeHolder!!.visibility = View.GONE
                     if (listDataState.isRetry) {
                         connectionFailedBar!!.visibility = View.GONE

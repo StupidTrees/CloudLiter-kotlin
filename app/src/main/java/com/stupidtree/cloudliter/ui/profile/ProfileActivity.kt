@@ -3,6 +3,7 @@ package com.stupidtree.cloudliter.ui.profile
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -14,6 +15,8 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import butterknife.BindView
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.RelationGroup
@@ -47,17 +50,14 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
     @BindView(R.id.text_username)
     var usernameTextView: TextView? = null
 
-    @JvmField
     @BindView(R.id.text_nickname)
-    var nicknameTextView: TextView? = null
+    lateinit var nicknameTextView: TextView
 
-    @JvmField
     @BindView(R.id.text_signature)
-    var signatureTextView: TextView? = null
+    lateinit var signatureTextView: TextView
 
-    @JvmField
     @BindView(R.id.icon_gender)
-    var genderIcon: ImageView? = null
+    lateinit var genderIcon: ImageView
 
     @JvmField
     @BindView(R.id.fab)
@@ -67,6 +67,11 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
     @BindView(R.id.avatar)
     var avatarImageView: ImageView? = null
 
+    @BindView(R.id.avatar_card)
+    lateinit var avatarCardView: CardView
+
+    @BindView(R.id.appbar)
+    lateinit var appbarLayout:AppBarLayout
 
     @JvmField
     @BindView(R.id.icon_color)
@@ -119,6 +124,21 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
     }
 
     override fun initViews() {
+        val initElevation = avatarCardView.cardElevation
+       // avatarCardView.pivotX = 64f
+        appbarLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val percentage = -verticalOffset.toFloat()/ appBarLayout!!.totalScrollRange.toFloat()
+            avatarCardView.pivotY = avatarCardView.height.toFloat()*0.5f
+            avatarCardView.pivotX = avatarCardView.width.toFloat()*0.3f
+            avatarCardView.scaleX = 1- percentage
+            avatarCardView.scaleY = 1- percentage
+            nicknameTextView.alpha = 1-2.5f*percentage
+            signatureTextView.alpha = 1-2.5f*percentage
+            genderIcon.alpha = 1-2.5f*percentage
+            avatarCardView.cardElevation = initElevation*(1-percentage)
+            Log.e("percentage",percentage.toString())
+        })
+
         //为ViewModel中的各种数据设置监听
         viewModel!!.userProfileLiveData?.observe(this, Observer { userProfileDataState ->
             if (userProfileDataState?.state === DataState.STATE.SUCCESS) {

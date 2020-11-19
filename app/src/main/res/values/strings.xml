@@ -41,7 +41,8 @@
     <string name="send_message">发消息</string>
     <string name="make_friends">加好友</string>
     <string name="fail">失败</string>
-    <string name="logout">登出</string>
+    <string name="logout">退出登录</string>
+    <string name="exit">退出</string>
     <string name="avatar">头像</string>
     <string name="signature">个人简介</string>
     <string name="my_profile_title">个人信息</string>
@@ -95,7 +96,7 @@
     <string name="select_action">选择操作</string>
     <string name="prompt_reject">拒绝</string>
     <string name="prompt_select_action">操作</string>
-    <string name="label_user_profile">TA的资料</string>
+    <string name="label_user_profile">用户信息</string>
     <string name="label_relation_settings">好友选项</string>
     <string name="attention_delete_friend">确定要结束这段友谊吗？</string>
     <string name="delete_friend_success">已删除好友</string>
@@ -134,4 +135,8 @@
     <string name="voice_duration_text">%02d:%02d</string>
     <string name="voice_button_hint_press">按住说话</string>
     <string name="voice_button_hint_pressed">松开结束</string>
+    <string name="nfc_title">一碰即聊</string>
+    <string name="scan_qr">扫一扫</string>
+    <string name="about_cloud_liter">关于云升</string>
+    <string name="discover_friend">发现朋友</string>
 </resources>

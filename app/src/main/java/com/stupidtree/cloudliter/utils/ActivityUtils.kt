@@ -3,6 +3,7 @@ package com.stupidtree.cloudliter.utils
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.nfc.NdefRecord
 import android.os.Bundle
 import com.stupidtree.cloudliter.data.model.*
 import com.stupidtree.cloudliter.data.model.Conversation.Companion.fromNewMessage
@@ -152,8 +153,12 @@ object ActivityUtils {
     /**
      * 进入二维码页面
      */
-    fun startQRCodeActivity(from:Context){
+    fun startQRCodeActivity(from: Context) {
         val it = Intent(from, QRCodeActivity::class.java)
         from.startActivity(it)
     }
+
+
+
+
 }

@@ -1,4 +1,4 @@
-package com.stupidtree.cloudliter.service
+package com.stupidtree.cloudliter.data.source.websource.service
 
 import androidx.lifecycle.LiveData
 import com.google.gson.JsonObject

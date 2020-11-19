@@ -12,7 +12,7 @@ class AudioPlayHelper internal constructor(val context: Activity, val voicePlayL
     var mMediaPlayer: MediaPlayer? = null
     var playingId:String? = null
     val PLAY_START = 3
-
+    val PLAY_COMPLETE = 4
 
     interface VoicePlayListener{
         fun onStartPlaying(playingId:String)
@@ -24,6 +24,11 @@ class AudioPlayHelper internal constructor(val context: Activity, val voicePlayL
         override fun handleMessage(msg: Message) {
             when (msg.what) {
                 PLAY_START-> playingId?.let { voicePlayListener.onStartPlaying(it) }
+                PLAY_COMPLETE->
+                    msg.obj.let {
+                        voicePlayListener.onPlayingFinished(it.toString())
+                    }
+
             }
         }
     }
@@ -40,11 +45,17 @@ class AudioPlayHelper internal constructor(val context: Activity, val voicePlayL
                 msg.what = PLAY_START
                 mainThreadHandler.sendMessage(msg)
                 mMediaPlayer!!.setOnCompletionListener {
-                    voicePlayListener.onPlayingFinished(playingId!!)
-                    playingId = null
+                    if(playingId!=null){
+                        val msg = Message.obtain()
+                        msg.what = PLAY_COMPLETE
+                        msg.obj = playingId
+                        playingId = null
+                        mainThreadHandler.sendMessage(msg)
+                    }
+
+
                 }
             }
-
         }.start()
     }
 

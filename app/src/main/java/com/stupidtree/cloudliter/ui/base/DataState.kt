@@ -5,8 +5,8 @@ package com.stupidtree.cloudliter.ui.base
  * 例如好友列表界面，应当存放一个”列表数据“，直观上，其应当是一个好友对象的List
  * 但因为实际应用中，在UI中除了要显示这个List本身外，还应能够表示”获取成功“，”获取失败“，”用户未登录“ 等【状态信息】
  * 因此DataState这个类存在的目的，便是包装在数据外层，附加上【状态信息】
- * @param <T> 指定该数据类型
-</T> */
+ * @param <TextRecord> 指定该数据类型
+</TextRecord> */
 class DataState<T> {
     /**
      * 定义几种基本的状态
@@ -26,6 +26,8 @@ class DataState<T> {
         REPLACE_ALL, APPEND, PUSH_HEAD, DELETE, APPEND_ONE
     }
 
+
+
     //表征数据状态
     var state: STATE
 
@@ -41,9 +43,17 @@ class DataState<T> {
     //是否为重试状态
     var isRetry = false
 
+    //重试后的状态
+    var stateRetried:STATE = STATE.NOTHING
+
     constructor(data: T) {
         this.data = data
-        state = STATE.SUCCESS
+        state = if(data==null){
+            STATE.FETCH_FAILED
+        }else{
+            STATE.SUCCESS
+        }
+
     }
 
     constructor(data: T, state: STATE) {
@@ -62,6 +72,10 @@ class DataState<T> {
 
     fun setRetry(retry: Boolean): DataState<T> {
         isRetry = retry
+        return this
+    }
+    fun setRetryState(retryState: STATE): DataState<T> {
+        stateRetried = retryState
         return this
     }
 

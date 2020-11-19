@@ -29,7 +29,7 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
                     val userLocal = localUserRepository.getLoggedInUser()
                     if (userLocal.isValid) {
                         //从用户资料仓库总取出数据
-                        return@switchMap profileRepository!!.getUserProfile(userLocal.id, userLocal.token!!)
+                        return@switchMap profileRepository!!.getUserProfile(userLocal.id!!, userLocal.token!!)
                     } else {
                         return@switchMap MutableLiveData(DataState<UserProfile?>(DataState.STATE.NOT_LOGGED_IN))
                     }

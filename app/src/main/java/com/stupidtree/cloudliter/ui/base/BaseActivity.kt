@@ -18,8 +18,8 @@ import com.stupidtree.cloudliter.R
 
 /**
  * 本项目所有Activity的基类
- * @param <T> 泛型T指定的是这个页面绑定的ViewModel
-</T> */
+ * @param <TextRecord> 泛型T指定的是这个页面绑定的ViewModel
+</TextRecord> */
 abstract class BaseActivity<T : ViewModel?> : AppCompatActivity() {
     /**
      * 每个Acitivity绑定一个ViewModel

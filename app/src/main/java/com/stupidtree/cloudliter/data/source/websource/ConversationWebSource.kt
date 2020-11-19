@@ -1,14 +1,14 @@
-package com.stupidtree.cloudliter.data.source
+package com.stupidtree.cloudliter.data.source.websource
 
 import androidx.arch.core.util.Function
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.model.ApiResponse
 import com.stupidtree.cloudliter.data.model.Conversation
-import com.stupidtree.cloudliter.service.ConversationService
-import com.stupidtree.cloudliter.service.LiveDataCallAdapter
-import com.stupidtree.cloudliter.service.codes.SUCCESS
-import com.stupidtree.cloudliter.service.codes.TOKEN_INVALID
+import com.stupidtree.cloudliter.data.source.websource.service.ConversationService
+import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
+import com.stupidtree.cloudliter.data.source.websource.service.codes.SUCCESS
+import com.stupidtree.cloudliter.data.source.websource.service.codes.TOKEN_INVALID
 import com.stupidtree.cloudliter.ui.base.DataState
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -34,15 +34,15 @@ class ConversationWebSource : BaseWebSource<ConversationService>(Retrofit.Builde
      * @param token 令牌
      * @return 获取结果
      */
-    fun getConversations(token: String): LiveData<DataState<List<Conversation>?>> {
-        return Transformations.map(service.getConversations(token)) { input: ApiResponse<List<Conversation>?>? ->
+    fun getConversations(token: String): LiveData<DataState<MutableList<Conversation>?>> {
+        return Transformations.map(service.getConversations(token)) { input ->
             if (null == input) {
-                return@map DataState<List<Conversation>?>(DataState.STATE.FETCH_FAILED)
+                return@map DataState<MutableList<Conversation>?>(DataState.STATE.FETCH_FAILED)
             }
             when (input.code) {
                 SUCCESS -> return@map DataState(input.data)
-                TOKEN_INVALID -> return@map DataState<List<Conversation>?>(DataState.STATE.TOKEN_INVALID)
-                else -> return@map DataState<List<Conversation>?>(DataState.STATE.FETCH_FAILED)
+                TOKEN_INVALID -> return@map DataState<MutableList<Conversation>?>(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState<MutableList<Conversation>?>(DataState.STATE.FETCH_FAILED)
             }
         }
     }

@@ -2,12 +2,13 @@ package com.stupidtree.cloudliter.data.repository
 
 import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.model.RelationEvent
 import com.stupidtree.cloudliter.data.model.RelationEvent.ACTION
 import com.stupidtree.cloudliter.data.model.UserRelation
-import com.stupidtree.cloudliter.data.source.RelationWebSource
+import com.stupidtree.cloudliter.data.source.websource.RelationWebSource
 import com.stupidtree.cloudliter.ui.base.DataState
 
 class RelationRepository(application: Application) {
@@ -15,21 +16,12 @@ class RelationRepository(application: Application) {
      * 数据源
      */
     //数据源：网络类型
-    var relationWebSource: RelationWebSource = RelationWebSource.instance!!
+    private var relationWebSource: RelationWebSource = RelationWebSource.instance!!
 
-    var chatMessageDao = AppDatabase.getDatabase(application).chatMessageDao()
+    private var chatMessageDao = AppDatabase.getDatabase(application).chatMessageDao()
 
-    /**
-     * 判断某用户是否是本用户的好友
-     *
-     * @param token 令牌
-     * @param id1   （非必须）本用户id
-     * @param id2   （必须）目标用户id
-     * @return Boolean型判断结果
-     */
-    fun isMyFriend(token: String, id1: String, id2: String): LiveData<DataState<Boolean?>> {
-        return relationWebSource.isFriends(token, id1, id2)
-    }
+    private var relationDao = AppDatabase.getDatabase(application).userRelationDao()
+
 
     /**
      * 获取关系对象
@@ -38,7 +30,28 @@ class RelationRepository(application: Application) {
      * @return 结果
      */
     fun queryRelation(token: String, friendId: String): LiveData<DataState<UserRelation?>> {
-        return relationWebSource.queryRelation(token, friendId)
+        val result =  MediatorLiveData<DataState<UserRelation?>>()
+        val localRes = relationDao.queryRelation(friendId)
+        result.addSource(localRes){
+            if(it!=null){
+                result.value = DataState(it,DataState.STATE.SUCCESS)
+            }else{
+                result.value = DataState(it,DataState.STATE.NOT_EXIST)
+            }
+        }
+        val webSource = relationWebSource.queryRelation(token, friendId)
+        result.addSource(webSource){webResult->
+            if(webResult.state==DataState.STATE.SUCCESS&&webResult.data!=null){
+                Thread{
+                    relationDao.saveRelation(webResult.data!!)
+                }.start()
+            }else if(webResult.state==DataState.STATE.NOT_EXIST){
+                Thread{
+                    relationDao.deleteRelation(friendId)
+                }.start()
+            }
+        }
+        return result
     }
 
     /**

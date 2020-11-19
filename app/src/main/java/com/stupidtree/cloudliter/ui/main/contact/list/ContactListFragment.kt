@@ -1,6 +1,7 @@
 package com.stupidtree.cloudliter.ui.main.contact.list
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -21,6 +22,7 @@ import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils
 import java.util.*
+import kotlin.Comparator
 
 /**
  * 联系人页面的Fragment
@@ -73,16 +75,24 @@ class ContactListFragment : BaseFragment<ContactListViewModel>() {
         refreshLayout!!.setOnRefreshListener { viewModel!!.startFetchData() }
 
         //当列表数据变更时，将自动调用本匿名函数
-        viewModel!!.listData?.observe(this, Observer { contactListState: DataState<List<UserRelation>?> ->
+        viewModel!!.listData.observe(this, { contactListState: DataState<List<UserRelation>?> ->
             refreshLayout!!.isRefreshing = false
             if (contactListState.state === DataState.STATE.SUCCESS) {
+                val newList = contactListState.data!!.sortedWith(comparator = object:Comparator<UserRelation>{
+                    override fun compare(o1: UserRelation?, o2: UserRelation?): Int {
+                        if(o1==null||o2==null) return -1
+                        val name1:String = if(o1.remark.isNullOrEmpty()) o1.friendNickname.toString() else o1.remark.toString()
+                        val name2:String = if(o2.remark.isNullOrEmpty()) o2.friendNickname.toString() else o2.remark.toString()
+                        return name1.compareTo(name2)
+                    }
+                })
                 //状态为”成功“，那么列表设置为可见，并通知列表适配器丝滑地更新列表项
-                listAdapter!!.notifyItemChangedSmooth(contactListState.data!!, object : RefreshJudge<UserRelation> {
+                listAdapter!!.notifyItemChangedSmooth(newList, object : RefreshJudge<UserRelation> {
                     override fun judge(oldData: UserRelation, newData: UserRelation): Boolean {
                         return oldData != newData || oldData.remark != newData.remark
                     }
                 })
-                if (contactListState.data!!.size > 0) {
+                if (contactListState.data!!.isNotEmpty()) {
                     list!!.visibility = View.VISIBLE
                     placeHolder!!.visibility = View.GONE
                 } else {
@@ -116,7 +126,7 @@ class ContactListFragment : BaseFragment<ContactListViewModel>() {
     /**
      * 定义本页面的列表适配器
      */
-    class XListAdapter(mContext: Context, mBeans: MutableList<UserRelation>) : BaseListAdapter<UserRelation, XListAdapter.XHolder>(mContext!!, mBeans) {
+    class XListAdapter(mContext: Context, mBeans: MutableList<UserRelation>) : BaseListAdapter<UserRelation, XListAdapter.XHolder>(mContext, mBeans) {
         override fun getLayoutId(viewType: Int): Int {
             return R.layout.fragment_contact_list_item
         }

@@ -8,9 +8,9 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.model.ChatMessage
-import com.stupidtree.cloudliter.data.source.ChatMessageDao
-import com.stupidtree.cloudliter.data.source.ChatMessageWebSource
-import com.stupidtree.cloudliter.data.source.SocketWebSource
+import com.stupidtree.cloudliter.data.source.dao.ChatMessageDao
+import com.stupidtree.cloudliter.data.source.websource.ChatMessageWebSource
+import com.stupidtree.cloudliter.data.source.websource.SocketWebSource
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.base.DataState.LIST_ACTION
@@ -97,11 +97,11 @@ class ChatRepository(context: Context) {
                 webListState?.let { listDataState.removeSource(it) }
                 webListState = chatMessageWebSource.getMessages(token, conversationId, topId, pageSize)
                 listDataState.addSource(webListState!!) { result ->
-                    if (result.state === DataState.STATE.SUCCESS && result.data!!.size > 0) {
+                    if (result.state === DataState.STATE.SUCCESS && result.data!!.isNotEmpty()) {
                         listDataState.removeSource(localListState!!)
                         saveMessageAsync(ArrayList(result.data))
                         if (chatMessages != null) {
-                            listDataState.value = result.setListAction(action).setRetry(chatMessages.size > 0)
+                            listDataState.value = result.setListAction(action).setRetry(chatMessages.isNotEmpty())
                         }
                     }
                 }
@@ -237,7 +237,7 @@ class ChatRepository(context: Context) {
      * @param filePath 文件
      * @return 返回结果
      */
-    fun ActionSendVoiceMessage(context: Context, token: String, fromId: String, toId: String, filePath: String,voiceSeconds:Int): LiveData<DataState<ChatMessage?>> {
+    fun actionSendVoiceMessage(token: String, fromId: String, toId: String, filePath: String, voiceSeconds: Int): LiveData<DataState<ChatMessage?>> {
         val result = MediatorLiveData<DataState<ChatMessage?>>()
         //读取图片文件
         val f = File(filePath)
@@ -286,7 +286,6 @@ class ChatRepository(context: Context) {
     }
 
     private fun saveMessageAsync(chatMessages: List<ChatMessage>?) {
-
         Thread { chatMessages?.let { chatMessageDao.saveMessage(it) } }.start()
     }
 

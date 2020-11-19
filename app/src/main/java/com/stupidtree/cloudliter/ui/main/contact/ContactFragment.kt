@@ -99,7 +99,6 @@ class ContactFragment : BaseFragment<ContactViewModel>() {
 
     override fun onResume() {
         super.onResume()
-        viewModel!!.startFetchData()
         viewModel!!.startFetchUnread()
     }
 

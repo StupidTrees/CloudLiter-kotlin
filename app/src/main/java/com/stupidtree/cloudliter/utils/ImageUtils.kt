@@ -18,7 +18,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
-import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.NotificationTarget
@@ -30,7 +29,7 @@ import com.google.zxing.WriterException
 import com.google.zxing.common.BitMatrix
 import com.google.zxing.qrcode.QRCodeWriter
 import com.stupidtree.cloudliter.R
-import com.stupidtree.cloudliter.data.source.UserPreferenceSource.Companion.getInstance
+import com.stupidtree.cloudliter.data.source.websource.UserPreferenceSource.Companion.getInstance
 import com.stupidtree.cloudliter.utils.TextUtils.isEmpty
 import java.util.*
 

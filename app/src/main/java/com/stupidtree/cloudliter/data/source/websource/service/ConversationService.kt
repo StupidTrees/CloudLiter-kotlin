@@ -1,4 +1,4 @@
-package com.stupidtree.cloudliter.service
+package com.stupidtree.cloudliter.data.source.websource.service
 
 import androidx.lifecycle.LiveData
 import com.stupidtree.cloudliter.data.model.ApiResponse
@@ -19,7 +19,7 @@ interface ConversationService {
      * @return 对话列表
      */
     @GET("/conversation/get")
-    fun getConversations(@Header("token") token: String?): LiveData<ApiResponse<List<Conversation>?>?>
+    fun getConversations(@Header("token") token: String?): LiveData<ApiResponse<MutableList<Conversation>?>?>
 
     /**
      * 查询两用户的某一对话

@@ -11,8 +11,8 @@ import butterknife.ButterKnife
 
 /**
  * 本项目所有Fragment的基类
- * @param <T> 泛型指定的是Fragment所绑定的ViewModel类型
-</T> */
+ * @param <TextRecord> 泛型指定的是Fragment所绑定的ViewModel类型
+</TextRecord> */
 abstract class BaseFragment<T : ViewModel> : Fragment() {
     //本Fragment持有的根View
     private var rootView: View? = null

@@ -1,6 +1,8 @@
 package com.stupidtree.cloudliter.data
 
 import androidx.room.TypeConverter
+import com.stupidtree.cloudliter.data.model.UserLocal
+import com.stupidtree.cloudliter.data.model.UserProfile
 import java.sql.Timestamp
 
 /**
@@ -17,5 +19,29 @@ object TypeConverters {
     @TypeConverter
     fun dateToTimestamp(date: Long?): Timestamp? {
         return date?.let { Timestamp(it) }
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun genderToString(date: UserLocal.GENDER): String {
+        return date.name
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun stringToGender(str:String): UserLocal.GENDER {
+        return UserLocal.GENDER.valueOf(str)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun colorToString(date: UserProfile.COLOR): String {
+        return date.name
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun stringToColor(str:String): UserProfile.COLOR {
+        return UserProfile.COLOR.valueOf(str)
     }
 }

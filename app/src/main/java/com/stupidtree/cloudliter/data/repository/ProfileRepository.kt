@@ -2,9 +2,11 @@ package com.stupidtree.cloudliter.data.repository
 
 import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Transformations
+import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.model.UserProfile
-import com.stupidtree.cloudliter.data.source.UserWebSource
+import com.stupidtree.cloudliter.data.source.websource.UserWebSource
 import com.stupidtree.cloudliter.ui.base.DataState
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -18,6 +20,7 @@ import java.util.*
 class ProfileRepository(application: Application) {
     //数据源1：网络类型数据源，用户网络操作
     private val userWebSource: UserWebSource = UserWebSource.instance!!
+    private val userProfileDao = AppDatabase.getDatabase(application).userProfileDao()
     private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
 
     /**
@@ -30,8 +33,21 @@ class ProfileRepository(application: Application) {
      * 其中DataState用于包装这个本体，附带状态信息
      * MutableLiveData则是UI层面的，用于和ViewModel层沟通
      */
-    fun getUserProfile(id: String?, token: String): LiveData<DataState<UserProfile?>> {
-        return userWebSource.getUserProfile(id, token)
+    fun getUserProfile(id: String, token: String): LiveData<DataState<UserProfile?>> {
+        val result = MediatorLiveData<DataState<UserProfile?>>()
+        result.addSource(userProfileDao.queryProfile(id)){ it ->
+            it?.let {
+                result.value = DataState(it)
+            }
+        }
+        result.addSource(userWebSource.getUserProfile(id, token)){
+            if(it.state==DataState.STATE.SUCCESS&&it.data!=null){
+                Thread{
+                    userProfileDao.saveProfile(it.data!!)
+                }.start()
+            }
+        }
+        return result
     }
 
     /**

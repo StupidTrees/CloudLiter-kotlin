@@ -1,6 +1,7 @@
 package com.stupidtree.cloudliter.ui.base
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +11,9 @@ import java.util.*
 /**
  * 本项目一般的RecyclerView的Adapter的基类
  *
- * @param <T> T泛型指定每个列表项的数据Model的类型
+ * @param <TextRecord> T泛型指定每个列表项的数据Model的类型
  * @param <H> H泛型指定ViewHolder的类型
-</H></T> */
+</H></TextRecord> */
 abstract class BaseListAdapter<T, H : RecyclerView.ViewHolder>(protected var mContext: Context,
                                                                 /**
                                                                  * 标准三件：数据源列表、Context、Inflater对象

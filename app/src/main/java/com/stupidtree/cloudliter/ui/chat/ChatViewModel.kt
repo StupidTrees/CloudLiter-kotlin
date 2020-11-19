@@ -108,8 +108,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun getListData(context: Context): LiveData<DataState<List<ChatMessage>?>> {
         if (listData == null) {
-            listData = Transformations.map<DataState<List<ChatMessage>?>, DataState<List<ChatMessage>?>>(chatRepository.getListDataState()) { input2: DataState<List<ChatMessage>?> ->
-                if (input2.data != null && input2.data!!.size > 0) {
+            listData = Transformations.map(chatRepository.getListDataState()) { input2: DataState<List<ChatMessage>?> ->
+                if (input2.data != null && input2.data!!.isNotEmpty()) {
                     when (input2.listAction) {
                         LIST_ACTION.APPEND_ONE -> {
                             Log.e("listAppendOne", input2.data.toString())
@@ -174,7 +174,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             if (input.isActioning) {
                 val userLocal = localUserRepository.getLoggedInUser()
                 if (userLocal.isValid && friendId != null) {
-                    return@switchMap chatRepository.ActionSendVoiceMessage(getApplication(), userLocal.token!!, userLocal.id!!, friendId!!, input.path!!,input.seconds)
+                    return@switchMap chatRepository.actionSendVoiceMessage(userLocal.token!!, userLocal.id!!, friendId!!, input.path!!, input.seconds)
                 } else {
                     return@switchMap MutableLiveData(DataState<ChatMessage?>(DataState.STATE.NOT_LOGGED_IN))
                 }

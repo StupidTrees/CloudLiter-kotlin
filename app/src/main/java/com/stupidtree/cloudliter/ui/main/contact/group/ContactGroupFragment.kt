@@ -69,7 +69,7 @@ class ContactGroupFragment : BaseFragment<ContactGroupViewModel>() {
         //设置下拉刷新
         refreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent)
         refreshLayout.setOnRefreshListener { viewModel!!.startFetchData() }
-        viewModel!!.listData?.observe(this, Observer { contactListState: DataState<List<UserRelation>?> ->
+        viewModel!!.listData.observe(this, Observer { contactListState: DataState<List<UserRelation>?> ->
             refreshLayout.isRefreshing = false
             if (contactListState.state === DataState.STATE.SUCCESS) {
                 //状态为”成功“，那么列表设置为可见，并通知列表适配器丝滑地更新列表项

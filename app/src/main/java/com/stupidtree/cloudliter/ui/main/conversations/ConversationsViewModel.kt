@@ -15,16 +15,20 @@ import java.util.*
 
 class ConversationsViewModel(application: Application) : AndroidViewModel(application) {
     /**
+     * 仓库区
+     */
+    //对话仓库
+    private val conversationRepository: ConversationRepository? = getInstance(application)
+
+    //本地用户仓库
+    private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
+
+
+    /**
      * 数据区
      */
     //数据本体：列表数据
-    var listData: MediatorLiveData<DataState<List<Conversation>?>>? = null
-        get() {
-            if (field == null) {
-                listData = conversationRepository!!.listLiveData
-            }
-            return field!!
-        }
+    var listData: MediatorLiveData<DataState<MutableList<Conversation>?>>? =conversationRepository!!.listLiveData
 
     //数据本体：未读消息
     var unreadMessageState: LiveData<DataState<HashMap<String, Int>>>? = null
@@ -66,19 +70,11 @@ class ConversationsViewModel(application: Application) : AndroidViewModel(applic
         private set
     private val unreadMessages = HashMap<String, Int>()
 
-    /**
-     * 仓库区
-     */
-    //对话仓库
-    private val conversationRepository: ConversationRepository? = getInstance(application)
-
-    //本地用户仓库
-    private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
 
     fun startRefresh() {
         val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {
-            conversationRepository!!.ActionGetConversations(userLocal.token!!)
+            conversationRepository!!.actionGetConversations(userLocal.token!!)
         } else {
             listData!!.setValue(DataState(DataState.STATE.NOT_LOGGED_IN))
         }

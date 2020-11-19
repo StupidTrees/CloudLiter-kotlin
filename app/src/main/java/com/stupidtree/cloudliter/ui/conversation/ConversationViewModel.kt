@@ -25,7 +25,7 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
                     if (input.isActioning) {
                         val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
-                            return@switchMap repository!!.queryConversation(userLocal.token!!, userLocal.id, input.data!!)
+                            return@switchMap repository!!.queryConversation(userLocal.token!!, userLocal.id!!, input.data)
                         } else {
                             return@switchMap MutableLiveData(DataState<Conversation?>(DataState.STATE.NOT_LOGGED_IN))
                         }

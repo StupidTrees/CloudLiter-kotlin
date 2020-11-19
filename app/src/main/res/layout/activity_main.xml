@@ -105,13 +105,14 @@
             android:layout_height="1dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
+            android:layout_marginBottom="16dp"
             android:alpha="0.8"
             android:background="?android:attr/listDivider" />
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/drawer_navigationview"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:layout_gravity="bottom|center|start"
 
             android:layout_weight="1"
@@ -119,10 +120,9 @@
             android:background="#00000000"
             android:overScrollMode="never"
             app:elevation="0dp"
-            app:itemHorizontalPadding="24dp"
-            app:itemIconPadding="18dp"
-            app:itemIconSize="24dp"
-            app:itemIconTint="?attr/textColorSecondary"
+            app:itemHorizontalPadding="32dp"
+            app:itemIconPadding="28dp"
+            app:itemIconSize="33dp"
             app:itemMaxLines="1"
             app:itemTextAppearance="@style/TextAppearance.AppCompat.Medium"
             app:itemTextColor="?attr/textColorSecondary"
@@ -137,13 +137,14 @@
             android:orientation="horizontal">
 
             <LinearLayout
+                android:id="@+id/exit_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clickable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:gravity="center|start"
                 android:orientation="horizontal"
-                android:paddingStart="24dp"
+                android:paddingStart="32dp"
                 android:paddingTop="16dp"
                 android:paddingEnd="8dp"
                 android:paddingBottom="16dp">
@@ -154,7 +155,7 @@
                     android:alpha="0.8"
                     android:tintMode="src_in"
                     android:visibility="visible"
-                    app:srcCompat="@drawable/ic_baseline_cloud_24"
+                    app:srcCompat="@drawable/ic_baseline_exit_to_app_24"
                     app:tint="?attr/colorControlNormal" />
 
                 <TextView
@@ -163,9 +164,9 @@
                     android:layout_gravity="center"
                     android:layout_marginStart="18dp"
                     android:layout_weight="1"
-                    android:text="深色模式"
+                    android:text="@string/exit"
                     android:textColor="?attr/textColorSecondary"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 

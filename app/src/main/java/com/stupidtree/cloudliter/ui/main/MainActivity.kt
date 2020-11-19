@@ -1,6 +1,7 @@
 package com.stupidtree.cloudliter.ui.main
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -39,9 +40,8 @@ class MainActivity : BaseActivity<MainViewModel>() {
     @BindView(R.id.drawer)
     var drawerLayout: DrawerLayout? = null
 
-    @JvmField
     @BindView(R.id.drawer_navigationview)
-    var navigationView: NavigationView? = null
+    lateinit var navigationView: NavigationView
 
     @JvmField
     @BindView(R.id.pager)
@@ -59,9 +59,12 @@ class MainActivity : BaseActivity<MainViewModel>() {
     @BindView(R.id.title)
     var title: TextView? = null
 
-    @JvmField
     @BindView(R.id.avatar)
-    var avatar: ImageView? = null
+    lateinit var avatar: ImageView
+
+
+    @BindView(R.id.exit_layout)
+    lateinit var exitLayout:ViewGroup
 
     /**
      * 抽屉里的View
@@ -71,7 +74,7 @@ class MainActivity : BaseActivity<MainViewModel>() {
     var drawerUsername: TextView? = null
     var drawerHeader: ViewGroup? = null
     override fun onCreate(savedInstanceState: Bundle?) {
-        setWindowParams(true, true, false)
+        setWindowParams(statusBar = true, darkColor = true, navi = false)
         super.onCreate(savedInstanceState)
         val bindIntent = Intent(this, SocketIOClientService::class.java)
         startService(bindIntent)
@@ -84,6 +87,7 @@ class MainActivity : BaseActivity<MainViewModel>() {
     }
 
     private fun setUpDrawer() {
+        navigationView.itemIconTintList = null
         val headerView = navigationView!!.inflateHeaderView(R.layout.activity_main_nav_header)
         drawerLayout!!.setStatusBarBackgroundColor(Color.TRANSPARENT)
         drawerLayout!!.setScrimColor(getBackgroundColorSecondAsTint())
@@ -152,7 +156,10 @@ class MainActivity : BaseActivity<MainViewModel>() {
             title!!.text = item.title
             true
         }
-        avatar!!.setOnClickListener { drawerLayout!!.openDrawer(GravityCompat.END) }
+        avatar.setOnClickListener { drawerLayout!!.openDrawer(GravityCompat.END) }
+        exitLayout.setOnClickListener {
+            finish()
+        }
     }
 
     private fun setUserViews(userLocalInfo: UserLocal) {
@@ -165,18 +172,28 @@ class MainActivity : BaseActivity<MainViewModel>() {
             drawerNickname!!.text = userLocalInfo.nickname
             drawerHeader!!.setOnClickListener { ActivityUtils.startProfileActivity(getThis(), viewModel!!.localUser.id!!) }
             navigationView!!.setNavigationItemSelectedListener { item: MenuItem ->
-                if (item.itemId == R.id.drawer_nav_my_profile) {
-                    ActivityUtils.startProfileActivity(getThis(),viewModel!!.localUser.id!!)
-                    return@setNavigationItemSelectedListener true
+                when (item.itemId) {
+                    R.id.drawer_nav_my_profile -> {
+                        ActivityUtils.startProfileActivity(getThis(),viewModel!!.localUser.id!!)
+                        true
+                    }
+                    R.id.drawer_nav_scan_qr -> {
+                        ActivityUtils.startQRCodeActivity(getThis())
+                       true
+                    }
+                    R.id.drawer_nav_discover_friend -> {
+                        ActivityUtils.startSearchActivity(getThis())
+                        true
+                    }
+                    else -> false
                 }
-                false
             }
         } else {
             //未登录的信息显示
             drawerUsername!!.setText(R.string.not_logged_in)
             drawerNickname!!.setText(R.string.please_log_in)
             drawerAvatar!!.setImageResource(R.drawable.place_holder_avatar)
-            avatar!!.setImageResource(R.drawable.place_holder_avatar)
+            avatar.setImageResource(R.drawable.place_holder_avatar)
             drawerHeader!!.setOnClickListener { ActivityUtils.startLoginActivity(getThis()) }
             navigationView!!.setNavigationItemSelectedListener { item: MenuItem ->
                 if (item.itemId == R.id.drawer_nav_my_profile) {

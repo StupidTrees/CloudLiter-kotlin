@@ -22,6 +22,21 @@ import java.util.*
  */
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
     /**
+     * 仓库区
+     */
+    //用户资料仓库
+    private val repository: ProfileRepository = getInstance(application)
+
+    //用户关系仓库
+    private val relationRepository: RelationRepository = RelationRepository.getInstance(application)
+
+    //本地用户仓库
+    private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
+
+    //好友分组仓库
+    private val groupRepository: GroupRepository = GroupRepository.instance!!
+
+    /**
      * 数据区
      */
     //数据本体：我和这个用户的好友关系
@@ -44,7 +59,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                             return@switchMap MutableLiveData(DataState<UserRelation?>(DataState.STATE.NOT_LOGGED_IN))
                         }
                     }
-                    MutableLiveData(DataState<UserRelation?>(DataState.STATE.NOTHING))
+                    MutableLiveData(DataState(DataState.STATE.NOTHING))
                 }
             }
             return field!!
@@ -164,20 +179,6 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     //Trigger:控制分配好友分组
     private var assignGroupController = MutableLiveData<StringTrigger>()
 
-    /**
-     * 仓库区
-     */
-    //用户资料仓库
-    private val repository: ProfileRepository = getInstance(application)
-
-    //用户关系仓库
-    private val relationRepository: RelationRepository = RelationRepository.getInstance(application)!!
-
-    //本地用户仓库
-    private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
-
-    //好友分组仓库
-    private val groupRepository: GroupRepository = GroupRepository.instance!!
 
     //从用户资料仓库中拉取数据
     var userProfileLiveData: LiveData<DataState<UserProfile?>>? = null
@@ -260,7 +261,6 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
         group.id?.let {
             assignGroupController.value = StringTrigger.getActioning(it)
         }
-
     }
 
     fun logout(context: Context) {

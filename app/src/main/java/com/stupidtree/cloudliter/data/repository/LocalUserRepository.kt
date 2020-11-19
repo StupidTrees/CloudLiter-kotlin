@@ -3,11 +3,10 @@ package com.stupidtree.cloudliter.data.repository
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import com.stupidtree.cloudliter.HiApplication
 import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.AppDatabase.Companion.getDatabase
 import com.stupidtree.cloudliter.data.model.UserLocal
-import com.stupidtree.cloudliter.data.source.UserPreferenceSource
+import com.stupidtree.cloudliter.data.source.websource.UserPreferenceSource
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
 
 /**
@@ -37,6 +36,7 @@ class LocalUserRepository(application: Application) {
         //本地缓存清空
         Thread {
             appDatabase.chatMessageDao().clearTable()
+            appDatabase.userRelationDao().clearTable()
             appDatabase.conversationDao().clearTable()
         }.start()
     }

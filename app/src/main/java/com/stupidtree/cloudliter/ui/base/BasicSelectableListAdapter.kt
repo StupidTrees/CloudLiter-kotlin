@@ -6,9 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 /**
  * 一个基本的可选择列表Adapter
  *
- * @param <T> T泛型指定每个列表项的数据Model的类型
+ * @param <TextRecord> T泛型指定每个列表项的数据Model的类型
  * @param <H> H泛型指定ViewHolder的类型
-</H></T> */
+</H></TextRecord> */
 abstract class BasicSelectableListAdapter<T, H : RecyclerView.ViewHolder>(mContext: Context, mBeans: MutableList<T>) : BaseListAdapter<T, H>(mContext, mBeans) {
     var selectedIndex = 0
         protected set

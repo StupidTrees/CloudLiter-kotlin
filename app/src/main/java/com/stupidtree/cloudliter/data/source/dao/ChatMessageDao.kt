@@ -1,4 +1,4 @@
-package com.stupidtree.cloudliter.data.source
+package com.stupidtree.cloudliter.data.source.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
@@ -10,10 +10,10 @@ import java.sql.Timestamp
 
 @Dao
 interface ChatMessageDao {
-    @Query("SELECT * FROM message WHERE conversationId IS :conversationId AND createdAt < :fromTime   ORDER BY id DESC LIMIT :pageSize ")
+    @Query("SELECT * FROM message WHERE conversationId IS :conversationId AND createdAt < :fromTime   ORDER BY createdAt DESC LIMIT :pageSize ")
     fun getMessages(conversationId: String, pageSize: Int, fromTime: Timestamp?): LiveData<List<ChatMessage>?>
 
-    @Query("SELECT * FROM message WHERE conversationId IS :conversationId  ORDER BY id DESC LIMIT :pageSize")
+    @Query("SELECT * FROM message WHERE conversationId IS :conversationId  ORDER BY createdAt DESC LIMIT :pageSize")
     fun getMessages(conversationId: String, pageSize: Int): LiveData<List<ChatMessage>?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
