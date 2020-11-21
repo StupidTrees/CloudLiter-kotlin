@@ -2,234 +2,259 @@ package com.stupidtree.cloudliter.ui.widgets
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Resources
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
-import com.stupidtree.cloudliter.data.model.WordsTag
 import java.util.*
+import java.util.concurrent.Executors
 
-class WordsCloudView @JvmOverloads constructor(context: Context?, attrs: AttributeSet? = null) : View(context, attrs) {
-    private var paint: Paint? = null
-    private var paint1: Paint? = null
-    private var mWidth = 0
-    private var mHeight = 0
-    private val showTags: MutableList<WordsTag> = ArrayList()
-    private var tags: List<String>? = null
-    private fun initView() {
-        paint = Paint()
-        paint!!.isAntiAlias = true
-        paint!!.color = Color.BLACK
-        paint1 = Paint()
-        paint1!!.isAntiAlias = true
-        paint1!!.color = Color.parseColor("#B7B7B7")
-    }
+class WordsCloudView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+        View(context, attrs, defStyleAttr) {
+    private val lock = Object()
+    private val typeSettingThreadPool = Executors.newSingleThreadExecutor()
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        mWidth = MeasureSpec.getSize(widthMeasureSpec)
-        mHeight = MeasureSpec.getSize(heightMeasureSpec)
-        setMeasuredDimension(mWidth, mHeight)
-        showTags.clear()
-        computeSingleRect(tags, dp2px(30), 0, 0, mWidth, mHeight)
-    }
+    private val tags = ArrayList<String>()
+    private val paint = Paint()
+    private var primaryTagColor = 0xFF000000.toInt()
+    private var secondaryTagColor = 0xFF808080.toInt()
+    private val drawRect = Rect()
+    private val minTextSize = 6f * resources.displayMetrics.density
+    private val primaryTagStrokeWidth = minTextSize / 8f
+    private lateinit var random: Random
+    private var bitmap: Bitmap? = null
+    private var region: Region? = null
 
-    fun setData(tags: List<String>?) {
-//        if (tags == null || tags.size() == 0) {
-//            throw new IllegalArgumentException("tags can not be null...");
-//        }
-        requireNotNull(tags) { "tags can not be null..." }
-        this.tags = tags
-        showTags.clear()
-        computeSingleRect(tags, dp2px(30), 0, 0, mWidth, mHeight)
-        invalidate()
-    }
-
-    fun isUsed(wordsTags: List<WordsTag>, name: String): Boolean {
-        for (wordsTag in wordsTags) {
-            return name == wordsTag.name
-        }
-        return false
-    }
-
-    private var cal = 0
-    private fun computeSingleRect(tags: List<String>?, textSize: Int, pLeft: Int, pTop: Int, pRight: Int, pBottom: Int) {
-        var mTextSize = textSize
-        if (tags == null || tags.isEmpty() || mTextSize < MIN_TEXT_SIZE || pBottom == 0 || pRight == 0 || pLeft >= pRight || pTop >= pBottom) {
-            return
-        }
-        var cLeft: Int
-        var cTop: Int
-        var cRight = 0
-        var cBottom = 0
-        var textWidth: Int
-        var textHeight: Int
-        val size = tags.size
-        var index = (Math.random() * size).toInt()
-        if (cal < tags.size) {
-            index = cal
-            cal++
-        }
-        val name = tags[index]
-
-        //计算当前rect的宽高
-        val rectWidth = pRight - pLeft
-        val rectHeight = pBottom - pTop
-        if (rectWidth > rectHeight) {
-            //父布局长大于高，横向布局合适
-            paint!!.textSize = mTextSize.toFloat()
-            textWidth = paint!!.measureText(name).toInt()
-            textHeight = (paint!!.fontMetrics.bottom - paint!!.fontMetrics.top).toInt()
-            if (textHeight > rectHeight) {
-                //记录之前的textsize
-                val beforeTextSize = mTextSize
-                while (textHeight > rectHeight) {
-                    mTextSize--
-                    paint!!.textSize = mTextSize.toFloat()
-                    textHeight = (paint!!.fontMetrics.bottom - paint!!.fontMetrics.top).toInt()
-                }
-                textWidth = paint!!.measureText(name).toInt()
-                while (textWidth > rectWidth) {
-                    mTextSize--
-                    paint!!.textSize = mTextSize.toFloat()
-                    textWidth = paint!!.measureText(name).toInt()
-                }
-                if (mTextSize < MIN_TEXT_SIZE) {
-                    return
-                }
-                textHeight = (paint!!.fontMetrics.bottom - paint!!.fontMetrics.top).toInt()
-                cLeft = pLeft
-                cTop = pTop
-                cRight = textWidth + pLeft
-                cBottom = textHeight + pTop
-                showTags.add(WordsTag(name, mTextSize, cLeft, cTop, cRight, cBottom))
-                textWidth = paint!!.measureText(name).toInt()
-                if (pRight - cRight > textWidth) {
-                    //右
-                    computeSingleRect(tags, beforeTextSize, cRight, pTop, pRight, pBottom)
-                } else {
-                    //右
-                    computeSingleRect(tags, --mTextSize, cRight, pTop, pRight, pBottom)
-                }
-            } else {
-                if (textWidth >= rectWidth) {
-                    while (textWidth > rectWidth) {
-                        mTextSize--
-                        paint!!.textSize = mTextSize.toFloat()
-                        textWidth = paint!!.measureText(name).toInt()
-                    }
-                    if (mTextSize < MIN_TEXT_SIZE) {
-                        return
-                    }
-                    textHeight = (paint!!.fontMetrics.bottom - paint!!.fontMetrics.top).toInt()
-                    cLeft = pLeft
-                    cTop = pTop
-                    cRight = pRight
-                    cBottom = cTop + textHeight
-                    showTags.add(WordsTag(name, mTextSize, cLeft, cTop, cRight, cBottom))
-
-                    //下
-                    mTextSize += 4
-                    computeSingleRect(tags, mTextSize, cLeft, cBottom, cRight, pBottom)
-                } else {
-                    cLeft = (Math.random() * (rectWidth / 3)).toInt() + pLeft // 除以3是为了尽快找到合适的位置
-                    while (cLeft + textWidth > pRight) {
-                        cLeft--
-                    }
-                    cTop = (Math.random() * (rectHeight / 2)).toInt() + pTop
-                    while (cTop + textHeight > pBottom) {
-                        cTop--
-                    }
-                    cRight = cLeft + textWidth
-                    cBottom = cTop + textHeight
-                    showTags.add(WordsTag(name, mTextSize, cLeft, cTop, cRight, cBottom))
-                    //左
-                    computeSingleRect(tags, --mTextSize, pLeft, pTop, cLeft, cBottom)
-                    //上
-                    computeSingleRect(tags, --mTextSize, cLeft, pTop, pRight, cTop)
-                    //右
-                    computeSingleRect(tags, --mTextSize, cRight, cTop, pRight, pBottom)
-                    //下
-                    computeSingleRect(tags, --mTextSize, pLeft, cBottom, cRight, pBottom)
-                }
-            }
-        } else {
-            //父布局高大于长，纵向布局合适
-            val beforeTextSize = mTextSize
-            paint!!.textSize = mTextSize.toFloat()
-            textHeight = (paint!!.fontMetrics.bottom - paint!!.fontMetrics.top).toInt()
-            while (textHeight * name.length > rectHeight) {
-                mTextSize--
-                paint!!.textSize = mTextSize.toFloat()
-                textHeight = (paint!!.fontMetrics.bottom - paint!!.fontMetrics.top).toInt()
-            }
-            if (mTextSize < MIN_TEXT_SIZE) {
-                return
-            }
-            textWidth = (paint!!.measureText(name) / name.length).toInt()
-            val length = name.length
-            if (pLeft + textWidth > pRight) {
-                //右 右边空间不足
-                computeSingleRect(tags, --mTextSize, pLeft, pTop, pRight, pBottom)
-                return
-            }
-            for (i in 0 until length) {
-                cLeft = pLeft
-                cTop = pTop + i * textHeight
-                cRight = cLeft + textWidth
-                cBottom = cTop + textHeight
-                showTags.add(WordsTag(name[i].toString(), mTextSize, cLeft, cTop, cRight, cBottom))
-            }
-            if (pRight - cRight > textWidth) {
-                //右
-                computeSingleRect(tags, beforeTextSize, cRight, pTop, pRight, cBottom)
-                //下
-                computeSingleRect(tags, --mTextSize, pLeft, cBottom, pRight, pBottom)
-            } else {
-                //右
-                computeSingleRect(tags, --mTextSize, cRight, pTop, pRight, cBottom)
-                //下
-                computeSingleRect(tags, --mTextSize, pLeft, cBottom, pRight, pBottom)
-            }
-        }
-    }
-
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        Log.d("---------->", showTags.size.toString() + "个")
-        Log.d("-------->", tags.toString() + "haha")
-        for (name in tags!!) {
-//            float maxTextSize = 0;
-            @SuppressLint("DrawAllocation") var maxWordsTag = WordsTag("", 0, 0, 0, 0, 0)
-            for (wordsTag in showTags) {
-                if (wordsTag.name == name && maxWordsTag.textsize <= wordsTag.textsize) {
-//                    maxTextSize = wordsTag.getTextsize();
-                    maxWordsTag = wordsTag
-                }
-            }
-            Log.d("----->", maxWordsTag.name + maxWordsTag.textsize)
-            paint!!.setTextSize(maxWordsTag.textsize.toFloat())
-            canvas.drawText(maxWordsTag.name, maxWordsTag.left.toFloat(), maxWordsTag.bottom - paint!!.fontMetrics.bottom, paint!!)
-            showTags.remove(maxWordsTag)
-        }
-        for (showTag in showTags) {
-            paint!!.textSize = showTag.textsize.toFloat()
-            paint1!!.textSize = showTag.textsize.toFloat()
-            canvas.drawText(showTag.name, showTag.left.toFloat(), showTag.bottom - paint!!.fontMetrics.bottom, paint1!!)
-        }
-    }
-
-    companion object {
-        const val MIN_TEXT_SIZE = 14
-        fun dp2px(dp: Int): Int {
-            return (dp * Resources.getSystem().displayMetrics.density).toInt()
-        }
-    }
 
     init {
-        initView()
+        paint.isAntiAlias = true
+        paint.textAlign = Paint.Align.CENTER
+        paint.style = Paint.Style.FILL_AND_STROKE
     }
+
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        reTypeSetting()
+    }
+
+
+    private fun typeSetting() {
+        typeSettingThreadPool.execute {
+            random = Random()
+            val region = this.region ?: Region(0, 0, width, height)
+            val tagModels = ArrayList<TagModel>()
+            tagModels.addAll(primaryTypeSetting(region))
+            tagModels.addAll(secondaryTypeSetting(region))
+            tagModels.addAll(edgeTypeSetting(region))
+            val tempBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(tempBitmap)
+            tagModels.forEach {
+                drawRect.set(it.left, it.top, it.left + it.width, it.top + it.height)
+                paint.textSize = it.textSize
+                paint.color = it.textColor
+                paint.strokeWidth = it.strokeWidth
+                if (it.width >= it.height) {
+                    val fontMetrics = paint.fontMetricsInt
+                    val baseline = (drawRect.bottom + drawRect.top - fontMetrics.bottom - fontMetrics.top) / 2f
+                    canvas.drawText(it.text, drawRect.centerX().toFloat(), baseline, paint)
+                } else
+                    drawVerticalTag(canvas, drawRect, it)
+            }
+            synchronized(lock) {
+                bitmap = tempBitmap
+            }
+            postInvalidate()
+        }
+    }
+
+
+    private fun primaryTypeSetting(region: Region): List<TagModel> {
+        val result = ArrayList<TagModel>()
+        val textMaxSize = calcMaxTextSize(width, height)
+        tags.forEach {
+            var textSize = if (tags.indexOf(it) == 0) textMaxSize else textMaxSize - minTextSize
+            while (textSize >= minTextSize) {
+                val tagModel = innerTypeSetting(region, textSize, primaryTagStrokeWidth, primaryTagColor, it)
+                if (tagModel != null) {
+                    result.add(tagModel)
+                    break
+                }
+                textSize -= minTextSize
+            }
+        }
+        return result
+    }
+
+
+    private fun secondaryTypeSetting(region: Region): List<TagModel> {
+        val result = ArrayList<TagModel>()
+        var textSize = calcMaxTextSize(width, height) - minTextSize * 2f
+        if (textSize < minTextSize)
+            textSize = minTextSize
+        while (true) {
+            var isAdded = false
+            tags.forEach {
+                val tagModel =
+                        innerTypeSetting(region, textSize, 0f, secondaryTagColor, it)
+                if (tagModel != null) {
+                    isAdded = true
+                    result.add(tagModel)
+                }
+            }
+            if (!isAdded)
+                textSize -= minTextSize
+            if (textSize < minTextSize)
+                break
+        }
+        return result
+    }
+
+
+    private fun edgeTypeSetting(region: Region): List<TagModel> {
+        val result = ArrayList<TagModel>()
+        val itr = RegionIterator(region)
+        val rect = Rect()
+        while (itr.next(rect)) {
+            val width = rect.width()
+            val height = rect.height()
+            if (width >= minTextSize && height >= minTextSize) {
+                var maxDrawTextLength = (width.coerceAtLeast(height) / minTextSize).toInt()
+                var text: String? = null
+                while (maxDrawTextLength >= 1 && text == null) {
+                    text = tags.firstOrNull { it.length == maxDrawTextLength }
+                    maxDrawTextLength--
+                }
+                if (text != null)
+                    result.add(TagModel(rect.left, rect.top, width, height, secondaryTagColor, minTextSize, 0f, text))
+            }
+        }
+        return result
+    }
+
+
+    private fun innerTypeSetting(
+            region: Region,
+            textSize: Float,
+            strokeWidth: Float,
+            textColor: Int,
+            text: String
+    ): TagModel? {
+        var tagModel: TagModel? = null
+        paint.textSize = textSize
+        paint.strokeWidth = strokeWidth
+        var width = paint.measureText(text).toInt()
+        var height = paint.textSize.toInt()
+        if (random.nextInt(3) == 2) {
+            val t = width
+            width = height
+            height = t
+        }
+        val rit = RegionIterator(region)
+        val rect = Rect()
+        while (rit.next(rect)) {
+            if (rect.width() >= width && rect.height() >= height) {
+                val left: Int = if (rect.width() - width < minTextSize)
+                    rect.left
+                else
+                    rect.left + (random.nextInt(((rect.width() - width) / minTextSize).toInt() + 1) * minTextSize).toInt()
+                val top: Int = if (rect.height() - height < minTextSize)
+                    rect.top
+                else
+                    rect.top + (random.nextInt(((rect.height() - height) / minTextSize).toInt() + 1) * minTextSize).toInt()
+                region.op(Rect(left, top, left + width, top + height), Region.Op.DIFFERENCE)
+                tagModel = TagModel(left, top, width, height, textColor, textSize*.92f, strokeWidth, text)
+                break
+            }
+        }
+        return tagModel
+    }
+
+
+    @SuppressLint("DrawAllocation")
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        synchronized(lock) {
+            if (bitmap != null)
+                canvas.drawBitmap(bitmap!!, 0f, 0f, paint)
+            else {
+                val paintTemp = Paint()
+                paintTemp.textSize = 60f
+                paintTemp.color = secondaryTagColor
+                paintTemp.textAlign = Paint.Align.LEFT
+                val text = "还没有词云呦"
+                val rect = Rect()
+                paintTemp.getTextBounds(text, 0, text.length, rect)
+                canvas.drawText(text, (measuredWidth / 2 - rect.width() / 2).toFloat(), 150f, paintTemp)
+            }
+        }
+    }
+
+
+    private fun drawVerticalTag(canvas: Canvas, drawRect: Rect, tag: TagModel) {
+        paint.textSize = tag.textSize
+        paint.color = tag.textColor
+        paint.strokeWidth = tag.strokeWidth
+        val textHeight = tag.height / tag.text.length
+        for (i in tag.text.indices) {
+            val text = tag.text.substring(i, i + 1)
+            val fontMetrics = paint.fontMetricsInt
+            val drawTop = drawRect.top + i * textHeight
+            val drawBottom = drawTop + textHeight
+            val baseline = (drawTop + drawBottom - fontMetrics.bottom - fontMetrics.top) / 2f
+            canvas.drawText(text, drawRect.centerX().toFloat(), baseline, paint)
+        }
+    }
+
+
+    private fun calcMaxTextSize(canvasWidth: Int, canvasHeight: Int): Float {
+        var length = 0
+        tags.map { if (it.length > length) length = it.length }
+        val min = canvasHeight.coerceAtMost(canvasWidth)
+        val tempSize = ((min * .8f) / length).toInt()
+        return (tempSize - (tempSize % minTextSize))
+    }
+
+
+    fun setTags(tags: List<String>) {
+        this.tags.clear()
+        this.tags.addAll(tags)
+        reTypeSetting()
+    }
+
+
+    /**
+     * 重新排版
+     */
+    private fun reTypeSetting() {
+        if (tags.isNotEmpty() && width > 0 && height > 0)
+            typeSetting()
+    }
+
+
+    /**
+     * 设置填充形状
+     * @param region 填充形状，形状大小不能超出控件本身大小
+     */
+    fun setRegion(region: Region) {
+        this.region = region
+        reTypeSetting()
+    }
+
+
+    /**
+     * 设置标签颜色
+     * @param primaryTagColor 主标签颜色
+     * @param secondaryTagColor 填充的标签颜色
+     */
+    fun setColors(primaryTagColor: Int, secondaryTagColor: Int) {
+        this.primaryTagColor = primaryTagColor
+        this.secondaryTagColor = secondaryTagColor
+        reTypeSetting()
+    }
+
+
+    private data class TagModel(
+            val left: Int = 0, val top: Int = 0, val width: Int = 0, val height: Int = 0,
+            val textColor: Int = 0, val textSize: Float = 0f, val strokeWidth: Float = 0f, val text: String = ""
+    )
 }

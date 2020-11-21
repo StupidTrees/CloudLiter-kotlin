@@ -57,14 +57,13 @@ class ConversationActivity : BaseActivity<ConversationViewModel>() {
                 conversationDataState.data?.let { setUpPage(it) }
             }
         })
-        wordsCloudView!!.setData(listOf(getString(R.string.no_word_cloud_yet)))
         viewModel!!.wordCloudLiveData?.observe(this, Observer { hashMapDataState ->
             if (hashMapDataState.state === DataState.STATE.SUCCESS) {
                 val tag = ArrayList<String>()
                 for ((key) in hashMapDataState.data!!) {
                     tag.add(key)
                 }
-                wordsCloudView!!.setData(tag)
+                wordsCloudView!!.setTags(tag)
             }
         })
         userLayout!!.setOnClickListener {
