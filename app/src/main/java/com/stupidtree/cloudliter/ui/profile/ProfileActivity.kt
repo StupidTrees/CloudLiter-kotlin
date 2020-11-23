@@ -263,14 +263,13 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                 }
             }
         })
-        wordsCloudView!!.setData(listOf(getString(R.string.no_word_cloud_yet)))
         viewModel!!.wordCloudLiveData?.observe(this, Observer { listDataState ->
             if (listDataState.state === DataState.STATE.SUCCESS) {
                 val tag = ArrayList<String>()
                 for ((key) in listDataState.data!!) {
                     tag.add(key)
                 }
-                wordsCloudView!!.setData(tag)
+                wordsCloudView!!.setTags(tag)
             }
         })
         logoutButton!!.setOnClickListener {
