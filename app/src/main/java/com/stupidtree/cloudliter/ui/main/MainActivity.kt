@@ -1,7 +1,6 @@
 package com.stupidtree.cloudliter.ui.main
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -80,15 +79,23 @@ class MainActivity : BaseActivity<MainViewModel>() {
         startService(bindIntent)
     }
 
+    override fun onStart() {
+        super.onStart()
+        try{
+            NotificationUtils.checkNotification(this)
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
-        NotificationUtils.checkNotification(this)
         setUserViews(viewModel!!.localUser)
     }
 
     private fun setUpDrawer() {
         navigationView.itemIconTintList = null
-        val headerView = navigationView!!.inflateHeaderView(R.layout.activity_main_nav_header)
+        val headerView = navigationView.inflateHeaderView(R.layout.activity_main_nav_header)
         drawerLayout!!.setStatusBarBackgroundColor(Color.TRANSPARENT)
         drawerLayout!!.setScrimColor(getBackgroundColorSecondAsTint())
         drawerLayout!!.drawerElevation = ImageUtils.dp2px(this, 84f).toFloat()
@@ -145,7 +152,6 @@ class MainActivity : BaseActivity<MainViewModel>() {
                 title!!.text = item.title
                 //Objects.requireNonNull(getSupportActionBar()).setTitle(item.getTitle());
             }
-
             override fun onPageScrollStateChanged(state: Int) {}
         })
         navView!!.setOnNavigationItemSelectedListener { item: MenuItem ->
@@ -166,12 +172,12 @@ class MainActivity : BaseActivity<MainViewModel>() {
         if (userLocalInfo.isValid) { //如果已登录
             //装载头像
             ImageUtils.loadLocalAvatarInto(this, userLocalInfo.avatar, drawerAvatar!!)
-            ImageUtils.loadLocalAvatarInto(this, userLocalInfo.avatar, avatar!!)
+            ImageUtils.loadLocalAvatarInto(this, userLocalInfo.avatar, avatar)
             //设置各种文字
             drawerUsername!!.text = userLocalInfo.username
             drawerNickname!!.text = userLocalInfo.nickname
             drawerHeader!!.setOnClickListener { ActivityUtils.startProfileActivity(getThis(), viewModel!!.localUser.id!!) }
-            navigationView!!.setNavigationItemSelectedListener { item: MenuItem ->
+            navigationView.setNavigationItemSelectedListener { item: MenuItem ->
                 when (item.itemId) {
                     R.id.drawer_nav_my_profile -> {
                         ActivityUtils.startProfileActivity(getThis(),viewModel!!.localUser.id!!)
@@ -195,7 +201,7 @@ class MainActivity : BaseActivity<MainViewModel>() {
             drawerAvatar!!.setImageResource(R.drawable.place_holder_avatar)
             avatar.setImageResource(R.drawable.place_holder_avatar)
             drawerHeader!!.setOnClickListener { ActivityUtils.startLoginActivity(getThis()) }
-            navigationView!!.setNavigationItemSelectedListener { item: MenuItem ->
+            navigationView.setNavigationItemSelectedListener { item: MenuItem ->
                 if (item.itemId == R.id.drawer_nav_my_profile) {
                     ActivityUtils.startLoginActivity(getThis())
                     return@setNavigationItemSelectedListener true

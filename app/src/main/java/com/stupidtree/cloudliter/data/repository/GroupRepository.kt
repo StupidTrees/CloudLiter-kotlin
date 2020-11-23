@@ -39,7 +39,6 @@ class GroupRepository internal constructor() {
      * @return 查询结果
      */
     fun addMyGroups(token: String, groupName: String): LiveData<DataState<String?>> {
-        println("repository stage:func addMyGroups succeed")
         return groupWebSource.addMyGroups(token, groupName)
     }
 
@@ -49,7 +48,6 @@ class GroupRepository internal constructor() {
      * @return 查询结果
      */
     fun deleteMyGroups(token: String, groupName: String): LiveData<DataState<String?>> {
-        println("repository stage:func deleteMyGroups succeed")
         return groupWebSource.deleteMyGroups(token, groupName)
     }
 

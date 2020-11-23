@@ -50,23 +50,18 @@ class GroupWebSource : BaseWebSource<GroupService>(Retrofit.Builder()
     fun addMyGroups(token: String?, groupName: String?): LiveData<DataState<String?>> {
         //当网络请求返回的结果解析、包装为DataState形式
         return Transformations.map(service.addMyGroups(token, groupName)) { input ->
-            Log.e("her", "！")
             if (input == null) {
                 return@map DataState<String?>(DataState.STATE.FETCH_FAILED)
             } else {
                 when (input.code) {
                     codes.SUCCESS -> {
-                        println("used!!!")
-                        println("websource stage: func:addMyGroup succeed")
-                        return@map DataState(input.data)
+                        return@map DataState(input.data,DataState.STATE.SUCCESS)
                     }
                     codes.TOKEN_INVALID -> {
-                        println("websource stage: func:addMyGroup token_invalid")
                         return@map DataState<String?>(DataState.STATE.TOKEN_INVALID)
                     }
                     codes.GROUP_NAME_EXIST -> return@map DataState<String?>(DataState.STATE.SPECIAL, input.message)
                     else -> {
-                        println("websource stage: func:addMyGroup default")
                         return@map DataState<String?>(DataState.STATE.FETCH_FAILED, input.message)
                     }
                 }
@@ -89,17 +84,13 @@ class GroupWebSource : BaseWebSource<GroupService>(Retrofit.Builder()
             } else {
                 when (input.code) {
                     codes.SUCCESS -> {
-                        println("used!!!")
-                        println("websource stage: func:deleteMyGroup succeed")
-                        return@map DataState(input.data)
+                         return@map DataState(input.data,DataState.STATE.SUCCESS)
                     }
                     codes.TOKEN_INVALID -> {
-                        println("websource stage: func:deleteMyGroup token_invalid")
                         return@map DataState<String?>(DataState.STATE.TOKEN_INVALID)
                     }
                     codes.GROUP_NAME_EXIST -> return@map DataState<String?>(DataState.STATE.SPECIAL, input.message)
                     else -> {
-                        println("websource stage: func:deleteMyGroup default")
                         return@map DataState<String?>(DataState.STATE.FETCH_FAILED, input.message)
                     }
                 }
@@ -120,7 +111,7 @@ class GroupWebSource : BaseWebSource<GroupService>(Retrofit.Builder()
                 return@map DataState<Any>(DataState.STATE.FETCH_FAILED)
             } else {
                 when (input.code) {
-                    codes.SUCCESS -> return@map DataState(input.data)
+                    codes.SUCCESS -> return@map DataState(input.data,DataState.STATE.SUCCESS)
                     codes.TOKEN_INVALID -> return@map DataState<Any>(DataState.STATE.TOKEN_INVALID)
                     else -> return@map DataState<Any>(DataState.STATE.FETCH_FAILED, input.message)
                 }
