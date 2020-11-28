@@ -12,9 +12,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.RelationGroup
 import com.stupidtree.cloudliter.ui.base.BaseActivity
+import com.stupidtree.cloudliter.ui.base.BaseListAdapter
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter.RefreshJudge
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.widgets.PopUpEditText
+import com.stupidtree.cloudliter.ui.widgets.PopUpSelectableList
 import com.stupidtree.cloudliter.ui.widgets.PopUpText
 import java.util.*
 
@@ -61,7 +63,7 @@ class GroupEditorActivity : BaseActivity<GroupEditorViewModel>() {
             if (listDataState.state === DataState.STATE.SUCCESS) {
                 listAdapter!!.notifyItemChangedSmooth(listDataState.data!!, object : RefreshJudge<RelationGroup> {
                     override fun judge(oldData: RelationGroup, newData: RelationGroup): Boolean {
-                        return oldData == newData
+                        return !(oldData == newData)
                     }
                 })
             }
@@ -94,12 +96,25 @@ class GroupEditorActivity : BaseActivity<GroupEditorViewModel>() {
                 ).show(supportFragmentManager, "confirm")
             }
         }
+
+        listAdapter?.setOnItemClickListener(object :BaseListAdapter.OnItemClickListener<RelationGroup>{
+            override fun onItemClick(data: RelationGroup, card: View?, position: Int) {
+                PopUpEditText().setTitle(R.string.change_group_name).setOnConfirmListener(object:PopUpEditText.OnConfirmListener{
+                    override fun OnConfirm(text: String) {
+                        viewModel?.startRenameGroup(data.id!!,text)
+                    }
+
+                }).setText(data.groupName).show(supportFragmentManager,"rename")
+            }
+
+        })
+
         viewModel!!.addGroupResult?.observe(this, Observer { stringDataState: DataState<String?> ->
             if (stringDataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.add_ok, Toast.LENGTH_SHORT).show()
                 viewModel!!.startRefresh()
             } else {
-                Toast.makeText(applicationContext, "失败", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
             }
         })
         viewModel!!.deleteGroupResult?.observe(this, Observer { stringDataState: DataState<String?> ->
@@ -107,9 +122,18 @@ class GroupEditorActivity : BaseActivity<GroupEditorViewModel>() {
                 Toast.makeText(getThis(), R.string.delete_ok, Toast.LENGTH_SHORT).show()
                 viewModel!!.startRefresh()
             } else {
-                Toast.makeText(applicationContext, "失败", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
             }
         })
+
+        viewModel!!.renameGroupResult?.observe(this){
+            if (it.state === DataState.STATE.SUCCESS) {
+                Toast.makeText(getThis(), R.string.rename_ok, Toast.LENGTH_SHORT).show()
+                viewModel!!.startRefresh()
+            } else {
+                Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onResume() {

@@ -36,7 +36,7 @@
     <string name="prompt_nickname">显示名称</string>
     <string name="sign_up_failed">注册失败</string>
     <string name="user_already_exists">用户名已被占用！</string>
-    <string name="search_hint">搜索用户</string>
+    <string name="search_hint">按用户信息搜索…</string>
     <string name="make_friends_success">成功添加好友</string>
     <string name="send_message">发消息</string>
     <string name="make_friends">加好友</string>
@@ -86,7 +86,7 @@
     <string name="with_you">和你聊天</string>
     <string name="with_other">和别人聊天</string>
     <string name="place_holder_yunmoji">[表情]</string>
-    <string name="title_relation_event">好友关系</string>
+    <string name="title_relation_event">好友事件</string>
     <string name="send_request_success">好友申请已发送</string>
     <string name="relation_requesting">等待同意</string>
     <string name="relation_rejected">拒绝</string>
@@ -139,4 +139,9 @@
     <string name="scan_qr">扫一扫</string>
     <string name="about_cloud_liter">关于云升</string>
     <string name="discover_friend">发现朋友</string>
+    <string name="logout_hint">退出登录后将清除所有本地缓存，确认退出吗?</string>
+    <string name="search_hint_word_cloud">按关键词匹配词云…</string>
+    <string name="hint_from_your_word_cloud">来自你的词云…</string>
+    <string name="change_group_name">修改分组名称</string>
+    <string name="rename_ok">重命名成功</string>
 </resources>

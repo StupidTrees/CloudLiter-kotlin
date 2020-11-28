@@ -62,8 +62,13 @@ class UserRepository private constructor(context: Context) {
      * @param token 令牌
      * @return 搜索结果列表
      */
-    fun searchUser(text: String, token: String): LiveData<DataState<List<UserSearched>?>> {
-        return userWebSource.searchUser(text, token)
+    fun searchUser(text: String, token: String, byWordCloud:Boolean): LiveData<DataState<List<UserSearched>?>> {
+        return if(byWordCloud){
+            userWebSource.searchUserByWordCloud(text, token)
+        }else{
+            userWebSource.searchUser(text, token)
+        }
+
     }
 
     companion object {

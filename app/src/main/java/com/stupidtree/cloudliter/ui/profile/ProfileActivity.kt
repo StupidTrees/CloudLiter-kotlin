@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -16,7 +15,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import butterknife.BindView
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.RelationGroup
@@ -105,10 +103,9 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
     @BindView(R.id.relation_card)
     var relationCard: ViewGroup? = null
 
-    @JvmField
     @BindView(R.id.logout)
-    var logoutButton //登出按钮
-            : Button? = null
+    lateinit var logoutButton //登出按钮
+            : View
 
     @JvmField
     @BindView(R.id.wordstag_layout)
@@ -183,12 +180,12 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                 Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel!!.relationLiveData?.observe(this, Observer { userRelationDataState ->
+        viewModel!!.relationLiveData?.observe(this, { userRelationDataState ->
             when {
                 userRelationDataState!!.state == DataState.STATE.SUCCESS -> {
                     //是好友关系，则提供发消息入口
                     relationCard!!.visibility = View.VISIBLE
-                    logoutButton!!.visibility = View.GONE
+                    logoutButton.visibility = View.GONE
                     button!!.setText(R.string.send_message)
                     button!!.setIconResource(R.drawable.ic_baseline_message_24)
                     button!!.isEnabled = true
@@ -242,7 +239,7 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                     //不是好友关系，则显示”添加好友“
                     relationCard!!.visibility = View.GONE
                     button!!.setText(R.string.make_friends)
-                    logoutButton!!.visibility = View.GONE
+                    logoutButton.visibility = View.GONE
                     button!!.isEnabled = true
                     button!!.setIconResource(R.drawable.ic_baseline_person_add_24)
                     button!!.setOnClickListener {
@@ -253,7 +250,12 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                 }
                 userRelationDataState.state === DataState.STATE.SPECIAL -> {
                     //是自己
-                    logoutButton!!.visibility = View.VISIBLE
+                    if(intent.getBooleanExtra("showLogout",true)){
+                        logoutButton.visibility = View.VISIBLE
+                    }else {
+                        logoutButton.visibility = View.GONE
+                    }
+
                     relationCard!!.visibility = View.GONE
                     button!!.setText(R.string.edit_my_profile)
                     button!!.isEnabled = true
@@ -272,10 +274,18 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
                 wordsCloudView!!.setTags(tag)
             }
         })
-        logoutButton!!.setOnClickListener {
+        logoutButton.setOnClickListener {
             //通知ViewModel登出
-            viewModel!!.logout(this)
-            finish()
+            PopUpText().setTitle(R.string.logout_hint).setOnConfirmListener(
+                    object :PopUpText.OnConfirmListener{
+                        override fun OnConfirm() {
+                            viewModel!!.logout(getThis())
+                            finish()
+                        }
+
+                    }
+            ).show(supportFragmentManager,"logout")
+
         }
     }
 
@@ -297,21 +307,21 @@ class ProfileActivity : BaseActivity<ProfileViewModel>() {
         if (userInfo != null) {
             ImageUtils.loadAvatarNoCacheInto(getThis(), userInfo.avatar, avatarImageView!!)
             usernameTextView!!.text = userInfo.username
-            nicknameTextView!!.text = userInfo.nickname
-            genderIcon!!.visibility = View.VISIBLE
+            nicknameTextView.text = userInfo.nickname
+            genderIcon.visibility = View.VISIBLE
             colorIcon!!.visibility = View.VISIBLE
             colorIconInner!!.visibility = View.VISIBLE
             if (TextUtils.isEmpty(userInfo.signature)) {
-                signatureTextView!!.setText(R.string.place_holder_no_signature)
+                signatureTextView.setText(R.string.place_holder_no_signature)
             } else {
-                signatureTextView!!.text = userInfo.signature
+                signatureTextView.text = userInfo.signature
             }
             colorIcon!!.setCardBackgroundColor(ColorUtils.getColorByEnum(getThis(), userInfo.color))
             colorIconInner!!.setCardBackgroundColor(ColorUtils.getColorByEnum(getThis(), userInfo.color))
             if (userInfo.gender == UserLocal.GENDER.MALE) {
-                genderIcon!!.setImageResource(R.drawable.ic_male_blue_24)
+                genderIcon.setImageResource(R.drawable.ic_male_blue_24)
             } else {
-                genderIcon!!.setImageResource(R.drawable.ic_female_pink_24)
+                genderIcon.setImageResource(R.drawable.ic_female_pink_24)
             }
         }
     }

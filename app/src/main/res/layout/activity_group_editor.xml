@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/backgroundColorBottom"
+    android:background="?attr/backgroundColorSecond"
     tools:context=".ui.group.GroupEditorActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/backgroundColorBottom"
+        android:background="?attr/backgroundColorSecond"
         android:fitsSystemWindows="true"
         app:elevation="0dp">
 

@@ -441,23 +441,19 @@ class ChatActivity : BaseActivity<ChatViewModel>() {
             textInput = !textInput
             refreshInputLayout()
         }
-        voiceButton.setOnTouchListener(object : View.OnTouchListener {
-            override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
-                if (p1 != null) {
-                    //Log.e("action",p1.action.toString())
-                    if (p1.action == MotionEvent.ACTION_DOWN) {
-                        voiceHelper.startRecord()
-                        voiceButtonHint.setText(R.string.voice_button_hint_pressed)
-                    } else if (p1.action == MotionEvent.ACTION_UP || p1.action == 3) {
-                        voiceHelper.stopRecord()
-                        voiceButtonHint.setText(R.string.voice_button_hint_press)
-                    }
+        voiceButton.setOnTouchListener { p0, p1 ->
+            if (p1 != null) {
+                //Log.e("action",p1.action.toString())
+                if (p1.action == MotionEvent.ACTION_DOWN) {
+                    voiceHelper.startRecord()
+                    voiceButtonHint.setText(R.string.voice_button_hint_pressed)
+                } else if (p1.action == MotionEvent.ACTION_UP || p1.action == 3) {
+                    voiceHelper.stopRecord()
+                    voiceButtonHint.setText(R.string.voice_button_hint_press)
                 }
-                return false
-
             }
-
-        })
+            false
+        }
 
         voiceCancel.setOnClickListener {
             cancelVoiceMessage()

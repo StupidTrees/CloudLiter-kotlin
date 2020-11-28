@@ -166,7 +166,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         for (index in indexes) {
             mBeans[index].read = true
             val holder = list.findViewHolderForAdapterPosition(index) as CHolder?
-            holder?.showRead()
+            if(!mBeans[index].sensitive)holder?.showRead()
         }
     }
 
@@ -403,6 +403,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             if (data.getType() == ChatMessage.TYPE.IMG) {
                 if (data.sensitive) {
                     see!!.visibility = View.VISIBLE
+                    read!!.visibility = View.GONE
                     see!!.setOnClickListener { view: View? -> switchSensitiveModeText(data) }
                     image!!.visibility = View.INVISIBLE
                     imageSensitivePlaceHolder!!.visibility = View.VISIBLE
@@ -414,6 +415,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                 }
             } else if (data.getType() == ChatMessage.TYPE.TXT) {
                 if (data.sensitive) {
+                    read!!.visibility = View.GONE
                     see!!.visibility = View.VISIBLE
                     emotion!!.visibility = View.GONE
                     see!!.setImageResource(R.drawable.ic_baseline_visibility_24)

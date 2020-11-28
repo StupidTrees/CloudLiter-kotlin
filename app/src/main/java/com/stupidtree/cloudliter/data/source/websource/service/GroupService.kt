@@ -41,9 +41,17 @@ interface GroupService {
     /**
      * 删除好友分组
      * @param token 令牌
-     * @return 对话列表
      */
     @FormUrlEncoded
     @POST("/group/delete")
     fun deleteMyGroups(@Header("token") token: String?, @Field("groupId") groupName: String?): LiveData<ApiResponse<String?>?>
+
+    /**
+     * 重命名好友分组
+     * @param token 令牌
+     */
+    @FormUrlEncoded
+    @POST("/group/rename")
+    fun renameGroup(@Header("token") token: String, @Field("groupId") id: String,@Field("name") name:String): LiveData<ApiResponse<String?>?>
+
 }

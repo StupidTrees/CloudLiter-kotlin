@@ -50,7 +50,14 @@ class GroupRepository internal constructor() {
     fun deleteMyGroups(token: String, groupName: String): LiveData<DataState<String?>> {
         return groupWebSource.deleteMyGroups(token, groupName)
     }
-
+    /**
+     * 获取删除情况
+     * @param token 令牌
+     * @return 查询结果
+     */
+    fun renameMyGroups(token: String, groupId:String, name:String): LiveData<DataState<String?>> {
+        return groupWebSource.renameGroup(token,groupId,name)
+    }
     companion object {
         //也是单例模式
         var instance: GroupRepository? = null

@@ -11,7 +11,8 @@
     android:fitsSystemWindows="true"
     android:foreground="?attr/selectableItemBackground"
     android:orientation="vertical"
-    android:paddingTop="36dp">
+    android:paddingTop="36dp"
+    android:focusable="true">
 
     <androidx.cardview.widget.CardView
         android:layout_width="72dp"
@@ -61,14 +62,16 @@
         android:textSize="16sp"
         android:textStyle="bold" />
 
+
     <View
+        android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="32dp"
         android:alpha="0.08"
-        android:background="?attr/colorControlNormal" />
+        android:background="?android:attr/listDivider" />
 
 </LinearLayout>
 

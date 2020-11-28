@@ -98,6 +98,38 @@ class GroupWebSource : BaseWebSource<GroupService>(Retrofit.Builder()
         }
     }
 
+
+
+    /**
+     * 重命名分组
+     *
+     * @param token 令牌
+     * @return 查询结果
+     */
+    fun renameGroup(token: String, groupId:String,name:String): LiveData<DataState<String?>> {
+        //当网络请求返回的结果解析、包装为DataState形式
+        return Transformations.map(service.renameGroup(token,groupId,name)) { input->
+            Log.e("her", "！")
+            if (input == null) {
+                return@map DataState<String?>(DataState.STATE.FETCH_FAILED)
+            } else {
+                when (input.code) {
+                    codes.SUCCESS -> {
+                        return@map DataState(input.data,DataState.STATE.SUCCESS)
+                    }
+                    codes.TOKEN_INVALID -> {
+                        return@map DataState<String?>(DataState.STATE.TOKEN_INVALID)
+                    }
+                    codes.GROUP_NAME_EXIST -> return@map DataState<String?>(DataState.STATE.SPECIAL, input.message)
+                    else -> {
+                        return@map DataState<String?>(DataState.STATE.FETCH_FAILED, input.message)
+                    }
+                }
+            }
+        }
+    }
+
+
     /**
      * 为好友分配分组
      * @param token 令牌

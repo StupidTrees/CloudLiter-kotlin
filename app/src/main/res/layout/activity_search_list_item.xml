@@ -8,12 +8,13 @@
     android:orientation="horizontal"
     android:paddingStart="16dp"
     android:paddingTop="8dp"
+    android:paddingEnd="16dp"
     android:paddingBottom="8dp">
 
     <ImageView
         android:id="@+id/avatar"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_gravity="center"
         app:srcCompat="@drawable/ic_baseline_emoji_emotions_24" />
 
@@ -38,6 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
             android:text="TextView"
             android:textColor="?attr/textColorSecondary" />
     </LinearLayout>

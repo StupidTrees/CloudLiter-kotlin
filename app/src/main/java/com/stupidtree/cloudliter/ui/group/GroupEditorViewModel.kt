@@ -84,6 +84,32 @@ class GroupEditorViewModel(application: Application) : AndroidViewModel(applicat
     //Trigger：控制删除请求的发送
     var deleteGroupController = MutableLiveData<StringTrigger>()
 
+
+    //状态数据：重命名分组的结果
+    var renameGroupResult: LiveData<DataState<String?>>? = null
+        get() {
+            if (field == null) {
+                renameGroupResult = Transformations.switchMap(renameGroupController) { input ->
+                    if (input.isActioning) {
+                        val userLocal = localUserRepository.getLoggedInUser()
+                        if (userLocal.isValid) {
+                            //System.out.println("viewmodel stage:func: getrenameGroupResult return is "+groupRepository.renameMyGroups(userLocal.getToken(),input.getValue()));
+                            return@switchMap groupRepository.renameMyGroups(userLocal.token!!, input.groupId!!,input.name!!)
+                        } else {
+                            //System.out.println("viewmodel stage: no log in,func: getrenameGroupResult return is "+groupRepository.renameMyGroups(userLocal.getToken(),input.getValue()));
+                            return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
+                        }
+                    }
+                    MutableLiveData()
+                }
+            }
+            return field!!
+        }
+
+    //Trigger：控制重命名请求的发送
+    var renameGroupController = MutableLiveData<RenameGroupTrigger>()
+
+
     /**
      * 仓库区
      */
@@ -99,7 +125,6 @@ class GroupEditorViewModel(application: Application) : AndroidViewModel(applicat
      * @param group 新组名
      */
     fun startAddGroup(group: String) {
-        println("viewmodel stage:func: startAddGroup group is $group")
         addGroupController.value = StringTrigger.getActioning(group)
     }
 
@@ -108,9 +133,17 @@ class GroupEditorViewModel(application: Application) : AndroidViewModel(applicat
      * @param group 新组名
      */
     fun startDeleteGroup(group: String) {
-        println("viewmodel stage:func: startDeleteGroup group is $group")
         deleteGroupController.value = StringTrigger.getActioning(group)
     }
+
+    /**
+     * 发起重命名好友分组请求
+     * @param group 新组名
+     */
+    fun startRenameGroup(groupId: String,newName:String) {
+        renameGroupController.value = RenameGroupTrigger.getActioning(groupId,newName)
+    }
+
 
     /**
      * 开始刷新页面

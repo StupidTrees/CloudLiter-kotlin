@@ -135,7 +135,26 @@ class UserWebSource : BaseWebSource<UserService>(Retrofit.Builder()
                     else -> return@map DataState<List<UserSearched>?>(DataState.STATE.FETCH_FAILED, input.message)
                 }
             }
-            DataState<List<UserSearched>?>(DataState.STATE.FETCH_FAILED)
+            DataState(DataState.STATE.FETCH_FAILED)
+        }
+    }
+
+    /**
+     * 按照词云搜索用户
+     * @param text 检索语句
+     * @param token 令牌
+     * @return 搜索结果
+     */
+    fun searchUserByWordCloud(text: String?, token: String?): LiveData<DataState<List<UserSearched>?>> {
+        return Transformations.map(service.searchUserByWordCloud(text, token)) { input->
+            if (input != null) {
+                when (input.code) {
+                    SUCCESS -> return@map DataState<List<UserSearched>?>(input.data!!)
+                    TOKEN_INVALID -> return@map DataState<List<UserSearched>?>(DataState.STATE.TOKEN_INVALID)
+                    else -> return@map DataState<List<UserSearched>?>(DataState.STATE.FETCH_FAILED, input.message)
+                }
+            }
+            DataState(DataState.STATE.FETCH_FAILED)
         }
     }
 

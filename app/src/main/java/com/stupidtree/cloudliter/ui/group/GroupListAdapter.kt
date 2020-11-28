@@ -2,6 +2,7 @@ package com.stupidtree.cloudliter.ui.group
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import butterknife.BindView
 import com.stupidtree.cloudliter.R
@@ -25,11 +26,17 @@ class GroupListAdapter(mContext: Context, mBeans: MutableList<RelationGroup>) : 
         return GHolder(v)
     }
 
-    protected override fun bindHolder(holder: GHolder, data: RelationGroup?, position: Int) {
+
+    override fun bindHolder(holder: GHolder, data: RelationGroup?, position: Int) {
         if (data != null) {
             holder.name!!.text = data.groupName
             if (onDeleteClickListener != null) {
                 holder.delete!!.setOnClickListener { view: View? -> onDeleteClickListener!!.OnDeleteClick(view, data, position) }
+            }
+            if(mOnItemClickListener!=null){
+                holder.card.setOnClickListener{
+                    mOnItemClickListener!!.onItemClick(data,it,position)
+                }
             }
         }
     }
@@ -38,6 +45,9 @@ class GroupListAdapter(mContext: Context, mBeans: MutableList<RelationGroup>) : 
         @JvmField
         @BindView(R.id.delete)
         var delete: View? = null
+
+        @BindView(R.id.card)
+        lateinit var card: ViewGroup
 
         @JvmField
         @BindView(R.id.name)

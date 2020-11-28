@@ -35,6 +35,18 @@ object AnimationUtils {
         view.startAnimation(ra)
     }
 
+    fun rotate(view: View) {
+        val fromD = 0f
+        val toD = 360f
+        val ra = RotateAnimation(fromD, toD, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f)
+        ra.interpolator = DecelerateInterpolator()
+        ra.duration = 400 //设置动画持续周期
+        ra.repeatCount = 0 //设置重复次数
+        ra.fillAfter = true //动画执行完后是否停留在执行完的状态
+        view.animation = ra
+        view.startAnimation(ra)
+    }
+
     /**
      * 顺时针旋转view(90°)
      *

@@ -11,6 +11,7 @@ import com.stupidtree.cloudliter.data.model.Conversation.Companion.fromUserRelat
 import com.stupidtree.cloudliter.ui.chat.ChatActivity
 import com.stupidtree.cloudliter.ui.conversation.ConversationActivity
 import com.stupidtree.cloudliter.ui.group.GroupEditorActivity
+import com.stupidtree.cloudliter.ui.main.MainActivity
 import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
 import com.stupidtree.cloudliter.ui.profile.ProfileActivity
 import com.stupidtree.cloudliter.ui.qrcode.QRCodeActivity
@@ -49,6 +50,7 @@ object ActivityUtils {
     fun startProfileActivity(from: Context, id: String) {
         val i = Intent(from, ProfileActivity::class.java)
         i.putExtra("id", id)
+        i.putExtra("showLogout",from is MainActivity)
         from.startActivity(i)
     }
 

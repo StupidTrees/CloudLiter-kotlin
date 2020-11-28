@@ -61,6 +61,16 @@ interface UserService {
                    @Header("token") token: String?): LiveData<ApiResponse<List<UserSearched>?>?>
 
     /**
+     * 根据词云搜索用户
+     * @param text 关键词
+     * @param token 登录状态的token
+     * @return 搜索结果
+     */
+    @GET("/user/search/word_cloud")
+    fun searchUserByWordCloud(@Query("word") text: String?,
+                   @Header("token") token: String?): LiveData<ApiResponse<List<UserSearched>?>?>
+
+    /**
      * 上传头像
      * @param file 头像体
      * @param token 登录状态的token
