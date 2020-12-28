@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import com.stupidtree.cloudliter.R
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -71,7 +72,8 @@ class WordsCloudView @JvmOverloads constructor(context: Context, attrs: Attribut
     private fun primaryTypeSetting(region: Region): List<TagModel> {
         val result = ArrayList<TagModel>()
         val textMaxSize = calcMaxTextSize(width, height)
-        tags.forEach {
+        for (i in 0 until tags.size / 2) {
+            val it = tags[i]
             var textSize = if (tags.indexOf(it) == 0) textMaxSize else textMaxSize - minTextSize
             while (textSize >= minTextSize) {
                 val tagModel = innerTypeSetting(region, textSize, primaryTagStrokeWidth, primaryTagColor, it)
@@ -82,6 +84,17 @@ class WordsCloudView @JvmOverloads constructor(context: Context, attrs: Attribut
                 textSize -= minTextSize
             }
         }
+//        tags.forEach {
+//            var textSize = if (tags.indexOf(it) == 0) textMaxSize else textMaxSize - minTextSize
+//            while (textSize >= minTextSize) {
+//                val tagModel = innerTypeSetting(region, textSize, primaryTagStrokeWidth, primaryTagColor, it)
+//                if (tagModel != null) {
+//                    result.add(tagModel)
+//                    break
+//                }
+//                textSize -= minTextSize
+//            }
+//        }
         return result
     }
 
@@ -93,14 +106,22 @@ class WordsCloudView @JvmOverloads constructor(context: Context, attrs: Attribut
             textSize = minTextSize
         while (true) {
             var isAdded = false
-            tags.forEach {
-                val tagModel =
-                        innerTypeSetting(region, textSize, 0f, secondaryTagColor, it)
+            for (i in tags.size / 2 until tags.size) {
+                val it = tags[i]
+                val tagModel = innerTypeSetting(region, textSize, 0f, secondaryTagColor, it)
                 if (tagModel != null) {
                     isAdded = true
                     result.add(tagModel)
                 }
             }
+//            tags.forEach {
+//                val tagModel =
+//                        innerTypeSetting(region, textSize, 0f, secondaryTagColor, it)
+//                if (tagModel != null) {
+//                    isAdded = true
+//                    result.add(tagModel)
+//                }
+//            }
             if (!isAdded)
                 textSize -= minTextSize
             if (textSize < minTextSize)
@@ -162,7 +183,7 @@ class WordsCloudView @JvmOverloads constructor(context: Context, attrs: Attribut
                 else
                     rect.top + (random.nextInt(((rect.height() - height) / minTextSize).toInt() + 1) * minTextSize).toInt()
                 region.op(Rect(left, top, left + width, top + height), Region.Op.DIFFERENCE)
-                tagModel = TagModel(left, top, width, height, textColor, textSize*.92f, strokeWidth, text)
+                tagModel = TagModel(left, top, width, height, textColor, textSize * .92f, strokeWidth, text)
                 break
             }
         }
@@ -181,7 +202,7 @@ class WordsCloudView @JvmOverloads constructor(context: Context, attrs: Attribut
                 paintTemp.textSize = 60f
                 paintTemp.color = secondaryTagColor
                 paintTemp.textAlign = Paint.Align.LEFT
-                val text = "还没有词云呦"
+                val text = context.getString(R.string.word_cloud_place_holder)
                 val rect = Rect()
                 paintTemp.getTextBounds(text, 0, text.length, rect)
                 canvas.drawText(text, (measuredWidth / 2 - rect.width() / 2).toFloat(), 150f, paintTemp)

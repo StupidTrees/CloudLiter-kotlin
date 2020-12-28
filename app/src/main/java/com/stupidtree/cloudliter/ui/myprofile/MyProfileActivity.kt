@@ -1,174 +1,104 @@
 package com.stupidtree.cloudliter.ui.myprofile
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
-import androidx.cardview.widget.CardView
-import androidx.lifecycle.Observer
-import butterknife.BindView
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserLocal.GENDER
 import com.stupidtree.cloudliter.data.model.UserProfile
 import com.stupidtree.cloudliter.data.model.UserProfile.COLOR
+import com.stupidtree.cloudliter.databinding.ActivityMyProfileBinding
 import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.widgets.PopUpEditText
 import com.stupidtree.cloudliter.ui.widgets.PopUpSelectableList
-import com.stupidtree.cloudliter.ui.widgets.PopUpText
 import com.stupidtree.cloudliter.utils.*
-import java.util.*
 
 /**
  * ”我的个人资料“ Activity
- */
-@SuppressLint("NonConstantResourceId")
-class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
-    /**
-     * View绑定区
-     */
+*/
+class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBinding>() {
 
-    @JvmField
-    @BindView(R.id.toolbar)
-    var toolbar //toolbar
-            : Toolbar? = null
-
-    @JvmField
-    @BindView(R.id.avatar_layout)
-    var avatarLayout //头像那一栏
-            : ViewGroup? = null
-
-    @JvmField
-    @BindView(R.id.nickname_layout)
-    var nicknameLayout //昵称那一栏
-            : ViewGroup? = null
-
-    @JvmField
-    @BindView(R.id.signature_layout)
-    var signatureLayout //签名那一栏
-            : ViewGroup? = null
-
-    @JvmField
-    @BindView(R.id.color_layout)
-    var colorLayout //颜色那一栏
-            : ViewGroup? = null
-
-    @JvmField
-    @BindView(R.id.nickname)
-    var nicknameText //昵称文本
-            : TextView? = null
-
-    @JvmField
-    @BindView(R.id.signature)
-    var signatureText //签名文本
-            : TextView? = null
-
-    @JvmField
-    @BindView(R.id.avatar)
-    var avatarImage //头像图片
-            : ImageView? = null
-
-    @JvmField
-    @BindView(R.id.color)
-    var colorText //颜色文本
-            : TextView? = null
-
-    @JvmField
-    @BindView(R.id.username)
-    var usernameText //用户名文本
-            : TextView? = null
-
-    @JvmField
-    @BindView(R.id.gender_layout)
-    var genderLayout //性别那一栏
-            : ViewGroup? = null
-
-    @JvmField
-    @BindView(R.id.gender)
-    var genderText //性别文本
-            : TextView? = null
-
-    @JvmField
-    @BindView(R.id.icon_color)
-    var colorIcon: CardView? = null
-
-    @JvmField
-    @BindView(R.id.icon_color_inner)
-    var colorIconInner: CardView? = null
-    override fun getViewModelClass(): Class<MyProfileViewModel>? {
+    override fun getViewModelClass(): Class<MyProfileViewModel> {
         return MyProfileViewModel::class.java
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setWindowParams(true, true, false)
-        setToolbarActionBack(toolbar!!)
+        setWindowParams(
+                statusBar = true,
+                darkColor = true,
+                navi = false
+        )
+        setToolbarActionBack(binding.toolbar)
 
         // cropImgUri = Uri.parse("file:///" + Environment.getExternalStorageDirectory() + "/avatar_cropped.jpg")
     }
 
     override fun initViews() {
         //点击头像那一栏，调用系统相册选择图片
-        avatarLayout!!.setOnClickListener { view: View? -> GalleryPicker.choosePhoto(getThis(), false) }
+        binding.avatarLayout.setOnClickListener { GalleryPicker.choosePhoto(getThis(), false) }
 
         //当viewModel的UserProfile数据发生变更时，通知UI更新
-        viewModel!!.userProfileLiveData?.observe(this, Observer { userProfileDataState: DataState<UserProfile?> ->
+        viewModel.userProfileLiveData?.observe(this, { userProfileDataState: DataState<UserProfile?> ->
             if (userProfileDataState.state === DataState.STATE.SUCCESS) {
                 setUserProfile(userProfileDataState.data)
             } else {
                 Toast.makeText(getThis(), "加载失败", Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel!!.changeAvatarResult?.observe(this, Observer { stringDataState ->
+        viewModel.changeAvatarResult?.observe(this, { stringDataState ->
             if (stringDataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show()
-                viewModel!!.startRefresh()
+                viewModel.startRefresh()
             } else {
-                Toast.makeText(applicationContext, "失败", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel!!.changeNicknameResult?.observe(this, Observer { stringDataState: DataState<String?> ->
+        viewModel.changeNicknameResult?.observe(this, { stringDataState: DataState<String?> ->
             if (stringDataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show()
-                viewModel!!.startRefresh()
+                viewModel.startRefresh()
             } else {
-                Toast.makeText(applicationContext, "失败", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel!!.changeGenderResult?.observe(this, Observer { stringDataState: DataState<String?> ->
+        viewModel.changeGenderResult?.observe(this, { stringDataState: DataState<String?> ->
             if (stringDataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show()
-                viewModel!!.startRefresh()
+                viewModel.startRefresh()
             } else {
-                Toast.makeText(applicationContext, "失败", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel!!.changeColorResult?.observe(this, Observer { stringDataState: DataState<String?> ->
+
+        viewModel.setWCAccessibilityResult?.observe(this, { stringDataState: DataState<String?> ->
+            if (stringDataState.state === DataState.STATE.SUCCESS) {
+                Toast.makeText(getThis(), R.string.set_success, Toast.LENGTH_SHORT).show()
+                viewModel.startRefresh()
+            } else {
+                Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
+            }
+        })
+        viewModel.changeColorResult?.observe(this, { stringDataState: DataState<String?> ->
             if (stringDataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show()
-                viewModel!!.startRefresh()
+                viewModel.startRefresh()
             } else {
-                Toast.makeText(applicationContext, "失败", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel!!.changeSignatureResult?.observe(this, Observer { stringDataState: DataState<String?> ->
+        viewModel.changeSignatureResult?.observe(this, { stringDataState: DataState<String?> ->
             if (stringDataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show()
-                viewModel!!.startRefresh()
+                viewModel.startRefresh()
             } else {
-                Toast.makeText(applicationContext, "失败", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
             }
         })
-        nicknameLayout!!.setOnClickListener { view: View? ->
-            val up = viewModel!!.userProfileLiveData?.value
+        binding.nicknameLayout.setOnClickListener {
+            val up = viewModel.userProfileLiveData?.value
             if (up != null && up.state === DataState.STATE.SUCCESS) {
                 PopUpEditText()
                         .setTitle(R.string.set_nickname)
@@ -176,7 +106,7 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
                         .setOnConfirmListener(object : PopUpEditText.OnConfirmListener {
                             override fun OnConfirm(text: String) {
                                 //控制viewModel发起更改昵称请求
-                                viewModel!!.startChangeNickname(text)
+                                viewModel.startChangeNickname(text)
                             }
                         })
                         .show(supportFragmentManager, "edit")
@@ -184,18 +114,19 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
         }
 
         //点击更改性别，弹出选择框
-        genderLayout!!.setOnClickListener { view: View? ->
-            val up = viewModel!!.userProfileLiveData?.value
+        binding.genderLayout.setOnClickListener {
+            val up = viewModel.userProfileLiveData?.value
             if (up != null && up.state === DataState.STATE.SUCCESS) {
                 PopUpSelectableList<GENDER>()
                         .setTitle(R.string.choose_gender)
                         .setInitValue(up.data!!.gender)
                         .setListData(
-                                Arrays.asList(getString(R.string.male), getString(R.string.female)),
-                                Arrays.asList(GENDER.MALE, GENDER.FEMALE)
+                                listOf(getString(R.string.male), getString(R.string.female)),
+                                listOf(GENDER.MALE, GENDER.FEMALE)
                         ).setOnConfirmListener(object : PopUpSelectableList.OnConfirmListener<GENDER> {
-                            override fun OnConfirm(title: String?, key: GENDER) {
-                                viewModel!!.startChangeGender(key)
+
+                            override fun onConfirm(title: String?, key: GENDER) {
+                                viewModel.startChangeGender(key)
                             }
                         })
                         .show(supportFragmentManager, "select")
@@ -203,21 +134,21 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
         }
 
         //点击更改颜色，弹出选择框
-        colorLayout!!.setOnClickListener { view: View? ->
-            val up = viewModel!!.userProfileLiveData?.value
+        binding.colorLayout.setOnClickListener {
+            val up = viewModel.userProfileLiveData?.value
             if (up != null && up.state === DataState.STATE.SUCCESS) {
                 PopUpSelectableList<COLOR>()
                         .setTitle(R.string.choose_color)
                         .setInitValue(up.data!!.color)
                         .setListData(
-                                Arrays.asList(getString(R.string.red),
+                                listOf(getString(R.string.red),
                                         getString(R.string.orange),
                                         getString(R.string.yellow),
                                         getString(R.string.green),
                                         getString(R.string.cyan),
                                         getString(R.string.blue),
                                         getString(R.string.purple)),
-                                Arrays.asList(COLOR.RED,
+                                listOf(COLOR.RED,
                                         COLOR.ORANGE,
                                         COLOR.YELLOW,
                                         COLOR.GREEN,
@@ -225,14 +156,15 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
                                         COLOR.BLUE,
                                         COLOR.PURPLE)
                         ).setOnConfirmListener(object : PopUpSelectableList.OnConfirmListener<COLOR> {
-                            override fun OnConfirm(title: String?, key: COLOR) {
-                                viewModel!!.startChangeColor(key)
+
+                            override fun onConfirm(title: String?, key: COLOR) {
+                                viewModel.startChangeColor(key)
                             }
                         }).show(supportFragmentManager, "select")
             }
         }
-        signatureLayout!!.setOnClickListener { view: View? ->
-            val up = viewModel!!.userProfileLiveData?.value
+        binding.signatureLayout.setOnClickListener {
+            val up = viewModel.userProfileLiveData?.value
             if (up != null && up.state === DataState.STATE.SUCCESS) {
                 PopUpEditText()
                         .setTitle(R.string.choose_signature)
@@ -240,11 +172,32 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
                         .setOnConfirmListener(object : PopUpEditText.OnConfirmListener {
                             override fun OnConfirm(text: String) {
                                 //控制viewModel发起更改签名请求
-                                viewModel!!.startChangeSignature(text)
+                                viewModel.startChangeSignature(text)
                             }
                         })
                         .show(supportFragmentManager, "edit")
             }
+        }
+
+        binding.wordcloudLayout.setOnClickListener {
+            viewModel.userProfileLiveData!!.value?.let {
+                if (it.data != null) {
+                    PopUpSelectableList<Boolean>()
+                            .setTitle(R.string.choose_color)
+                            .setInitValue(it.data!!.wordCloudPrivate)
+                            .setListData(
+                                    listOf(getString(R.string.word_cloud_public),
+                                            getString(R.string.word_cloud_private)),
+                                    listOf(false, true))
+                            .setOnConfirmListener(object : PopUpSelectableList.OnConfirmListener<Boolean> {
+                                override fun onConfirm(title: String?, key: Boolean) {
+                                    viewModel.startChangeWCAccessibility(key)
+                                }
+                            }).show(supportFragmentManager, "select")
+                }
+            }
+
+
         }
     }
 
@@ -255,30 +208,28 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
      */
     private fun setUserProfile(profile: UserProfile?) {
         //设置头像
-        ImageUtils.loadLocalAvatarInto(getThis(), profile!!.avatar, avatarImage!!)
+        ImageUtils.loadLocalAvatarInto(getThis(), profile!!.avatar, binding.avatar)
         //设置各种文本信息
-        colorText!!.setText(profile.colorName)
-        nicknameText!!.text = profile.nickname
-        colorIcon!!.setCardBackgroundColor(ColorUtils.getColorByEnum(getThis(), profile.color))
-        colorIconInner!!.setCardBackgroundColor(ColorUtils.getColorByEnum(getThis(), profile.color))
+        binding.color.setText(profile.colorName)
+        binding.nickname.text = profile.nickname
+        binding.wordcloudAccessibility.setText(if (profile.wordCloudPrivate) R.string.word_cloud_private else R.string.word_cloud_public)
+        binding.iconColor.setCardBackgroundColor(ColorUtils.getColorByEnum(getThis(), profile.color))
+        binding.iconColorInner.setCardBackgroundColor(ColorUtils.getColorByEnum(getThis(), profile.color))
         if (!TextUtils.isEmpty(profile.signature)) {
-            signatureText!!.text = profile.signature
+            binding.signature.text = profile.signature
         } else {
-            signatureText!!.setText(R.string.place_holder_no_signature)
+            binding.signature.setText(R.string.place_holder_no_signature)
         }
-        usernameText!!.text = profile.username
-        genderText!!.setText(if (profile.gender == GENDER.MALE) R.string.male else R.string.female)
+        binding.username.text = profile.username
+        binding.gender.setText(if (profile.gender == GENDER.MALE) R.string.male else R.string.female)
     }
 
     override fun onStart() {
         super.onStart()
         //Activity启动时，就通知viewModel进行刷新UI上的用户资料
-        viewModel!!.startRefresh()
+        viewModel.startRefresh()
     }
 
-    override fun getLayoutId(): Int {
-        return R.layout.activity_my_profile
-    }
 
     /**
      * 当用户通过系统相册选择图片返回时，将调用本函数
@@ -306,7 +257,7 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
             RC_CROP_PHOTO -> {                //裁剪图片返回，此时通知viewModel请求更改头像
                 val path = GalleryPicker.getCroppedCacheDir(this)?.let { FileProviderUtils.getFilePathByUri(this, it) }
                 // create RequestBody instance from file
-                path?.let { viewModel!!.startChangeAvatar(it) }
+                path?.let { viewModel.startChangeAvatar(it) }
             }
         }
     }
@@ -318,5 +269,9 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel>() {
         const val RC_CHOOSE_PHOTO = 10
         const val RC_TAKE_PHOTO = 11
         const val RC_CROP_PHOTO = 12
+    }
+
+    override fun initViewBinding(): ActivityMyProfileBinding {
+        return ActivityMyProfileBinding.inflate(layoutInflater)
     }
 }

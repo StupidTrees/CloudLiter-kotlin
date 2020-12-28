@@ -1,41 +1,35 @@
 package com.stupidtree.cloudliter.ui.search
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.view.View
-import android.widget.TextView
-import androidx.cardview.widget.CardView
-import butterknife.BindView
-import com.stupidtree.cloudliter.R
+import android.view.ViewGroup
+import androidx.viewbinding.ViewBinding
+import com.stupidtree.cloudliter.databinding.ActivitySearchMyWordItemBinding
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter
 import com.stupidtree.cloudliter.ui.base.BaseViewHolder
 
-@SuppressLint("NonConstantResourceId")
+
 class MyWordCloudListAdapter(mContext: Context, mBeans: MutableList<String>) : BaseListAdapter<String, MyWordCloudListAdapter.WHolder>(mContext, mBeans) {
 
-    class WHolder(itemView: View) : BaseViewHolder(itemView) {
-        @BindView(R.id.title)
-        lateinit var title: TextView
+    class WHolder(itemView: ActivitySearchMyWordItemBinding) : BaseViewHolder<ActivitySearchMyWordItemBinding>(itemView)
 
-        @BindView(R.id.card)
-        lateinit var card: CardView
-    }
 
-    override fun getLayoutId(viewType: Int): Int {
-        return R.layout.activity_search_my_word_item
-    }
 
-    override fun createViewHolder(v: View, viewType: Int): WHolder {
-        return WHolder(v)
-    }
 
     override fun bindHolder(holder: WHolder, data: String?, position: Int) {
-        holder.title.text = data
+        holder.binding.title.text = data
         if (mOnItemClickListener != null && data != null) {
-            holder.card.setOnClickListener { v ->
+            holder.binding.card.setOnClickListener { v ->
                 mOnItemClickListener!!.onItemClick(data, v, position)
             }
         }
+    }
+
+    override fun getViewBinding(parent: ViewGroup, viewType: Int): ViewBinding {
+        return ActivitySearchMyWordItemBinding.inflate(mInflater,parent,false)
+    }
+
+    override fun createViewHolder(viewBinding: ViewBinding, viewType: Int): WHolder {
+        return WHolder(viewBinding as ActivitySearchMyWordItemBinding)
     }
 
 }

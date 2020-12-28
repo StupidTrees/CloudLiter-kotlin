@@ -4,12 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
+import androidx.viewbinding.ViewBinding
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ChatMessage
+import com.stupidtree.cloudliter.databinding.ActivityChatPopupTextMessageDetailBinding
+import com.stupidtree.cloudliter.databinding.ActivityChatPopupTextMessageDetailSegmentationItemBinding
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter
 import com.stupidtree.cloudliter.ui.base.BaseViewHolder
 import com.stupidtree.cloudliter.ui.widgets.TransparentBottomSheetDialog
@@ -19,18 +19,7 @@ import java.text.DecimalFormat
  * 圆角的文本框底部弹窗
  */
 @SuppressLint("NonConstantResourceId")
-class PopUpTextMessageDetail : TransparentBottomSheetDialog() {
-    /**
-     * View绑定区
-     */
-
-    @JvmField
-    @BindView(R.id.list)
-    var list: RecyclerView? = null
-
-    @JvmField
-    @BindView(R.id.emotion)
-    var emotion: TextView? = null
+class PopUpTextMessageDetail : TransparentBottomSheetDialog<ActivityChatPopupTextMessageDetailBinding>() {
 
     /**
      * 适配器区
@@ -57,39 +46,37 @@ class PopUpTextMessageDetail : TransparentBottomSheetDialog() {
 
     override fun initViews(v: View) {
         listAdapter = context?.let { LAdapter(it, chatMessage.getExtraAsSegmentation()) }
-        list!!.adapter = listAdapter
-        list!!.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        emotion!!.text = DecimalFormat("#.###").format(chatMessage.emotion)
+        binding.list.adapter = listAdapter
+        binding.list.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.emotion.text = DecimalFormat("#.###").format(chatMessage.emotion)
     }
 
     inner class LAdapter(mContext: Context, mBeans: MutableList<String>) : BaseListAdapter<String, LAdapter.LHolder>(mContext, mBeans) {
-        override fun getLayoutId(viewType: Int): Int {
-            return R.layout.activity_chat_popup_text_message_detail_segmentation_item
-        }
 
-        override fun createViewHolder(v: View, viewType: Int): LHolder {
-            return LHolder(v)
-        }
 
-        protected override fun bindHolder(holder: LHolder, data: String?, position: Int) {
+        override fun bindHolder(holder: LHolder, data: String?, position: Int) {
             if (data != null) {
-                holder.text!!.text = data
+                holder.binding.text.text = data
             }
-            holder.item!!.setOnClickListener { view: View? ->
+            holder.binding.item.setOnClickListener { view: View? ->
                 if (mOnItemClickListener != null) {
                     data?.let { mOnItemClickListener!!.onItemClick(it, view, position) }
                 }
             }
         }
 
-        inner class LHolder(itemView: View) : BaseViewHolder(itemView) {
-            @JvmField
-            @BindView(R.id.text)
-            var text: TextView? = null
+        inner class LHolder(itemView: ActivityChatPopupTextMessageDetailSegmentationItemBinding) : BaseViewHolder<ActivityChatPopupTextMessageDetailSegmentationItemBinding>(itemView)
 
-            @JvmField
-            @BindView(R.id.item)
-            var item: ViewGroup? = null
+        override fun getViewBinding(parent: ViewGroup, viewType: Int): ViewBinding {
+            return ActivityChatPopupTextMessageDetailSegmentationItemBinding.inflate(layoutInflater,parent,false)
         }
+
+        override fun createViewHolder(viewBinding: ViewBinding, viewType: Int): LHolder {
+            return LHolder(viewBinding as ActivityChatPopupTextMessageDetailSegmentationItemBinding)
+        }
+    }
+
+    override fun initViewBinding(v: View): ActivityChatPopupTextMessageDetailBinding {
+        return ActivityChatPopupTextMessageDetailBinding.bind(v)
     }
 }

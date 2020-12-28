@@ -9,18 +9,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.fragment.app.Fragment
-import androidx.viewpager.widget.ViewPager
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
-import butterknife.BindView
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.navigation.NavigationView
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserLocal
+import com.stupidtree.cloudliter.databinding.ActivityMainBinding
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
 import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.BaseTabAdapter
@@ -34,79 +29,51 @@ import com.stupidtree.cloudliter.utils.NotificationUtils
  * 很显然，这是主界面
  */
 @SuppressLint("NonConstantResourceId")
-class MainActivity : BaseActivity<MainViewModel>() {
-    @JvmField
-    @BindView(R.id.drawer)
-    var drawerLayout: DrawerLayout? = null
-
-    @BindView(R.id.drawer_navigationview)
-    lateinit var navigationView: NavigationView
-
-    @JvmField
-    @BindView(R.id.pager)
-    var pager: ViewPager? = null
-
-    @JvmField
-    @BindView(R.id.nav_view)
-    var navView: BottomNavigationView? = null
-
-    @JvmField
-    @BindView(R.id.toolbar)
-    var toolbar: Toolbar? = null
-
-    @JvmField
-    @BindView(R.id.title)
-    var title: TextView? = null
-
-    @BindView(R.id.avatar)
-    lateinit var avatar: ImageView
-
-
-    @BindView(R.id.exit_layout)
-    lateinit var exitLayout:ViewGroup
+class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
     /**
      * 抽屉里的View
      */
-    var drawerAvatar: ImageView? = null
-    var drawerNickname: TextView? = null
-    var drawerUsername: TextView? = null
-    var drawerHeader: ViewGroup? = null
+    private var drawerAvatar: ImageView? = null
+    private var drawerNickname: TextView? = null
+    private var drawerUsername: TextView? = null
+    private var drawerHeader: ViewGroup? = null
     override fun onCreate(savedInstanceState: Bundle?) {
-        setWindowParams(statusBar = true, darkColor = true, navi = false)
         super.onCreate(savedInstanceState)
+        setSupportActionBar(binding.toolbar)
+        setWindowParams(statusBar = true, darkColor = true, navi = false)
         val bindIntent = Intent(this, SocketIOClientService::class.java)
         startService(bindIntent)
     }
 
     override fun onStart() {
         super.onStart()
-        try{
+        try {
             NotificationUtils.checkNotification(this)
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        setUserViews(viewModel!!.localUser)
+        setUserViews(viewModel.localUser)
     }
 
     private fun setUpDrawer() {
-        navigationView.itemIconTintList = null
-        val headerView = navigationView.inflateHeaderView(R.layout.activity_main_nav_header)
-        drawerLayout!!.setStatusBarBackgroundColor(Color.TRANSPARENT)
-        drawerLayout!!.setScrimColor(getBackgroundColorSecondAsTint())
-        drawerLayout!!.drawerElevation = ImageUtils.dp2px(this, 84f).toFloat()
+        binding.drawerNavigationview.itemIconTintList = null
+        val headerView = binding.drawerNavigationview.inflateHeaderView(R.layout.activity_main_nav_header)
+        binding.drawer.setStatusBarBackgroundColor(Color.TRANSPARENT)
+        binding.drawer.setScrimColor(getBackgroundColorSecondAsTint())
+        binding.drawer.drawerElevation = ImageUtils.dp2px(this, 84f).toFloat()
         drawerAvatar = headerView.findViewById(R.id.avatar)
         drawerHeader = headerView.findViewById(R.id.drawer_header)
         drawerNickname = headerView.findViewById(R.id.nickname)
         drawerUsername = headerView.findViewById(R.id.username)
-        drawerLayout!!.addDrawerListener(object : DrawerListener {
+        binding.drawer.addDrawerListener(object : DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
                 //offset 偏移值
-                val mContent = drawerLayout!!.getChildAt(0)
+                val mContent = binding.drawer.getChildAt(0)
                 val scale = 1 - slideOffset
                 val rightScale = 0.8f + scale * 0.2f
                 mContent.translationX = -drawerView.measuredWidth * slideOffset
@@ -119,7 +86,7 @@ class MainActivity : BaseActivity<MainViewModel>() {
             }
 
             override fun onDrawerOpened(drawerView: View) {
-                setUserViews(viewModel!!.localUser)
+                setUserViews(viewModel.localUser)
             }
 
             override fun onDrawerClosed(drawerView: View) {}
@@ -128,11 +95,11 @@ class MainActivity : BaseActivity<MainViewModel>() {
     }
 
     override fun initViews() {
-        setSupportActionBar(toolbar)
+
         setUpDrawer()
-        title!!.text = navView!!.menu.getItem(0).title
+        binding.title.text = binding.navView.menu.getItem(0).title
         //Objects.requireNonNull(getSupportActionBar()).setTitle(navView.getMenu().getItem(0).getTitle());
-        pager!!.adapter = object : BaseTabAdapter(supportFragmentManager, 2) {
+        binding.pager.adapter = object : BaseTabAdapter(supportFragmentManager, 2) {
             override fun initItem(position: Int): Fragment {
                 return if (position == 0) {
                     ConversationsFragment.newInstance()
@@ -143,27 +110,28 @@ class MainActivity : BaseActivity<MainViewModel>() {
                 super.destroyItem(container, position, `object`)
             }
         }
-        pager!!.offscreenPageLimit = 3
-        pager!!.addOnPageChangeListener(object : OnPageChangeListener {
+        binding.pager.offscreenPageLimit = 3
+        binding.pager.addOnPageChangeListener(object : OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageSelected(position: Int) {
-                val item = navView!!.menu.getItem(position)
+                val item = binding.navView.menu.getItem(position)
                 item.isChecked = true
-                title!!.text = item.title
+                binding.title.text = item.title
                 //Objects.requireNonNull(getSupportActionBar()).setTitle(item.getTitle());
             }
+
             override fun onPageScrollStateChanged(state: Int) {}
         })
-        navView!!.setOnNavigationItemSelectedListener { item: MenuItem ->
+        binding.navView.setOnNavigationItemSelectedListener { item: MenuItem ->
             when (item.itemId) {
-                R.id.navigation_home -> pager!!.currentItem = 0
-                R.id.navigation_dashboard -> pager!!.currentItem = 1
+                R.id.navigation_home -> binding.pager.currentItem = 0
+                R.id.navigation_dashboard -> binding.pager.currentItem = 1
             }
-            title!!.text = item.title
+            binding.title.text = item.title
             true
         }
-        avatar.setOnClickListener { drawerLayout!!.openDrawer(GravityCompat.END) }
-        exitLayout.setOnClickListener {
+        binding.avatar.setOnClickListener { binding.drawer.openDrawer(GravityCompat.END) }
+        binding.exitLayout.setOnClickListener {
             finish()
         }
     }
@@ -172,20 +140,20 @@ class MainActivity : BaseActivity<MainViewModel>() {
         if (userLocalInfo.isValid) { //如果已登录
             //装载头像
             ImageUtils.loadLocalAvatarInto(this, userLocalInfo.avatar, drawerAvatar!!)
-            ImageUtils.loadLocalAvatarInto(this, userLocalInfo.avatar, avatar)
+            ImageUtils.loadLocalAvatarInto(this, userLocalInfo.avatar, binding.avatar)
             //设置各种文字
             drawerUsername!!.text = userLocalInfo.username
             drawerNickname!!.text = userLocalInfo.nickname
-            drawerHeader!!.setOnClickListener { ActivityUtils.startProfileActivity(getThis(), viewModel!!.localUser.id!!) }
-            navigationView.setNavigationItemSelectedListener { item: MenuItem ->
+            drawerHeader!!.setOnClickListener { ActivityUtils.startProfileActivity(getThis(), viewModel.localUser.id!!) }
+            binding.drawerNavigationview.setNavigationItemSelectedListener { item: MenuItem ->
                 when (item.itemId) {
                     R.id.drawer_nav_my_profile -> {
-                        ActivityUtils.startProfileActivity(getThis(),viewModel!!.localUser.id!!)
+                        ActivityUtils.startProfileActivity(getThis(), viewModel.localUser.id!!)
                         true
                     }
                     R.id.drawer_nav_scan_qr -> {
                         ActivityUtils.startQRCodeActivity(getThis())
-                       true
+                        true
                     }
                     R.id.drawer_nav_discover_friend -> {
                         ActivityUtils.startSearchActivity(getThis())
@@ -199,9 +167,9 @@ class MainActivity : BaseActivity<MainViewModel>() {
             drawerUsername!!.setText(R.string.not_logged_in)
             drawerNickname!!.setText(R.string.please_log_in)
             drawerAvatar!!.setImageResource(R.drawable.place_holder_avatar)
-            avatar.setImageResource(R.drawable.place_holder_avatar)
+            binding.avatar.setImageResource(R.drawable.place_holder_avatar)
             drawerHeader!!.setOnClickListener { ActivityUtils.startLoginActivity(getThis()) }
-            navigationView.setNavigationItemSelectedListener { item: MenuItem ->
+            binding.drawerNavigationview.setNavigationItemSelectedListener { item: MenuItem ->
                 if (item.itemId == R.id.drawer_nav_my_profile) {
                     ActivityUtils.startLoginActivity(getThis())
                     return@setNavigationItemSelectedListener true
@@ -213,8 +181,8 @@ class MainActivity : BaseActivity<MainViewModel>() {
 
     override fun onBackPressed() {
         //super.onBackPressed();
-        if (drawerLayout!!.isDrawerOpen(GravityCompat.END)) {
-            drawerLayout!!.closeDrawer(GravityCompat.END)
+        if (binding.drawer.isDrawerOpen(GravityCompat.END)) {
+            binding.drawer.closeDrawer(GravityCompat.END)
             return
         }
         //返回桌面而非退出
@@ -224,11 +192,12 @@ class MainActivity : BaseActivity<MainViewModel>() {
         startActivity(intent)
     }
 
-    override fun getLayoutId(): Int {
-        return R.layout.activity_main
-    }
 
     override fun getViewModelClass(): Class<MainViewModel> {
         return MainViewModel::class.java
+    }
+
+    override fun initViewBinding(): ActivityMainBinding {
+        return ActivityMainBinding.inflate(layoutInflater)
     }
 }

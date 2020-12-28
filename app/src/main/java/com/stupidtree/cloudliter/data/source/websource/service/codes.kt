@@ -12,4 +12,5 @@ object codes {
     const val GROUP_NAME_EXIST = 3017
     const val TOKEN_INVALID = 7000
     const val RELATION_NOT_EXIST = 3014
+    const val WORD_CLOUD_PRIVATE = 3021
 }

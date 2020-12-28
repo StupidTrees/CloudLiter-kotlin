@@ -8,6 +8,7 @@ import com.stupidtree.cloudliter.data.model.UserProfile.COLOR
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository.Companion.instance
+import com.stupidtree.cloudliter.ui.base.BooleanTrigger
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.base.StringTrigger
 import java.util.*
@@ -156,7 +157,32 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
         }
 
     //Trigger：控制更改签名请求的发送，其中携带了新昵称字符串
-    var changeSignatureController = MutableLiveData<StringTrigger>()
+    private var changeSignatureController = MutableLiveData<StringTrigger>()
+
+
+
+    //状态数据：更改签名的结果
+    var setWCAccessibilityResult: LiveData<DataState<String?>>? = null
+        get() {
+            if (field == null) {
+                //也是一样的
+                setWCAccessibilityResult = Transformations.switchMap(changeWCAccessibilityController) { input->
+                    if (input.isActioning) {
+                        val userLocal = localUserRepository.getLoggedInUser()
+                        if (userLocal.isValid) {
+                            return@switchMap profileRepository!!.setWordCloudAccessibility(userLocal.token!!,input.data)
+                        } else {
+                            return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
+                        }
+                    }
+                    MutableLiveData()
+                }
+            }
+            return field!!
+        }
+
+    //Trigger：控制↑
+    var changeWCAccessibilityController = MutableLiveData<BooleanTrigger>()
 
     /**
      * 仓库区
@@ -208,6 +234,13 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
      */
     fun startChangeSignature(signature: String) {
         changeSignatureController.value = StringTrigger.getActioning(signature)
+    }
+
+    /**
+     * 发起更改词云可见性请求
+     */
+    fun startChangeWCAccessibility(private:Boolean) {
+        changeWCAccessibilityController.value = BooleanTrigger.getActioning(private)
     }
 
     /**

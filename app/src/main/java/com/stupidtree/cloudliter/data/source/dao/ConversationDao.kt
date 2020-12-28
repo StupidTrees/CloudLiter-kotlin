@@ -17,6 +17,7 @@ interface ConversationDao {
     fun saveConversation(data: Conversation)
     @Delete
     fun deleteConversations(data:List<Conversation>)
+
     @Query("DELETE FROM conversation")
     fun clearTable()
 }

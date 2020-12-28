@@ -44,6 +44,7 @@ class SocketIOClientService : Service() {
     var receiver: BroadcastReceiver? = null
     private val binders = HashMap<String?, JWebSocketClientBinder>()
 
+
     interface OnUnreadFetchedListener {
         fun onUnreadFetched(unread: HashMap<String, Int>)
     }
@@ -73,10 +74,12 @@ class SocketIOClientService : Service() {
                     }
                     ACTION_ONLINE -> if (intent.getStringExtra("userId") != null) {
                         val id = intent.getStringExtra("userId")
+                        loggedInUserId = id
                         Log.e("请求上线", id.toString())
                         socket!!.emit("login", id)
                     }
                     ACTION_OFFLINE -> {
+                        loggedInUserId = null
                         if (intent.getStringExtra("userId") != null) {
                             socket!!.emit("logout", intent.getStringExtra("userId"))
                         }
@@ -154,10 +157,8 @@ class SocketIOClientService : Service() {
         }
         socketConn()
         initNotification()
-
-        //开启心跳检测
-        mHandler.postDelayed(heartBeatRunnable, HEART_BEAT_RATE)
     }
+
 
     //连接到Server
     private fun socketConn() {
@@ -227,14 +228,18 @@ class SocketIOClientService : Service() {
                 }
             }
         }
+        socket!!.on("relation_event") { _: Array<Any> ->
+            val i = Intent(ACTION_RELATION_EVENT)
+            sendBroadcast(i)
+        }
         socket!!.on("unread_message") { args: Array<Any> ->
-            if (args.size > 0) {
+            if (args.isNotEmpty()) {
                 try {
                     try {
                         incomingMessage.clear()
-                        val jo: ApiResponse<*> = Gson().fromJson<ApiResponse<*>>(args[0].toString(), ApiResponse::class.java)
+                        val jo: ApiResponse<*> = Gson().fromJson(args[0].toString(), ApiResponse::class.java)
                         Log.e("推送未读消息", jo.toString())
-                        val m: HashMap<String,*> = Gson().fromJson<HashMap<String, *>>(jo.data.toString(), HashMap::class.java)
+                        val m: HashMap<String, *> = Gson().fromJson<HashMap<String, *>>(jo.data.toString(), HashMap::class.java)
                         for ((key, value) in m) {
                             incomingMessage[key] = value.toString().toFloat().toInt()
                         }
@@ -304,6 +309,8 @@ class SocketIOClientService : Service() {
         }
         if (message.getType() === ChatMessage.TYPE.IMG) {
             newContent = getString(R.string.place_holder_image)
+        } else if (message.getType() == ChatMessage.TYPE.VOICE) {
+            newContent = getString(R.string.place_holder_voice)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationBuilder = Notification.Builder(this, "cloudLiterMessageChanel")
@@ -347,6 +354,7 @@ class SocketIOClientService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.e("service_destroy","DS!")
         socket!!.disconnect()
         unregisterReceiver(receiver)
     }
@@ -360,8 +368,11 @@ class SocketIOClientService : Service() {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+        Log.e("startCommand", this.toString())
+        mHandler.postDelayed(heartBeatRunnable, HEART_BEAT_RATE)
         return START_STICKY
     }
+
 
     override fun onUnbind(intent: Intent): Boolean {
 //        binders.remove(intent.getAction());
@@ -396,12 +407,14 @@ class SocketIOClientService : Service() {
     }
 
     //重连调用可以在主线程中进行
-    private val mHandler = Handler(Looper.getMainLooper())
+    private var mHandler = Handler(Looper.getMainLooper())
     private val heartBeatRunnable: Runnable = object : Runnable {
         override fun run() {
             if (socket != null) {
-                if (!socket!!.connected()) {
-                    socket!!.connect()
+                socket!!.connect()
+                Log.e("心跳重连", "--")
+                if(loggedInUserId!=null){
+                    socket!!.emit("login", loggedInUserId)
                 }
             }
             //定时对长连接进行心跳检测
@@ -414,6 +427,8 @@ class SocketIOClientService : Service() {
         const val ACTION_FRIEND_STATE_CHANGED = "CLOUD_LITER_FRIEND_STATE_CHANGE"
         const val ACTION_MESSAGE_SENT = "CLOUD_LITER_MESSAGE_SENT"
         const val ACTION_MESSAGE_READ = "CLOUD_LITER_MESSAGE_READ"
+        const val ACTION_RELATION_EVENT = "CLOUD_LITER_RELATION_EVENT"
+
         const val ACTION_INTO_CONVERSATION = "CLOUD_LITER_INTO_CONVERSATION"
         const val ACTION_LEFT_CONVERSATION = "CLOUD_LITER_LEFT_CONVERSATION"
         const val ACTION_ONLINE = "CLOUD_LITER_ONLINE"
@@ -422,5 +437,6 @@ class SocketIOClientService : Service() {
         const val ACTION_MARK_READ = "CLOUD_LITER_MARK_READ"
         private const val HEART_BEAT_RATE = 10 * 1000 //每隔10秒进行一次对长连接的心跳检测
                 .toLong()
+        private var loggedInUserId:String? =  null;
     }
 }

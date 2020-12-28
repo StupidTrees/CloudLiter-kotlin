@@ -14,6 +14,7 @@ import com.stupidtree.cloudliter.data.source.websource.service.UserService
 import com.stupidtree.cloudliter.data.source.websource.service.codes.SUCCESS
 import com.stupidtree.cloudliter.data.source.websource.service.codes.TOKEN_INVALID
 import com.stupidtree.cloudliter.data.source.websource.service.codes.USER_ALREADY_EXISTS
+import com.stupidtree.cloudliter.data.source.websource.service.codes.WORD_CLOUD_PRIVATE
 import com.stupidtree.cloudliter.data.source.websource.service.codes.WRONG_PASSWORD
 import com.stupidtree.cloudliter.data.source.websource.service.codes.WRONG_USERNAME
 import com.stupidtree.cloudliter.ui.base.DataState
@@ -166,6 +167,7 @@ class UserWebSource : BaseWebSource<UserService>(Retrofit.Builder()
      */
     fun getUserProfile(id: String?, token: String): LiveData<DataState<UserProfile?>> {
         return Transformations.map<ApiResponse<UserProfile?>, DataState<UserProfile?>>(service.getUserProfile(id, token)) { input: ApiResponse<UserProfile?>? ->
+            Log.e("profile", input.toString())
             if (input != null) {
                 when (input.code) {
                     SUCCESS -> return@map DataState(input.data)
@@ -256,7 +258,27 @@ class UserWebSource : BaseWebSource<UserService>(Retrofit.Builder()
             DataState(DataState.STATE.FETCH_FAILED)
         }
     }
-
+    /**
+     * 设置词云可见性
+     * @param token 令牌
+     * @return 操作结果
+     */
+    fun setWordCloudAccessibility(token: String, private:Boolean): LiveData<DataState<String?>> {
+        return Transformations.map<ApiResponse<Any?>, DataState<String?>>(service.setWordCloudAccessibility(private, token)) { input: ApiResponse<Any?>? ->
+            Log.e("changeWCAccessibility: ", input.toString())
+            if (input != null) {
+                when (input.code) {
+                    SUCCESS -> {
+                        println("SUCCEED")
+                        return@map DataState<String?>(DataState.STATE.SUCCESS)
+                    }
+                    TOKEN_INVALID -> return@map DataState<String?>(DataState.STATE.TOKEN_INVALID)
+                    else -> return@map DataState<String?>(DataState.STATE.FETCH_FAILED, input.message)
+                }
+            }
+            DataState(DataState.STATE.FETCH_FAILED)
+        }
+    }
     /**
      * 更换头像
      * @param token 令牌
@@ -293,12 +315,13 @@ class UserWebSource : BaseWebSource<UserService>(Retrofit.Builder()
             // Log.e("getWordCloud", String.valueOf(input));
             if (input != null) {
                 when (input.code) {
+                    WORD_CLOUD_PRIVATE->return@map DataState<HashMap<String, Float?>?>(DataState.STATE.SPECIAL)
                     SUCCESS -> return@map DataState<HashMap<String, Float?>?>(input.data!!)
                     TOKEN_INVALID -> return@map DataState<HashMap<String, Float?>?>(DataState.STATE.TOKEN_INVALID)
                     else -> return@map DataState<HashMap<String, Float?>?>(DataState.STATE.FETCH_FAILED)
                 }
             }
-            DataState<HashMap<String, Float?>?>(DataState.STATE.FETCH_FAILED)
+            DataState(DataState.STATE.FETCH_FAILED)
         }
     }
 

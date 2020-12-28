@@ -1,10 +1,15 @@
 package com.stupidtree.cloudliter.utils
 
+import android.animation.Animator
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.RotateAnimation
+
 
 /**
  * 动画控制函数
@@ -68,5 +73,29 @@ object AnimationUtils {
         va.interpolator = DecelerateInterpolator()
         va.addUpdateListener { valueAnimator: ValueAnimator -> view.rotation = (valueAnimator.animatedValue as Float) }
         va.start()
+    }
+
+    @SuppressLint("WrongConstant")
+     fun floatAnim(view: View, delay: Int) {
+        val animators: MutableList<Animator> = ArrayList()
+        val translationXAnim = ObjectAnimator.ofFloat(view, "translationX", -6.0f, 6.0f, -6.0f)
+        translationXAnim.duration = 2200
+        translationXAnim.repeatCount = ValueAnimator.INFINITE //无限循环
+        translationXAnim.repeatMode = -1
+        //translationXAnim.interpolator = DecelerateInterpolator()
+        translationXAnim.start()
+
+        animators.add(translationXAnim)
+        val translationYAnim = ObjectAnimator.ofFloat(view, "translationY", -24.0f, 24.0f, -24.0f)
+        translationYAnim.duration = 4000
+        translationYAnim.repeatCount = ValueAnimator.INFINITE
+        translationYAnim.repeatMode = -1
+       // translationYAnim.interpolator = DecelerateInterpolator()
+        translationYAnim.start()
+        animators.add(translationYAnim)
+        val btnSexAnimatorSet = AnimatorSet()
+        btnSexAnimatorSet.playTogether(animators)
+        btnSexAnimatorSet.startDelay = delay.toLong()
+        btnSexAnimatorSet.start()
     }
 }

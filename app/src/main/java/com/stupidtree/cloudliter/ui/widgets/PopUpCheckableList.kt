@@ -3,33 +3,26 @@ package com.stupidtree.cloudliter.ui.widgets
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.annotation.StringRes
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
+import androidx.viewbinding.ViewBinding
 import com.stupidtree.cloudliter.R
+import com.stupidtree.cloudliter.databinding.DialogBottomCheckableListBinding
+import com.stupidtree.cloudliter.databinding.DialogBottomCheckableListItemBinding
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter
 import com.stupidtree.cloudliter.ui.base.BaseViewHolder
+
 import java.util.*
 
 /**
  * 圆角的文本框底部弹窗
  */
-class PopUpCheckableList<T> : TransparentBottomSheetDialog() {
+class PopUpCheckableList<T> : TransparentBottomSheetDialog<DialogBottomCheckableListBinding>() {
     /**
      * View绑定区
      */
-    @JvmField
-    @BindView(R.id.title)
-    var title: TextView? = null
 
-    @JvmField
-    @BindView(R.id.list)
-    var list: RecyclerView? = null
 
-    @StringRes
-    var init_title: Int? = null
+    var init_title: String?=null
 
     /**
      * 适配器区
@@ -46,14 +39,14 @@ class PopUpCheckableList<T> : TransparentBottomSheetDialog() {
         fun OnConfirm(title: String?, key: T)
     }
 
-    fun setTitle(@StringRes title: Int): PopUpCheckableList<T> {
+    fun setTitle(title: String): PopUpCheckableList<T> {
         init_title = title
         return this
     }
 
     fun setListData(titles: List<String?>, keys: List<T>): PopUpCheckableList<T> {
         listRes = ArrayList()
-        for (i in 0 until Math.min(titles.size, keys.size)) {
+        for (i in 0 until titles.size.coerceAtMost(keys.size)) {
             (listRes as ArrayList<ItemData<T?>>).add(ItemData(titles[i], keys[i]))
         }
         return this
@@ -64,13 +57,10 @@ class PopUpCheckableList<T> : TransparentBottomSheetDialog() {
         return this
     }
 
-    override fun getLayoutId(): Int {
-        return R.layout.dialog_bottom_checkable_list
-    }
 
     override fun onStart() {
         super.onStart()
-        listAdapter!!.notifyDataSetChanged()
+        listAdapter.notifyDataSetChanged()
     }
 
     override fun initViews(v: View) {
@@ -83,18 +73,19 @@ class PopUpCheckableList<T> : TransparentBottomSheetDialog() {
                 }
             }
         })
-        list!!.adapter = listAdapter
-        list!!.layoutManager = LinearLayoutManager(requireContext())
+        val list = binding.list
+        list.adapter = listAdapter
+        list.layoutManager = LinearLayoutManager(requireContext())
         if (init_title != null) {
-            title!!.setText(init_title!!)
+           binding.title.setText(init_title!!)
         }
     }
 
     class ItemData<K>(var name: String?, var data: K) {
-        override fun equals(o: Any?): Boolean {
-            if (this === o) return true
-            if (o == null || javaClass != o.javaClass) return false
-            val keyData = o as ItemData<*>
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other == null || javaClass != other.javaClass) return false
+            val keyData = other as ItemData<*>
             return data == keyData.data
         }
 
@@ -103,32 +94,40 @@ class PopUpCheckableList<T> : TransparentBottomSheetDialog() {
         }
     }
 
+
     internal class LAdapter<C>(mContext: Context, mBeans: MutableList<ItemData<C>>) : BaseListAdapter<ItemData<C>, LAdapter.LHolder>(mContext, mBeans) {
-        override fun getLayoutId(viewType: Int): Int {
-            return R.layout.dialog_bottom_checkable_list_item
-        }
 
-        override fun createViewHolder(v: View, viewType: Int): LHolder {
-            return LHolder(v)
-        }
 
-        protected override fun bindHolder(holder: LHolder, data: ItemData<C>?, position: Int) {
+        override fun bindHolder(holder: LHolder, data: ItemData<C>?, position: Int) {
             if (data != null) {
-                holder.text!!.text = data.name
+                holder.binding.text.text = data.name
             }
-            holder.item!!.setOnClickListener { view: View? ->
+            holder.binding.item.setOnClickListener { view: View? ->
                 data?.let { mOnItemClickListener?.onItemClick(it, view, position) }
             }
         }
 
-        internal class LHolder(itemView: View) : BaseViewHolder(itemView) {
-            @JvmField
-            @BindView(R.id.text)
-            var text: TextView? = null
 
-            @JvmField
-            @BindView(R.id.item)
-            var item: ViewGroup? = null
+
+
+        override fun createViewHolder(viewBinding: ViewBinding, viewType: Int): LHolder {
+            return LHolder(viewBinding as DialogBottomCheckableListItemBinding)
+        }
+
+        class LHolder(view: DialogBottomCheckableListItemBinding) : BaseViewHolder<DialogBottomCheckableListItemBinding>(view)
+
+        override fun getViewBinding(parent: ViewGroup, viewType: Int): ViewBinding {
+            return DialogBottomCheckableListItemBinding.inflate(mInflater,parent,false)
         }
     }
+
+    override fun getLayoutId(): Int {
+        return R.layout.dialog_bottom_checkable_list
+    }
+
+    override fun initViewBinding(v: View): DialogBottomCheckableListBinding {
+        return DialogBottomCheckableListBinding.inflate(layoutInflater)
+    }
+
+
 }

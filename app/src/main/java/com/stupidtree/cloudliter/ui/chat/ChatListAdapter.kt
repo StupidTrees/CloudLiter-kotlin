@@ -5,11 +5,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.BaseViewHolder
+import com.stupidtree.cloudliter.ui.base.BaseListAdapterClassic
 import com.stupidtree.cloudliter.ui.chat.MessageReadNotification
 import com.stupidtree.cloudliter.ui.widgets.EmoticonsTextView
 import com.stupidtree.cloudliter.utils.ActivityUtils
@@ -22,8 +21,11 @@ import kotlin.math.abs
 /**
  * 聊天列表的适配器
  */
-@SuppressLint("NonConstantResourceId")
-internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableList<ChatMessage>) : BaseListAdapter<ChatMessage, ChatListAdapter.CHolder>(chatActivity, mBeans) {
+@SuppressLint("ParcelCreator")
+internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableList<ChatMessage>) : BaseListAdapterClassic<ChatMessage, ChatListAdapter.CHolder>(chatActivity, mBeans) {
+
+
+
     override fun getLayoutId(viewType: Int): Int {
         return when (viewType) {
             TYPE_MINE -> R.layout.activity_chat_message_text_mine
@@ -42,7 +44,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             cm.isTimeStamp -> {
                 TYPE_TIME
             }
-            cm.toId == chatActivity.viewModel!!.myId -> {
+            cm.toId == chatActivity.viewModel.myId -> {
                 when {
                     cm.getType() == ChatMessage.TYPE.IMG -> TYPE_FRIEND_IMAGE
                     cm.getType() == ChatMessage.TYPE.TXT -> TYPE_FRIEND
@@ -74,9 +76,9 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             } else {
                 holder.bindSensitiveAndEmotion(data)
                 if (holder.viewType == TYPE_MINE || holder.viewType == TYPE_MINE_IMAGE || holder.viewType == TYPE_MINE_VOICE) {
-                    chatActivity.viewModel!!.myAvatar?.let { ImageUtils.loadLocalAvatarInto(chatActivity, it, holder.avatar!!) }
+                    chatActivity.viewModel.myAvatar?.let { ImageUtils.loadLocalAvatarInto(chatActivity, it, holder.avatar!!) }
                 } else {
-                    chatActivity.viewModel!!.friendAvatar?.let { ImageUtils.loadAvatarInto(chatActivity, it, holder.avatar!!) }
+                    chatActivity.viewModel.friendAvatar?.let { ImageUtils.loadAvatarInto(chatActivity, it, holder.avatar!!) }
                 }
                 holder.avatar!!.setOnClickListener { view: View? -> data.fromId?.let { ActivityUtils.startProfileActivity(chatActivity, it) } }
                 if (holder.progress != null) {
@@ -313,53 +315,32 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         if (toAdd.size > 0) {
             toAdd.add(0, ChatMessage.getTimeStampHolderInstance(toAdd[0].createdAt))
         }
-        super.notifyItemChangedSmooth(toAdd, object : RefreshJudge<ChatMessage> {
+        super.notifyItemChangedSmooth(toAdd, object : BaseListAdapter.RefreshJudge<ChatMessage> {
             override fun judge(oldData: ChatMessage, newData: ChatMessage): Boolean {
                 return oldData != newData
             }
         })
     }
 
-    internal inner class CHolder(itemView: View, var viewType: Int) : BaseViewHolder(itemView) {
+    internal inner class CHolder(itemView: View, var viewType: Int) : RecyclerView.ViewHolder(itemView) {
+        
+        var content: EmoticonsTextView? = itemView.findViewById(R.id.content)
+        var avatar: ImageView? = itemView.findViewById(R.id.avatar)
+        var bubble: View? = itemView.findViewById(R.id.bubble)
+        var progress: View? = itemView.findViewById(R.id.progress)
 
-        @JvmField
-        @BindView(R.id.content)
-        var content: EmoticonsTextView? = null
-
-        @JvmField
-        @BindView(R.id.avatar)
-        var avatar: ImageView? = null
-
-        @JvmField
-        @BindView(R.id.bubble)
-        var bubble: View? = null
-
-
-        @JvmField
-        @BindView(R.id.progress)
-        var progress: View? = null
-
-        @JvmField
-        @BindView(R.id.see)
         var see //点击查看敏感消息
-                : ImageView? = null
+                : ImageView? =  itemView.findViewById(R.id.see)
 
-        @JvmField
-        @BindView(R.id.emotion)
-        var emotion: ImageView? = null
+        var emotion: ImageView? =  itemView.findViewById(R.id.emotion)
 
-        @JvmField
-        @BindView(R.id.image)
         var image //图片
-                : ImageView? = null
+                : ImageView? =  itemView.findViewById(R.id.image)
 
-        @JvmField
-        @BindView(R.id.read)
-        var read: View? = null
+        var read: View? =  itemView.findViewById(R.id.read)
 
-        @JvmField
-        @BindView(R.id.image_sensitive)
-        var imageSensitivePlaceHolder: ViewGroup? = null
+
+        var imageSensitivePlaceHolder: ViewGroup? = itemView.findViewById(R.id.image_sensitive)
         var sensitiveExpanded = false
 
 
@@ -415,7 +396,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                 }
             } else if (data.getType() == ChatMessage.TYPE.TXT) {
                 if (data.sensitive) {
-                    read!!.visibility = View.GONE
+                    read?.let{it.visibility = View.GONE}
                     see!!.visibility = View.VISIBLE
                     emotion!!.visibility = View.GONE
                     see!!.setImageResource(R.drawable.ic_baseline_visibility_24)
@@ -428,19 +409,19 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                     val emotionValue = data.emotion
                     var iconRes = R.drawable.ic_emotion_normal
                     when {
-                        emotionValue >= 2 -> {
+                        emotionValue >= 0.7 -> {
                             iconRes = R.drawable.ic_emotion_pos_3
                         }
-                        emotionValue >= 1 -> {
+                        emotionValue >= 0.4 -> {
                             iconRes = R.drawable.ic_emotion_pos_2
                         }
                         emotionValue > 0 -> {
                             iconRes = R.drawable.ic_emotion_pos_1
                         }
-                        emotionValue <= -2 -> {
+                        emotionValue <= -0.7 -> {
                             iconRes = R.drawable.ic_emotion_neg_3
                         }
-                        emotionValue <= -1 -> {
+                        emotionValue <= -0.4 -> {
                             iconRes = R.drawable.ic_emotion_neg_2
                         }
                         emotionValue < 0 -> {

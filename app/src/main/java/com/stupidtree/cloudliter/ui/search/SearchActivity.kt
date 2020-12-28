@@ -1,26 +1,23 @@
 package com.stupidtree.cloudliter.ui.search
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
-import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import butterknife.BindView
+import androidx.viewbinding.ViewBinding
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserSearched
+import com.stupidtree.cloudliter.databinding.ActivitySearchBinding
+import com.stupidtree.cloudliter.databinding.ActivitySearchListItemBinding
 import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter.OnItemClickListener
@@ -30,50 +27,22 @@ import com.stupidtree.cloudliter.ui.search.SearchActivity.SListAdapter.SViewHold
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.AnimationUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
+import kotlinx.android.synthetic.main.activity_search.*
 import java.util.*
 import kotlin.collections.ArrayList
 
 /**
  * "搜索"页面Activity
  */
-@SuppressLint("NonConstantResourceId")
-class SearchActivity : BaseActivity<SearchViewModel>() {
-    /**
-     * View绑定区
-     */
-    @JvmField
-    @BindView(R.id.toolbar)
-    var toolbar: Toolbar? = null
-
-    @BindView(R.id.searchview)
-    lateinit var searchText: EditText
-
-    @JvmField
-    @BindView(R.id.loading)
-    var progressLoading: ProgressBar? = null
-
-    @BindView(R.id.list)
-    lateinit var list: RecyclerView
-
-
-    @BindView(R.id.hint)
-    lateinit var hintView: View
-
-    @BindView(R.id.wordcloud)
-    lateinit var myWordCloudList: RecyclerView
-
-
-    @BindView(R.id.mode_button)
-    lateinit var modeButton:ImageView
-
+class SearchActivity : BaseActivity<SearchViewModel, ActivitySearchBinding>() {
     /**
      * 适配器区
      */
     var listAdapter //搜索结果列表的Adapter
             : SListAdapter? = null
-    var wordCloudListAdapter:MyWordCloudListAdapter?=null
+    private var wordCloudListAdapter: MyWordCloudListAdapter? = null
 
-    override fun getViewModelClass(): Class<SearchViewModel>? {
+    override fun getViewModelClass(): Class<SearchViewModel> {
         return SearchViewModel::class.java
     }
 
@@ -84,17 +53,17 @@ class SearchActivity : BaseActivity<SearchViewModel>() {
 
     }
 
-    private fun onSearchModeSwitched(wordCloudSearch: Boolean){
-        if(wordCloudSearch){
-            modeButton.setImageResource(R.drawable.ic_bt_wordcloud);
-            searchText.setHint(R.string.search_hint_word_cloud)
-        }else{
-            modeButton.setImageResource(R.drawable.ic_bt_id);
-            searchText.setHint(R.string.search_hint)
+    private fun onSearchModeSwitched(wordCloudSearch: Boolean) {
+        if (wordCloudSearch) {
+            binding.modeButton.setImageResource(R.drawable.ic_bt_wordcloud)
+            binding.searchview.setHint(R.string.search_hint_word_cloud)
+        } else {
+            binding.modeButton.setImageResource(R.drawable.ic_bt_id)
+            binding.searchview.setHint(R.string.search_hint)
         }
-        AnimationUtils.rotate(modeButton)
-        searchText.setText("")
-        hintView.visibility = View.VISIBLE
+        AnimationUtils.rotate(binding.modeButton)
+        binding.searchview.setText("")
+        binding.hint.visibility = View.VISIBLE
         list.visibility = View.GONE
     }
 
@@ -110,13 +79,14 @@ class SearchActivity : BaseActivity<SearchViewModel>() {
             }
         })
 
-        wordCloudListAdapter = MyWordCloudListAdapter(this,ArrayList())
-        myWordCloudList.adapter = wordCloudListAdapter
-        myWordCloudList.layoutManager = LinearLayoutManager(this,RecyclerView.HORIZONTAL,false)
+        wordCloudListAdapter = MyWordCloudListAdapter(this, ArrayList())
+
+        binding.wordcloud.adapter = wordCloudListAdapter
+        binding.wordcloud.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
         //为viewModel的各种data设置监听
-        viewModel!!.searchListStateLiveData?.observe(this, Observer { searchListState: DataState<List<UserSearched>?> ->
-            progressLoading!!.visibility = View.GONE
-            hintView.visibility = View.GONE
+        viewModel.searchListStateLiveData?.observe(this, { searchListState: DataState<List<UserSearched>?> ->
+            binding.loading.visibility = View.GONE
+            binding.hint.visibility = View.GONE
             list.visibility = View.VISIBLE
             if (searchListState.state == DataState.STATE.SUCCESS) {
                 searchListState.data.let {
@@ -127,21 +97,27 @@ class SearchActivity : BaseActivity<SearchViewModel>() {
                 Toast.makeText(applicationContext, "搜索失败！", Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel?.searchMode?.observe(this,{
+        viewModel.searchMode.observe(this, {
             onSearchModeSwitched(it)
         })
-        viewModel!!.myWordCloudLiveData?.observe(this, Observer {
-            if(it.state==DataState.STATE.SUCCESS&&it.data!=null){
+        viewModel.myWordCloudLiveData?.observe(this, {
+            if (it.state == DataState.STATE.SUCCESS && it.data != null) {
                 val list = ArrayList<String>()
-                for(s in it.data!!.keys){
+                for (s in it.data!!.keys) {
                     list.add(s)
                 }
                 wordCloudListAdapter?.notifyItemChangedSmooth(list)
+                if (it.data!!.isEmpty()) {
+                    binding.wordcloudLayout.visibility = View.GONE
+                } else {
+                    binding.wordcloudLayout.visibility = View.VISIBLE
+                }
+
             }
         })
 
         //搜索输入框选择”搜索“的动作监听
-        searchText.setOnEditorActionListener { textView: TextView, i: Int, _: KeyEvent? ->
+        binding.searchview.setOnEditorActionListener { textView: TextView, i: Int, _: KeyEvent? ->
             if (TextUtils.isEmpty(textView.text.toString())) return@setOnEditorActionListener false
             if (i == EditorInfo.IME_ACTION_GO || i == EditorInfo.IME_ACTION_SEARCH) {
                 startSearch()
@@ -150,97 +126,103 @@ class SearchActivity : BaseActivity<SearchViewModel>() {
             false
         }
 
-        searchText.addTextChangedListener(object:TextWatcher{
+        cancel.visibility = View.GONE
+        cancel.setOnClickListener {
+            binding.searchview.text = null
+            binding.hint.visibility = View.VISIBLE
+            list.visibility = View.GONE
+            cancel.visibility = View.GONE
+        }
+        binding.searchview.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
             }
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                 if(s.isNullOrEmpty()){
-                     hintView.visibility = View.VISIBLE
-                     list.visibility = View.GONE
-                 }
+                if (s.isNullOrEmpty()) {
+                    binding.hint.visibility = View.VISIBLE
+                    list.visibility = View.GONE
+                    cancel.visibility = View.GONE
+                } else {
+                    cancel.visibility = View.VISIBLE
+                }
             }
+
             override fun afterTextChanged(s: Editable?) {
 
             }
 
         })
 
-        wordCloudListAdapter?.setOnItemClickListener(object:OnItemClickListener<String>{
+        wordCloudListAdapter?.setOnItemClickListener(object : OnItemClickListener<String> {
             override fun onItemClick(data: String, card: View?, position: Int) {
-                viewModel?.setSearchMode(true)
-                searchText.setText(data)
+                viewModel.setSearchMode(true)
+                binding.searchview.setText(data)
                 startSearch()
             }
         })
 
-        modeButton.setOnClickListener{
-            viewModel?.switchSearchMode()
+        binding.modeButton.setOnClickListener {
+            viewModel.switchSearchMode()
         }
     }
 
-    private fun startSearch(){
+    private fun startSearch() {
         // 隐藏软键盘
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(window.decorView.windowToken, 0)
         //通知ViewModel进行搜索，传入搜索框的文本作为检索语句
-        viewModel?.beginSearch(searchText.text.toString())
-        progressLoading!!.visibility = View.VISIBLE
+        viewModel.beginSearch(binding.searchview.text.toString())
+        binding.loading.visibility = View.VISIBLE
     }
 
-    override fun getLayoutId(): Int {
-        return R.layout.activity_search
-    }
 
+    override fun onStart() {
+        super.onStart()
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        binding.searchview.requestFocus()
+        imm.showSoftInput(binding.searchview, 0)
+    }
 
     override fun onResume() {
         super.onResume()
-        viewModel?.beginRefresh()
+        viewModel.beginRefresh()
+
     }
+
     /**
      * 本页面搜索结果列表的适配器
      */
     class SListAdapter(mContext: Context, mBeans: MutableList<UserSearched>) : BaseListAdapter<UserSearched, SViewHolder>(mContext, mBeans) {
-        override fun getLayoutId(viewType: Int): Int {
-            return R.layout.activity_search_list_item
-        }
 
         override fun bindHolder(holder: SViewHolder, data: UserSearched?, position: Int) {
             if (data != null) {
                 //显示头像
-                ImageUtils.loadAvatarInto(mContext, data.avatar, holder.avatar!!)
+                ImageUtils.loadAvatarInto(mContext, data.avatar, holder.binding.avatar)
                 //显示各种其他信息
-                holder.username!!.text = data.username
-                holder.nickname!!.text = data.nickname
+                holder.binding.username.text = data.username
+                holder.binding.nickname.text = data.nickname
                 //点击事件
-                holder.item!!.setOnClickListener { view: View? ->
+                holder.binding.item.setOnClickListener { view: View? ->
                     mOnItemClickListener?.onItemClick(data, view, position)
                 }
             }
         }
 
-        override fun createViewHolder(v: View, viewType: Int): SViewHolder {
-            return SViewHolder(v)
+
+        class SViewHolder(itemView: ActivitySearchListItemBinding) : BaseViewHolder<ActivitySearchListItemBinding>(itemView)
+
+        override fun getViewBinding(parent: ViewGroup, viewType: Int): ViewBinding {
+            return ActivitySearchListItemBinding.inflate(mInflater, parent, false)
         }
 
-        class SViewHolder(itemView: View) : BaseViewHolder(itemView) {
-            @JvmField
-            @BindView(R.id.nickname)
-            var nickname: TextView? = null
-
-            @JvmField
-            @BindView(R.id.username)
-            var username: TextView? = null
-
-            @JvmField
-            @BindView(R.id.item)
-            var item: ViewGroup? = null
-
-            @JvmField
-            @BindView(R.id.avatar)
-            var avatar: ImageView? = null
+        override fun createViewHolder(viewBinding: ViewBinding, viewType: Int): SViewHolder {
+            return SViewHolder(viewBinding as ActivitySearchListItemBinding)
         }
 
+    }
 
+    override fun initViewBinding(): ActivitySearchBinding {
+        return ActivitySearchBinding.inflate(layoutInflater)
     }
 }

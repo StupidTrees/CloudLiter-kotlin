@@ -1,20 +1,13 @@
 package com.stupidtree.cloudliter.ui.qrcode
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentTransaction
-import butterknife.BindView
-import com.king.zxing.CaptureActivity
 import com.king.zxing.CaptureFragment
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserLocal
+import com.stupidtree.cloudliter.databinding.ActivityQRCodeBinding
 import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.utils.ActivityUtils
@@ -24,18 +17,7 @@ import com.stupidtree.cloudliter.utils.TextUtils
 
 
 @SuppressLint("NonConstantResourceId")
-class QRCodeActivity : BaseActivity<QRCodeViewModel>() {
-    @BindView(R.id.toolbar)
-    lateinit var toolbar: Toolbar
-
-    @BindView(R.id.image)
-    lateinit var image: ImageView
-
-    @BindView(R.id.avatar)
-    lateinit var avatar: ImageView
-
-    @BindView(R.id.nickname)
-    lateinit var nickname: TextView
+class QRCodeActivity : BaseActivity<QRCodeViewModel,ActivityQRCodeBinding>() {
 
     lateinit var captureFragment: CaptureFragment
 
@@ -43,14 +25,11 @@ class QRCodeActivity : BaseActivity<QRCodeViewModel>() {
         captureFragment = CaptureFragment.newInstance()
         super.onCreate(savedInstanceState)
         setWindowParams(statusBar = true, darkColor = true, navi = false)
-        setToolbarActionBack(toolbar)
+        setToolbarActionBack(binding.toolbar)
     }
 
-    override fun getLayoutId(): Int {
-        return R.layout.activity_q_r_code
-    }
 
-    override fun getViewModelClass(): Class<QRCodeViewModel>? {
+    override fun getViewModelClass(): Class<QRCodeViewModel> {
         return QRCodeViewModel::class.java
     }
 
@@ -71,9 +50,9 @@ class QRCodeActivity : BaseActivity<QRCodeViewModel>() {
     }
 
     override fun initViews() {
-        viewModel!!.imageLiveData?.observe(this, { data ->
+        viewModel.imageLiveData?.observe(this, { data ->
             if (data.state == DataState.STATE.SUCCESS) {
-                image.setImageBitmap(data.data)
+                binding.image.setImageBitmap(data.data)
             }
         })
 
@@ -83,13 +62,17 @@ class QRCodeActivity : BaseActivity<QRCodeViewModel>() {
     }
 
     private fun setUserInfo(user: UserLocal) {
-        ImageUtils.loadLocalAvatarInto(this, user.avatar, avatar)
-        nickname.text = user.nickname
+        ImageUtils.loadLocalAvatarInto(this, user.avatar, binding.avatar)
+        binding.nickname.text = user.nickname
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel!!.startRefresh()
-        setUserInfo(viewModel!!.getLoggedInUser())
+        viewModel.startRefresh()
+        setUserInfo(viewModel.getLoggedInUser())
+    }
+
+    override fun initViewBinding(): ActivityQRCodeBinding {
+        return ActivityQRCodeBinding.inflate(layoutInflater)
     }
 }

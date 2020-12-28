@@ -35,32 +35,40 @@ class ConversationsViewModel(application: Application) : AndroidViewModel(applic
         get() {
             if (field == null) {
                 field = Transformations.map(conversationRepository!!.unreadMessageState) { input: DataState<HashMap<String, Int>> ->
-                    if (input.listAction === DataState.LIST_ACTION.APPEND) {
-                        for (key in input.data!!.keys) {
-                            val oldValue = unreadMessages[key]
-                            if (oldValue == null) {
-                                unreadMessages[key] = 1
-                            } else {
-                                unreadMessages[key] = oldValue + 1
-                            }
-                        }
-                    } else if (input.listAction === DataState.LIST_ACTION.DELETE) {
-                        for (key in input.data!!.keys) {
-                            val oldValue = unreadMessages[key]
-                            val deleteValue = input.data!![key]
-                            if (oldValue != null) {
-                                if (oldValue <= 1) {
-                                    unreadMessages.remove(key)
-                                } else if (deleteValue != null) {
-                                    unreadMessages[key] = oldValue - deleteValue
+                    when {
+                        input.listAction === DataState.LIST_ACTION.APPEND -> {
+                            for (key in input.data!!.keys) {
+                                val oldValue = unreadMessages[key]
+                                if (oldValue == null) {
+                                    unreadMessages[key] = 1
                                 } else {
-                                    unreadMessages[key] = oldValue - 1
+                                    unreadMessages[key] = oldValue + 1
                                 }
                             }
                         }
-                    } else if (input.listAction === DataState.LIST_ACTION.REPLACE_ALL) {
-                        unreadMessages.clear()
-                        unreadMessages.putAll(input.data!!)
+                        input.listAction === DataState.LIST_ACTION.DELETE -> {
+                            for (key in input.data!!.keys) {
+                                val oldValue = unreadMessages[key]
+                                val deleteValue = input.data!![key]
+                                if (oldValue != null) {
+                                    when {
+                                        oldValue <= 1 -> {
+                                            unreadMessages.remove(key)
+                                        }
+                                        deleteValue != null -> {
+                                            unreadMessages[key] = oldValue - deleteValue
+                                        }
+                                        else -> {
+                                            unreadMessages[key] = oldValue - 1
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        input.listAction === DataState.LIST_ACTION.REPLACE_ALL -> {
+                            unreadMessages.clear()
+                            unreadMessages.putAll(input.data!!)
+                        }
                     }
                     input
                 }
@@ -111,7 +119,7 @@ class ConversationsViewModel(application: Application) : AndroidViewModel(applic
     fun callOnline(context: Context) {
         val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {
-            conversationRepository!!.ActionCallOnline(context, userLocal)
+            conversationRepository!!.actionCallOnline(context, userLocal)
         }
     }
 

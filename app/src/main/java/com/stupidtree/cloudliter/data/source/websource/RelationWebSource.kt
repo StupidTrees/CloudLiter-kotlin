@@ -179,6 +179,7 @@ class RelationWebSource : BaseWebSource<RelationService>(Retrofit.Builder()
      */
     fun deleteFriend(token: String, friendId: String): LiveData<DataState<*>> {
         return Transformations.map(service.deleteFriend(token, friendId)) { input: ApiResponse<Any?>? ->
+            Log.e("delete_friend", input.toString());
             if (null == input) {
                 return@map DataState<Any>(DataState.STATE.FETCH_FAILED)
             }

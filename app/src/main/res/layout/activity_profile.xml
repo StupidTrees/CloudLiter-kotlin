@@ -137,11 +137,18 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:id="@+id/refresh"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        android:layout_height="match_parent">
+
+
     <androidx.core.widget.NestedScrollView
-        android:overScrollMode="never"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+        android:overScrollMode="never"
+       >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -207,6 +214,48 @@
                         android:backgroundTintMode="src_over"
                         android:padding="4dp"
                         app:srcCompat="@drawable/ic_baseline_person_24"
+                        app:tint="?attr/colorPrimary" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/logout"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:text="@string/logout"
+                        android:textColor="?attr/textColorPrimary"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:textColor="?attr/textColorSecondary"
+                        android:textSize="18sp" />
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/element_round_primary_light"
+                        android:padding="4dp"
+                        app:srcCompat="@drawable/ic_baseline_exit_to_app_24"
                         app:tint="?attr/colorPrimary" />
 
                 </LinearLayout>
@@ -413,17 +462,33 @@
                 android:paddingEnd="8dp"
                 android:paddingBottom="8dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginBottom="16dp"
-                    android:alpha="0.4"
-                    android:text="@string/prompt_user_word_cloud"
-                    android:textColor="?attr/textColorSecondary"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.4"
+                        android:text="@string/prompt_user_word_cloud"
+                        android:textColor="?attr/textColorSecondary"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/lock"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="4dp"
+                        android:contentDescription="@string/word_cloud_locked"
+                        android:src="@drawable/ic_lock" />
+                </LinearLayout>
 
                 <com.stupidtree.cloudliter.ui.widgets.WordsCloudView
                     android:id="@+id/wordstag_layout"
@@ -436,32 +501,10 @@
 
             </LinearLayout>
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/logout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="48dp"
-                android:layout_marginEnd="24dp"
-                android:layout_marginBottom="24dp"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="?attr/colorPrimary"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="3dp">
-
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:padding="10dp"
-                    android:text="@string/logout"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp" />
-            </androidx.cardview.widget.CardView>
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab"
@@ -478,5 +521,4 @@
         app:layout_anchor="@+id/appbar"
         app:layout_anchorGravity="end|bottom"
         tools:ignore="RtlHardcoded" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

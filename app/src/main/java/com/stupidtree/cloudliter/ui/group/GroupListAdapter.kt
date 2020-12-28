@@ -3,54 +3,43 @@ package com.stupidtree.cloudliter.ui.group
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import butterknife.BindView
-import com.stupidtree.cloudliter.R
+import androidx.viewbinding.ViewBinding
 import com.stupidtree.cloudliter.data.model.RelationGroup
+import com.stupidtree.cloudliter.databinding.ActivityGroupEditorListItemBinding
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter
 import com.stupidtree.cloudliter.ui.base.BaseViewHolder
 import com.stupidtree.cloudliter.ui.group.GroupListAdapter.GHolder
 
 class GroupListAdapter(mContext: Context, mBeans: MutableList<RelationGroup>) : BaseListAdapter<RelationGroup, GHolder>(mContext, mBeans) {
     interface OnDeleteClickListener {
-        fun OnDeleteClick(button: View?, group: RelationGroup, position: Int)
+        fun onDeleteClick(button: View?, group: RelationGroup, position: Int)
     }
 
     var onDeleteClickListener: OnDeleteClickListener? = null
 
-    override fun getLayoutId(viewType: Int): Int {
-        return R.layout.activity_group_editor_list_item
-    }
-
-    override fun createViewHolder(v: View, viewType: Int): GHolder {
-        return GHolder(v)
-    }
 
 
     override fun bindHolder(holder: GHolder, data: RelationGroup?, position: Int) {
         if (data != null) {
-            holder.name!!.text = data.groupName
+            holder.binding.name.text = data.groupName
             if (onDeleteClickListener != null) {
-                holder.delete!!.setOnClickListener { view: View? -> onDeleteClickListener!!.OnDeleteClick(view, data, position) }
+                holder.binding.delete.setOnClickListener { view: View? -> onDeleteClickListener!!.onDeleteClick(view, data, position) }
             }
             if(mOnItemClickListener!=null){
-                holder.card.setOnClickListener{
+                holder.binding.card.setOnClickListener{
                     mOnItemClickListener!!.onItemClick(data,it,position)
                 }
             }
         }
     }
 
-    class GHolder(itemView: View) : BaseViewHolder(itemView) {
-        @JvmField
-        @BindView(R.id.delete)
-        var delete: View? = null
+    class GHolder(itemView: ActivityGroupEditorListItemBinding) : BaseViewHolder<ActivityGroupEditorListItemBinding>(itemView)
 
-        @BindView(R.id.card)
-        lateinit var card: ViewGroup
+    override fun getViewBinding(parent: ViewGroup, viewType: Int): ViewBinding {
+        return ActivityGroupEditorListItemBinding.inflate(mInflater,parent,false)
+    }
 
-        @JvmField
-        @BindView(R.id.name)
-        var name: TextView? = null
+    override fun createViewHolder(viewBinding: ViewBinding, viewType: Int): GHolder {
+        return GHolder(viewBinding as ActivityGroupEditorListItemBinding)
     }
 }

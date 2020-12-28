@@ -3,14 +3,12 @@ package com.stupidtree.cloudliter.ui.chat
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.repository.ChatRepository
 import com.stupidtree.cloudliter.data.repository.ChatRepository.Companion.getInstance
+import com.stupidtree.cloudliter.data.repository.ConversationRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.base.DataState.LIST_ACTION
@@ -20,6 +18,13 @@ import java.sql.Timestamp
 
 class ChatViewModel(application: Application) : AndroidViewModel(application) {
     /**
+     * 仓库区
+     */
+    private val chatRepository: ChatRepository = getInstance(application)
+    private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
+    private val conversationRepository = ConversationRepository.getInstance(application)
+
+    /**
      * 数据区
      */
     //数据本体 朋友id
@@ -27,8 +32,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         private set
 
     //数据本体：对话对象
-    val conversation = MutableLiveData<Conversation?>()
-
+    val conversation = MediatorLiveData<Conversation?>()
     //数据本体：消息列表
     private var listData: LiveData<DataState<List<ChatMessage>?>>? = null
 
@@ -90,15 +94,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     private var bottomId: String? = null
     private var bottomUUID: String? = null
 
-    /**
-     * 仓库区
-     */
-    private val chatRepository: ChatRepository = getInstance(application)
-    private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
-    fun setConversation(conversation: Conversation) {
-        this.conversation.value = conversation
-        friendId = conversation.friendId
-    }
+
 
     /**
      * 获取聊天列表状态数据
@@ -127,7 +123,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                             Log.e("listAppend", input2.data.toString())
                             bottomId = input2.data!![0].id
                             bottomUUID = input2.data!![0].uuid
-                            markAllRead(context.applicationContext, input2.data!![input2.data!!.size - 1].id)
+                            markAllRead(context.applicationContext)
                         }
                         LIST_ACTION.REPLACE_ALL -> {
                             //初次进入
@@ -135,13 +131,13 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                             topTime = input2.data!![input2.data!!.size - 1].createdAt
                             bottomId = input2.data!![0].id
                             bottomUUID = input2.data!![0].uuid
-                            markAllRead(context.applicationContext, topId!!)
+                            markAllRead(context.applicationContext)
                         }
                         LIST_ACTION.PUSH_HEAD -> {
                             //下拉加载
                             topId = input2.data!![input2.data!!.size - 1].id
                             topTime = input2.data!![input2.data!!.size - 1].createdAt
-                            markAllRead(context.applicationContext, topId!!)
+                            markAllRead(context.applicationContext)
                         }
                     }
                 }
@@ -316,10 +312,13 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun markAllRead(context: Context, topId: String) {
+    fun markAllRead(context: Context) {
         if (conversationId != null && localUserRepository.isUserLoggedIn) {
-            chatRepository.ActionMarkAllRead(context, myId!!, conversationId!!,
-                    topTime!!, pageSize)
+            if(topTime!=null&&conversationId!=null&&myId!=null){
+                chatRepository.ActionMarkAllRead(context, myId!!, conversationId!!,
+                        topTime!!, pageSize)
+            }
+
         }
     }
 
@@ -327,6 +326,30 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         chatMessage.toId?.let {
             chatMessage.conversationId?.let { it1 ->
                 chatRepository.ActionMarkRead(context, it, chatMessage.id, it1)
+            }
+        }
+    }
+
+    fun setConversation(conversation: Conversation) {
+        this.conversation.value = conversation
+        friendId = conversation.friendId
+    }
+
+    private var webConversationData:LiveData<DataState<Conversation?>>? = null
+
+    fun refreshConversation(){
+        friendId?.let{id->
+            val userLocal = localUserRepository.getLoggedInUser()
+            webConversationData?.let {
+                conversation.removeSource(it)
+            }
+            webConversationData = conversationRepository?.queryConversation(userLocal.token!!, userLocal.id!!,id)
+            webConversationData?.let {
+                conversation.addSource(it){data->
+                    if(data.state==DataState.STATE.SUCCESS){
+                        conversation.value = data.data
+                    }
+                }
             }
         }
     }

@@ -1,4 +1,300 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources>
-    <string name="app_name">云升</string>
+
+    <string name="app_name">Cloud Liter</string>
+
+    <string name="app_slogan">liter of cloud</string>
+
+    <string name="title_home">Message</string>
+
+    <string name="title_contact">Friends</string>
+
+    <string name="prompt_username">Username</string>
+
+    <string name="prompt_password">Password</string>
+
+    <string name="action_sign_in">Login</string>
+
+    <string name="action_sign_in_short">Login</string>
+
+    <string name="invalid_username">Username must be longer than 3 characters and contains only numbers and letters </string>
+
+    <string name="invalid_password">Password must be longer than 8 characters</string>
+
+    <string name="inconsistent_password">The passwords you typed do not match. Type the same password in both text boxes.</string>
+
+    <string name="login_success">Login succeed!</string>
+
+    <string name="sign_up_success">Sign up succeed!</string>
+
+    <string name="login_failed">Login failed!</string>
+
+    <string name="empty_nickname">Choose a fun nickname for your account!</string>
+
+    <string name="login_failed_wrong_username">No such user!</string>
+
+    <string name="login_failed_wrong_password">Wrong password!</string>
+
+    <string name="male">male</string>
+
+    <string name="female">female</string>
+
+    <string name="red">Red</string>
+
+    <string name="orange">Orange</string>
+
+    <string name="yellow">Yellow</string>
+
+    <string name="green">Green</string>
+
+    <string name="cyan">Cyan</string>
+
+    <string name="blue">Blue</string>
+
+    <string name="purple">Purple</string>
+
+    <string name="title_activity_welcome">WelcomeActivity</string>
+
+
+    <string name="not_logged_in">Not login yet</string>
+
+    <string name="please_log_in">Please login</string>
+
+    <string name="Login">Login</string>
+
+    <string name="sign_up">Sign up</string>
+
+    <string name="prompt_confirm_password">Confirm password</string>
+
+    <string name="prompt_nickname">Nickname</string>
+
+    <string name="sign_up_failed">Sign up failed！</string>
+
+
+    <string name="user_already_exists">This account is already used!</string>
+
+    <string name="search_hint">Search Friends</string>
+
+    <string name="make_friends_success">Friend added successfully</string>
+
+    <string name="send_message">Chat</string>
+
+    <string name="make_friends">Add</string>
+
+    <string name="fail">Fail</string>
+
+    <string name="logout">Logout</string>
+
+    <string name="avatar">Avatar</string>
+
+    <string name="signature">Signature</string>
+
+    <string name="my_profile_title">My Profile</string>
+
+    <string name="confirm">Confirm</string>
+
+    <string name="cancel">Cancel</string>
+
+    <string name="input_hint">Input…</string>
+
+    <string name="set_nickname">Set Nickname</string>
+
+    <string name="no_image_selected">Please choose an image</string>
+
+    <string name="avatar_change_success">Avatar changed successfully</string>
+
+    <string name="username2">Account</string>
+
+    <string name="gender">Gender</string>
+
+    <string name="choose_gender">Choose Gender</string>
+
+    <string name="choose_color">Choose Color</string>
+
+    <string name="send">Send</string>
+
+    <string name="online">Online</string>
+
+    <string name="offline">Offline</string>
+
+    <string name="choose_signature">What am I thinking...</string>
+
+    <string name="attention_please">Tips</string>
+
+    <string name="need_that_freaking_notification_permission">To ensure messages arrive at once, please enable suspension notification permission</string>
+
+    <string name="relation_title">Relation Option</string>
+
+    <string name="prompt_set_remark">Set Remark</string>
+
+    <string name="add_into_blacklist">Add To Blacklist</string>
+
+    <string name="delete_friend">Delete</string>
+
+    <string name="prompt_set_group">Set Group</string>
+
+    <string name="prompt_user_word_cloud">Word Cloud</string>
+
+    <string name="place_holder_no_signature">Too lazy to say anything…</string>
+
+    <string name="color">Color</string>
+
+    <string name="fetch_failed">Fetch Failed</string>
+
+    <string name="no_contact">No Contact</string>
+
+    <string name="no_conversation">No Chat</string>
+
+    <string name="date_format_1">yyyy-M-d</string>
+
+    <string name="date_format_2">M-d</string>
+    <string name="date_format_3">yyyy M-d hh:mm</string>
+    <string name="date_format_am">hh:mm aa</string>
+
+    <string name="date_format_pm">hh:mm aa</string>
+
+    <string name="yesterday">Yesterday</string>
+
+    <string name="the_day_before_yesterday">Day before Yesterday</string>
+
+    <string name="date_format_with_prefix">"%s %s"</string>
+
+    <string name="view_history">View History</string>
+
+    <string name="chat_word_cloud">View Word Cloud</string>
+
+    <string name="title_conversation">Our Conversation</string>
+
+    <string name="with_you">With You</string>
+
+    <string name="with_other">With others</string>
+
+    <string name="place_holder_yunmoji">[Yunmoji]</string>
+
+    <string name="title_relation_event">Relation</string>
+
+    <string name="send_request_success">Request Sent</string>
+
+    <string name="relation_requesting">Waiting</string>
+
+    <string name="relation_rejected">Rejected</string>
+
+    <string name="relation_accepted">Accepted</string>
+
+    <string name="relation_delete">Deleted you</string>
+
+    <string name="prompt_accept">Accept</string>
+
+    <string name="select_action">Response friend request</string>
+
+    <string name="prompt_reject">Reject</string>
+
+    <string name="prompt_select_action">Option</string>
+
+    <string name="label_user_profile">His/Her Profile</string>
+
+    <string name="label_relation_settings">Friend Option</string>
+
+    <string name="attention_delete_friend">Sure to delete?</string>
+
+    <string name="delete_friend_success">Delete Success</string>
+
+    <string name="relation_you_deleted">You deleted him/her</string>
+
+    <string name="menu_my_profile">My Profile</string>
+
+    <string name="menu_setting">Option</string>
+
+    <string name="hint_sensitive_message">Containing Sensitive Information</string>
+
+    <string name="description_switch_sensitive">Show/Hide Sensitive Information</string>
+
+    <string name="content_description_avatar">User Avatar</string>
+
+    <string name="back">Back</string>
+
+    <string name="user_state">User State</string>
+
+    <string name="select_yunmoji">Select Yunmoji</string>
+
+    <string name="edit_my_profile">Profile</string>
+
+    <string name="title_activity_group">Group Option</string>
+
+    <string name="contact_friend_list">Friends</string>
+
+    <string name="contact_friend_group">Group</string>
+
+    <string name="connection_failed">Connect Failed</string>
+
+    <string name="place_holder_image">[image]</string>
+
+    <string name="label_emotion_analyse">Emotion Analyse</string>
+
+    <string name="label_emotion_neutral">Neutral</string>
+
+    <string name="label_drawing">Drawing</string>
+
+
+    <string name="label_Porn">Porn</string>
+
+
+    <string name="label_sexy">Sexy</string>
+
+    <string name="label_hentai">Hentai</string>
+
+
+    <string name="title_pick_group">Setting Group</string>
+
+    <string name="assign_group_success">Group Setting Succeed</string>
+
+    <string name="no_word_cloud_yet">词云空</string>
+    \
+    <string name="label_conversation_word_cloud">Our Word Cloud</string>
+
+    <string name="add_group">Add Group</string>
+
+    <string name="add_ok">Group Added</string>
+
+    <string name="delete_ok">Group Deleted</string>
+
+    <string name="ensure_delete">Sure to delete this group?</string>
+
+    <string name="not_assigned_group">Individual</string>
+
+    <string name="qrcode_title">Qrcode</string>
+
+    <string name="invalid_business_card">Invalid Business Card！</string>
+
+    <string name="voice_duration_text">%02d:%02d</string>
+
+    <string name="voice_button_hint_press">Hold to Talk</string>
+
+    <string name="voice_button_hint_pressed">Loose to Stop</string>
+    <string name="exit">Exit</string>
+    <string name="scan_qr">Scan</string>
+    <string name="about_cloud_liter">About CloudLiter</string>
+    <string name="discover_friend">Add friends</string>
+    <string name="logout_hint">All local caches will be cleared after logging out. Are you sure to log out?</string>
+    <string name="search_hint_word_cloud">Explore new friends by word cloud…</string>
+    <string name="hint_from_your_word_cloud">These are your common words…</string>
+    <string name="change_group_name">Change group name</string>
+    <string name="rename_ok">rename success</string>
+    <string name="place_holder_voice">[voice]</string>
+    <string name="read">seen</string>
+    <string name="word_cloud_place_holder">词云空</string>
+    <string name="label_basic_profile">Basic Profile</string>
+    <string name="label_privacy_settings">Privacy Options</string>
+    <string name="word_cloud_accessibility">Word Cloud</string>
+    <string name="word_cloud_private">Hide</string>
+    <string name="word_cloud_public">Show</string>
+    <string name="set_success">set success</string>
+    <string name="private_word_cloud">私密</string>
+    <string name="label_conversation_met">We became friends at</string>
+    <string name="label_conversation_last_chat">We recently chatted at</string>
+    <string name="label_conversation_since_met">You\'ve been friends for</string>
+    <string name="days">days</string>
+    <string name="word_cloud_locked">word cloud locked</string>
+    <string name="click_to_log_in">Click to log in</string>
+
 </resources>

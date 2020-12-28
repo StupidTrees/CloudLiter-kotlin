@@ -121,6 +121,17 @@ interface UserService {
     fun changeSignature(@Field("signature") signature: String?, @Header("token") token: String?): LiveData<ApiResponse<Any?>?>
 
     /**
+     * 设置词云可见性
+     * @param private 是否可见
+     * @param token 登录状态的token（表征了用户身份）
+     * @return 操作结果
+     */
+    @FormUrlEncoded
+    @POST("/user/profile/word_cloud_private")
+    fun setWordCloudAccessibility(@Field("private") private:Boolean, @Header("token") token: String?): LiveData<ApiResponse<Any?>?>
+
+
+    /**
      * 获取用户词云
      * @param token 登录状态的token
      * @return 搜索结果

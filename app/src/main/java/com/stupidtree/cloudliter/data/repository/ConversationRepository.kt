@@ -102,7 +102,7 @@ class ConversationRepository(context: Context) {
      * @param context   上下文
      * @param userLocal 本地用户
      */
-    fun ActionCallOnline(context: Context, userLocal: UserLocal) {
+    fun actionCallOnline(context: Context, userLocal: UserLocal) {
         socketWebSource.callOnline(context, userLocal)
     }
 

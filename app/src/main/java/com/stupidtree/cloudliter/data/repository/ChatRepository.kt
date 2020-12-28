@@ -118,7 +118,7 @@ class ChatRepository(context: Context) {
      * @param afterId        现有列表底部的消息id
      */
     fun ActionFetchNewMessages(token: String, conversationId: String, afterId: String?) {
-        listDataState.removeSource(webListState!!)
+        webListState?.let{listDataState.removeSource(it)}
         webListState = chatMessageWebSource.getMessagesAfter(token, conversationId, afterId, false)
         listDataState.addSource(webListState!!) { result ->
             Log.e("手动拉取本地未存新消息", "$afterId-$result")
@@ -273,14 +273,14 @@ class ChatRepository(context: Context) {
     }
 
     private fun saveMessageAsync(chatMessage: ChatMessage) {
-        Thread({ chatMessageDao.saveMessage(listOf(chatMessage)) }).start()
+        Thread { chatMessageDao.saveMessage(listOf(chatMessage)) }.start()
     }
 
     private fun markMessageReadAsync(notification: MessageReadNotification?) {
         if (notification!!.type == MessageReadNotification.TYPE.ALL) {
-            Thread(Runnable { chatMessageDao.messageAllRead(notification.conversationId, notification.fromTime) }).start()
+            Thread { chatMessageDao.messageAllRead(notification.conversationId, notification.fromTime) }.start()
         } else {
-            Thread(Runnable { notification.id?.let { chatMessageDao.messageRead(it) } }).start()
+            Thread { notification.id?.let { chatMessageDao.messageRead(it) } }.start()
         }
         //new Thread(() -> chatMessageDao.saveMessage(Collections.singletonList(chatMessage))).start();
     }

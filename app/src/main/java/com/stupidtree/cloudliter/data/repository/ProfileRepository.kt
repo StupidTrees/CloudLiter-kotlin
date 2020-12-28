@@ -138,6 +138,13 @@ class ProfileRepository(application: Application) {
         }
     }
 
+
+    /**
+     * 设置词云可见性
+     */
+    fun setWordCloudAccessibility(token: String, private:Boolean): LiveData<DataState<String?>> {
+        return userWebSource.setWordCloudAccessibility(private = private,token = token)
+    }
     /**
      * 获取用户词云
      *

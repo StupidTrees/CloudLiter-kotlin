@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "87b0ef483c95e5b430a8a7debf18fae8",
+    "identityHash": "552b4b49f351b4a930da8372dfb9e2fb",
     "entities": [
       {
         "tableName": "message",
@@ -235,7 +235,7 @@
       },
       {
         "tableName": "profile",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `username` TEXT, `nickname` TEXT, `gender` TEXT, `signature` TEXT, `avatar` TEXT, `color` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `username` TEXT, `nickname` TEXT, `gender` TEXT, `signature` TEXT, `avatar` TEXT, `color` TEXT, `wordCloudPrivate` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -278,6 +278,12 @@
             "columnName": "color",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "wordCloudPrivate",
+            "columnName": "wordCloudPrivate",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -293,7 +299,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '87b0ef483c95e5b430a8a7debf18fae8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '552b4b49f351b4a930da8372dfb9e2fb')"
     ]
   }
 }

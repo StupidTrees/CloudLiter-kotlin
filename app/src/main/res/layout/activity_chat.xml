@@ -41,6 +41,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:maxEms="12"
                 android:textColor="?attr/textColorPrimary"
                 android:textSize="24sp">
 
@@ -79,6 +80,7 @@
                     android:layout_gravity="center"
                     android:alpha="0.8"
                     android:gravity="center"
+                    android:maxEms="6"
                     android:text="@string/offline"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -275,7 +277,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/add"
+                android:id="@+id/emotion"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"

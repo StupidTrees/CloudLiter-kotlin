@@ -1,59 +1,39 @@
 package com.stupidtree.cloudliter.ui.welcome
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
-import androidx.viewpager.widget.ViewPager
-import butterknife.BindView
-import com.google.android.material.tabs.TabLayout
 import com.stupidtree.cloudliter.R
+import com.stupidtree.cloudliter.databinding.ActivityWelcomeBinding
 import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.BaseTabAdapter
 import com.stupidtree.cloudliter.ui.welcome.login.LoginFragment
 import com.stupidtree.cloudliter.ui.welcome.signup.SignUpFragment
-import java.util.*
+import com.stupidtree.cloudliter.utils.AnimationUtils
 
 /**
  * 用户注册/登录页面
  * 只是个空壳，不需要ViewModel
  */
-class WelcomeActivity : BaseActivity<ViewModel?>() {
-    /**
-     * View绑定区
-     */
-    @JvmField
-    @BindView(R.id.toolbar)
-    var toolbar: Toolbar? = null
+@SuppressLint("NonConstantResourceId")
+class WelcomeActivity : BaseActivity<WelcomeViewModel,ActivityWelcomeBinding>() {
 
-    @JvmField
-    @BindView(R.id.pager)
-    var pager: ViewPager? = null
-
-    @JvmField
-    @BindView(R.id.tabs)
-    var tabs: TabLayout? = null
     override fun onCreate(savedInstanceState: Bundle?) {
-        setWindowParams(true, true, true)
+        setWindowParams(statusBar = true, darkColor = true, navi = true)
+        setToolbarActionBack(binding.toolbar)
         super.onCreate(savedInstanceState)
     }
 
-    override fun getViewModelClass(): Class<ViewModel?>? {
-        //不需要ViewModel。返回null即可
-        return null
-    }
-
     override fun initViews() {
-        setSupportActionBar(toolbar)
-        setToolbarActionBack(toolbar!!)
+
         supportActionBar?.title = ""
         //设置两个fragment，一个登录一个注册
-        pager!!.adapter = object : BaseTabAdapter(supportFragmentManager, 2) {
+        binding.pager.adapter = object : BaseTabAdapter(supportFragmentManager, 2) {
             override fun initItem(position: Int): Fragment {
-                if(position==0){
-                    return LoginFragment.newInstance()
+                return if(position==0){
+                    LoginFragment.newInstance()
                 }else{
-                    return SignUpFragment.newInstance()
+                    SignUpFragment.newInstance()
                 }
             }
 
@@ -63,10 +43,20 @@ class WelcomeActivity : BaseActivity<ViewModel?>() {
                 } else getString(R.string.sign_up)
             }
         }
-        tabs!!.setupWithViewPager(pager)
+        binding.tabs.setupWithViewPager(binding.pager)
     }
 
-    override fun getLayoutId(): Int {
-        return R.layout.activity_welcome
+    override fun onStart() {
+        super.onStart()
+        AnimationUtils.floatAnim(binding.logo,0)
+    }
+
+
+    override fun initViewBinding(): ActivityWelcomeBinding {
+        return ActivityWelcomeBinding.inflate(layoutInflater)
+    }
+
+    override fun getViewModelClass(): Class<WelcomeViewModel> {
+        return WelcomeViewModel::class.java
     }
 }

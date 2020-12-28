@@ -78,7 +78,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                             return@switchMap MutableLiveData(DataState<HashMap<String, Float?>?>(DataState.STATE.NOT_LOGGED_IN))
                         }
                     }
-                    MutableLiveData(DataState<HashMap<String, Float?>?>(DataState.STATE.NOTHING))
+                    MutableLiveData(DataState(DataState.STATE.NOTHING))
                 }
             }
             return field!!
@@ -126,7 +126,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                             return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
                         }
                     }
-                    MutableLiveData<DataState<String?>?>()
+                    MutableLiveData()
                 }
             }
             return field!!
@@ -148,7 +148,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                             return@switchMap MutableLiveData<DataState<*>>(DataState<Any>(DataState.STATE.NOT_LOGGED_IN))
                         }
                     }
-                    MutableLiveData<DataState<*>>(DataState<Any>(DataState.STATE.NOTHING))
+                    MutableLiveData(DataState<Any>(DataState.STATE.NOTHING))
                 }
             }
             return field!!
@@ -194,7 +194,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                             return@switchMap MutableLiveData(DataState<UserProfile?>(DataState.STATE.NOT_LOGGED_IN))
                         }
                     }
-                    MutableLiveData(DataState<UserProfile?>(DataState.STATE.NOTHING))
+                    MutableLiveData(DataState(DataState.STATE.NOTHING))
                 }
             }
             return field

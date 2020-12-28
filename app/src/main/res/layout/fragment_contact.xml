@@ -14,7 +14,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingTop="16dp"
@@ -66,11 +66,11 @@
                 android:id="@+id/edit_group"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:visibility="gone"
                 android:layout_marginStart="16dp"
                 android:clickable="true"
                 android:focusable="auto"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:visibility="gone"
                 app:cardBackgroundColor="?attr/colorPrimary"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="0dp">
@@ -104,6 +104,7 @@
                     app:srcCompat="@drawable/ic_search_button"
                     app:tint="@android:color/white" />
             </androidx.cardview.widget.CardView>
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/scan_qr"
                 android:layout_width="48dp"

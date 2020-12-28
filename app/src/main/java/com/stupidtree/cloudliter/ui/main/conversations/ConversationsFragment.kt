@@ -1,24 +1,22 @@
 package com.stupidtree.cloudliter.ui.main.conversations
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import butterknife.BindView
+import androidx.viewbinding.ViewBinding
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.Conversation
-import com.stupidtree.cloudliter.ui.base.BaseFragment
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.BaseViewHolder
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.widgets.EmoticonsTextView
+import com.stupidtree.cloudliter.databinding.FragmentConversationsBinding
+import com.stupidtree.cloudliter.databinding.FragmentConversationsListItemBinding
+import com.stupidtree.cloudliter.service.socket.SocketIOClientService.Companion.ACTION_RELATION_EVENT
+import com.stupidtree.cloudliter.ui.base.*
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils
@@ -28,31 +26,19 @@ import java.util.*
  * “消息”页面
  */
 @SuppressLint("NonConstantResourceId")
-class ConversationsFragment : BaseFragment<ConversationsViewModel>() {
+class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel,FragmentConversationsBinding>() {
+
     /**
-     * View绑定区
+     * 广播区
      */
-    @JvmField
-    @BindView(R.id.list)
-    var list: RecyclerView? = null
-
-    @JvmField
-    @BindView(R.id.place_holder)
-    var placeHolder //列表无内容时显示的布局
-            : ViewGroup? = null
-
-    @JvmField
-    @BindView(R.id.place_holder_text)
-    var placeHolderText //不显示列表时显示文字
-            : TextView? = null
-
-    @JvmField
-    @BindView(R.id.refresh)
-    var refreshLayout: SwipeRefreshLayout? = null
-
-    @JvmField
-    @BindView(R.id.connection_failed_bar)
-    var connectionFailedBar: ViewGroup? = null
+    override var receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "android.net.conn.CONNECTIVITY_CHANGE") {
+                Log.e("网络状态改变", intent.toString())
+            }
+            viewModel.startRefresh()
+        }
+    }
 
     /**
      * 适配器区
@@ -62,10 +48,16 @@ class ConversationsFragment : BaseFragment<ConversationsViewModel>() {
         return ConversationsViewModel::class.java
     }
 
+    override fun getIntentFilter(): IntentFilter {
+        val iF = IntentFilter("android.net.conn.CONNECTIVITY_CHANGE")
+        iF.addAction(ACTION_RELATION_EVENT)
+        return iF
+    }
+
     override fun initViews(view: View) {
         listAdapter = context?.let { CAdapter(it, LinkedList()) }
-        list!!.adapter = listAdapter
-        list!!.layoutManager = LinearLayoutManager(context)
+        binding?.list?.adapter = listAdapter
+        binding?.list?.layoutManager = LinearLayoutManager(context)
         listAdapter!!.setOnItemClickListener(object : BaseListAdapter.OnItemClickListener<Conversation> {
             override fun onItemClick(data: Conversation, card: View?, position: Int) {
                 ActivityUtils.startChatActivity(requireContext(), data)
@@ -73,14 +65,13 @@ class ConversationsFragment : BaseFragment<ConversationsViewModel>() {
         })
 
         //设置下拉刷新
-        //设置下拉刷新
-        refreshLayout!!.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent)
-        refreshLayout!!.setOnRefreshListener { viewModel!!.startRefresh() }
+       binding?.refresh?.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent)
+       binding?.refresh?.setOnRefreshListener { viewModel.startRefresh() }
 
 
         // searchBar.setOnClickListener(view1 -> ActivityUtils.startSearchActivity(requireActivity()));
-        viewModel!!.listData?.observe(this, { listDataState ->
-            refreshLayout!!.isRefreshing = false
+        viewModel.listData?.observe(this, { listDataState ->
+           binding?.refresh?.isRefreshing = false
             if (listDataState.data != null && listDataState.data!!.isNotEmpty()) {
                 val listD = listDataState.data!!
                 listD.sortWith { conversation: Conversation, t1: Conversation ->
@@ -88,71 +79,76 @@ class ConversationsFragment : BaseFragment<ConversationsViewModel>() {
                 }
                 listAdapter!!.notifyItemChangedSmooth(listD)
                 if (listD.isNotEmpty()) {
-                    list!!.visibility = View.VISIBLE
-                    placeHolder!!.visibility = View.GONE
+                    binding?.list?.visibility = View.VISIBLE
+                    binding?.placeHolder?.visibility = View.GONE
                 } else {
-                    list!!.visibility = View.GONE
-                    placeHolder!!.visibility = View.VISIBLE
-                    placeHolderText!!.setText(R.string.no_conversation)
+                    binding?.list?.visibility = View.GONE
+                    binding?.placeHolder?.visibility = View.VISIBLE
+                    binding?.placeHolderText?.setText(R.string.no_conversation)
                 }
             }
             when {
                 listDataState.state === DataState.STATE.NOT_LOGGED_IN -> {
-                    placeHolder!!.visibility = View.VISIBLE
-                    list!!.visibility = View.GONE
-                    placeHolderText!!.setText(R.string.not_logged_in)
+                    binding?.placeHolder?.visibility = View.VISIBLE
+                    binding?.list?.visibility = View.GONE
+                    binding?.placeHolderText?.setText(R.string.click_to_log_in)
+                    binding?.placeHolder?.setOnClickListener {
+                        ActivityUtils.startLoginActivity(requireContext())
+                    }
                     if (listDataState.isRetry) {
-                        connectionFailedBar!!.visibility = View.GONE
+                        binding?.connectionFailedBar?.visibility = View.GONE
                     }
                 }
-                listDataState.isRetry&&listDataState.stateRetried === DataState.STATE.FETCH_FAILED -> {
-                    list!!.visibility = View.VISIBLE
-                    placeHolder!!.visibility = View.GONE
+                listDataState.isRetry && listDataState.stateRetried === DataState.STATE.FETCH_FAILED -> {
+                    binding?.list?.visibility = View.VISIBLE
+                    binding?.placeHolder?.visibility = View.GONE
                     if (listDataState.isRetry) {
-                        connectionFailedBar!!.visibility = View.VISIBLE
+                        binding?.connectionFailedBar?.visibility = View.VISIBLE
                     }
                 }
-                listDataState.isRetry&&listDataState.stateRetried===DataState.STATE.SUCCESS-> {
-                    placeHolder!!.visibility = View.GONE
-                    if (listDataState.isRetry) {
-                        connectionFailedBar!!.visibility = View.GONE
+                listDataState.isRetry && listDataState.stateRetried === DataState.STATE.SUCCESS -> {
+                    binding?.placeHolder?.visibility = View.GONE
+                    binding?.connectionFailedBar?.visibility = View.GONE
+                    if (listDataState.data != null && listDataState.data!!.isEmpty()) {
+                        binding?.list?.visibility = View.GONE
+                        binding?.placeHolder?.visibility = View.VISIBLE
+                        binding?.placeHolderText?.setText(R.string.no_conversation)
                     }
                 }
                 listDataState.state !== DataState.STATE.SUCCESS -> {
-                    placeHolder!!.visibility = View.VISIBLE
-                    list!!.visibility = View.GONE
+                    binding?.placeHolder?.visibility = View.VISIBLE
+                    binding?.list?.visibility = View.GONE
                     if (listDataState.isRetry) {
-                        connectionFailedBar!!.visibility = View.GONE
+                        binding?.connectionFailedBar?.visibility = View.GONE
                     }
-                    placeHolderText!!.setText(R.string.fetch_failed)
+                    binding?.placeHolderText?.setText(R.string.fetch_failed)
                 }
             }
         })
-        viewModel!!.unreadMessageState?.observe(this, Observer { listDataState ->
+        viewModel.unreadMessageState?.observe(this, Observer { listDataState ->
             //refreshLayout.setRefreshing(true);
-            viewModel!!.startRefresh()
+            viewModel.startRefresh()
         })
     }
 
-    override fun getLayoutId(): Int {
-        return R.layout.fragment_conversations
-    }
+
 
     override fun onResume() {
         super.onResume()
-        viewModel!!.startRefresh()
-        viewModel!!.callOnline(requireContext())
+        viewModel.startRefresh()
+        viewModel.callOnline(requireContext())
 
     }
 
+
     override fun onStart() {
         super.onStart()
-        viewModel!!.bindService(activity)
+        viewModel.bindService(activity)
     }
 
     override fun onDetach() {
         super.onDetach()
-        viewModel!!.unbindService(activity)
+        viewModel.unbindService(activity)
     }
 
     inner class CAdapter(mContext: Context, mBeans: MutableList<Conversation>) : BaseListAdapter<Conversation, CAdapter.CHolder>(mContext, mBeans) {
@@ -160,34 +156,29 @@ class ConversationsFragment : BaseFragment<ConversationsViewModel>() {
          * 缓存每个对话的未读状态
          */
         var unreadMap: HashMap<String, Int> = HashMap()
-        override fun getLayoutId(viewType: Int): Int {
-            return R.layout.fragment_conversations_list_item
-        }
 
-        override fun createViewHolder(v: View, viewType: Int): CHolder {
-            return CHolder(v)
-        }
+
 
         override fun bindHolder(holder: CHolder, data: Conversation?, position: Int) {
             if (data != null) {
-                ImageUtils.loadAvatarInto(mContext, data.friendAvatar, holder.avatar!!)
-                holder.lastMessage!!.text = data.lastMessage
+                ImageUtils.loadAvatarInto(mContext, data.friendAvatar, holder.binding.avatar)
+                holder.binding.lastMessage.text = data.lastMessage
                 if (TextUtils.isEmpty(data.friendRemark)) {
-                    holder.name!!.text = data.friendNickname
+                    holder.binding.name.text = data.friendNickname
                 } else {
-                    holder.name!!.text = data.friendRemark
+                    holder.binding.name.text = data.friendRemark
                 }
-                val unread = viewModel!!.getUnreadNumber(data)
+                val unread = viewModel.getUnreadNumber(data)
                 unreadMap[data.id] = unread
                 if (unread > 0) {
-                    holder.unread!!.visibility = View.VISIBLE
-                    holder.unread!!.text = unread.toString()
+                    holder.binding.unread.visibility = View.VISIBLE
+                    holder.binding.unread.text = unread.toString()
                 } else {
-                    holder.unread!!.visibility = View.INVISIBLE
+                    holder.binding.unread.visibility = View.INVISIBLE
                 }
-                holder.updatedAt!!.text = TextUtils.getConversationTimeText(mContext, data.updatedAt)
+                holder.binding.updatedAt.text = TextUtils.getConversationTimeText(mContext, data.updatedAt)
                 if (mOnItemClickListener != null) {
-                    holder.item!!.setOnClickListener { view: View? -> mOnItemClickListener!!.onItemClick(data, view, position) }
+                    holder.binding.item.setOnClickListener { view: View? -> mOnItemClickListener!!.onItemClick(data, view, position) }
                 }
             }
         }
@@ -195,7 +186,7 @@ class ConversationsFragment : BaseFragment<ConversationsViewModel>() {
         override fun notifyItemChangedSmooth(newL: List<Conversation>) {
             super.notifyItemChangedSmooth(newL, object : RefreshJudge<Conversation> {
                 override fun judge(oldData: Conversation, newData: Conversation): Boolean {
-                    val newUnread = viewModel!!.getUnreadNumber(newData)
+                    val newUnread = viewModel.getUnreadNumber(newData)
                     val lastUnread = unreadMap[oldData.id]
                     return newData != oldData || lastUnread != newUnread
                 }
@@ -206,30 +197,14 @@ class ConversationsFragment : BaseFragment<ConversationsViewModel>() {
             })
         }
 
-        inner class CHolder(itemView: View) : BaseViewHolder(itemView) {
-            @JvmField
-            @BindView(R.id.name)
-            var name: TextView? = null
+        inner class CHolder(itemView: FragmentConversationsListItemBinding) : BaseViewHolder<FragmentConversationsListItemBinding>(itemView)
 
-            @JvmField
-            @BindView(R.id.last_message)
-            var lastMessage: EmoticonsTextView? = null
+        override fun getViewBinding(parent: ViewGroup, viewType: Int): ViewBinding {
+            return FragmentConversationsListItemBinding.inflate(layoutInflater,parent,false)
+        }
 
-            @JvmField
-            @BindView(R.id.avatar)
-            var avatar: ImageView? = null
-
-            @JvmField
-            @BindView(R.id.updated_at)
-            var updatedAt: TextView? = null
-
-            @JvmField
-            @BindView(R.id.item)
-            var item: ViewGroup? = null
-
-            @JvmField
-            @BindView(R.id.unread)
-            var unread: TextView? = null
+        override fun createViewHolder(viewBinding: ViewBinding, viewType: Int): CHolder {
+            return CHolder(viewBinding as FragmentConversationsListItemBinding)
         }
 
     }
@@ -239,5 +214,9 @@ class ConversationsFragment : BaseFragment<ConversationsViewModel>() {
         fun newInstance(): ConversationsFragment {
             return ConversationsFragment()
         }
+    }
+
+    override fun initViewBinding(): FragmentConversationsBinding {
+        return FragmentConversationsBinding.inflate(layoutInflater)
     }
 }

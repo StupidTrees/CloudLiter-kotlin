@@ -38,6 +38,7 @@ class LocalUserRepository(application: Application) {
             appDatabase.chatMessageDao().clearTable()
             appDatabase.userRelationDao().clearTable()
             appDatabase.conversationDao().clearTable()
+            appDatabase.userProfileDao().clearTable()
         }.start()
     }
 

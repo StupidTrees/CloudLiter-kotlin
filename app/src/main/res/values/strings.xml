@@ -26,7 +26,7 @@
     <string name="blue">蓝</string>
     <string name="purple">紫</string>
 
-    <string name="title_activity_welcome">WelcomeActivity</string>
+    <string name="title_activity_welcome">欢迎</string>
 
     <string name="not_logged_in">未登录</string>
     <string name="please_log_in">请登录</string>
@@ -74,6 +74,7 @@
     <string name="no_contact">没有联系人</string>
     <string name="no_conversation">没有会话</string>
     <string name="date_format_1">yyyy年M月d日</string>
+    <string name="date_format_3">yyyy年M月d日 hh时mm分</string>
     <string name="date_format_2">M月d日</string>
     <string name="date_format_am">上午hh:mm</string>
     <string name="date_format_pm">下午hh:mm</string>
@@ -123,7 +124,7 @@
     <string name="label_hentai">Hentai</string>
     <string name="title_pick_group">设置好友分组</string>
     <string name="assign_group_success">设置分组成功</string>
-    <string name="no_word_cloud_yet">还没有词云哟</string>
+    <string name="no_word_cloud_yet">词云空</string>
     <string name="label_conversation_word_cloud">我们的聊天词云</string>
     <string name="add_group">添加好友分组</string>
     <string name="add_ok">添加分组成功</string>
@@ -135,7 +136,6 @@
     <string name="voice_duration_text">%02d:%02d</string>
     <string name="voice_button_hint_press">按住说话</string>
     <string name="voice_button_hint_pressed">松开结束</string>
-    <string name="nfc_title">一碰即聊</string>
     <string name="scan_qr">扫一扫</string>
     <string name="about_cloud_liter">关于云升</string>
     <string name="discover_friend">发现朋友</string>
@@ -144,4 +144,20 @@
     <string name="hint_from_your_word_cloud">来自你的词云…</string>
     <string name="change_group_name">修改分组名称</string>
     <string name="rename_ok">重命名成功</string>
+    <string name="place_holder_voice">[语音]</string>
+    <string name="read">已读</string>
+    <string name="word_cloud_place_holder">还没有词云呦</string>
+    <string name="label_basic_profile">基本资料</string>
+    <string name="label_privacy_settings">隐私设置</string>
+    <string name="word_cloud_accessibility">词云保密</string>
+    <string name="word_cloud_private">不展示 不被搜索</string>
+    <string name="word_cloud_public">公开 可被搜索</string>
+    <string name="set_success">设置成功</string>
+    <string name="private_word_cloud">私密</string>
+    <string name="label_conversation_met">好友建立日期</string>
+    <string name="label_conversation_last_chat">最近一次聊天是在</string>
+    <string name="label_conversation_since_met">已成为好友</string>
+    <string name="days">天</string>
+    <string name="word_cloud_locked">词云已上锁</string>
+    <string name="click_to_log_in">点击登录</string>
 </resources>

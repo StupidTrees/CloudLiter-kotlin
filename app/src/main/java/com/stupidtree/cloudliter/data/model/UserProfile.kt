@@ -32,6 +32,8 @@ class UserProfile {
     var color //颜色
             : COLOR? = null
 
+    var wordCloudPrivate:Boolean = false//词云私密性
+
     @get:StringRes
     val colorName: Int
         get() = when (color) {
