@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.stupidtree.cloudliter.R
@@ -16,21 +15,17 @@ import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.main.contact.group.ContactGroupFragment
 import com.stupidtree.cloudliter.ui.main.contact.list.ContactListFragment
 import com.stupidtree.cloudliter.utils.ActivityUtils
-import kotlinx.android.synthetic.main.fragment_contact.*
 
 /**
  * 联系人页面的Fragment
  */
 class ContactFragment : BaseFragmentWithReceiver<ContactViewModel,FragmentContactBinding>() {
 
-
-
     /**
      * 广播区
      */
     override var receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Log.e("好友事件", intent.toString())
             viewModel.startFetchUnread()
         }
     }
@@ -72,12 +67,11 @@ class ContactFragment : BaseFragmentWithReceiver<ContactViewModel,FragmentContac
                     ContactGroupFragment.newInstance()
                 }
             }
-
-            override fun getPageTitle(position: Int): CharSequence? {
+            override fun getPageTitle(position: Int): CharSequence {
                 return if (position == 0) getString(R.string.contact_friend_list) else getString(R.string.contact_friend_group)
             }
         }
-        binding?.tabs?.setupWithViewPager(pager)
+        binding?.tabs?.setupWithViewPager(binding?.pager)
     }
 
     override fun onResume() {

@@ -23,8 +23,7 @@ abstract class BaseListAdapter<T, H : RecyclerView.ViewHolder>(
      * 标准三件：数据源列表、Context、Inflater对象
      */
     protected var mBeans: MutableList<T>
-) : RecyclerView.Adapter<H>(),
-    Parcelable {
+) : RecyclerView.Adapter<H>() {
     var mInflater: LayoutInflater = LayoutInflater.from(mContext)
 
     val beans: List<T>
@@ -78,12 +77,6 @@ abstract class BaseListAdapter<T, H : RecyclerView.ViewHolder>(
      */
     val indexBias: Int
         get() = 0
-
-    constructor(parcel: Parcel) : this(
-            TODO("mContext"),
-            TODO("mBeans")) {
-
-    }
 
 
     fun willNotifyNormalChange(): Boolean { //当位置不发生变化时，是否刷新该item
@@ -409,14 +402,6 @@ abstract class BaseListAdapter<T, H : RecyclerView.ViewHolder>(
 
     interface RefreshJudge<T> {
         fun judge(oldData: T, newData: T): Boolean
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-
-    }
-
-    override fun describeContents(): Int {
-        return 0
     }
 
 
