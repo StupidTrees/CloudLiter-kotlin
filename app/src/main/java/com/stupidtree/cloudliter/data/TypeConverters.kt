@@ -2,7 +2,6 @@ package com.stupidtree.cloudliter.data
 
 import androidx.room.TypeConverter
 import com.stupidtree.cloudliter.data.model.UserLocal
-import com.stupidtree.cloudliter.data.model.UserProfile
 import java.sql.Timestamp
 
 /**
@@ -35,13 +34,13 @@ object TypeConverters {
 
     @JvmStatic
     @TypeConverter
-    fun colorToString(date: UserProfile.COLOR): String {
+    fun accessibilityToString(date: UserLocal.ACCESSIBILITY): String {
         return date.name
     }
 
     @JvmStatic
     @TypeConverter
-    fun stringToColor(str:String): UserProfile.COLOR {
-        return UserProfile.COLOR.valueOf(str)
+    fun stringToAccessibility(str:String): UserLocal.ACCESSIBILITY {
+        return UserLocal.ACCESSIBILITY.valueOf(str)
     }
 }

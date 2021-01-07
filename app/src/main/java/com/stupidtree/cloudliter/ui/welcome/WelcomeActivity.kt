@@ -21,8 +21,8 @@ class WelcomeActivity : BaseActivity<WelcomeViewModel,ActivityWelcomeBinding>() 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setWindowParams(statusBar = true, darkColor = true, navi = true)
+        binding.toolbar.title = ""
         setToolbarActionBack(binding.toolbar)
-        binding.collapsing.title = ""
     }
 
     override fun initViews() {

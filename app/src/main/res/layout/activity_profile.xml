@@ -76,37 +76,6 @@
                         android:src="@drawable/ic_male_blue_24"
                         android:visibility="invisible" />
 
-                    <FrameLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="6dp"
-                        android:visibility="gone">
-
-                        <androidx.cardview.widget.CardView
-                            android:id="@+id/icon_color"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_gravity="center"
-                            android:alpha="0.4"
-                            android:visibility="gone"
-                            app:cardBackgroundColor="@color/colorPrimary"
-                            app:cardCornerRadius="10dp"
-                            app:cardElevation="0dp">
-
-                        </androidx.cardview.widget.CardView>
-
-                        <androidx.cardview.widget.CardView
-                            android:id="@+id/icon_color_inner"
-                            android:layout_width="12dp"
-                            android:layout_height="12dp"
-                            android:layout_gravity="center"
-                            android:visibility="gone"
-                            app:cardBackgroundColor="@color/colorPrimary"
-                            app:cardCornerRadius="6dp"
-                            app:cardElevation="0dp" />
-
-                    </FrameLayout>
                 </LinearLayout>
 
                 <TextView

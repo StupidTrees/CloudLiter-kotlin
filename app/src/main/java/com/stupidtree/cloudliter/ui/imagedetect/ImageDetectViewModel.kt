@@ -1,9 +1,8 @@
-package com.stupidtree.cloudliter.ui.image
+package com.stupidtree.cloudliter.ui.imagedetect
 
 import android.app.Application
 import android.graphics.Bitmap
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.model.ChatMessage
@@ -19,7 +18,7 @@ class ImageDetectViewModel(application: Application) : AndroidViewModel(applicat
 
     var imageUrl = MutableLiveData<String>()
     var imageLiveData = MutableLiveData<Bitmap>()
-    var chatMessageLiveData = MutableLiveData<ChatMessage>()
+    var chatMessageLiveData = MutableLiveData<ChatMessage?>()
     var detectionResult = Transformations.switchMap(imageLiveData){
         return@switchMap detectionRepository.detectImage(it)
     }

@@ -16,6 +16,10 @@ class UserLocal : Serializable {
         MALE, FEMALE
     }
 
+    enum class ACCESSIBILITY {
+        NO, YES_PUBLIC,YES_PRIVATE
+    }
+
     var username //用户名
             : String? = null
     var id //用户id
@@ -26,11 +30,13 @@ class UserLocal : Serializable {
             : String? = null
     var token //保存用户登陆状态的token（重要）
             : String? = null
-    get
+        get
     var gender //用户性别
             : GENDER? = null
     var avatar //用户头像链接
             : String? = null
+
+    var accessibility: ACCESSIBILITY = ACCESSIBILITY.NO
 
     val isValid: Boolean
         get() {
@@ -41,7 +47,9 @@ class UserLocal : Serializable {
     fun setGender(gender: String?) {
         this.gender = if (gender == "MALE") GENDER.MALE else GENDER.FEMALE
     }
-
+    fun setAccessibility(accessibility: String?) {
+        accessibility?.let { this.accessibility = ACCESSIBILITY.valueOf(it) }
+    }
     override fun toString(): String {
         return Gson().toJson(this)
     }
@@ -65,6 +73,7 @@ class UserLocal : Serializable {
                 val signature = JsonUtils.getStringData(info, "signature")
                 val gender = JsonUtils.getStringData(info, "gender")
                 val avatar = JsonUtils.getStringData(info, "avatar")
+                val accessibility = JsonUtils.getStringData(info, "accessibility")
                 userLocal.username = username
                 userLocal.nickname = nickname
                 userLocal.signature = signature
@@ -72,6 +81,7 @@ class UserLocal : Serializable {
                 userLocal.avatar = avatar
                 userLocal.token = token
                 userLocal.id = id
+                accessibility?.let { userLocal.accessibility = ACCESSIBILITY.valueOf(it) }
                 return userLocal
             }
             return userLocal

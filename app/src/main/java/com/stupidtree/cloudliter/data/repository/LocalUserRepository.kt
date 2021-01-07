@@ -65,11 +65,18 @@ class LocalUserRepository(application: Application) {
      * 更改本地缓存的用户性别
      * @param gender 性别/MALE/FEMALE
      */
-    fun ChangeLocalGender(gender: String?) {
+    fun changeLocalGender(gender: String?) {
         mePreferenceSource.saveGender(gender)
         loggedInUser = mePreferenceSource.localUser
     }
 
+    /**
+     * 更改本地缓存的用户无障碍类别
+     */
+    fun changeLocalAccessibility(acc: String?) {
+        mePreferenceSource.saveAccessibility(acc)
+        loggedInUser = mePreferenceSource.localUser
+    }
     /**
      * 更改本地缓存的签名
      * @param signature 新签名

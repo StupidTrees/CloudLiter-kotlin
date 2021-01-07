@@ -35,6 +35,7 @@ class UserPreferenceSource(private val context: Context) {
                 .putString("username", user.username)
                 .putString("nickname", user.nickname)
                 .putString("gender", user.gender.toString())
+                .putString("accessibility",user.accessibility.toString())
                 .putString("signature", user.signature) //获取签名
                 .putString("token", user.token)
                 .putString("avatar", user.avatar)
@@ -65,7 +66,11 @@ class UserPreferenceSource(private val context: Context) {
                 .putString("signature", signature)
                 .apply()
     }
-
+    fun saveAccessibility(accessibility: String?) {
+        preference!!.edit()
+                .putString("accessibility",accessibility)
+                .apply()
+    }
     fun clearLocalUser() {
         val preferences = context.getSharedPreferences(SP_NAME_LOCAL_USER, Context.MODE_PRIVATE)
         preferences.edit().clear().apply()
@@ -84,12 +89,13 @@ class UserPreferenceSource(private val context: Context) {
             result.signature = preferences.getString("signature", null)
             result.token = preferences.getString("token", null)
             result.setGender(preferences.getString("gender", "MALE"))
+            result.setAccessibility(preferences.getString("accessibility", "NO"))
             result.avatar = preferences.getString("avatar", null)
             // Log.e("get_local_user", String.valueOf(result));
             return result
         }
 
-    fun changeMyAvatarGlideSignature() {
+    private fun changeMyAvatarGlideSignature() {
         preference!!.edit().putString("my_avatar", UUID.randomUUID().toString()).apply()
     }
 

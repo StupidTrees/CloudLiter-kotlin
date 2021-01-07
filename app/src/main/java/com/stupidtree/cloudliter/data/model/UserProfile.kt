@@ -1,5 +1,6 @@
 package com.stupidtree.cloudliter.data.model
 
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -12,9 +13,6 @@ import com.stupidtree.cloudliter.data.model.UserLocal.GENDER
  */
 @Entity(tableName = "profile")
 class UserProfile {
-    enum class COLOR {
-        RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, PURPLE
-    }
 
     @PrimaryKey
     var id //用户id
@@ -29,32 +27,23 @@ class UserProfile {
             : String? = null
     var avatar //头像
             : String? = null
-    var color //颜色
-            : COLOR? = null
+    var accessibility //颜色
+            : UserLocal.ACCESSIBILITY = UserLocal.ACCESSIBILITY.NO
 
     var wordCloudPrivate:Boolean = false//词云私密性
 
-    @get:StringRes
-    val colorName: Int
-        get() = when (color) {
-            COLOR.RED -> R.string.red
-            COLOR.ORANGE -> R.string.orange
-            COLOR.YELLOW -> R.string.yellow
-            COLOR.GREEN -> R.string.green
-            COLOR.CYAN -> R.string.cyan
-            COLOR.PURPLE -> R.string.purple
-            else -> R.string.blue
-        }
 
-    override fun toString(): String {
-        return "UserProfile{" +
-                "id='" + id + '\'' +
-                ", username='" + username + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", gender=" + gender +
-                ", signature='" + signature + '\'' +
-                ", avatar='" + avatar + '\'' +
-                ", color=" + color +
-                '}'
+    fun getAccessibilityName():Int{
+        return when (accessibility) {
+            UserLocal.ACCESSIBILITY.NO -> {
+                R.string.accessibility_off
+            }
+            UserLocal.ACCESSIBILITY.YES_PUBLIC -> {
+                R.string.accessibility_on_public
+            }
+            else -> {
+                R.string.accessibility_on_private
+            }
+        }
     }
 }

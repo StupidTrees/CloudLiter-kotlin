@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.model.Conversation
+import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.data.model.Yunmoji
 import com.stupidtree.cloudliter.databinding.ActivityChatBinding
 import com.stupidtree.cloudliter.ui.base.BaseActivity
@@ -27,6 +28,7 @@ import com.stupidtree.cloudliter.ui.base.BaseListAdapterClassic
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpImageMessageDetail
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpTextMessageDetail
+import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectBottomFragment
 import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
 import com.stupidtree.cloudliter.utils.*
 import java.util.*
@@ -35,7 +37,7 @@ import java.util.*
  * 对话窗口
  */
 @SuppressLint("NonConstantResourceId")
-class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
+class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
 
     //输入状态：语音或文字
     private var textInput: Boolean = true
@@ -89,7 +91,7 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
     //启动时，绑定服务
     override fun onStart() {
         super.onStart()
-        Log.e("ChatActivity","bindService")
+        Log.e("ChatActivity", "bindService")
         viewModel.bindService(this)
         refreshInputLayout()
     }
@@ -99,7 +101,6 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
         super.onNewIntent(intent)
         if (intent.extras != null && intent.extras!!.getSerializable("conversation") != null) {
             val conversation = intent.extras!!.getSerializable("conversation") as Conversation?
-            Log.e("变更Intent", conversation.toString())
             if (conversation != null) {
                 if (viewModel.conversationId != conversation.id) {
                     viewModel.setConversation(conversation)
@@ -284,9 +285,9 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
     }
 
     override fun onBackPressed() {
-        if(bottomPanelState!=PANEL.COLLAPSE){
+        if (bottomPanelState != PANEL.COLLAPSE) {
             collapseBottomPanel(collapseKeyboard = true, animate = true)
-        }else{
+        } else {
             super.onBackPressed()
         }
     }
@@ -294,7 +295,7 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
     //设置toolbar
     private fun setUpToolbar() {
         binding.back.setOnClickListener { onBackPressed() }
-        binding.menu.setOnClickListener { ActivityUtils.startConversationActivity(getThis(), viewModel!!.friendId!!) }
+        binding.menu.setOnClickListener { ActivityUtils.startConversationActivity(getThis(), viewModel.friendId!!) }
     }
 
     //初始化聊天列表
@@ -318,9 +319,9 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
                     PopUpTextMessageDetail().setChatMessage(data)
                             .show(supportFragmentManager, "detail")
                 } else if (data.getType() == ChatMessage.TYPE.IMG && !data.isTimeStamp) {
-                    data.content?.let { ActivityUtils.startImageDetectionActivity(getThis(), it,data) }
-//                    PopUpImageMessageDetail().setChatMessage(data)
-//                            .show(supportFragmentManager, "detail")
+                    data.content?.let {
+                        ActivityUtils.startImageDetectionActivity(getThis(), ImageUtils.getChatMessageImageUrl(it), data)
+                    }
                 }
                 return true
             }
@@ -366,7 +367,7 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
         }
         binding.emotion.setOnClickListener {
             if (bottomPanelState == PANEL.EMOTION) {
-                collapseBottomPanel(true, true)
+                collapseBottomPanel(collapseKeyboard = true, animate = true)
             } else {
                 expandBottomPanel(PANEL.EMOTION)
             }
@@ -408,11 +409,6 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
             }
             false
         }
-//        binding.input.setOnClickListener {
-//            lockContentHeight()
-//            collapseBottomPanel()
-//            unlockContentHeight()
-//        }
     }
 
 
@@ -421,9 +417,8 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
         val ymList = ArrayList<Yunmoji>()
         val desc = resources.getStringArray(R.array.yunmoji_descriptions)
         for (i in 1..20) {
-            val item = Yunmoji(resources.getIdentifier(String.format(Locale.getDefault(), "yunmoji_y%03d", i), "drawable", packageName)
-            ,desc[i-1])
-           ymList.add(item)
+            val item = Yunmoji(resources.getIdentifier(String.format(Locale.getDefault(), "yunmoji_y%03d", i), "drawable", packageName), desc[i - 1])
+            ymList.add(item)
         }
 
         binding.yunmojiList.layoutManager = GridLayoutManager(this, 6)
@@ -446,7 +441,12 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
         if (TextUtils.isEmpty(conversation.friendRemark)) {
             binding.title.text = conversation.friendNickname
         } else {
-           binding.title.text = conversation.friendRemark
+            binding.title.text = conversation.friendRemark
+        }
+        if (conversation.friendAccessibility == UserLocal.ACCESSIBILITY.NO) {
+            binding.accessibilityIcon.visibility = View.GONE
+        } else {
+            binding.accessibilityIcon.visibility = View.VISIBLE
         }
     }
 
@@ -587,7 +587,7 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
 
     //释放被锁定内容高度
     private fun unlockContentHeight() {
-       binding.refresh
+        binding.refresh
         binding.input.postDelayed({ (binding.refresh.layoutParams as LinearLayout.LayoutParams).weight = 1.0f }, 280L)
     }
 
@@ -631,7 +631,24 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
                 return
             }
             val filePath = FileProviderUtils.getFilePathByUri(getThis(), uri)
-            filePath?.let { viewModel.sendImageMessage(it) }
+            filePath?.let {
+                viewModel.conversation.value?.let { conversation ->
+                    if (conversation.friendAccessibility == UserLocal.ACCESSIBILITY.NO) {
+                        viewModel.sendImageMessage(it)
+                    } else {
+                        ImageDetectBottomFragment().setMessage(null)
+                                .setTitle(getString(R.string.hint_accessibility_sure_to_send_title))
+                                .setSubtitle(getString(R.string.hint_accessibility_sure_to_send_subtitle))
+                                .setUrl(filePath)
+                                .setOnConfirmListener(object : ImageDetectBottomFragment.OnConfirmListener {
+                                    override fun onConfirm(url: String) {
+                                        viewModel.sendImageMessage(it)
+                                    }
+                                })
+                                .show(supportFragmentManager, "xx")
+                    }
+                }
+            }
         }
     }
 

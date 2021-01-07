@@ -66,6 +66,7 @@ class ConversationActivity : BaseActivity<ConversationViewModel,ActivityConversa
         intent.getStringExtra("friendId")?.let { viewModel.startRefresh(it) }
         binding.refresh.isRefreshing = true
     }
+
     override fun onResume() {
         super.onResume()
         startRefresh()

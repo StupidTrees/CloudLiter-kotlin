@@ -220,11 +220,11 @@ class UserWebSource : BaseWebSource<UserService>(Retrofit.Builder()
     /**
      * 更换颜色
      * @param token 令牌
-     * @param color 颜色
+     * @param accessibility 用户类型
      * @return 操作结果
      */
-    fun changeColor(token: String, color: String): LiveData<DataState<String?>> {
-        return Transformations.map<ApiResponse<Any?>, DataState<String?>>(service.changeColor(color, token)) { input: ApiResponse<Any?>? ->
+    fun changeAccessibility(token: String, accessibility: String): LiveData<DataState<String?>> {
+        return Transformations.map<ApiResponse<Any?>, DataState<String?>>(service.changeAccessibility(accessibility, token)) { input: ApiResponse<Any?>? ->
             if (input != null) {
                 when (input.code) {
                     SUCCESS -> return@map DataState<String?>(DataState.STATE.SUCCESS)

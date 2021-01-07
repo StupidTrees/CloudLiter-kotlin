@@ -273,15 +273,11 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
             binding.textUsername.text = userInfo.username
             binding.textNickname.text = userInfo.nickname
             binding.iconGender.visibility = View.VISIBLE
-            binding.iconColor.visibility = View.VISIBLE
-            binding.iconColorInner.visibility = View.VISIBLE
             if (TextUtils.isEmpty(userInfo.signature)) {
                 binding.textSignature.setText(R.string.place_holder_no_signature)
             } else {
                 binding.textSignature.text = userInfo.signature
             }
-            binding.iconColor.setCardBackgroundColor(ColorUtils.getColorByEnum(getThis(), userInfo.color))
-            binding.iconColorInner.setCardBackgroundColor(ColorUtils.getColorByEnum(getThis(), userInfo.color))
             if (userInfo.gender == UserLocal.GENDER.MALE) {
                 binding.iconGender.setImageResource(R.drawable.ic_male_blue_24)
             } else {

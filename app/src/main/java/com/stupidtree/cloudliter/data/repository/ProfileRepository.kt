@@ -100,23 +100,19 @@ class ProfileRepository(application: Application) {
     fun changeGender(token: String, gender: String): LiveData<DataState<String?>> {
         return Transformations.map(userWebSource.changeGender(token, gender)) { input: DataState<String?> ->
             if (input.state === DataState.STATE.SUCCESS) {
-                localUserRepository.ChangeLocalGender(gender)
+                localUserRepository.changeLocalGender(gender)
             }
             input
         }
     }
 
     /**
-     * 更改用户性别
-     *
-     * @param token 令牌
-     * @param color 新颜色 赤橙黄绿青蓝紫
-     * @return 操作结果
+     * 更改用户无障碍类别
      */
-    fun changeColor(token: String, color: String): LiveData<DataState<String?>> {
-        return Transformations.map(userWebSource.changeColor(token, color)) { input: DataState<String?> ->
+    fun changeUserAccessibility(token: String, accessibility: String): LiveData<DataState<String?>> {
+        return Transformations.map(userWebSource.changeAccessibility(token,accessibility)) { input: DataState<String?> ->
             if (input.state === DataState.STATE.SUCCESS) {
-                //？？？？？？？？？？？？？？
+                localUserRepository.changeLocalAccessibility(accessibility)
             }
             input
         }

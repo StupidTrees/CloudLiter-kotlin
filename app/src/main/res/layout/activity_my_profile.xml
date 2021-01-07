@@ -79,6 +79,38 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/accessibility_layout"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:text="@string/accessibility_type"
+                    android:textColor="?attr/textColorPrimary"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/color"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textColor="?attr/textColorSecondary"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/avatar_layout"
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
@@ -131,67 +163,6 @@
 
                 <TextView
                     android:id="@+id/gender"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:textColor="?attr/textColorSecondary"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/color_layout"
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:clickable="true"
-                android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="8dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:text="@string/color"
-                    android:textColor="?attr/textColorPrimary"
-                    android:textSize="18sp" />
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_marginEnd="8dp">
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/icon_color"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="center"
-                        android:alpha="0.4"
-                        app:cardBackgroundColor="@color/colorPrimary"
-                        app:cardCornerRadius="10dp"
-                        app:cardElevation="0dp">
-
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/icon_color_inner"
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:layout_gravity="center"
-                        app:cardBackgroundColor="@color/colorPrimary"
-                        app:cardCornerRadius="6dp"
-                        app:cardElevation="0dp" />
-
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/color"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"

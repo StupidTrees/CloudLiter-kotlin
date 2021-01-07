@@ -22,6 +22,7 @@ class Conversation : Serializable {
     var friendNickname: String? = null
     var friendAvatar: String? = null
     var friendRemark: String? = null
+    var friendAccessibility:UserLocal.ACCESSIBILITY = UserLocal.ACCESSIBILITY.NO
     var relationId: String? = null
     var createdAt: Timestamp? = null
     var updatedAt: Timestamp? = null
@@ -38,28 +39,14 @@ class Conversation : Serializable {
                 friendAvatar == that.friendAvatar &&
                 relationId == that.relationId &&
                 createdAt == that.createdAt &&
-                updatedAt == that.updatedAt
+                updatedAt == that.updatedAt&&
+                friendAccessibility  == that.friendAccessibility
     }
 
     override fun hashCode(): Int {
         return Objects.hash(id, historyId, lastMessage, friendId, groupId, friendNickname, friendAvatar, relationId, createdAt, updatedAt)
     }
 
-    override fun toString(): String {
-        return "Conversation{" +
-                "id='" + id + '\'' +
-                ", historyId='" + historyId + '\'' +
-                ", lastMessage='" + lastMessage + '\'' +
-                ", friendId='" + friendId + '\'' +
-                ", groupId='" + groupId + '\'' +
-                ", friendNickname='" + friendNickname + '\'' +
-                ", friendAvatar='" + friendAvatar + '\'' +
-                ", friendRemark='" + friendRemark + '\'' +
-                ", relationId='" + relationId + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}'
-    }
 
     companion object {
         @JvmStatic
@@ -70,6 +57,7 @@ class Conversation : Serializable {
             conversation.friendRemark = message.friendRemark
             conversation.id = message.conversationId!!
             conversation.relationId = message.relationId
+            conversation.friendAccessibility = message.friendAccessibility
             return conversation
         }
 
@@ -82,8 +70,7 @@ class Conversation : Serializable {
             conversation.friendNickname = friendProfile.nickname
             conversation.id = TextUtils.getP2PIdOrdered(friendProfile.id.toString(), userLocal.id.toString())
             conversation.relationId = userRelation.friendId
-            Log.e("conver_FPF", friendProfile.toString())
-            Log.e("conver_UR", userRelation.toString())
+            conversation.friendAccessibility = friendProfile.accessibility
             return conversation
         }
     }

@@ -5,15 +5,18 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import com.stupidtree.cloudliter.R
+import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.data.model.UserLocal.GENDER
 import com.stupidtree.cloudliter.data.model.UserProfile
-import com.stupidtree.cloudliter.data.model.UserProfile.COLOR
 import com.stupidtree.cloudliter.databinding.ActivityMyProfileBinding
 import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.widgets.PopUpEditText
 import com.stupidtree.cloudliter.ui.widgets.PopUpSelectableList
-import com.stupidtree.cloudliter.utils.*
+import com.stupidtree.cloudliter.utils.FileProviderUtils
+import com.stupidtree.cloudliter.utils.GalleryPicker
+import com.stupidtree.cloudliter.utils.ImageUtils
+import com.stupidtree.cloudliter.utils.TextUtils
 
 /**
  * ”我的个人资料“ Activity
@@ -81,7 +84,7 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
                 Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel.changeColorResult?.observe(this, { stringDataState: DataState<String?> ->
+        viewModel.changeAccessibilityResult?.observe(this, { stringDataState: DataState<String?> ->
             if (stringDataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show()
                 viewModel.startRefresh()
@@ -134,31 +137,23 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
         }
 
         //点击更改颜色，弹出选择框
-        binding.colorLayout.setOnClickListener {
+        binding.accessibilityLayout.setOnClickListener {
             val up = viewModel.userProfileLiveData?.value
             if (up != null && up.state === DataState.STATE.SUCCESS) {
-                PopUpSelectableList<COLOR>()
+                PopUpSelectableList<UserLocal.ACCESSIBILITY>()
                         .setTitle(R.string.choose_color)
-                        .setInitValue(up.data!!.color)
+                        .setInitValue(up.data!!.accessibility)
                         .setListData(
-                                listOf(getString(R.string.red),
-                                        getString(R.string.orange),
-                                        getString(R.string.yellow),
-                                        getString(R.string.green),
-                                        getString(R.string.cyan),
-                                        getString(R.string.blue),
-                                        getString(R.string.purple)),
-                                listOf(COLOR.RED,
-                                        COLOR.ORANGE,
-                                        COLOR.YELLOW,
-                                        COLOR.GREEN,
-                                        COLOR.CYAN,
-                                        COLOR.BLUE,
-                                        COLOR.PURPLE)
-                        ).setOnConfirmListener(object : PopUpSelectableList.OnConfirmListener<COLOR> {
+                                listOf(getString(R.string.accessibility_off),
+                                        getString(R.string.accessibility_on_public),
+                                        getString(R.string.accessibility_on_private)),
+                                listOf(UserLocal.ACCESSIBILITY.NO,
+                                UserLocal.ACCESSIBILITY.YES_PUBLIC,
+                                UserLocal.ACCESSIBILITY.YES_PRIVATE)
+                        ).setOnConfirmListener(object : PopUpSelectableList.OnConfirmListener<UserLocal.ACCESSIBILITY> {
 
-                            override fun onConfirm(title: String?, key: COLOR) {
-                                viewModel.startChangeColor(key)
+                            override fun onConfirm(title: String?, key: UserLocal.ACCESSIBILITY) {
+                                viewModel.startChangeAccessibility(key)
                             }
                         }).show(supportFragmentManager, "select")
             }
@@ -210,11 +205,9 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
         //设置头像
         ImageUtils.loadLocalAvatarInto(getThis(), profile!!.avatar, binding.avatar)
         //设置各种文本信息
-        binding.color.setText(profile.colorName)
+        binding.color.setText(profile.getAccessibilityName())
         binding.nickname.text = profile.nickname
         binding.wordcloudAccessibility.setText(if (profile.wordCloudPrivate) R.string.word_cloud_private else R.string.word_cloud_public)
-        binding.iconColor.setCardBackgroundColor(ColorUtils.getColorByEnum(getThis(), profile.color))
-        binding.iconColorInner.setCardBackgroundColor(ColorUtils.getColorByEnum(getThis(), profile.color))
         if (!TextUtils.isEmpty(profile.signature)) {
             binding.signature.text = profile.signature
         } else {

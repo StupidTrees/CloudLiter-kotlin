@@ -2,9 +2,9 @@ package com.stupidtree.cloudliter.ui.myprofile
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.data.model.UserLocal.GENDER
 import com.stupidtree.cloudliter.data.model.UserProfile
-import com.stupidtree.cloudliter.data.model.UserProfile.COLOR
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository.Companion.instance
@@ -115,14 +115,14 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
     var changeGenderController = MutableLiveData<StringTrigger>()
 
     //状态数据：更改颜色结果
-    var changeColorResult: LiveData<DataState<String?>>? = null
+    var changeAccessibilityResult: LiveData<DataState<String?>>? = null
         get() {
             if (field == null) {
-                changeColorResult = Transformations.switchMap(changeColorController) { input: StringTrigger ->
+                changeAccessibilityResult = Transformations.switchMap(changeAccessibilityController) { input: StringTrigger ->
                     if (input.isActioning) {
                         val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
-                            return@switchMap profileRepository!!.changeColor(userLocal.token!!, input.data)
+                            return@switchMap profileRepository!!.changeUserAccessibility(userLocal.token!!, input.data)
                         } else {
                             return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -134,7 +134,7 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
         }
 
     //Trigger：控制更改颜色请求的发送，其中携带了新颜色的字符串
-    var changeColorController = MutableLiveData<StringTrigger>()
+    var changeAccessibilityController = MutableLiveData<StringTrigger>()
 
     //状态数据：更改签名的结果
     var changeSignatureResult: LiveData<DataState<String?>>? = null
@@ -220,12 +220,12 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     /**
-     * 发起更换颜色请求
-     * @param color 新颜色
+     * 发起更换无障碍用户类型请求
+     * @param Accessibility 无障碍类型
      */
-    fun startChangeColor(color: COLOR) {
-        val colorStr = color.name
-        changeColorController.value = StringTrigger.getActioning(colorStr)
+    fun startChangeAccessibility(Accessibility: UserLocal.ACCESSIBILITY) {
+        val AccessibilityStr = Accessibility.name
+        changeAccessibilityController.value = StringTrigger.getActioning(AccessibilityStr)
     }
 
     /**

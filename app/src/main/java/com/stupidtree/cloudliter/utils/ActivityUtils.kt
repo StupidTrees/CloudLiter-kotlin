@@ -3,7 +3,6 @@ package com.stupidtree.cloudliter.utils
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.nfc.NdefRecord
 import android.os.Bundle
 import com.stupidtree.cloudliter.data.model.*
 import com.stupidtree.cloudliter.data.model.Conversation.Companion.fromNewMessage
@@ -11,7 +10,7 @@ import com.stupidtree.cloudliter.data.model.Conversation.Companion.fromUserRelat
 import com.stupidtree.cloudliter.ui.chat.ChatActivity
 import com.stupidtree.cloudliter.ui.conversation.ConversationActivity
 import com.stupidtree.cloudliter.ui.group.GroupEditorActivity
-import com.stupidtree.cloudliter.ui.image.ImageDetectActivity
+import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectActivity
 import com.stupidtree.cloudliter.ui.main.MainActivity
 import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
 import com.stupidtree.cloudliter.ui.profile.ProfileActivity

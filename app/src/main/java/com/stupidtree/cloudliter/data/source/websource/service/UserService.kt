@@ -107,8 +107,8 @@ interface UserService {
      * @return 操作结果
      */
     @FormUrlEncoded
-    @POST("/user/profile/change_color")
-    fun changeColor(@Field("color") color: String?, @Header("token") token: String?): LiveData<ApiResponse<Any?>?>
+    @POST("/user/profile/change_accessibility")
+    fun changeAccessibility(@Field("accessibility") accessibility: String?, @Header("token") token: String?): LiveData<ApiResponse<Any?>?>
 
     /**
      * 更换签名

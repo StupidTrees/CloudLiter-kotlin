@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.Conversation
+import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.databinding.FragmentConversationsBinding
 import com.stupidtree.cloudliter.databinding.FragmentConversationsListItemBinding
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService.Companion.ACTION_RELATION_EVENT
@@ -175,6 +176,11 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel,Fr
                     holder.binding.unread.text = unread.toString()
                 } else {
                     holder.binding.unread.visibility = View.INVISIBLE
+                }
+                if(data.friendAccessibility==UserLocal.ACCESSIBILITY.NO){
+                    holder.binding.accessibilityIcon.visibility = View.GONE
+                }else{
+                    holder.binding.accessibilityIcon.visibility = View.VISIBLE
                 }
                 holder.binding.updatedAt.text = TextUtils.getConversationTimeText(mContext, data.updatedAt)
                 if (mOnItemClickListener != null) {

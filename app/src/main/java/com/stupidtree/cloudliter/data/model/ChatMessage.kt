@@ -32,6 +32,7 @@ class ChatMessage : Serializable {
 
     @Ignore
     var friendRemark: String? = null
+    var friendAccessibility: UserLocal.ACCESSIBILITY = UserLocal.ACCESSIBILITY.NO
 
     @Ignore
     var friendAvatar: String? = null

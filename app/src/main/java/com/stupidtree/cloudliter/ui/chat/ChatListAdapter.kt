@@ -69,7 +69,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
     override fun bindHolder(holder: CHolder, data: ChatMessage?, position: Int) {
         if (data != null) {
             if (holder.read != null) {
-                holder.read!!.visibility = if (data.read && !data.sensitive) View.VISIBLE else View.GONE
+                holder.read?.visibility = if (data.read && !data.sensitive) View.VISIBLE else View.GONE
             }
             if (holder.viewType == TYPE_TIME) {
                 bindTimestamp(holder, data)
@@ -80,21 +80,21 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                 } else {
                     chatActivity.viewModel.friendAvatar?.let { ImageUtils.loadAvatarInto(chatActivity, it, holder.avatar!!) }
                 }
-                holder.avatar!!.setOnClickListener { view: View? -> data.fromId?.let { ActivityUtils.startProfileActivity(chatActivity, it) } }
+                holder.avatar?.setOnClickListener { view: View? -> data.fromId?.let { ActivityUtils.startProfileActivity(chatActivity, it) } }
                 if (holder.progress != null) {
                     if (data.isProgressing) {
-                        holder.progress!!.visibility = View.VISIBLE
+                        holder.progress?.visibility = View.VISIBLE
                     } else {
-                        holder.progress!!.visibility = View.GONE
+                        holder.progress?.visibility = View.GONE
                     }
                 }
                 //图片消息
                 if (data.getType() == ChatMessage.TYPE.IMG) {
                     if (holder.progress != null) {
-                        if (holder.progress!!.visibility != View.VISIBLE) {
+                        if (holder.progress?.visibility != View.VISIBLE) {
                             data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
                         } else {
-                            holder.image!!.setImageResource(R.drawable.place_holder_loading)
+                            holder.image?.setImageResource(R.drawable.place_holder_loading)
                         }
                     } else {
                         data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
@@ -347,13 +347,13 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         //隐藏加载圈圈
         fun hideProgress() {
             if (progress != null) {
-                progress!!.visibility = View.GONE
+                progress?.visibility = View.GONE
             }
         }
 
         fun showRead() {
             if (read != null) {
-                read!!.visibility = View.VISIBLE
+                read?.visibility = View.VISIBLE
             }
         }
 
@@ -362,18 +362,18 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             sensitiveExpanded = !sensitiveExpanded
             if (see == null) return
             if (sensitiveExpanded) {
-                content!!.text = data.content
-                see!!.setImageResource(R.drawable.ic_baseline_visibility_off_24)
+                content?.text = data.content
+                see?.setImageResource(R.drawable.ic_baseline_visibility_off_24)
                 if (data.getType() == ChatMessage.TYPE.IMG && image != null && imageSensitivePlaceHolder != null) {
-                    image!!.visibility = View.VISIBLE
-                    imageSensitivePlaceHolder!!.visibility = View.GONE
+                    image?.visibility = View.VISIBLE
+                    imageSensitivePlaceHolder?.visibility = View.GONE
                 }
             } else if (data.sensitive) {
-                see!!.setImageResource(R.drawable.ic_baseline_visibility_24)
-                content!!.setText(R.string.hint_sensitive_message)
+                see?.setImageResource(R.drawable.ic_baseline_visibility_24)
+                content?.setText(R.string.hint_sensitive_message)
                 if (data.getType() == ChatMessage.TYPE.IMG && image != null && imageSensitivePlaceHolder != null) {
-                    image!!.visibility = View.INVISIBLE
-                    imageSensitivePlaceHolder!!.visibility = View.VISIBLE
+                    image?.visibility = View.INVISIBLE
+                    imageSensitivePlaceHolder?.visibility = View.VISIBLE
                 }
             }
         }
@@ -383,29 +383,29 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             sensitiveExpanded = false
             if (data.getType() == ChatMessage.TYPE.IMG) {
                 if (data.sensitive) {
-                    see!!.visibility = View.VISIBLE
-                    read!!.visibility = View.GONE
-                    see!!.setOnClickListener { view: View? -> switchSensitiveModeText(data) }
-                    image!!.visibility = View.INVISIBLE
-                    imageSensitivePlaceHolder!!.visibility = View.VISIBLE
-                    content!!.setText(R.string.hint_sensitive_message)
+                    see?.visibility = View.VISIBLE
+                    read?.visibility = View.GONE
+                    see?.setOnClickListener { switchSensitiveModeText(data) }
+                    image?.visibility = View.INVISIBLE
+                    imageSensitivePlaceHolder?.visibility = View.VISIBLE
+                    content?.setText(R.string.hint_sensitive_message)
                 } else {
-                    imageSensitivePlaceHolder!!.visibility = View.GONE
-                    image!!.visibility = View.VISIBLE
-                    see!!.visibility = View.GONE
+                    imageSensitivePlaceHolder?.visibility = View.GONE
+                    image?.visibility = View.VISIBLE
+                    see?.visibility = View.GONE
                 }
             } else if (data.getType() == ChatMessage.TYPE.TXT) {
                 if (data.sensitive) {
                     read?.let{it.visibility = View.GONE}
-                    see!!.visibility = View.VISIBLE
-                    emotion!!.visibility = View.GONE
-                    see!!.setImageResource(R.drawable.ic_baseline_visibility_24)
-                    see!!.setOnClickListener { view: View? -> switchSensitiveModeText(data) }
-                    content!!.setText(R.string.hint_sensitive_message)
+                    see?.visibility = View.VISIBLE
+                    emotion?.visibility = View.GONE
+                    see?.setImageResource(R.drawable.ic_baseline_visibility_24)
+                    see?.setOnClickListener { view: View? -> switchSensitiveModeText(data) }
+                    content?.setText(R.string.hint_sensitive_message)
                 } else {
-                    see!!.visibility = View.GONE
-                    content!!.text = data.content
-                    emotion!!.visibility = View.VISIBLE
+                    see?.visibility = View.GONE
+                    content?.text = data.content
+                    emotion?.visibility = View.VISIBLE
                     val emotionValue = data.emotion
                     var iconRes = R.drawable.ic_emotion_normal
                     when {
@@ -428,11 +428,11 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                             iconRes = R.drawable.ic_emotion_neg_1
                         }
                     }
-                    emotion!!.setImageResource(iconRes)
+                    emotion?.setImageResource(iconRes)
                 }
             } else {
                 data.extra?.let {
-                    content!!.text = TextUtils.getVoiceTimeText(mContext, Integer.parseInt(it.replace("\"", "")))
+                    content?.text = TextUtils.getVoiceTimeText(mContext, Integer.parseInt(it.replace("\"", "")))
                 }
             }
         }
@@ -441,13 +441,13 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             if (image != null) {
                 when (data.playing) {
                     ChatMessage.VOICE_STATE.STOPPED -> {
-                        image!!.setImageResource(R.drawable.ic_voice_wave)
+                        image?.setImageResource(R.drawable.ic_voice_wave)
                     }
                     ChatMessage.VOICE_STATE.PAUSED -> {
-                        image!!.setImageResource(R.drawable.ic_baseline_play_circle_outline_24)
+                        image?.setImageResource(R.drawable.ic_baseline_play_circle_outline_24)
                     }
                     else -> {
-                        image!!.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24)
+                        image?.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24)
                     }
                 }
             }
@@ -457,10 +457,10 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         //绑定点击事件
         fun bindClickAction(data: ChatMessage, position: Int) {
             if (mOnItemLongClickListener != null && bubble != null) {
-                bubble!!.setOnLongClickListener { view: View? -> mOnItemLongClickListener!!.onItemLongClick(data, view, position) }
+                bubble?.setOnLongClickListener { view: View? -> mOnItemLongClickListener?.onItemLongClick(data, view, position)!!}
             }
             if (mOnItemClickListener != null && bubble != null) {
-                bubble!!.setOnClickListener { view: View? -> mOnItemClickListener!!.onItemClick(data, view, position) }
+                bubble?.setOnClickListener { view: View? -> mOnItemClickListener?.onItemClick(data, view, position) }
             }
         }
 

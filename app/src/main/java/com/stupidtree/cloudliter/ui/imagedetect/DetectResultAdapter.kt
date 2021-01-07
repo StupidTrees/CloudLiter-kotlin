@@ -1,4 +1,4 @@
-package com.stupidtree.cloudliter.ui.image
+package com.stupidtree.cloudliter.ui.imagedetect
 
 import android.annotation.SuppressLint
 import android.content.Context

@@ -1,20 +1,13 @@
-package com.stupidtree.cloudliter.ui.image.widgets;
+package com.stupidtree.cloudliter.ui.imagedetect.widgets;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
-
-import com.stupidtree.cloudliter.R;
 import com.stupidtree.cloudliter.data.source.ai.yolo.Classifier;
 
 import java.util.List;

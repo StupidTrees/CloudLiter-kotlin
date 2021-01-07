@@ -1,4 +1,4 @@
-package com.stupidtree.cloudliter.ui.image.widgets;
+package com.stupidtree.cloudliter.ui.imagedetect.widgets;
 
 import android.content.Context;
 import android.graphics.Canvas;

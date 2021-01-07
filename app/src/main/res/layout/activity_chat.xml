@@ -91,6 +91,19 @@
                         android:textSize="12sp"
                         android:textStyle="bold" />
                 </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/accessibility_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:alpha="0.6"
+                    android:contentDescription="@string/hint_friend_accessibility"
+                    android:focusable="true"
+                    android:padding="6dp"
+                    android:theme="@style/rippleControl"
+                    app:srcCompat="@drawable/ic_baseline_accessibility_24" />
+
             </LinearLayout>
 
             <Space
