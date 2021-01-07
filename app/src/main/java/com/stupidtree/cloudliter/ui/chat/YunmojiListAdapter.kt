@@ -19,7 +19,7 @@ internal class YunmojiListAdapter(mContext: Context?, mBeans: MutableList<Yunmoj
     override fun bindHolder(holder: YunmojiItemHolder, data: Yunmoji?, position: Int) {
         val yunmoji = mBeans[position]
         holder.binding.image.setImageResource(yunmoji.imageID)
-        //表示当这项的图片点击时调用onItemClickListener
+        holder.binding.image.contentDescription = yunmoji.description
         if (mOnItemClickListener != null) {
             holder.binding.image.setOnClickListener { view: View? -> data?.let { mOnItemClickListener!!.onItemClick(it, view, position) } }
         }

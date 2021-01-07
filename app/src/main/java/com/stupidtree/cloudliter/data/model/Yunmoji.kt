@@ -1,6 +1,6 @@
 package com.stupidtree.cloudliter.data.model
 
-class Yunmoji(val imageID: Int) {
+class Yunmoji(val imageID: Int,val description:String) {
     private var lastStr: String? = null
 
     fun getLastName(position: Int): String {

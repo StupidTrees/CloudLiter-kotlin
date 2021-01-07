@@ -419,8 +419,10 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
     //初始化表情列表
     private fun setUpYunmojiList() {
         val ymList = ArrayList<Yunmoji>()
+        val desc = resources.getStringArray(R.array.yunmoji_descriptions)
         for (i in 1..20) {
-            val item = Yunmoji(resources.getIdentifier(String.format(Locale.getDefault(), "yunmoji_y%03d", i), "drawable", packageName))
+            val item = Yunmoji(resources.getIdentifier(String.format(Locale.getDefault(), "yunmoji_y%03d", i), "drawable", packageName)
+            ,desc[i-1])
            ymList.add(item)
         }
 

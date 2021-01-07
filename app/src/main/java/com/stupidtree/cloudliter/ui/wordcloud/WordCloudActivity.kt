@@ -32,6 +32,7 @@ class WordCloudActivity : BaseActivity<WordCloudViewModel, ActivityWordCloudBind
 
 
         viewModel.wordCloudLiveData.observe(this) {
+            binding.refresh.isRefreshing = false
             if (it.state == DataState.STATE.SUCCESS) {
                 val newList = mutableListOf<Pair<String, Float?>>()
                 for (key in it.data!!.keys) {
@@ -41,6 +42,7 @@ class WordCloudActivity : BaseActivity<WordCloudViewModel, ActivityWordCloudBind
             }
         }
 
+        binding.refresh.setColorSchemeColors(getColorPrimary())
     }
 
     override fun onResume() {

@@ -311,4 +311,27 @@
     <string name="hint_horizontal_screen">图片比例较宽，建议横屏后触摸该图片</string>
     <string name="sensitive_result">敏感判定：%.2f%%</string>
     <string name="title_word_cloud">词云管理</string>
+
+    <string-array name="yunmoji_descriptions">
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+        <item>狗</item>
+    </string-array>
 </resources>
