@@ -11,8 +11,8 @@ android {
         applicationId 'com.stupidtree.cloudliter'
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 20201129
-        versionName "1.31"
+        versionCode 20210107
+        versionName "1.32"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -111,6 +111,10 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.3'
     //二维码扫描
     implementation 'com.king.zxing:zxing-lite:1.1.9-androidx'
+
+    //tflite
+    implementation 'org.tensorflow:tensorflow-lite:2.2.0'
+    implementation 'org.tensorflow:tensorflow-lite-gpu:2.2.0'
 }
 repositories {
     mavenCentral()

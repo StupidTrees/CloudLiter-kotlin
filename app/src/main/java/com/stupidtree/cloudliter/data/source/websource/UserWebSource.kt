@@ -312,7 +312,6 @@ class UserWebSource : BaseWebSource<UserService>(Retrofit.Builder()
      */
     fun getUserWordCloud(token: String?, userId: String): LiveData<DataState<HashMap<String, Float?>?>> {
         return Transformations.map(service.getWordCloud(token, userId)) { input  ->
-            // Log.e("getWordCloud", String.valueOf(input));
             if (input != null) {
                 when (input.code) {
                     WORD_CLOUD_PRIVATE->return@map DataState<HashMap<String, Float?>?>(DataState.STATE.SPECIAL)

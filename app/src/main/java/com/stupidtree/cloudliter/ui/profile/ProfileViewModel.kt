@@ -73,7 +73,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                     val user = localUserRepository.getLoggedInUser()
                     if (input.isActioning) {
                         if (user.isValid) {
-                            return@switchMap repository.getUserWordCloud(user.token!!, input.data!!)
+                            return@switchMap repository.getUserWordCloud(user.token!!, input.data)
                         } else {
                             return@switchMap MutableLiveData(DataState<HashMap<String, Float?>?>(DataState.STATE.NOT_LOGGED_IN))
                         }

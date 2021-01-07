@@ -118,6 +118,6 @@ class PickGroupDialog : TransparentBottomSheetDialog<DialogBottomGroupListBindin
     }
 
     override fun initViewBinding(v: View): DialogBottomGroupListBinding {
-        return DialogBottomGroupListBinding.inflate(layoutInflater)
+        return DialogBottomGroupListBinding.bind(v)
     }
 }

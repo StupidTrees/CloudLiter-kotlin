@@ -126,7 +126,7 @@ class PopUpCheckableList<T> : TransparentBottomSheetDialog<DialogBottomCheckable
     }
 
     override fun initViewBinding(v: View): DialogBottomCheckableListBinding {
-        return DialogBottomCheckableListBinding.inflate(layoutInflater)
+        return DialogBottomCheckableListBinding.bind(v)
     }
 
 

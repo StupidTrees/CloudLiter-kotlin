@@ -19,9 +19,10 @@ import com.stupidtree.cloudliter.utils.AnimationUtils
 class WelcomeActivity : BaseActivity<WelcomeViewModel,ActivityWelcomeBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setWindowParams(statusBar = true, darkColor = true, navi = true)
         setToolbarActionBack(binding.toolbar)
-        super.onCreate(savedInstanceState)
+        binding.collapsing.title = ""
     }
 
     override fun initViews() {

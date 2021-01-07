@@ -11,6 +11,7 @@ import com.stupidtree.cloudliter.data.model.Conversation.Companion.fromUserRelat
 import com.stupidtree.cloudliter.ui.chat.ChatActivity
 import com.stupidtree.cloudliter.ui.conversation.ConversationActivity
 import com.stupidtree.cloudliter.ui.group.GroupEditorActivity
+import com.stupidtree.cloudliter.ui.image.ImageDetectActivity
 import com.stupidtree.cloudliter.ui.main.MainActivity
 import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
 import com.stupidtree.cloudliter.ui.profile.ProfileActivity
@@ -19,6 +20,7 @@ import com.stupidtree.cloudliter.ui.relationevent.RelationEventActivity
 import com.stupidtree.cloudliter.ui.search.SearchActivity
 import com.stupidtree.cloudliter.ui.welcome.WelcomeActivity
 import com.stupidtree.cloudliter.ui.widgets.PhotoDetailActivity
+import com.stupidtree.cloudliter.ui.wordcloud.WordCloudActivity
 
 /**
  * 此类整合了跳转到各个Activity的入口
@@ -123,16 +125,16 @@ object ActivityUtils {
     }
 
     /**
-     * 显示一张大图
+     * 圖片識別
      * @param from 上下文
      * @param url 图片链接
      */
-    fun showOneImage(from: Context, url: String?) {
-        val it = Intent(from, PhotoDetailActivity::class.java)
-        val urlsArr = arrayOfNulls<String>(1)
-        urlsArr[0] = url
-        it.putExtra("urls", urlsArr)
-        it.putExtra("init_index", 0)
+    fun startImageDetectionActivity(from: Context, url: String, chatMessage: ChatMessage) {
+        val it = Intent(from, ImageDetectActivity::class.java)
+        it.putExtra("url", url)
+        val b = Bundle()
+        b.putSerializable("message",chatMessage)
+        it.putExtras(b)
         from.startActivity(it)
     }
 
@@ -161,6 +163,13 @@ object ActivityUtils {
     }
 
 
+    /**
+     * 进入词云详情
+     */
+    fun startWordCloudActivity(from:Context){
+        val it = Intent(from, WordCloudActivity::class.java)
+        from.startActivity(it)
+    }
 
 
 }

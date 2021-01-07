@@ -59,6 +59,7 @@
                         android:layout_gravity="center"
                         android:layout_marginEnd="16dp"
                         android:clickable="true"
+                        android:contentDescription="@string/description_expand_menu"
                         android:foreground="?attr/selectableItemBackground"
                         android:visibility="visible"
                         tools:srcCompat="@tools:sample/avatars" />

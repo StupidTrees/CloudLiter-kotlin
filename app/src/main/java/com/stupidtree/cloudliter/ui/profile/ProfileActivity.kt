@@ -215,7 +215,9 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
                     } else {
                         binding.logout.visibility = View.GONE
                     }
-
+                    binding.wordstagLayout.setOnClickListener {
+                        ActivityUtils.startWordCloudActivity(getThis())
+                    }
                     binding.relationCard.visibility = View.GONE
                     binding.fab.setText(R.string.edit_my_profile)
                     binding.fab.isEnabled = true

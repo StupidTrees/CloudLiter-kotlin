@@ -318,8 +318,9 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
                     PopUpTextMessageDetail().setChatMessage(data)
                             .show(supportFragmentManager, "detail")
                 } else if (data.getType() == ChatMessage.TYPE.IMG && !data.isTimeStamp) {
-                    PopUpImageMessageDetail().setChatMessage(data)
-                            .show(supportFragmentManager, "detail")
+                    data.content?.let { ActivityUtils.startImageDetectionActivity(getThis(), it,data) }
+//                    PopUpImageMessageDetail().setChatMessage(data)
+//                            .show(supportFragmentManager, "detail")
                 }
                 return true
             }
@@ -378,7 +379,7 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
             textInput = !textInput
             refreshInputLayout()
         }
-        binding.voiceButton.setOnTouchListener { p0, p1 ->
+        binding.voiceButton.setOnTouchListener { _, p1 ->
             if (p1 != null) {
                 //Log.e("action",p1.action.toString())
                 if (p1.action == MotionEvent.ACTION_DOWN) {
@@ -451,12 +452,14 @@ class ChatActivity : BaseActivity<ChatViewModel,ActivityChatBinding>() {
     //刷新输入区状态
     private fun refreshInputLayout() {
         if (textInput) {
-            collapseBottomPanel(true, true)
+            collapseBottomPanel(collapseKeyboard = true, animate = true)
             refreshVoiceBubble()
+            binding.switchButton.contentDescription = getString(R.string.switch_to_voice)
             binding.switchIcon.setImageResource(R.drawable.ic_voice_wave)
             binding.input.visibility = View.VISIBLE
         } else {
             expandBottomPanel(PANEL.VOICE)
+            binding.switchButton.contentDescription = getString(R.string.switch_to_text)
             binding.voiceButtonHint.setText(R.string.voice_button_hint_press)
             binding.switchIcon.setImageResource(R.drawable.ic_baseline_keyboard_24)
             refreshVoiceBubble()
