@@ -29,7 +29,7 @@ android {
         }
     }
 
-    buildFeatures{
+    buildFeatures {
         //dataBinding = true
         // for view binding :
         viewBinding = true
@@ -42,7 +42,7 @@ android {
 
 configurations {
     cleanedAnnotations
-    compile.exclude group: 'org.jetbrains' , module:'annotations'
+    compile.exclude group: 'org.jetbrains', module: 'annotations'
 }
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
@@ -55,7 +55,7 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'org.jetbrains:annotations-java5:15.0'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
-    implementation 'androidx.room:room-runtime:2.2.6'
+
     testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
@@ -79,8 +79,8 @@ dependencies {
     implementation "org.java-websocket:Java-WebSocket:1.4.0"
 
     //socketIO
-    implementation ("io.socket:socket.io-client:1.0.0",{
-        exclude group:'org.json', module:'json'
+    implementation("io.socket:socket.io-client:1.0.0", {
+        exclude group: 'org.json', module: 'json'
     })
 
 
@@ -103,6 +103,9 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
     //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    //room
+    implementation 'androidx.room:room-runtime:2.2.6'
     kapt "android.arch.persistence.room:compiler:2.2.5"
     kapt 'androidx.room:room-compiler:2.2.6'
     implementation 'android.arch.persistence.room:runtime:2.2.5'
