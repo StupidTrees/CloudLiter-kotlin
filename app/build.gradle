@@ -11,8 +11,8 @@ android {
         applicationId 'com.stupidtree.cloudliter'
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 20210108
-        versionName "1.33"
+        versionCode 20210116
+        versionName "1.34"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {

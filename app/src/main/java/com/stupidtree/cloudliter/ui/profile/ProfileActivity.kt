@@ -21,9 +21,9 @@ import com.stupidtree.cloudliter.ui.base.BaseActivityWithReceiver
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.group.pick.PickGroupDialog
 import com.stupidtree.cloudliter.ui.widgets.PopUpEditText
+import com.stupidtree.cloudliter.ui.widgets.PopUpMultipleCheckableList
 import com.stupidtree.cloudliter.ui.widgets.PopUpText
 import com.stupidtree.cloudliter.utils.ActivityUtils
-import com.stupidtree.cloudliter.utils.ColorUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils
 import java.util.*
@@ -87,7 +87,16 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
 
                     }
             ).show(supportFragmentManager, "logout")
-
+//            PopUpMultipleCheckableList<Int>(R.string.search_hint,R.string.logout,1)
+//                    .setInitValues(listOf(0x1))
+//                    .setListData(listOf("健全","视力障碍","听觉障碍","肢体障碍"),
+//                    listOf(0,0x1,0x2,0x4))
+//                    .setOnConfirmListener(object :PopUpMultipleCheckableList.OnConfirmListener<Int>{
+//                        override fun onConfirm(titles: List<String?>, data: List<Int>) {
+//                            Toast.makeText(applicationContext, "checked:$titles",Toast.LENGTH_SHORT).show()
+//                        }
+//
+//                    }).show(supportFragmentManager,"")
         }
         binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(getThis(), R.color.colorPrimary))
 

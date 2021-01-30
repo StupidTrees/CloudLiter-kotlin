@@ -2,7 +2,6 @@ package com.stupidtree.cloudliter.ui.widgets
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
@@ -12,21 +11,15 @@ import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.databinding.DialogBottomSelectableListBinding
 import com.stupidtree.cloudliter.databinding.DialogBottomSelectableListItemBinding
 import com.stupidtree.cloudliter.ui.base.BaseViewHolder
-import com.stupidtree.cloudliter.ui.base.BasicSelectableListAdapter
+import com.stupidtree.cloudliter.ui.base.BasicMultipleCheckableListAdapter
 import java.util.*
 import kotlin.collections.ArrayList
 
 /**
  * 圆角的文本框底部弹窗
  */
-class PopUpSelectableList<T> : TransparentBottomSheetDialog<DialogBottomSelectableListBinding>() {
-
-    @StringRes
-    var initTitle: Int? = null
-
-    @StringRes
-    var initHint: Int? = null
-    var initText: String? = null
+class PopUpMultipleCheckableList<T>(@StringRes val title: Int, @StringRes hint: Int, private val minCheck:Int) : TransparentBottomSheetDialog<DialogBottomSelectableListBinding>(
+) {
 
     /**
      * 适配器区
@@ -37,24 +30,14 @@ class PopUpSelectableList<T> : TransparentBottomSheetDialog<DialogBottomSelectab
      * 不得已放在UI里的数据
      */
     private var listRes: MutableList<ItemData<T>>? = null
-    private var initSelected: T? = null
+    private var initSelected: List<T> = mutableListOf()
     private var onConfirmListener: OnConfirmListener<T>? = null
 
     interface OnConfirmListener<T> {
-        fun onConfirm(title: String?, key: T)
+        fun onConfirm(titles: List<String?>, data: List<T>)
     }
 
-    fun setTitle(@StringRes title: Int): PopUpSelectableList<T> {
-        initTitle = title
-        return this
-    }
-
-    fun setText(text: String?): PopUpSelectableList<T> {
-        initText = text
-        return this
-    }
-
-    fun setListData(titles: List<String?>, keys: List<T>): PopUpSelectableList<T> {
+    fun setListData(titles: List<String?>, keys: List<T>): PopUpMultipleCheckableList<T> {
         listRes = ArrayList()
         for (i in 0 until titles.size.coerceAtMost(keys.size)) {
             (listRes as ArrayList<ItemData<T>>).add(ItemData(titles[i], keys[i]))
@@ -62,46 +45,41 @@ class PopUpSelectableList<T> : TransparentBottomSheetDialog<DialogBottomSelectab
         return this
     }
 
-    fun setHint(@StringRes hint: Int): PopUpSelectableList<T> {
-        initHint = hint
-        return this
-    }
-
-    fun setInitValue(value: T?): PopUpSelectableList<T> {
+    fun setInitValues(value: List<T>): PopUpMultipleCheckableList<T> {
         initSelected = value
         return this
     }
 
-    fun setOnConfirmListener(onConfirmListener: OnConfirmListener<T>): PopUpSelectableList<T> {
+    fun setOnConfirmListener(onConfirmListener: OnConfirmListener<T>): PopUpMultipleCheckableList<T> {
         this.onConfirmListener = onConfirmListener
         return this
     }
-    
+
 
     override fun onStart() {
         super.onStart()
-        if (initSelected != null) {
-            listAdapter.setSelected(ItemData(null, initSelected!!))
+        val l = mutableListOf<ItemData<T>>()
+        for(d in initSelected){
+            l.add(ItemData(null,d))
         }
-        listAdapter.notifyDataSetChanged()
+        listAdapter.setChecked(l)
     }
 
     override fun initViews(v: View) {
-        listAdapter = LAdapter(requireContext(), listRes!!)
+        listAdapter = LAdapter(requireContext(), listRes!!,minCheck)
         binding.list.adapter = listAdapter
         binding.list.layoutManager = LinearLayoutManager(requireContext())
-        if (initTitle != null) {
-            binding.title.setText(initTitle!!)
-        }
+        binding.title.setText(title)
         binding.cancel.setOnClickListener { dismiss() }
         binding.confirm.setOnClickListener {
-            if (onConfirmListener != null) {
-                val data = listAdapter.selectedData
-                Log.e("data", data.toString())
-                if (data != null) {
-                    onConfirmListener!!.onConfirm(data.name, data.data)
-                }
+            val data = listAdapter.getCheckedData()
+            val titles = mutableListOf<String?>()
+            val keys = mutableListOf<T>()
+            for (d in data) {
+                titles.add(d.name)
+                keys.add(d.data)
             }
+            onConfirmListener?.onConfirm(titles, keys)
             dismiss()
         }
     }
@@ -121,14 +99,15 @@ class PopUpSelectableList<T> : TransparentBottomSheetDialog<DialogBottomSelectab
     }
 
     @SuppressLint("ParcelCreator")
-    internal class LAdapter<C>(mContext: Context, mBeans: MutableList<ItemData<C>>) : BasicSelectableListAdapter<ItemData<C>, LAdapter.LHolder>(
-        mContext, mBeans) {
+    internal class LAdapter<C>(mContext: Context, mBeans: MutableList<ItemData<C>>,minCheck: Int) : BasicMultipleCheckableListAdapter<ItemData<C>, LAdapter.LHolder>(
+            mContext, mBeans,minCheck) {
+
         override fun bindHolder(holder: LHolder, data: ItemData<C>?, position: Int) {
             if (data != null) {
                 holder.binding.text.text = data.name
-                holder.binding.item.setOnClickListener { selectItem(position, data) }
+                holder.binding.item.setOnClickListener { checkItem(position) }
             }
-            if (position == selectedIndex) { //若被选中
+            if (selectedIndex.contains(position)) { //若被选中
                 holder.binding.selected.visibility = View.VISIBLE
             } else {
                 holder.binding.selected.visibility = View.GONE
@@ -136,19 +115,16 @@ class PopUpSelectableList<T> : TransparentBottomSheetDialog<DialogBottomSelectab
 
         }
 
-        internal class LHolder(view: DialogBottomSelectableListItemBinding) : BaseViewHolder<DialogBottomSelectableListItemBinding>(view) {
-        }
-
+        internal class LHolder(view: DialogBottomSelectableListItemBinding) : BaseViewHolder<DialogBottomSelectableListItemBinding>(view)
 
         override fun createViewHolder(viewBinding: ViewBinding, viewType: Int): LHolder {
             return LHolder(viewBinding as DialogBottomSelectableListItemBinding)
         }
 
         override fun getViewBinding(parent: ViewGroup, viewType: Int): ViewBinding {
-            return DialogBottomSelectableListItemBinding.inflate(mInflater,parent,false)
+            return DialogBottomSelectableListItemBinding.inflate(mInflater, parent, false)
         }
     }
-
 
 
     override fun getLayoutId(): Int {
