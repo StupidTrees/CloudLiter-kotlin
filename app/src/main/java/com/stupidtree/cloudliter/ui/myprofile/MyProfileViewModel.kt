@@ -159,6 +159,28 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
     //Trigger：控制更改签名请求的发送，其中携带了新昵称字符串
     private var changeSignatureController = MutableLiveData<StringTrigger>()
 
+    //状态数据：变更用户类型的结果
+    var changeTypeResult: LiveData<DataState<String?>>? = null
+        get() {
+            if (field == null) {
+                changeTypeResult = Transformations.switchMap(changeTypeController) { input: TypeTrigger ->
+                    if (input.isActioning) {
+                        val userLocal = localUserRepository.getLoggedInUser()
+                        if (userLocal.isValid) {
+                            return@switchMap profileRepository!!.changeUserType(userLocal.token!!, input.type, input.subType, input.typePermission)
+                        } else {
+                            return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
+                        }
+                    }
+                    MutableLiveData<DataState<String?>>()
+                }
+            }
+            return field!!
+        }
+
+    //Trigger：控制更改用户类型请求的发送，其中携带了用户类型、用户详细类型、隐私类型
+    var changeTypeController = MutableLiveData<TypeTrigger>()
+
 
 
     //状态数据：更改签名的结果
@@ -226,6 +248,16 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
     fun startChangeAccessibility(Accessibility: UserLocal.ACCESSIBILITY) {
         val AccessibilityStr = Accessibility.name
         changeAccessibilityController.value = StringTrigger.getActioning(AccessibilityStr)
+    }
+
+    /**
+     * 发起更换用户类型及隐私类型请求
+     * @param type 用户类型
+     * @param subType 用户类型详细分类
+     * @param tpyePermission 无障碍隐私类型
+     */
+    fun startChangeType(type: Int, subType: String?, tpyePermission: UserLocal.TYPEPERMISSION) {
+        changeTypeController.value = TypeTrigger.getActioning(type, subType, tpyePermission.name)
     }
 
     /**

@@ -43,4 +43,16 @@ object TypeConverters {
     fun stringToAccessibility(str:String): UserLocal.ACCESSIBILITY {
         return UserLocal.ACCESSIBILITY.valueOf(str)
     }
+
+    @JvmStatic
+    @TypeConverter
+    fun typePermissionToString(date: UserLocal.TYPEPERMISSION): String {
+        return date.name
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun stringToTypePermission(str:String): UserLocal.TYPEPERMISSION {
+        return UserLocal.TYPEPERMISSION.valueOf(str)
+    }
 }

@@ -119,6 +119,24 @@ class ProfileRepository(application: Application) {
     }
 
     /**
+     * 更改用户类型和隐私类型
+     * @param type 用户类型
+     * @param subType 用户类型详细分类
+     * @param tpyePermission 无障碍隐私类型
+     * @return 操作结果
+     */
+    fun changeUserType(token: String, type: Int, subType: String?, typePermission: String?): LiveData<DataState<String?>> {
+        return Transformations.map(userWebSource.changeType(token, type, subType, typePermission)) { input: DataState<String?> ->
+            if (input.state == DataState.STATE.SUCCESS) {
+                localUserRepository.changeLocalType(type)
+                localUserRepository.changeLocalSubType(subType)
+                localUserRepository.changeLocalTypePermission(typePermission)
+            }
+            input
+        }
+    }
+
+    /**
      * 更改用户签名
      *
      * @param token     令牌

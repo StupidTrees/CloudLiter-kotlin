@@ -111,6 +111,20 @@ interface UserService {
     fun changeAccessibility(@Field("accessibility") accessibility: String?, @Header("token") token: String?): LiveData<ApiResponse<Any?>?>
 
     /**
+     * 更换无障碍状态
+     * @param type 用户类型
+     * @param subType 无障碍二级分类
+     * @param typePermission 无障碍隐私类型
+     * @return 操作结果
+     */
+    @FormUrlEncoded
+    @POST("/user/profile/change_type")
+    fun changeType(@Field("type") type: Int,
+                   @Field("subType") subType: String?,
+                   @Field("typePermission") typePermission: String?,
+                   @Header("token") token: String?): LiveData<ApiResponse<Any?>?>
+
+    /**
      * 更换签名
      * @param signature 新签名
      * @param token 登录状态的token（表征了用户身份）

@@ -20,6 +20,10 @@ class UserLocal : Serializable {
         NO, YES_PUBLIC,YES_PRIVATE
     }
 
+    enum class TYPEPERMISSION {
+        PRIVATE, PUBLIC, PROTECTED
+    }
+
     var username //用户名
             : String? = null
     var id //用户id
@@ -38,6 +42,14 @@ class UserLocal : Serializable {
 
     var accessibility: ACCESSIBILITY = ACCESSIBILITY.NO
 
+    var type // 用户类型
+            : Int? = null
+    var subType // 无障碍二级分类
+            : String? = null
+    var typePermission
+            : TYPEPERMISSION = TYPEPERMISSION.PRIVATE
+
+
     val isValid: Boolean
         get() {
             Log.e("valid", (token != null && id != null).toString())
@@ -49,6 +61,9 @@ class UserLocal : Serializable {
     }
     fun setAccessibility(accessibility: String?) {
         accessibility?.let { this.accessibility = ACCESSIBILITY.valueOf(it) }
+    }
+    fun setTypePermission(typePermission: String?) {
+        typePermission?.let { this.typePermission = TYPEPERMISSION.valueOf(it) }
     }
     override fun toString(): String {
         return Gson().toJson(this)
@@ -74,6 +89,9 @@ class UserLocal : Serializable {
                 val gender = JsonUtils.getStringData(info, "gender")
                 val avatar = JsonUtils.getStringData(info, "avatar")
                 val accessibility = JsonUtils.getStringData(info, "accessibility")
+                val type = JsonUtils.getIntegerData(info, "type")
+                val subType = JsonUtils.getStringData(info, "subType")
+                val typePermission = JsonUtils.getStringData(info, "typePermission")
                 userLocal.username = username
                 userLocal.nickname = nickname
                 userLocal.signature = signature
@@ -82,6 +100,9 @@ class UserLocal : Serializable {
                 userLocal.token = token
                 userLocal.id = id
                 accessibility?.let { userLocal.accessibility = ACCESSIBILITY.valueOf(it) }
+                userLocal.type = type
+                userLocal.subType = subType
+                typePermission?.let { userLocal.typePermission = TYPEPERMISSION.valueOf(it) }
                 return userLocal
             }
             return userLocal

@@ -237,6 +237,27 @@ class UserWebSource : BaseWebSource<UserService>(Retrofit.Builder()
     }
 
     /**
+     * 更换无障碍状态
+     * @param token 令牌
+     * @param type 用户类型
+     * @param subType 无障碍二级分类
+     * @param typePermission 无障碍隐私类型
+     * @return 操作结果
+     */
+    fun changeType(token: String, type: Int, subType: String?, typePermission: String?): LiveData<DataState<String?>> {
+        return Transformations.map<ApiResponse<Any?>, DataState<String?>>(service.changeType(type, subType, typePermission, token)) { input: ApiResponse<Any?>? ->
+            if (input != null) {
+                when (input.code) {
+                    SUCCESS -> return@map DataState<String?>(DataState.STATE.SUCCESS)
+                    TOKEN_INVALID -> return@map DataState<String?>(DataState.STATE.TOKEN_INVALID)
+                    else -> return@map DataState<String?>(DataState.STATE.FETCH_FAILED, input.message)
+                }
+            }
+            DataState(DataState.STATE.FETCH_FAILED)
+        }
+    }
+
+    /**
      * 更换签名
      * @param token 令牌
      * @param signature 签名

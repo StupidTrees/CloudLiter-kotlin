@@ -3,6 +3,7 @@ package com.stupidtree.cloudliter.ui.myprofile
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserLocal
@@ -12,6 +13,7 @@ import com.stupidtree.cloudliter.databinding.ActivityMyProfileBinding
 import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.widgets.PopUpEditText
+import com.stupidtree.cloudliter.ui.widgets.PopUpMultipleCheckableList
 import com.stupidtree.cloudliter.ui.widgets.PopUpSelectableList
 import com.stupidtree.cloudliter.utils.FileProviderUtils
 import com.stupidtree.cloudliter.utils.GalleryPicker
@@ -92,6 +94,14 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
                 Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
             }
         })
+        viewModel.changeTypeResult?.observe(this, { stringDataState: DataState<String?> ->
+            if (stringDataState.state === DataState.STATE.SUCCESS) {
+                Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show()
+                viewModel.startRefresh()
+            } else {
+                Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
+            }
+        })
         viewModel.changeSignatureResult?.observe(this, { stringDataState: DataState<String?> ->
             if (stringDataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show()
@@ -137,25 +147,74 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
         }
 
         //点击更改颜色，弹出选择框
-        binding.accessibilityLayout.setOnClickListener {
+//        binding.accessibilityLayout.setOnClickListener {
+//            val up = viewModel.userProfileLiveData?.value
+//            if (up != null && up.state === DataState.STATE.SUCCESS) {
+//                PopUpSelectableList<UserLocal.ACCESSIBILITY>()
+//                        .setTitle(R.string.choose_color)
+//                        .setInitValue(up.data!!.accessibility)
+//                        .setListData(
+//                                listOf(getString(R.string.accessibility_off),
+//                                        getString(R.string.accessibility_on_public),
+//                                        getString(R.string.accessibility_on_private)),
+//                                listOf(UserLocal.ACCESSIBILITY.NO,
+//                                UserLocal.ACCESSIBILITY.YES_PUBLIC,
+//                                UserLocal.ACCESSIBILITY.YES_PRIVATE)
+//                        ).setOnConfirmListener(object : PopUpSelectableList.OnConfirmListener<UserLocal.ACCESSIBILITY> {
+//
+//                            override fun onConfirm(title: String?, key: UserLocal.ACCESSIBILITY) {
+//                                viewModel.startChangeAccessibility(key)
+//                            }
+//                        }).show(supportFragmentManager, "select")
+//            }
+//        }
+
+        // 点击更换无障碍隐私类型，弹出选择框
+        binding.typePermissionLayout.setOnClickListener {
             val up = viewModel.userProfileLiveData?.value
             if (up != null && up.state === DataState.STATE.SUCCESS) {
-                PopUpSelectableList<UserLocal.ACCESSIBILITY>()
-                        .setTitle(R.string.choose_color)
-                        .setInitValue(up.data!!.accessibility)
+                PopUpSelectableList<UserLocal.TYPEPERMISSION>()
+                        .setTitle(R.string.type_permission)
+                        .setInitValue(up.data!!.typePermission)
                         .setListData(
-                                listOf(getString(R.string.accessibility_off),
-                                        getString(R.string.accessibility_on_public),
-                                        getString(R.string.accessibility_on_private)),
-                                listOf(UserLocal.ACCESSIBILITY.NO,
-                                UserLocal.ACCESSIBILITY.YES_PUBLIC,
-                                UserLocal.ACCESSIBILITY.YES_PRIVATE)
-                        ).setOnConfirmListener(object : PopUpSelectableList.OnConfirmListener<UserLocal.ACCESSIBILITY> {
-
-                            override fun onConfirm(title: String?, key: UserLocal.ACCESSIBILITY) {
-                                viewModel.startChangeAccessibility(key)
+                                listOf(getString(R.string.type_permission_public),
+                                        getString(R.string.type_permission_protected),
+                                        getString(R.string.type_permission_private)),
+                                listOf(UserLocal.TYPEPERMISSION.PUBLIC,
+                                        UserLocal.TYPEPERMISSION.PROTECTED,
+                                        UserLocal.TYPEPERMISSION.PRIVATE)
+                        ).setOnConfirmListener(object : PopUpSelectableList.OnConfirmListener<UserLocal.TYPEPERMISSION> {
+                            override fun onConfirm(title: String?, key: UserLocal.TYPEPERMISSION) {
+                                viewModel.startChangeType(up.data!!.type, up.data!!.subType, key)
+//                                viewModel.userProfileLiveData?.value?.data?.let { it1 -> viewModel.startChangeType(it1.type, it1.subType, key) }
                             }
                         }).show(supportFragmentManager, "select")
+            }
+        }
+
+        //点击更改用户类型，弹出多选框
+        binding.typeLayout.setOnClickListener {
+            viewModel.userProfileLiveData!!.value?.let {
+                if (it.data != null) {
+                    PopUpMultipleCheckableList<Int>(R.string.type, 0, 0)
+                            .setInitValues(it.data!!.getTypeList(it.data!!.type))
+                            .setListData(
+                                    listOf(getString(R.string.type_visual),
+                                            getString(R.string.type_hearing),
+                                            getString(R.string.type_limb)),
+                                    listOf(it.data!!.VISUAL,
+                                            it.data!!.HEARING,
+                                            it.data!!.LIMB)
+                            ).setOnConfirmListener(object : PopUpMultipleCheckableList.OnConfirmListener<Int> {
+                                override fun onConfirm(titles: List<String?>, data: List<Int>) {
+                                    var key = 0
+                                    for (d in data) {
+                                        key = d xor key
+                                    }
+                                    viewModel.startChangeType(key, it.data!!.subType, it.data!!.typePermission)
+                                }
+                            }).show(supportFragmentManager, "select")
+                }
             }
         }
         binding.signatureLayout.setOnClickListener {
@@ -205,7 +264,8 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
         //设置头像
         ImageUtils.loadLocalAvatarInto(getThis(), profile!!.avatar, binding.avatar)
         //设置各种文本信息
-        binding.color.setText(profile.getAccessibilityName())
+        binding.typePermission.setText(profile.getTypePermissionName())
+        binding.type.setText(profile.getTypeName())
         binding.nickname.text = profile.nickname
         binding.wordcloudAccessibility.setText(if (profile.wordCloudPrivate) R.string.word_cloud_private else R.string.word_cloud_public)
         if (!TextUtils.isEmpty(profile.signature)) {

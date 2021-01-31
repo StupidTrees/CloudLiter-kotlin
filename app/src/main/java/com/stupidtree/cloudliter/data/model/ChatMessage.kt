@@ -33,6 +33,7 @@ class ChatMessage : Serializable {
     @Ignore
     var friendRemark: String? = null
     var friendAccessibility: UserLocal.ACCESSIBILITY = UserLocal.ACCESSIBILITY.NO
+    var friendTypePermission: UserLocal.TYPEPERMISSION = UserLocal.TYPEPERMISSION.PRIVATE
 
     @Ignore
     var friendAvatar: String? = null
@@ -88,7 +89,7 @@ class ChatMessage : Serializable {
     val isTimeStamp: Boolean
         get() = id == "time"
 
-    fun getType(): TYPE {
+    fun getTypeEnum(): TYPE {
 
         return when (type) {
             "IMG" -> TYPE.IMG

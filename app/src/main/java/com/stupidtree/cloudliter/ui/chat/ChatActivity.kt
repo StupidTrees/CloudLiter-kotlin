@@ -24,9 +24,7 @@ import com.stupidtree.cloudliter.data.model.Yunmoji
 import com.stupidtree.cloudliter.databinding.ActivityChatBinding
 import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.BaseListAdapterClassic
 import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.chat.detail.PopUpImageMessageDetail
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpTextMessageDetail
 import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectBottomFragment
 import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
@@ -315,10 +313,10 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         binding.refresh.setOnRefreshListener { viewModel.loadMore() }
         listAdapter.setOnItemLongClickListener(object : BaseListAdapter.OnItemLongClickListener<ChatMessage> {
             override fun onItemLongClick(data: ChatMessage, view: View?, position: Int): Boolean {
-                if (data.getType() == ChatMessage.TYPE.TXT && !data.isTimeStamp) {
+                if (data.getTypeEnum() == ChatMessage.TYPE.TXT && !data.isTimeStamp) {
                     PopUpTextMessageDetail().setChatMessage(data)
                             .show(supportFragmentManager, "detail")
-                } else if (data.getType() == ChatMessage.TYPE.IMG && !data.isTimeStamp) {
+                } else if (data.getTypeEnum() == ChatMessage.TYPE.IMG && !data.isTimeStamp) {
                     data.content?.let {
                         ActivityUtils.startImageDetectionActivity(getThis(), ImageUtils.getChatMessageImageUrl(it), data)
                     }
@@ -328,11 +326,11 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         })
         listAdapter.setOnItemClickListener(object : BaseListAdapter.OnItemClickListener<ChatMessage> {
             override fun onItemClick(data: ChatMessage, card: View?, position: Int) {
-                if (data.getType() == ChatMessage.TYPE.IMG && !data.isTimeStamp) {
+                if (data.getTypeEnum() == ChatMessage.TYPE.IMG && !data.isTimeStamp) {
                     val urls = listAdapter.imageUrls
                     ActivityUtils.showMultipleImages(getThis(), urls, urls.indexOf(data.content?.let { ImageUtils.getChatMessageImageUrl(it) })
                     )
-                } else if (data.getType() == ChatMessage.TYPE.VOICE && !data.isTimeStamp) {
+                } else if (data.getTypeEnum() == ChatMessage.TYPE.VOICE && !data.isTimeStamp) {
                     if (audioPlayHelper.playingId != null) {
                         if (audioPlayHelper.playingId != data.id) {//有其他消息正在播放
                             listAdapter.changeAudioState(binding.list, audioPlayHelper.playingId!!, ChatMessage.VOICE_STATE.STOPPED)

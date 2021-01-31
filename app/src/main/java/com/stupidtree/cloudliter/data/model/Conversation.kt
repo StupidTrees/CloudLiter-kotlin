@@ -23,6 +23,7 @@ class Conversation : Serializable {
     var friendAvatar: String? = null
     var friendRemark: String? = null
     var friendAccessibility:UserLocal.ACCESSIBILITY = UserLocal.ACCESSIBILITY.NO
+    var friendTypePermission:UserLocal.TYPEPERMISSION = UserLocal.TYPEPERMISSION.PRIVATE
     var relationId: String? = null
     var createdAt: Timestamp? = null
     var updatedAt: Timestamp? = null
@@ -40,7 +41,8 @@ class Conversation : Serializable {
                 relationId == that.relationId &&
                 createdAt == that.createdAt &&
                 updatedAt == that.updatedAt&&
-                friendAccessibility  == that.friendAccessibility
+                friendAccessibility  == that.friendAccessibility&&
+                friendTypePermission == that.friendTypePermission
     }
 
     override fun hashCode(): Int {
@@ -58,6 +60,7 @@ class Conversation : Serializable {
             conversation.id = message.conversationId!!
             conversation.relationId = message.relationId
             conversation.friendAccessibility = message.friendAccessibility
+            conversation.friendTypePermission = message.friendTypePermission
             return conversation
         }
 
@@ -71,6 +74,7 @@ class Conversation : Serializable {
             conversation.id = TextUtils.getP2PIdOrdered(friendProfile.id.toString(), userLocal.id.toString())
             conversation.relationId = userRelation.friendId
             conversation.friendAccessibility = friendProfile.accessibility
+            conversation.friendTypePermission = friendProfile.typePermission
             return conversation
         }
     }

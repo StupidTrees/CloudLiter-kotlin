@@ -307,9 +307,9 @@ class SocketIOClientService : Service() {
             val faceText = matcher.group()
             newContent = newContent!!.replace(faceText, getString(R.string.place_holder_yunmoji))
         }
-        if (message.getType() === ChatMessage.TYPE.IMG) {
+        if (message.getTypeEnum() === ChatMessage.TYPE.IMG) {
             newContent = getString(R.string.place_holder_image)
-        } else if (message.getType() == ChatMessage.TYPE.VOICE) {
+        } else if (message.getTypeEnum() == ChatMessage.TYPE.VOICE) {
             newContent = getString(R.string.place_holder_voice)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

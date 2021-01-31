@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f03d0e5f5906fd824de504ecc529283b",
+    "identityHash": "4bdcef090f49e5561d5b3413070a4d72",
     "entities": [
       {
         "tableName": "message",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `fromId` TEXT, `toId` TEXT, `type` TEXT DEFAULT 'TXT', `content` TEXT, `friendAccessibility` TEXT NOT NULL, `conversationId` TEXT, `relationId` TEXT, `read` INTEGER NOT NULL, `sensitive` INTEGER NOT NULL, `emotion` REAL NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `extra` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `fromId` TEXT, `toId` TEXT, `type` TEXT DEFAULT 'TXT', `content` TEXT, `friendAccessibility` TEXT NOT NULL, `friendTypePermission` TEXT NOT NULL, `conversationId` TEXT, `relationId` TEXT, `read` INTEGER NOT NULL, `sensitive` INTEGER NOT NULL, `emotion` REAL NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `extra` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -42,6 +42,12 @@
           {
             "fieldPath": "friendAccessibility",
             "columnName": "friendAccessibility",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "friendTypePermission",
+            "columnName": "friendTypePermission",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -105,7 +111,7 @@
       },
       {
         "tableName": "conversation",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `historyId` TEXT, `lastMessage` TEXT, `friendId` TEXT, `groupId` TEXT, `friendNickname` TEXT, `friendAvatar` TEXT, `friendRemark` TEXT, `friendAccessibility` TEXT NOT NULL, `relationId` TEXT, `createdAt` INTEGER, `updatedAt` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `historyId` TEXT, `lastMessage` TEXT, `friendId` TEXT, `groupId` TEXT, `friendNickname` TEXT, `friendAvatar` TEXT, `friendRemark` TEXT, `friendAccessibility` TEXT NOT NULL, `friendTypePermission` TEXT NOT NULL, `relationId` TEXT, `createdAt` INTEGER, `updatedAt` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -158,6 +164,12 @@
           {
             "fieldPath": "friendAccessibility",
             "columnName": "friendAccessibility",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "friendTypePermission",
+            "columnName": "friendTypePermission",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -247,8 +259,32 @@
       },
       {
         "tableName": "profile",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `username` TEXT, `nickname` TEXT, `gender` TEXT, `signature` TEXT, `avatar` TEXT, `accessibility` TEXT NOT NULL, `wordCloudPrivate` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`NORMAL` INTEGER NOT NULL, `VISUAL` INTEGER NOT NULL, `HEARING` INTEGER NOT NULL, `LIMB` INTEGER NOT NULL, `id` TEXT NOT NULL, `username` TEXT, `nickname` TEXT, `gender` TEXT, `signature` TEXT, `avatar` TEXT, `accessibility` TEXT NOT NULL, `type` INTEGER NOT NULL, `subType` TEXT, `typePermission` TEXT NOT NULL, `wordCloudPrivate` INTEGER NOT NULL, PRIMARY KEY(`NORMAL`))",
         "fields": [
+          {
+            "fieldPath": "NORMAL",
+            "columnName": "NORMAL",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "VISUAL",
+            "columnName": "VISUAL",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "HEARING",
+            "columnName": "HEARING",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "LIMB",
+            "columnName": "LIMB",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
           {
             "fieldPath": "id",
             "columnName": "id",
@@ -292,6 +328,24 @@
             "notNull": true
           },
           {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subType",
+            "columnName": "subType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "typePermission",
+            "columnName": "typePermission",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
             "fieldPath": "wordCloudPrivate",
             "columnName": "wordCloudPrivate",
             "affinity": "INTEGER",
@@ -300,7 +354,7 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "NORMAL"
           ],
           "autoGenerate": false
         },
@@ -311,7 +365,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f03d0e5f5906fd824de504ecc529283b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4bdcef090f49e5561d5b3413070a4d72')"
     ]
   }
 }

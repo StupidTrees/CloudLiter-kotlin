@@ -78,6 +78,27 @@ class LocalUserRepository(application: Application) {
         loggedInUser = mePreferenceSource.localUser
     }
     /**
+     * 更改本地缓存的用户类型（无障碍）
+     */
+    fun changeLocalType(type: Int?) {
+        mePreferenceSource.saveType(type)
+        loggedInUser = mePreferenceSource.localUser
+    }
+    /**
+     * 更改本地缓存的用户详细类型
+     */
+    fun changeLocalSubType(subType: String?) {
+        mePreferenceSource.saveSubType(subType)
+        loggedInUser = mePreferenceSource.localUser
+    }
+    /**
+     * 更改本地缓存的无障碍隐私类型
+     */
+    fun changeLocalTypePermission(typePermission: String?) {
+        mePreferenceSource.saveTypePermission(typePermission)
+        loggedInUser = mePreferenceSource.localUser
+    }
+    /**
      * 更改本地缓存的签名
      * @param signature 新签名
      */

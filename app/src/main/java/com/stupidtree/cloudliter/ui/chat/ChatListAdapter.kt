@@ -9,7 +9,6 @@ import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter
 import com.stupidtree.cloudliter.ui.base.BaseListAdapterClassic
-import com.stupidtree.cloudliter.ui.chat.MessageReadNotification
 import com.stupidtree.cloudliter.ui.widgets.EmoticonsTextView
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
@@ -46,15 +45,15 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             }
             cm.toId == chatActivity.viewModel.myId -> {
                 when {
-                    cm.getType() == ChatMessage.TYPE.IMG -> TYPE_FRIEND_IMAGE
-                    cm.getType() == ChatMessage.TYPE.TXT -> TYPE_FRIEND
+                    cm.getTypeEnum() == ChatMessage.TYPE.IMG -> TYPE_FRIEND_IMAGE
+                    cm.getTypeEnum() == ChatMessage.TYPE.TXT -> TYPE_FRIEND
                     else -> TYPE_FRIEND_VOICE
                 }
             }
             else -> {
                 when {
-                    cm.getType() == ChatMessage.TYPE.IMG -> TYPE_MINE_IMAGE
-                    cm.getType() == ChatMessage.TYPE.VOICE -> TYPE_MINE_VOICE
+                    cm.getTypeEnum() == ChatMessage.TYPE.IMG -> TYPE_MINE_IMAGE
+                    cm.getTypeEnum() == ChatMessage.TYPE.VOICE -> TYPE_MINE_VOICE
                     else -> TYPE_MINE
                 }
             }
@@ -89,7 +88,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                     }
                 }
                 //图片消息
-                if (data.getType() == ChatMessage.TYPE.IMG) {
+                if (data.getTypeEnum() == ChatMessage.TYPE.IMG) {
                     if (holder.progress != null) {
                         if (holder.progress?.visibility != View.VISIBLE) {
                             data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
@@ -99,7 +98,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                     } else {
                         data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
                     }
-                } else if (data.getType() == ChatMessage.TYPE.VOICE) {
+                } else if (data.getTypeEnum() == ChatMessage.TYPE.VOICE) {
                     holder.bindVoiceState(data)
                 }
             }
@@ -125,7 +124,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         get() {
             val res: MutableList<String> = ArrayList()
             for (cm in mBeans) {
-                if (!cm.isTimeStamp && cm.getType() == ChatMessage.TYPE.IMG) {
+                if (!cm.isTimeStamp && cm.getTypeEnum() == ChatMessage.TYPE.IMG) {
                     cm.content?.let {
                         res.add(ImageUtils.getChatMessageImageUrl(it))
                     }
@@ -193,7 +192,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                 holder.hideProgress()
                 holder.bindSensitiveAndEmotion(sentMessage)
                 holder.bindClickAction(sentMessage, index)
-                if (sentMessage.getType() == ChatMessage.TYPE.IMG) {
+                if (sentMessage.getTypeEnum() == ChatMessage.TYPE.IMG) {
                     holder.updateImage(sentMessage)
                 }
             }
@@ -364,14 +363,14 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             if (sensitiveExpanded) {
                 content?.text = data.content
                 see?.setImageResource(R.drawable.ic_baseline_visibility_off_24)
-                if (data.getType() == ChatMessage.TYPE.IMG && image != null && imageSensitivePlaceHolder != null) {
+                if (data.getTypeEnum() == ChatMessage.TYPE.IMG && image != null && imageSensitivePlaceHolder != null) {
                     image?.visibility = View.VISIBLE
                     imageSensitivePlaceHolder?.visibility = View.GONE
                 }
             } else if (data.sensitive) {
                 see?.setImageResource(R.drawable.ic_baseline_visibility_24)
                 content?.setText(R.string.hint_sensitive_message)
-                if (data.getType() == ChatMessage.TYPE.IMG && image != null && imageSensitivePlaceHolder != null) {
+                if (data.getTypeEnum() == ChatMessage.TYPE.IMG && image != null && imageSensitivePlaceHolder != null) {
                     image?.visibility = View.INVISIBLE
                     imageSensitivePlaceHolder?.visibility = View.VISIBLE
                 }
@@ -381,7 +380,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         //绑定敏感词状态
         fun bindSensitiveAndEmotion(data: ChatMessage) {
             sensitiveExpanded = false
-            if (data.getType() == ChatMessage.TYPE.IMG) {
+            if (data.getTypeEnum() == ChatMessage.TYPE.IMG) {
                 if (data.sensitive) {
                     see?.visibility = View.VISIBLE
                     read?.visibility = View.GONE
@@ -394,7 +393,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                     image?.visibility = View.VISIBLE
                     see?.visibility = View.GONE
                 }
-            } else if (data.getType() == ChatMessage.TYPE.TXT) {
+            } else if (data.getTypeEnum() == ChatMessage.TYPE.TXT) {
                 if (data.sensitive) {
                     read?.let{it.visibility = View.GONE}
                     see?.visibility = View.VISIBLE

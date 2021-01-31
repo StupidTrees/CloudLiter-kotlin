@@ -71,6 +71,21 @@ class UserPreferenceSource(private val context: Context) {
                 .putString("accessibility",accessibility)
                 .apply()
     }
+    fun saveType(type: Int?) {
+        preference!!.edit()
+                .putInt("type", type!!)
+                .apply()
+    }
+    fun saveSubType(subType: String?) {
+        preference!!.edit()
+                .putString("subType", subType)
+                .apply()
+    }
+    fun saveTypePermission(typePermission: String?) {
+        preference!!.edit()
+                .putString("typePermission", typePermission)
+                .apply()
+    }
     fun clearLocalUser() {
         val preferences = context.getSharedPreferences(SP_NAME_LOCAL_USER, Context.MODE_PRIVATE)
         preferences.edit().clear().apply()
