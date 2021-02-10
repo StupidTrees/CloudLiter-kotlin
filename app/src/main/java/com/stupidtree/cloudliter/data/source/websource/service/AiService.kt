@@ -1,6 +1,7 @@
 package com.stupidtree.cloudliter.data.source.websource.service
 
 import androidx.lifecycle.LiveData
+import com.google.gson.JsonObject
 import com.stupidtree.cloudliter.data.model.ApiResponse
 import okhttp3.MultipartBody
 import retrofit2.http.Header
@@ -18,5 +19,5 @@ interface AiService {
      */
     @Multipart
     @POST("/ai/image/classify")
-    fun sendAiImage(@Header("token") token: String, @Part upload: MultipartBody.Part): LiveData<ApiResponse<String?>?>
+    fun imageClassify(@Header("token") token: String, @Part upload: MultipartBody.Part): LiveData<ApiResponse<JsonObject>>
 }

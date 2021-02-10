@@ -17,7 +17,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun conversationDao(): ConversationDao
     abstract fun userRelationDao():UserRelationDao
     abstract fun userProfileDao(): UserProfileDao
-    abstract fun aiDao(): AiDao
 
     companion object {
         @Volatile

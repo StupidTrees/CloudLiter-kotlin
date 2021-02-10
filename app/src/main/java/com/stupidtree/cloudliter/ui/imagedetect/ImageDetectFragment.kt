@@ -4,16 +4,14 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.databinding.FragmentImageDedectBinding
 import com.stupidtree.cloudliter.ui.base.BaseFragment
+import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpImageMessageDetail
-import com.stupidtree.cloudliter.utils.FileProviderUtils
-import com.stupidtree.cloudliter.utils.ImageUtils
 import kotlinx.android.synthetic.main.fragment_image_dedect.*
 
 class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDedectBinding>() {
@@ -35,6 +33,14 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
     }
 
     override fun initViews(view: View) {
+        listAdapter = DetectResultAdapter(requireContext(), mutableListOf())
+        binding?.list?.adapter = listAdapter
+        binding?.list?.layoutManager = LinearLayoutManager(requireContext())
+        binding?.sensitiveCard?.setOnClickListener {
+            viewModel.chatMessageLiveData.value?.let {
+                PopUpImageMessageDetail().setChatMessage(it).show(parentFragmentManager, "sens")
+            }
+        }
         viewModel.imageUrl.observe(this) {
             Thread {
                 val myBitmap: Bitmap = Glide.with(requireContext())
@@ -64,10 +70,6 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
                     }
                 }
                 binding?.labeledImageView?.announceForAccessibility(announce)
-                // 图片分类
-                viewModel.getAiImageClassifyResult().observe(this, {})
-                arguments?.getString("url")?.let { viewModel.sendImageMessage(it) }
-                viewModel.aiImageClassify.value = arguments?.getString("class")
             }
         }
         viewModel.chatMessageLiveData.observe(this) {
@@ -83,25 +85,16 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
             }
         }
         // 图片分类
-        viewModel.aiImageClassify.observe(this) {
-            if (it == null) {
-                binding?.kindCard?.visibility = View.GONE
-                Log.d("HHHHH:::","HHHHHHH")
+        viewModel.imageClassifyResult.observe(this) {
+            if (it.state!=DataState.STATE.SUCCESS) {
+                binding?.classifyCard?.visibility = View.GONE
             } else {
-                binding?.kindCard?.visibility = View.VISIBLE
-                Log.d("LLLLLLL:::",it.toString())
+                binding?.kindText?.text = getString(R.string.scene_classify_result_test,it.data?.get("class_cn")?.asString)
+                binding?.classifyCard?.visibility = View.VISIBLE
             }
         }
-        listAdapter = DetectResultAdapter(requireContext(), mutableListOf())
-        binding?.list?.adapter = listAdapter
-        binding?.list?.layoutManager = LinearLayoutManager(requireContext())
-        binding?.sensitiveCard?.setOnClickListener {
-            viewModel.chatMessageLiveData.value?.let {
-                PopUpImageMessageDetail().setChatMessage(it).show(parentFragmentManager, "sens")
-            }
-        }
-        viewModel.chatMessageLiveData.value = arguments?.getSerializable("message") as ChatMessage?
 
+        viewModel.chatMessageLiveData.value = arguments?.getSerializable("message") as ChatMessage?
     }
 
     companion object {

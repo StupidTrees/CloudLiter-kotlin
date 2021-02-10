@@ -3,6 +3,7 @@ package com.stupidtree.cloudliter.data.source.websource
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import com.google.gson.JsonObject
 import com.stupidtree.cloudliter.data.model.ApiResponse
 import com.stupidtree.cloudliter.data.source.websource.service.AiService
 import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
@@ -24,16 +25,16 @@ class AiWebSource : BaseWebSource<AiService>(Retrofit.Builder()
      * @param file 文件
      * @return 操作结果
      */
-    fun sendAiImage(token: String, upload: MultipartBody.Part): LiveData<DataState<String?>> {
-        return Transformations.map(service.sendAiImage(token, upload)) { input: ApiResponse<String?>? ->
-            Log.e("发送图片结果HHH", input.toString())
+    fun imageClassify(token: String, upload: MultipartBody.Part): LiveData<DataState<JsonObject>> {
+        return Transformations.map(service.imageClassify(token, upload)) { input->
+            //Log.e("resp", input.toString())
             if (input == null) {
-                return@map DataState<String?>(DataState.STATE.FETCH_FAILED)
+                return@map DataState(DataState.STATE.FETCH_FAILED)
             }
             when (input.code) {
-                codes.SUCCESS -> return@map DataState(input.data)
-                codes.TOKEN_INVALID -> return@map DataState<String?>(DataState.STATE.TOKEN_INVALID)
-                else -> return@map DataState<String?>(DataState.STATE.FETCH_FAILED, input.message)
+                codes.SUCCESS -> return@map DataState(input.data!!)
+                codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
             }
         }
     }

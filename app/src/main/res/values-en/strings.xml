@@ -330,6 +330,7 @@
     <string name="type_visual_hearing_limb">视力 | 听力 | 肢体障碍</string>
     <string name="hint_accessibility_sure_to_send_title">是否继续发送?</string>
     <string name="hint_accessibility_sure_to_send_subtitle">对方为无障碍用户，这张图片将被识别为如下所示并通过Talkback反馈给对方，请确保对方能获得清楚的图片描述</string>
+    <string name="scene_classify_result_test">场景检测：%s</string>
 
     <string-array name="yunmoji_descriptions">
         <item>狗</item>
