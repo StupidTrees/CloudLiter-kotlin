@@ -177,7 +177,8 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel,Fr
                 } else {
                     holder.binding.unread.visibility = View.INVISIBLE
                 }
-                if(data.friendAccessibility==UserLocal.ACCESSIBILITY.NO){
+                if(data.friendTypePermission==UserLocal.TYPEPERMISSION.PRIVATE){
+//                if(data.friendType==0){
                     holder.binding.accessibilityIcon.visibility = View.GONE
                 }else{
                     holder.binding.accessibilityIcon.visibility = View.VISIBLE

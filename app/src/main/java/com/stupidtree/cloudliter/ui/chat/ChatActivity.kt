@@ -441,9 +441,14 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         } else {
             binding.title.text = conversation.friendRemark
         }
-        if (conversation.friendAccessibility == UserLocal.ACCESSIBILITY.NO) {
+        if (conversation.friendTypePermission == UserLocal.TYPEPERMISSION.PRIVATE) {
+//        if (conversation.friendType == 0) {
+            Log.d("GONE:","GONEGONEGONE")
+//            conversation.friendAccessibility
+//            binding.accessibilityIcon.visibility = View.VISIBLE
             binding.accessibilityIcon.visibility = View.GONE
         } else {
+            Log.d("VIS:","VISVISVIS")
             binding.accessibilityIcon.visibility = View.VISIBLE
         }
     }
@@ -631,7 +636,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
             val filePath = FileProviderUtils.getFilePathByUri(getThis(), uri)
             filePath?.let {
                 viewModel.conversation.value?.let { conversation ->
-                    if (conversation.friendAccessibility == UserLocal.ACCESSIBILITY.NO) {
+                    if (conversation.friendTypePermission == UserLocal.TYPEPERMISSION.PRIVATE) {
                         viewModel.sendImageMessage(it)
                     } else {
                         ImageDetectBottomFragment().setMessage(null)

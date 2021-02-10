@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4bdcef090f49e5561d5b3413070a4d72",
+    "identityHash": "e2a52375a40cd400758d629711188ae8",
     "entities": [
       {
         "tableName": "message",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `fromId` TEXT, `toId` TEXT, `type` TEXT DEFAULT 'TXT', `content` TEXT, `friendAccessibility` TEXT NOT NULL, `friendTypePermission` TEXT NOT NULL, `conversationId` TEXT, `relationId` TEXT, `read` INTEGER NOT NULL, `sensitive` INTEGER NOT NULL, `emotion` REAL NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `extra` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `fromId` TEXT, `toId` TEXT, `type` TEXT DEFAULT 'TXT', `content` TEXT, `friendAccessibility` TEXT NOT NULL, `friendTypePermission` TEXT NOT NULL, `friendType` INTEGER NOT NULL, `friendSubType` TEXT, `conversationId` TEXT, `relationId` TEXT, `read` INTEGER NOT NULL, `sensitive` INTEGER NOT NULL, `emotion` REAL NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `extra` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -50,6 +50,18 @@
             "columnName": "friendTypePermission",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "friendType",
+            "columnName": "friendType",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "friendSubType",
+            "columnName": "friendSubType",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "conversationId",
@@ -111,7 +123,7 @@
       },
       {
         "tableName": "conversation",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `historyId` TEXT, `lastMessage` TEXT, `friendId` TEXT, `groupId` TEXT, `friendNickname` TEXT, `friendAvatar` TEXT, `friendRemark` TEXT, `friendAccessibility` TEXT NOT NULL, `friendTypePermission` TEXT NOT NULL, `relationId` TEXT, `createdAt` INTEGER, `updatedAt` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `historyId` TEXT, `lastMessage` TEXT, `friendId` TEXT, `groupId` TEXT, `friendNickname` TEXT, `friendAvatar` TEXT, `friendRemark` TEXT, `friendAccessibility` TEXT NOT NULL, `friendTypePermission` TEXT NOT NULL, `friendType` INTEGER NOT NULL, `friendSubType` TEXT, `relationId` TEXT, `createdAt` INTEGER, `updatedAt` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -172,6 +184,18 @@
             "columnName": "friendTypePermission",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "friendType",
+            "columnName": "friendType",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "friendSubType",
+            "columnName": "friendSubType",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "relationId",
@@ -365,7 +389,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4bdcef090f49e5561d5b3413070a4d72')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e2a52375a40cd400758d629711188ae8')"
     ]
   }
 }

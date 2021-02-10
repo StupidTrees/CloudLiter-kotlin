@@ -24,6 +24,8 @@ class Conversation : Serializable {
     var friendRemark: String? = null
     var friendAccessibility:UserLocal.ACCESSIBILITY = UserLocal.ACCESSIBILITY.NO
     var friendTypePermission:UserLocal.TYPEPERMISSION = UserLocal.TYPEPERMISSION.PRIVATE
+    var friendType: Int = 0
+    var friendSubType: String? = null
     var relationId: String? = null
     var createdAt: Timestamp? = null
     var updatedAt: Timestamp? = null
@@ -42,11 +44,13 @@ class Conversation : Serializable {
                 createdAt == that.createdAt &&
                 updatedAt == that.updatedAt&&
                 friendAccessibility  == that.friendAccessibility&&
-                friendTypePermission == that.friendTypePermission
+                friendTypePermission == that.friendTypePermission&&
+                friendType == that.friendType&&
+                friendSubType == that.friendSubType
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(id, historyId, lastMessage, friendId, groupId, friendNickname, friendAvatar, relationId, createdAt, updatedAt)
+        return Objects.hash(id, historyId, lastMessage, friendId, groupId, friendNickname, friendAvatar, relationId, createdAt, updatedAt, friendType, friendSubType)
     }
 
 
@@ -61,6 +65,8 @@ class Conversation : Serializable {
             conversation.relationId = message.relationId
             conversation.friendAccessibility = message.friendAccessibility
             conversation.friendTypePermission = message.friendTypePermission
+            conversation.friendType = message.friendType
+            conversation.friendSubType = message.friendSubType
             return conversation
         }
 
@@ -75,6 +81,8 @@ class Conversation : Serializable {
             conversation.relationId = userRelation.friendId
             conversation.friendAccessibility = friendProfile.accessibility
             conversation.friendTypePermission = friendProfile.typePermission
+            conversation.friendType = friendProfile.type
+            conversation.friendSubType = friendProfile.subType
             return conversation
         }
     }

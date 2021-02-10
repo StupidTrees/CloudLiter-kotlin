@@ -2,7 +2,9 @@ package com.stupidtree.cloudliter.ui.imagedetect
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.stupidtree.cloudliter.R
@@ -10,7 +12,9 @@ import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.databinding.FragmentImageDedectBinding
 import com.stupidtree.cloudliter.ui.base.BaseFragment
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpImageMessageDetail
+import com.stupidtree.cloudliter.utils.FileProviderUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
+import kotlinx.android.synthetic.main.fragment_image_dedect.*
 
 class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDedectBinding>() {
 
@@ -60,6 +64,10 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
                     }
                 }
                 binding?.labeledImageView?.announceForAccessibility(announce)
+                // 图片分类
+                viewModel.getAiImageClassifyResult().observe(this, {})
+                arguments?.getString("url")?.let { viewModel.sendImageMessage(it) }
+                viewModel.aiImageClassify.value = arguments?.getString("class")
             }
         }
         viewModel.chatMessageLiveData.observe(this) {
@@ -72,6 +80,16 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
                         map["Porn"]!! + map["Hentai"]!! + map["Sexy"]!! + map["Neutral"]!! + map["Drawing"]!!
                         )
                 binding?.sensitiveText?.text = getString(R.string.sensitive_result, per * 100)
+            }
+        }
+        // 图片分类
+        viewModel.aiImageClassify.observe(this) {
+            if (it == null) {
+                binding?.kindCard?.visibility = View.GONE
+                Log.d("HHHHH:::","HHHHHHH")
+            } else {
+                binding?.kindCard?.visibility = View.VISIBLE
+                Log.d("LLLLLLL:::",it.toString())
             }
         }
         listAdapter = DetectResultAdapter(requireContext(), mutableListOf())
