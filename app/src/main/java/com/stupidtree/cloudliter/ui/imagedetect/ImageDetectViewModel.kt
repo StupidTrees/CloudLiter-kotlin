@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.repository.AiRepository
-import com.stupidtree.cloudliter.data.repository.DetectionRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.ui.base.DataState
 
@@ -18,14 +17,12 @@ class ImageDetectViewModel(application: Application) : AndroidViewModel(applicat
      */
     private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
     private val aiRepository: AiRepository = AiRepository.getInstance(application)
-    private val detectionRepository = DetectionRepository.getInstance(application)
-
 
     var imageUrl = MutableLiveData<String>()
     var imageLiveData = MutableLiveData<Bitmap>()
     var chatMessageLiveData = MutableLiveData<ChatMessage?>()
     var detectionResult = Transformations.switchMap(imageLiveData) {
-        return@switchMap detectionRepository.detectImage(it)
+        return@switchMap aiRepository.detectImage(it)
     }
     var imageClassifyResult = Transformations.switchMap(imageLiveData) { input ->
         val userLocal = localUserRepository.getLoggedInUser()

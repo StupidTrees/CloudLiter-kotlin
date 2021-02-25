@@ -12,7 +12,6 @@ class BitmapRequestBody(
 
     override fun contentType(): MediaType? {
         return MediaType.parse(when(format){
-            Bitmap.CompressFormat.WEBP -> "image/webp"
             Bitmap.CompressFormat.PNG -> "image/png"
             else -> "image/jpeg"
         })
