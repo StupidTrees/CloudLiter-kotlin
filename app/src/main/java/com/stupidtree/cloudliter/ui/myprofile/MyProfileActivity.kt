@@ -3,7 +3,6 @@ package com.stupidtree.cloudliter.ui.myprofile
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserLocal
@@ -186,7 +185,6 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
                         ).setOnConfirmListener(object : PopUpSelectableList.OnConfirmListener<UserLocal.TYPEPERMISSION> {
                             override fun onConfirm(title: String?, key: UserLocal.TYPEPERMISSION) {
                                 viewModel.startChangeType(up.data!!.type, up.data!!.subType, key)
-//                                viewModel.userProfileLiveData?.value?.data?.let { it1 -> viewModel.startChangeType(it1.type, it1.subType, key) }
                             }
                         }).show(supportFragmentManager, "select")
             }

@@ -28,6 +28,7 @@ import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpTextMessageDetail
 import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectBottomFragment
 import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
+import com.stupidtree.cloudliter.ui.widgets.PopUpText
 import com.stupidtree.cloudliter.utils.*
 import java.util.*
 
@@ -441,15 +442,39 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         } else {
             binding.title.text = conversation.friendRemark
         }
-        if (conversation.friendTypePermission == UserLocal.TYPEPERMISSION.PRIVATE) {
-//        if (conversation.friendType == 0) {
-            Log.d("GONE:","GONEGONEGONE")
-//            conversation.friendAccessibility
-//            binding.accessibilityIcon.visibility = View.VISIBLE
-            binding.accessibilityIcon.visibility = View.GONE
+
+        binding.accessibilityIcon.visibility = View.GONE
+        binding.accessibilityIcon2.visibility = View.GONE
+        binding.accessibilityIcon3.visibility = View.GONE
+        if (conversation.friendType == 0) {
+            binding.typeIcon.visibility = View.GONE
         } else {
-            Log.d("VIS:","VISVISVIS")
-            binding.accessibilityIcon.visibility = View.VISIBLE
+            binding.typeIcon.visibility = View.VISIBLE
+            when (conversation.friendType) {
+                1 -> { binding.accessibilityIcon.visibility = View.VISIBLE }
+                2 -> { binding.accessibilityIcon2.visibility = View.VISIBLE }
+                3 -> {
+                    binding.accessibilityIcon.visibility = View.VISIBLE
+                    binding.accessibilityIcon2.visibility = View.VISIBLE
+                }
+                4 -> { binding.accessibilityIcon3.visibility = View.VISIBLE }
+                5 -> {
+                    binding.accessibilityIcon.visibility = View.VISIBLE
+                    binding.accessibilityIcon3.visibility = View.VISIBLE
+                }
+                6 -> {
+                    binding.accessibilityIcon2.visibility = View.VISIBLE
+                    binding.accessibilityIcon3.visibility = View.VISIBLE
+                }
+                7 -> {
+                    binding.accessibilityIcon.visibility = View.VISIBLE
+                    binding.accessibilityIcon2.visibility = View.VISIBLE
+                    binding.accessibilityIcon3.visibility = View.VISIBLE
+                }
+                else -> {
+                    binding.typeIcon.visibility = View.GONE
+                }
+            }
         }
     }
 
@@ -492,7 +517,17 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
     //发送语音消息
     private fun voiceMessageSend() {
         if (!TextUtils.isEmpty(voiceHelper.filePath)) {
-            viewModel.sendVoiceMessage(voiceHelper.filePath, voiceHelper.timeCount)
+//            viewModel.sendVoiceMessage(voiceHelper.filePath, voiceHelper.timeCount)
+            voiceHelper.let {
+                viewModel.conversation.value?.let { conversation ->
+                    if (conversation.friendType == 2 || conversation.friendType == 3 || conversation.friendType == 6 || conversation.friendType == 7) {
+                        //TODO
+                        viewModel.sendVoiceMessage(it.filePath, it.timeCount)
+                    } else {
+                        viewModel.sendVoiceMessage(it.filePath, it.timeCount)
+                    }
+                }
+            }
         }
         voiceHelper.sendRecord()
         binding.voiceCancel.visibility = View.GONE
@@ -636,12 +671,10 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
             val filePath = FileProviderUtils.getFilePathByUri(getThis(), uri)
             filePath?.let {
                 viewModel.conversation.value?.let { conversation ->
-                    if (conversation.friendTypePermission == UserLocal.TYPEPERMISSION.PRIVATE) {
-                        viewModel.sendImageMessage(it)
-                    } else {
+                    if (conversation.friendType == 1 || conversation.friendType == 3 || conversation.friendType == 5 || conversation.friendType == 7) {
                         ImageDetectBottomFragment().setMessage(null)
                                 .setTitle(getString(R.string.hint_accessibility_sure_to_send_title))
-                                .setSubtitle(getString(R.string.hint_accessibility_sure_to_send_subtitle))
+                                .setSubtitle(getString(R.string.hint_type_visual_sure_to_send_subtitle))
                                 .setUrl(filePath)
                                 .setOnConfirmListener(object : ImageDetectBottomFragment.OnConfirmListener {
                                     override fun onConfirm(url: String) {
@@ -649,6 +682,8 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                                     }
                                 })
                                 .show(supportFragmentManager, "xx")
+                    } else {
+                        viewModel.sendImageMessage(it)
                     }
                 }
             }

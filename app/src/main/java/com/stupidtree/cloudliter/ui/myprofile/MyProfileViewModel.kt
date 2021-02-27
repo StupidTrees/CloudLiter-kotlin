@@ -254,10 +254,10 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
      * 发起更换用户类型及隐私类型请求
      * @param type 用户类型
      * @param subType 用户类型详细分类
-     * @param tpyePermission 无障碍隐私类型
+     * @param typePermission 无障碍隐私类型
      */
-    fun startChangeType(type: Int, subType: String?, tpyePermission: UserLocal.TYPEPERMISSION) {
-        changeTypeController.value = TypeTrigger.getActioning(type, subType, tpyePermission.name)
+    fun startChangeType(type: Int, subType: String?, typePermission: UserLocal.TYPEPERMISSION) {
+        changeTypeController.value = TypeTrigger.getActioning(type, subType, typePermission.name)
     }
 
     /**

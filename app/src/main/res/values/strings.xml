@@ -192,29 +192,33 @@
     <string name="type_hearing_limb">听力 | 肢体障碍</string>
     <string name="type_visual_hearing_limb">视力 | 听力 | 肢体障碍</string>
     <string name="hint_friend_accessibility">对方处于无障碍模式</string>
+    <string name="hint_friend_type_visual">对方为视力障碍用户</string>
+    <string name="hint_friend_type_hearing">对方为听力障碍用户</string>
+    <string name="hint_friend_type_limb">对方为肢体障碍用户</string>
     <string name="hint_accessibility_sure_to_send_title">是否继续发送?</string>
     <string name="hint_accessibility_sure_to_send_subtitle">对方为无障碍用户，这张图片将被识别为如下所示并通过Talkback反馈给对方，请确保对方能获得清楚的图片描述</string>
+    <string name="hint_type_visual_sure_to_send_subtitle">对方为视力障碍用户，这条语音消息将被转化为如下所示的文本消息反馈给对方，请确保对方能获得准确的文本信息</string>
     <string name="scene_classify_result_test">场景推测：%s</string>
     <string-array name="yunmoji_descriptions">
+        <item>企鹅</item>
+        <item>兔子</item>
+        <item>熊猫</item>
+        <item>大象</item>
+        <item>斑马</item>
+        <item>松鼠</item>
+        <item>熊</item>
+        <item>牛</item>
+        <item>狐狸</item>
         <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
-        <item>狗</item>
+        <item>狮子</item>
+        <item>猪</item>
+        <item>猫</item>
+        <item>猫头鹰</item>
+        <item>猴子</item>
+        <item>羊</item>
+        <item>老虎</item>
+        <item>老鼠</item>
+        <item>长颈鹿</item>
+        <item>青蛙</item>
     </string-array>
 </resources>

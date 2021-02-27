@@ -92,17 +92,8 @@
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/accessibility_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:alpha="0.6"
-                    android:contentDescription="@string/hint_friend_accessibility"
-                    android:focusable="true"
-                    android:padding="6dp"
-                    android:theme="@style/rippleControl"
-                    app:srcCompat="@drawable/ic_baseline_accessibility_24" />
+
+
 
             </LinearLayout>
 
@@ -143,6 +134,62 @@
             android:overScrollMode="never" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <LinearLayout
+        android:id="@+id/type_icon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="-8dp"
+        android:elevation="2dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal"
+            android:background="?attr/backgroundColorSecond"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/accessibility_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:alpha="0.6"
+                android:contentDescription="@string/hint_friend_type_visual"
+                android:focusable="true"
+                android:padding="6dp"
+                android:theme="@style/rippleControl"
+                app:srcCompat="@drawable/ic_baseline_type_visual_24" />
+            <ImageView
+                android:id="@+id/accessibility_icon2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:alpha="0.6"
+                android:contentDescription="@string/hint_friend_type_hearing"
+                android:focusable="true"
+                android:padding="6dp"
+                android:theme="@style/rippleControl"
+                app:srcCompat="@drawable/ic_baseline_type_hearing_24" />
+            <ImageView
+                android:id="@+id/accessibility_icon3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:alpha="0.6"
+                android:contentDescription="@string/hint_friend_type_limb"
+                android:focusable="true"
+                android:padding="6dp"
+                android:theme="@style/rippleControl"
+                app:srcCompat="@drawable/ic_baseline_type_limb_24" />
+
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
