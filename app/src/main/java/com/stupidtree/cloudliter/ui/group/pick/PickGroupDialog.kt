@@ -70,8 +70,8 @@ class PickGroupDialog : TransparentBottomSheetDialog<DialogBottomGroupListBindin
         binding.cancel.setOnClickListener { dismiss() }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         binding.loading.visibility = View.VISIBLE
         viewModel!!.startRefresh()
     }
@@ -109,7 +109,7 @@ class PickGroupDialog : TransparentBottomSheetDialog<DialogBottomGroupListBindin
         class LHolder(itemView: DialogBottomSelectableListItemBinding) : BaseViewHolder<DialogBottomSelectableListItemBinding>(itemView)
 
         override fun getViewBinding(parent: ViewGroup, viewType: Int): ViewBinding {
-            return DialogBottomSelectableListItemBinding.inflate(mInflater,parent,false)
+            return DialogBottomSelectableListItemBinding.inflate(mInflater, parent, false)
         }
 
         override fun createViewHolder(viewBinding: ViewBinding, viewType: Int): LHolder {

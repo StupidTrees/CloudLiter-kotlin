@@ -290,7 +290,6 @@ class UserWebSource : BaseWebSource<UserService>(Retrofit.Builder()
             if (input != null) {
                 when (input.code) {
                     SUCCESS -> {
-                        println("SUCCEED")
                         return@map DataState<String?>(DataState.STATE.SUCCESS)
                     }
                     TOKEN_INVALID -> return@map DataState<String?>(DataState.STATE.TOKEN_INVALID)

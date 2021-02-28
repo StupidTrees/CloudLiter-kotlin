@@ -71,7 +71,7 @@ object ImageUtils {
      */
     fun loadChatMessageInto(context: Context, filename: String, target: ImageView) {
         if (isEmpty(filename)) {
-            target.setImageResource(R.drawable.place_holder_avatar)
+            target.setImageResource(R.drawable.place_holder_loading)
         } else {
             val glideUrl = GlideUrl(getChatMessageImageUrl(filename), LazyHeaders.Builder().addHeader("device-type", "android").build())
             Glide.with(context).load(glideUrl)

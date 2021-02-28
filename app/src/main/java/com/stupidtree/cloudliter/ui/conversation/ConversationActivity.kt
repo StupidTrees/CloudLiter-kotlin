@@ -67,8 +67,8 @@ class ConversationActivity : BaseActivity<ConversationViewModel,ActivityConversa
         binding.refresh.isRefreshing = true
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         startRefresh()
     }
 

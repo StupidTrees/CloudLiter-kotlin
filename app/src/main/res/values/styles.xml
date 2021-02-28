@@ -4,6 +4,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDisabled">@color/colorPrimaryDisabled</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="backgroundColorBottom">#FFFFFFFF</item>
         <item name="backgroundColorBottomAsTint">#CFFFFFFF</item>

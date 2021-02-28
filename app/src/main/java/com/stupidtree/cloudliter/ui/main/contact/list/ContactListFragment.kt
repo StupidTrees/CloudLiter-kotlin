@@ -114,8 +114,8 @@ class ContactListFragment : BaseFragmentWithReceiver<ContactListViewModel,Fragme
     }
 
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         viewModel.startFetchData()
     }
 

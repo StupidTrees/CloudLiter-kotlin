@@ -179,15 +179,10 @@ class SearchActivity : BaseActivity<SearchViewModel, ActivitySearchBinding>() {
 
     override fun onStart() {
         super.onStart()
+        viewModel.beginRefresh()
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         binding.searchview.requestFocus()
         imm.showSoftInput(binding.searchview, 0)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.beginRefresh()
-
     }
 
     /**

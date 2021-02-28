@@ -27,8 +27,9 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
 
     var listAdapter: DetectResultAdapter? = null
 
-    override fun onResume() {
-        super.onResume()
+
+    override fun onStart() {
+        super.onStart()
         viewModel.imageUrl.value = arguments?.getString("url")
     }
 

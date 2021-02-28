@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.view.HapticFeedbackConstants
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.GravityCompat
@@ -24,6 +26,7 @@ import com.stupidtree.cloudliter.ui.main.conversations.ConversationsFragment
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.NotificationUtils
+import me.ibrahimsn.lib.OnItemSelectedListener
 
 /**
  * 很显然，这是主界面
@@ -53,12 +56,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
         setUserViews(viewModel.localUser)
     }
+
 
     private fun setUpDrawer() {
         binding.drawerNavigationview.itemIconTintList = null
@@ -97,7 +97,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     override fun initViews() {
 
         setUpDrawer()
-        binding.title.text = binding.navView.menu.getItem(0).title
+        binding.title.text = getString(R.string.title_home)
         //Objects.requireNonNull(getSupportActionBar()).setTitle(navView.getMenu().getItem(0).getTitle());
         binding.pager.adapter = object : BaseTabAdapter(supportFragmentManager, 2) {
             override fun initItem(position: Int): Fragment {
@@ -114,22 +114,32 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         binding.pager.addOnPageChangeListener(object : OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageSelected(position: Int) {
-                val item = binding.navView.menu.getItem(position)
-                item.isChecked = true
-                binding.title.text = item.title
+                binding.navView.itemActiveIndex = position
+                binding.title.setText(when(position){
+                    0->R.string.title_home
+                    else->R.string.title_contact
+                })
                 //Objects.requireNonNull(getSupportActionBar()).setTitle(item.getTitle());
             }
 
             override fun onPageScrollStateChanged(state: Int) {}
         })
-        binding.navView.setOnNavigationItemSelectedListener { item: MenuItem ->
-            when (item.itemId) {
-                R.id.navigation_home -> binding.pager.currentItem = 0
-                R.id.navigation_dashboard -> binding.pager.currentItem = 1
+        binding.navView.onItemSelectedListener = object:OnItemSelectedListener {
+            override fun onItemSelect(pos: Int): Boolean {
+                binding.navView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                binding.pager.currentItem = pos
+                return true
             }
-            binding.title.text = item.title
-            true
+
         }
+//        binding.navView.setOnNavigationItemSelectedListener { item: MenuItem ->
+//            when (item.itemId) {
+//                R.id.navigation_home -> binding.pager.currentItem = 0
+//                R.id.navigation_dashboard -> binding.pager.currentItem = 1
+//            }
+//            binding.title.text = item.title
+//            true
+//        }
         binding.avatar.setOnClickListener { binding.drawer.openDrawer(GravityCompat.END) }
         binding.exitLayout.setOnClickListener {
             finish()

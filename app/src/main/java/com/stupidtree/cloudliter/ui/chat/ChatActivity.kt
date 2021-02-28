@@ -93,6 +93,21 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         Log.e("ChatActivity", "bindService")
         viewModel.bindService(this)
         refreshInputLayout()
+        if (intent.extras != null && intent.extras!!.getSerializable("conversation") != null) {
+            val conversation = intent.extras!!.getSerializable("conversation") as Conversation?
+            if (conversation != null) {
+                if (viewModel.conversationId == null) {
+                    viewModel.setConversation(conversation)
+                    viewModel.markAllRead(getThis())
+                    viewModel.fetchHistoryData() //初次进入时，重新加载聊天记录
+                } else {
+                    viewModel.fetchNewData() //非第一次进入
+                }
+            }
+        }
+        viewModel.getIntoConversation(this)
+        mHandler.postDelayed(heartBeatRunnable, 5 * 1000)
+        viewModel.refreshConversation()
     }
 
     //更新Intent时（更换聊天对象），刷新列表
@@ -109,26 +124,6 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                 viewModel.setConversation(conversation)
             }
         }
-    }
-
-    //每次回到页面时，声明进入对话
-    override fun onResume() {
-        super.onResume()
-        if (intent.extras != null && intent.extras!!.getSerializable("conversation") != null) {
-            val conversation = intent.extras!!.getSerializable("conversation") as Conversation?
-            if (conversation != null) {
-                if (viewModel.conversationId == null) {
-                    viewModel.setConversation(conversation)
-                    viewModel.markAllRead(getThis())
-                    viewModel.fetchHistoryData() //初次进入时，重新加载聊天记录
-                } else {
-                    viewModel.fetchNewData() //非第一次进入
-                }
-            }
-        }
-        viewModel.getIntoConversation(this)
-        mHandler.postDelayed(heartBeatRunnable, 5 * 1000)
-        viewModel.refreshConversation()
     }
 
     //每次页面失去焦点时，退出对话，解绑服务

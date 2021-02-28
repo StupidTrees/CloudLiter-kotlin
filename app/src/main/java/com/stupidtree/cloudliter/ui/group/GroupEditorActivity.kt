@@ -115,8 +115,8 @@ class GroupEditorActivity : BaseActivity<GroupEditorViewModel,ActivityGroupEdito
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         viewModel.startRefresh()
     }
 

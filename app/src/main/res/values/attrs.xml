@@ -11,5 +11,6 @@
     <attr name="backgroundColorSecond" format="color" />
     <attr name="backgroundColorSecondAsTint" format="color" />
     <attr name="colorControlDisabled" format="color" />
+    <attr name="colorPrimaryDisabled" format="color"/>
 </resources>
 

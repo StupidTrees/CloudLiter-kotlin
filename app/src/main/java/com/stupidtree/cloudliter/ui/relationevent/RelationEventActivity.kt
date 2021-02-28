@@ -92,8 +92,9 @@ class RelationEventActivity : BaseActivity<RelationEventViewModel,ActivityRelati
         viewModel.markReadResult?.observe(this, { })
     }
 
-    override fun onResume() {
-        super.onResume()
+
+    override fun onStart() {
+        super.onStart()
         viewModel.startRefresh()
         viewModel.startMarkRead()
     }

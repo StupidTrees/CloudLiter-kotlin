@@ -127,6 +127,8 @@ dependencies {
     //tflite
     implementation 'org.tensorflow:tensorflow-lite:2.2.0'
     implementation 'org.tensorflow:tensorflow-lite-gpu:2.2.0'
+
+    implementation 'com.github.ibrahimsn98:SmoothBottomBar:1.7.6'//底部导航
 }
 repositories {
     mavenCentral()

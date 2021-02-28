@@ -74,8 +74,8 @@ class ContactFragment : BaseFragmentWithReceiver<ContactViewModel,FragmentContac
         binding?.tabs?.setupWithViewPager(binding?.pager)
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         viewModel.startFetchUnread()
     }
 

@@ -47,6 +47,8 @@ class QRCodeActivity : BaseActivity<QRCodeViewModel,ActivityQRCodeBinding>() {
             }
             true
         }
+        viewModel.startRefresh()
+        setUserInfo(viewModel.getLoggedInUser())
     }
 
     override fun initViews() {
@@ -66,11 +68,7 @@ class QRCodeActivity : BaseActivity<QRCodeViewModel,ActivityQRCodeBinding>() {
         binding.nickname.text = user.nickname
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.startRefresh()
-        setUserInfo(viewModel.getLoggedInUser())
-    }
+
 
     override fun initViewBinding(): ActivityQRCodeBinding {
         return ActivityQRCodeBinding.inflate(layoutInflater)

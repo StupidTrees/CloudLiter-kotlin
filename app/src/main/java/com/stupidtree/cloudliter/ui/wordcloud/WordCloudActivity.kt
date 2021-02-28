@@ -45,8 +45,8 @@ class WordCloudActivity : BaseActivity<WordCloudViewModel, ActivityWordCloudBind
         binding.refresh.setColorSchemeColors(getColorPrimary())
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         viewModel.startRefresh()
     }
 }

@@ -134,17 +134,13 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel,Fr
 
 
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.startRefresh()
-        viewModel.callOnline(requireContext())
-
-    }
 
 
     override fun onStart() {
         super.onStart()
         viewModel.bindService(activity)
+        viewModel.startRefresh()
+        viewModel.callOnline(requireContext())
     }
 
     override fun onDetach() {

@@ -79,7 +79,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                 } else {
                     chatActivity.viewModel.friendAvatar?.let { ImageUtils.loadAvatarInto(chatActivity, it, holder.avatar!!) }
                 }
-                holder.avatar?.setOnClickListener { view: View? -> data.fromId?.let { ActivityUtils.startProfileActivity(chatActivity, it) } }
+                holder.avatar?.setOnClickListener { data.fromId?.let { ActivityUtils.startProfileActivity(chatActivity, it) } }
                 if (holder.progress != null) {
                     if (data.isProgressing) {
                         holder.progress?.visibility = View.VISIBLE

@@ -258,8 +258,8 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
         })
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         startRefresh()
     }
 
