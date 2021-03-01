@@ -47,7 +47,7 @@ class ChatMessage : Serializable {
     var createdAt: Timestamp? = null
     var updatedAt: Timestamp? = null
     var extra: String? = null
-    //long createdTime;
+    var ttsResult: String? = ""    //语音识别结果
 
     /**
      * 服务器上不保存的属性
@@ -56,8 +56,6 @@ class ChatMessage : Serializable {
     @Ignore
     var isProgressing: Boolean
 
-    //语音识别结果
-    var ttsResult: String? = ""
 
     enum class VOICE_STATE { PLAYING, PAUSED, STOPPED }
     enum class TTS_STATE { STOPPED, PROCESSING, SUCCESS, FAILED }

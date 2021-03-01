@@ -101,18 +101,29 @@
                     android:id="@+id/tts_result"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:alpha="0.8"
+                    android:maxEms="12"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingBottom="8dp"
-                    android:textColor="@android:color/white"
-                    android:alpha="0.8"
                     android:text="hello world"
+                    android:textColor="@android:color/white"
                     android:textSize="12sp"
                     android:visibility="gone" />
 
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
+
+        <ImageView
+            android:id="@+id/emotion"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="top|end"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="-6dp"
+            android:visibility="invisible"
+            app:srcCompat="@drawable/ic_emotion_pos_1" />
 
 
     </LinearLayout>

@@ -60,14 +60,14 @@ class UserProfile {
 
     fun getTypeList(typeT:Int):List<Int>{
         return when (typeT) {
-            1 -> { listOf<Int>(VISUAL) }
-            2 -> { listOf<Int>(HEARING) }
-            3 -> { listOf<Int>(VISUAL, HEARING) }
-            4 -> { listOf<Int>(LIMB) }
-            5 -> { listOf<Int>(VISUAL, LIMB) }
-            6 -> { listOf<Int>(HEARING, LIMB) }
-            7 -> { listOf<Int>(VISUAL, HEARING, LIMB) }
-            else -> { listOf<Int>() }
+            1 -> { listOf(VISUAL) }
+            2 -> { listOf(HEARING) }
+            3 -> { listOf(VISUAL, HEARING) }
+            4 -> { listOf(LIMB) }
+            5 -> { listOf(VISUAL, LIMB) }
+            6 -> { listOf(HEARING, LIMB) }
+            7 -> { listOf(VISUAL, HEARING, LIMB) }
+            else -> { listOf() }
         }
     }
 

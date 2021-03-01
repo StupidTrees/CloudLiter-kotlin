@@ -115,7 +115,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         input
     }
 
-    val ttsResultLiveData: MediatorLiveData<Pair<DataState<String>, ChatMessage>> = MediatorLiveData()
+    val ttsResultLiveData: MediatorLiveData<DataState<ChatMessage?>> = MediatorLiveData()
     var messageReadState: LiveData<DataState<MessageReadNotification>> = Transformations.map(chatRepository.messageReadState) { input: DataState<MessageReadNotification> -> input }
 
     //控制↑的刷新
@@ -340,23 +340,21 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     fun startTTS(message: ChatMessage) {
         val dt = getTTSOneTaskLiveData(message)
         ttsResultLiveData.addSource(dt) {
+            it.data?.id = message.id
             ttsResultLiveData.value = it
-            ttsResultLiveData.removeSource(dt)//移除任务
+            ttsResultLiveData.removeSource(dt) //移除任务
         }
     }
 
     /**
-     * 获取某个语音合成任务的livedata
+     * 获取某个语音合成任务的liveData
      */
-    private fun getTTSOneTaskLiveData(message: ChatMessage): LiveData<Pair<DataState<String>, ChatMessage>> {
+    private fun getTTSOneTaskLiveData(message: ChatMessage): LiveData<DataState<ChatMessage?>> {
         val userLocal = localUserRepository.getLoggedInUser()
         return if (userLocal.isValid) {
-            Transformations.switchMap(chatRepository.startTTS(userLocal.token!!, message)) {
-                message.ttsResult = it.data
-                MutableLiveData(Pair(it, message))
-            }
+            chatRepository.startTTS(userLocal.token!!, message)
         } else {
-            MutableLiveData(Pair(DataState(DataState.STATE.NOT_LOGGED_IN), message))
+            MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
         }
     }
 

@@ -119,15 +119,15 @@ class ChatMessageWebSource : BaseWebSource<ChatMessageService>(Retrofit.Builder(
         }
     }
 
-    fun startTTS(token: String, id: String):LiveData<DataState<String>>{
-        return Transformations.map(service.startTTS(token,id)){input:ApiResponse<JsonObject>?->
+    fun startTTS(token: String, id: String):LiveData<DataState<ChatMessage?>>{
+        return Transformations.map(service.startTTS(token,id)){input->
             Log.e("语音合成结果", input.toString())
            // val jo = JsonUtils.getJSONObject(input?.data)
             if (input == null) {
-                return@map DataState<String>(DataState.STATE.FETCH_FAILED)
+                return@map DataState(DataState.STATE.FETCH_FAILED)
             }
             when (input.code) {
-                codes.SUCCESS -> return@map DataState(JsonUtils.getStringData(input.data,"result")?:"")
+                codes.SUCCESS -> return@map DataState(input.data)
                 codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
                 else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
             }

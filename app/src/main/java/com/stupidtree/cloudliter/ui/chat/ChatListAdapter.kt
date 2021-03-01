@@ -225,17 +225,22 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
     /**
      * 语音识别状态变更
      */
-    fun changeTTSState(list: RecyclerView, id: String, result:String?,action: ChatMessage.TTS_STATE) {
+    fun changeTTSState(list: RecyclerView, chatMessage:ChatMessage?, action: ChatMessage.TTS_STATE) {
         var index = -1
         for (i in mBeans.indices.reversed()) {
-            if (mBeans[i].id == id) {
+            if (mBeans[i].id == chatMessage?.id) {
                 index = i
                 break
             }
         }
         if (index >= 0) {
-            mBeans[index].ttsResult = result
-            mBeans[index].ttsState = action
+            chatMessage?.let {
+                mBeans[index].ttsResult = it.ttsResult
+                mBeans[index].extra = it.extra
+                mBeans[index].emotion = it.emotion
+                mBeans[index].sensitive = it.sensitive
+                mBeans[index].ttsState = action
+            }
             val holder = list.findViewHolderForAdapterPosition(index) as CHolder?
             holder?.bindVoiceState(mBeans[index])
         }
@@ -344,7 +349,8 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
     }
 
     internal inner class CHolder(itemView: View, var viewType: Int) : RecyclerView.ViewHolder(itemView) {
-        private val ttsButtonAnimation: ValueAnimator = ValueAnimator.ofFloat(0f,360f)
+        private val ttsButtonAnimation: ValueAnimator = ValueAnimator.ofFloat(0f, 360f)
+
         init {
             ttsButtonAnimation.repeatCount = -1
             ttsButtonAnimation.addUpdateListener {
@@ -432,41 +438,44 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                     see?.visibility = View.VISIBLE
                     emotion?.visibility = View.GONE
                     see?.setImageResource(R.drawable.ic_baseline_visibility_24)
-                    see?.setOnClickListener { view: View? -> switchSensitiveModeText(data) }
+                    see?.setOnClickListener { switchSensitiveModeText(data) }
                     content?.setText(R.string.hint_sensitive_message)
                 } else {
                     see?.visibility = View.GONE
                     content?.text = data.content
                     emotion?.visibility = View.VISIBLE
-                    val emotionValue = data.emotion
-                    var iconRes = R.drawable.ic_emotion_normal
-                    when {
-                        emotionValue >= 0.7 -> {
-                            iconRes = R.drawable.ic_emotion_pos_3
-                        }
-                        emotionValue >= 0.4 -> {
-                            iconRes = R.drawable.ic_emotion_pos_2
-                        }
-                        emotionValue > 0 -> {
-                            iconRes = R.drawable.ic_emotion_pos_1
-                        }
-                        emotionValue <= -0.7 -> {
-                            iconRes = R.drawable.ic_emotion_neg_3
-                        }
-                        emotionValue <= -0.4 -> {
-                            iconRes = R.drawable.ic_emotion_neg_2
-                        }
-                        emotionValue < 0 -> {
-                            iconRes = R.drawable.ic_emotion_neg_1
-                        }
-                    }
-                    emotion?.setImageResource(iconRes)
+                    setEmotionIcon(data.emotion)
                 }
             } else {
                 data.extra?.let {
                     content?.text = TextUtils.getVoiceTimeText(mContext, Integer.parseInt(it.replace("\"", "")))
                 }
             }
+        }
+
+        private fun setEmotionIcon(emotionValue: Float) {
+            var iconRes = R.drawable.ic_emotion_normal
+            when {
+                emotionValue >= 0.7 -> {
+                    iconRes = R.drawable.ic_emotion_pos_3
+                }
+                emotionValue >= 0.4 -> {
+                    iconRes = R.drawable.ic_emotion_pos_2
+                }
+                emotionValue > 0 -> {
+                    iconRes = R.drawable.ic_emotion_pos_1
+                }
+                emotionValue <= -0.7 -> {
+                    iconRes = R.drawable.ic_emotion_neg_3
+                }
+                emotionValue <= -0.4 -> {
+                    iconRes = R.drawable.ic_emotion_neg_2
+                }
+                emotionValue < 0 -> {
+                    iconRes = R.drawable.ic_emotion_neg_1
+                }
+            }
+            emotion?.setImageResource(iconRes)
         }
 
         fun bindVoiceState(data: ChatMessage) {
@@ -482,6 +491,13 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                         image?.setImageResource(R.drawable.ic_baseline_pause_circle_filled_24)
                     }
                 }
+            }
+            if (!data.ttsResult.isNullOrEmpty()) {
+                emotion?.visibility = View.VISIBLE
+                setEmotionIcon(data.emotion)
+                data.ttsState = ChatMessage.TTS_STATE.SUCCESS
+            } else {
+                emotion?.visibility = View.INVISIBLE
             }
             if (ttsButton != null) {
                 when (data.ttsState) {

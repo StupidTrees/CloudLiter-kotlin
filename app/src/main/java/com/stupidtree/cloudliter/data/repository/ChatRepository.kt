@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.source.dao.ChatMessageDao
@@ -118,7 +119,7 @@ class ChatRepository(context: Context) {
      * @param afterId        现有列表底部的消息id
      */
     fun ActionFetchNewMessages(token: String, conversationId: String, afterId: String?) {
-        webListState?.let{listDataState.removeSource(it)}
+        webListState?.let { listDataState.removeSource(it) }
         webListState = chatMessageWebSource.getMessagesAfter(token, conversationId, afterId, false)
         listDataState.addSource(webListState!!) { result ->
             Log.e("手动拉取本地未存新消息", "$afterId-$result")
@@ -259,8 +260,17 @@ class ChatRepository(context: Context) {
     /**
      * 开始语音合成
      */
-    fun startTTS(token:String,message:ChatMessage):LiveData<DataState<String>>{
-        return chatMessageWebSource.startTTS(token,message.id)
+    fun startTTS(token: String, message: ChatMessage): LiveData<DataState<ChatMessage?>> {
+        return Transformations.map(chatMessageWebSource.startTTS(token, message.id)) {
+            if (it.state == DataState.STATE.SUCCESS) {
+                it.data?.let { cm ->
+                    cm.id = message.id
+                    saveMessageAsync(cm)
+                }
+
+            }
+            return@map it
+        }
     }
 
     fun bindService(context: Context) {

@@ -276,8 +276,9 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
             }
         })
         viewModel.ttsResultLiveData.observe(this) {
-            listAdapter.changeTTSState(binding.list, it.second.id,it.second.ttsResult, if (it.first.state == DataState.STATE.SUCCESS)
+            listAdapter.changeTTSState(binding.list, it.data, if (it.state == DataState.STATE.SUCCESS)
                 ChatMessage.TTS_STATE.SUCCESS else ChatMessage.TTS_STATE.FAILED)
+
         }
     }
 
@@ -347,7 +348,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         })
         listAdapter.onTTSButtonClickListener = object : ChatListAdapter.OnTTSButtonClickListener {
             override fun onClick(v: View, data: ChatMessage, position: Int) {
-                listAdapter.changeTTSState(binding.list,data.id,"",ChatMessage.TTS_STATE.PROCESSING)
+                listAdapter.changeTTSState(binding.list,data,ChatMessage.TTS_STATE.PROCESSING)
                 viewModel.startTTS(data)
             }
 

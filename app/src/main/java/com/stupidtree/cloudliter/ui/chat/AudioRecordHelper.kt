@@ -2,19 +2,21 @@ package com.stupidtree.cloudliter.ui.chat
 
 import android.app.Activity
 import android.media.MediaRecorder
-import android.os.*
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.text.format.DateFormat
-import android.util.Log
 import com.stupidtree.cloudliter.utils.PermissionUtils
 import java.io.File
 import java.util.*
 
 class AudioRecordHelper(val context: Activity, val onRecordListener: OnRecordListener) {
-    enum class STATE{RECORDING,IDLE,DONE}
+    enum class STATE { RECORDING, IDLE, DONE }
+
     // 录音功能相关
     var recorder // MediaRecorder 实例
             : MediaRecorder? = null
-    var state:STATE = STATE.IDLE//录音状态
+    var state: STATE = STATE.IDLE//录音状态
     var fileName // 录音文件的名称
             : String? = null
     var filePath // 录音文件存储路径
@@ -35,23 +37,23 @@ class AudioRecordHelper(val context: Activity, val onRecordListener: OnRecordLis
         override fun handleMessage(msg: Message) {
             when (msg.what) {
                 RECORD_START -> {
-                    if(msg.obj is java.lang.Exception){
+                    if (msg.obj is java.lang.Exception) {
                         onRecordListener.onRecordStart(msg.obj as java.lang.Exception)
-                    }else{
+                    } else {
                         onRecordListener.onRecordStart(null)
                     }
                 }
-                RECORD_STOP ->{
-                    if(msg.obj is java.lang.Exception){
-                        onRecordListener.onRecordStop(null, 0,msg.obj as java.lang.Exception?)
-                    }else{
-                        onRecordListener.onRecordStop(msg.obj as String?, msg.arg1,null)
+                RECORD_STOP -> {
+                    if (msg.obj is java.lang.Exception) {
+                        onRecordListener.onRecordStop(null, 0, msg.obj as java.lang.Exception?)
+                    } else {
+                        onRecordListener.onRecordStop(msg.obj as String?, msg.arg1, null)
                     }
                 }
                 TIME_COUNT -> {
                     val count = msg.obj as Int
                     onRecordListener.onRecordTimeTick(count, null)
-                    if(count>10){
+                    if (count > 10) {
                         stopRecord()
                     }
                 }
@@ -61,7 +63,7 @@ class AudioRecordHelper(val context: Activity, val onRecordListener: OnRecordLis
 
     interface OnRecordListener {
         fun onRecordStart(exception: java.lang.Exception?)
-        fun onRecordStop(path: String?,seconds:Int, exception: java.lang.Exception?)
+        fun onRecordStop(path: String?, seconds: Int, exception: java.lang.Exception?)
         fun onRecordTimeTick(count: Int, exception: java.lang.Exception?)
     }
 
@@ -72,9 +74,9 @@ class AudioRecordHelper(val context: Activity, val onRecordListener: OnRecordLis
      */
     fun startRecord() {
         PermissionUtils.grantAudioPermissions(context)
-        if(state==STATE.DONE){//有未发送的语音
+        if (state == STATE.DONE) {//有未发送的语音
             cancelRecord()
-        }else if(state==STATE.RECORDING){
+        } else if (state == STATE.RECORDING) {
             return
         }
         destroy()
@@ -93,6 +95,10 @@ class AudioRecordHelper(val context: Activity, val onRecordListener: OnRecordLis
                 recorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
                 /* ②设置音频文件的编码：AAC/AMR_NB/AMR_MB/Default 声音的（波形）的采样 */
                 recorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+
+                recorder?.setAudioChannels(1)
+                recorder?.setAudioEncodingBitRate(128000)
+                recorder?.setAudioSamplingRate(16000)
                 fileName = DateFormat.format("yyyyMMdd_HHmmss", Calendar.getInstance(Locale.CHINA)).toString() + ".m4a"
                 val f = File(audioSaveDir)
                 if (!f.exists()) {
@@ -103,7 +109,7 @@ class AudioRecordHelper(val context: Activity, val onRecordListener: OnRecordLis
                 recorder?.prepare()
                 /* ④开始 */recorder?.start()
                 // 初始化录音时长记录
-                if(timeThread!=null){
+                if (timeThread != null) {
                     timeThread!!.interrupt()
                 }
                 timeThread = Thread { countTime() }
@@ -123,12 +129,11 @@ class AudioRecordHelper(val context: Activity, val onRecordListener: OnRecordLis
     }
 
 
-
     /**
      * 停止录音
      */
     fun stopRecord() {
-        if(state!=STATE.RECORDING){
+        if (state != STATE.RECORDING) {
             return
         }
         recorder?.setOnErrorListener(null)
@@ -145,14 +150,14 @@ class AudioRecordHelper(val context: Activity, val onRecordListener: OnRecordLis
                 mainThreadHandler.sendMessage(mes)
                 state = STATE.DONE
             } catch (e: RuntimeException) {
-               // e.printStackTrace()
+                // e.printStackTrace()
                 val file = File(filePath)
                 if (file.exists()) file.delete()
                 filePath = ""
                 try {
                     recorder?.reset()
                     recorder?.release()
-                }catch (e:Exception){
+                } catch (e: Exception) {
 
                 }
                 val mes = Message.obtain()
@@ -170,11 +175,11 @@ class AudioRecordHelper(val context: Activity, val onRecordListener: OnRecordLis
     /**
      * 取消录音：删除录音文件
      */
-    fun cancelRecord(){
-        state=STATE.IDLE
-        filePath =""
+    fun cancelRecord() {
+        state = STATE.IDLE
+        filePath = ""
         timeCount = 0
-        Thread{
+        Thread {
             val file = File(filePath)
             if (file.exists()) file.delete()
         }.start()
@@ -183,15 +188,15 @@ class AudioRecordHelper(val context: Activity, val onRecordListener: OnRecordLis
     /**
      * 发送语音消息：转换状态
      */
-    fun sendRecord(){
-        state=STATE.IDLE
+    fun sendRecord() {
+        state = STATE.IDLE
         filePath = ""
         timeCount = 0
     }
 
     private fun countTime() {
-        while (state==STATE.RECORDING) {
-            if(Thread.interrupted()) return
+        while (state == STATE.RECORDING) {
+            if (Thread.interrupted()) return
             timeCount++
             val msg = Message.obtain()
             msg.what = TIME_COUNT

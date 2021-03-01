@@ -62,7 +62,7 @@ interface ChatMessageService {
      */
     @FormUrlEncoded
     @POST("/ai/voice/tts")
-    fun startTTS(@Header("token") token: String, @Field("id") messageId:String): LiveData<ApiResponse<JsonObject>>
+    fun startTTS(@Header("token") token: String, @Field("id") messageId:String): LiveData<ApiResponse<ChatMessage>>
 
 }
 
