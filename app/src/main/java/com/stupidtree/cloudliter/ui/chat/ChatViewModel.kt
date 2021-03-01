@@ -33,58 +33,102 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     //数据本体：对话对象
     val conversation = MediatorLiveData<Conversation?>()
-    //数据本体：消息列表
-    private var listData: LiveData<DataState<List<ChatMessage>?>>? = null
 
-    //状态数据：朋友在线状态
-    var friendStateLiveData: LiveData<DataState<FriendState>>? = null
-        get() {
-            if (field == null) {
-                field = Transformations.switchMap(friendStateController) { input: FriendStateTrigger ->
-                    if (input.isActioning) {
-                        when (input.online) {
-                            "ONLINE" -> return@switchMap MutableLiveData(DataState(FriendState.online))
-                            "OFFLINE" -> return@switchMap MutableLiveData(DataState(FriendState.offline))
-                            "YOU" -> return@switchMap MutableLiveData(DataState(FriendState.withYou))
-                            "OTHER" -> return@switchMap MutableLiveData(DataState(FriendState.withOther))
-                        }
+
+    /**
+     * 获取聊天列表状态数据
+     * 注意：并不是存放完整的聊天列表，而是动作，比如插入、删除等
+     */
+    val listData: LiveData<DataState<List<ChatMessage>?>> =  Transformations.map(chatRepository.getListDataState()) { input2: DataState<List<ChatMessage>?> ->
+        if (input2.data != null && input2.data?.isNotEmpty()==true) {
+            when (input2.listAction) {
+                LIST_ACTION.APPEND_ONE -> {
+                    Log.e("listAppendOne", input2.data.toString())
+                    //不是这个窗口的消息
+                    if (input2.data!![0].conversationId != conversationId) {
+                        return@map DataState<List<ChatMessage>?>(DataState.STATE.NOTHING)
                     }
-                    MutableLiveData(DataState<FriendState>(DataState.STATE.NOTHING))
+                    if (!TextUtils.isEmpty(input2.data!![0].id)) {
+                        bottomId = input2.data!![0].id
+                    }
+                    bottomUUID = input2.data!![0].uuid
+                }
+                LIST_ACTION.APPEND -> {
+                    //拉取一堆新消息
+                    Log.e("listAppend", input2.data.toString())
+                    bottomId = input2.data!![0].id
+                    bottomUUID = input2.data!![0].uuid
+                    markAllRead(application)
+                }
+                LIST_ACTION.REPLACE_ALL -> {
+                    //初次进入
+                    topId = input2.data!![input2.data!!.size - 1].id
+                    topTime = input2.data!![input2.data!!.size - 1].createdAt
+                    bottomId = input2.data!![0].id
+                    bottomUUID = input2.data!![0].uuid
+                    markAllRead(application)
+                }
+                LIST_ACTION.PUSH_HEAD -> {
+                    //下拉加载
+                    topId = input2.data!![input2.data!!.size - 1].id
+                    topTime = input2.data!![input2.data!!.size - 1].createdAt
+                    markAllRead(application)
                 }
             }
-            return field
         }
-        private set
+        input2
+    }
 
-    //trigger：控制↑的刷新
-    private val friendStateController: LiveData<FriendStateTrigger>
+    //trigger：控制↓的刷新
+    private val friendStateController: LiveData<FriendStateTrigger> = Transformations.map(chatRepository.friendsStateController) { input: FriendStateTrigger ->
+        Log.e("apply", input.online.toString())
+        if (friendId == null) {
+            return@map FriendStateTrigger.still
+        }
+        if (input.id == friendId) {
+            return@map FriendStateTrigger.getActioning(input.id, input.online)
+        }
+        FriendStateTrigger.still
+    }
+
+    //状态数据：朋友在线状态
+    var friendStateLiveData: LiveData<DataState<FriendState>> = Transformations.switchMap(friendStateController) { input: FriendStateTrigger ->
+        if (input.isActioning) {
+            when (input.online) {
+                "ONLINE" -> return@switchMap MutableLiveData(DataState(FriendState.online))
+                "OFFLINE" -> return@switchMap MutableLiveData(DataState(FriendState.offline))
+                "YOU" -> return@switchMap MutableLiveData(DataState(FriendState.withYou))
+                "OTHER" -> return@switchMap MutableLiveData(DataState(FriendState.withOther))
+            }
+        }
+        MutableLiveData(DataState<FriendState>(DataState.STATE.NOTHING))
+    }
+
 
     //状态数据：消息发送结果
-    var messageSentState: LiveData<DataState<ChatMessage>>? = null
-        get() {
-            if (field == null) {
-                field = Transformations.map(chatRepository.messageSentSate) { input: DataState<ChatMessage> ->
-                    input.data?.let {
-                        if(it.uuid==bottomUUID){
-                            bottomId = it.id
-                        }
-                    }
-
-                    input }
+    var messageSentState: LiveData<DataState<ChatMessage>> = Transformations.map(chatRepository.messageSentSate) { input: DataState<ChatMessage> ->
+        input.data?.let {
+            if (it.uuid == bottomUUID) {
+                bottomId = it.id
             }
-            return field
         }
-        private set
-    var messageReadState: LiveData<DataState<MessageReadNotification>>? = null
-        get() {
-            if (field == null) {
-                field = Transformations.map(chatRepository.messageReadState) { input: DataState<MessageReadNotification> -> input }
+        input
+    }
+
+    private val ttsController = MutableLiveData<ChatMessage>()
+    val ttsResultLiveData:LiveData<Pair<DataState<String>,ChatMessage>> = Transformations.switchMap(ttsController){message->
+        val userLocal = localUserRepository.getLoggedInUser()
+        if (userLocal.isValid) {
+            return@switchMap Transformations.switchMap(chatRepository.startTTS(userLocal.token!!,message)){
+                MutableLiveData(Pair(it,message))
             }
-            return field
+        }else{
+            return@switchMap MutableLiveData(Pair(DataState(DataState.STATE.NOT_LOGGED_IN),message))
         }
-        private set
 
+    }
 
+    var messageReadState: LiveData<DataState<MessageReadNotification>> = Transformations.map(chatRepository.messageReadState) { input: DataState<MessageReadNotification> -> input }
     //控制↑的刷新
     private val imageSendController = MutableLiveData<StringTrigger>()
     private val voiceSendController = MutableLiveData<VoiceMessageTrigger>()
@@ -94,58 +138,6 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     private var bottomId: String? = null
     private var bottomUUID: String? = null
 
-
-
-    /**
-     * 获取聊天列表状态数据
-     * 注意：并不是存放完整的聊天列表，而是动作，比如插入、删除等
-     *
-     * @return 状态数据
-     */
-    fun getListData(context: Context): LiveData<DataState<List<ChatMessage>?>> {
-        if (listData == null) {
-            listData = Transformations.map(chatRepository.getListDataState()) { input2: DataState<List<ChatMessage>?> ->
-                if (input2.data != null && input2.data!!.isNotEmpty()) {
-                    when (input2.listAction) {
-                        LIST_ACTION.APPEND_ONE -> {
-                            Log.e("listAppendOne", input2.data.toString())
-                            //不是这个窗口的消息
-                            if (input2.data!![0].conversationId != conversationId) {
-                                return@map DataState<List<ChatMessage>?>(DataState.STATE.NOTHING)
-                            }
-                            if(!TextUtils.isEmpty(input2.data!![0].id)){
-                                bottomId = input2.data!![0].id
-                            }
-                            bottomUUID = input2.data!![0].uuid
-                        }
-                        LIST_ACTION.APPEND -> {
-                            //拉取一堆新消息
-                            Log.e("listAppend", input2.data.toString())
-                            bottomId = input2.data!![0].id
-                            bottomUUID = input2.data!![0].uuid
-                            markAllRead(context.applicationContext)
-                        }
-                        LIST_ACTION.REPLACE_ALL -> {
-                            //初次进入
-                            topId = input2.data!![input2.data!!.size - 1].id
-                            topTime = input2.data!![input2.data!!.size - 1].createdAt
-                            bottomId = input2.data!![0].id
-                            bottomUUID = input2.data!![0].uuid
-                            markAllRead(context.applicationContext)
-                        }
-                        LIST_ACTION.PUSH_HEAD -> {
-                            //下拉加载
-                            topId = input2.data!![input2.data!!.size - 1].id
-                            topTime = input2.data!![input2.data!!.size - 1].createdAt
-                            markAllRead(context.applicationContext)
-                        }
-                    }
-                }
-                input2
-            }
-        }
-        return listData!!
-    }
 
 
     //状态数据：图片消息发送
@@ -204,8 +196,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * 发送语音
      */
-    fun sendVoiceMessage(path: String,time:Int) {
-        voiceSendController.value = VoiceMessageTrigger.getActioning(path,time)
+    fun sendVoiceMessage(path: String, time: Int) {
+        voiceSendController.value = VoiceMessageTrigger.getActioning(path, time)
     }
 
     fun bindService(context: Context?) {
@@ -314,7 +306,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     fun markAllRead(context: Context) {
         if (conversationId != null && localUserRepository.isUserLoggedIn) {
-            if(topTime!=null&&conversationId!=null&&myId!=null){
+            if (topTime != null && conversationId != null && myId != null) {
                 chatRepository.ActionMarkAllRead(context, myId!!, conversationId!!,
                         topTime!!, pageSize)
             }
@@ -335,18 +327,18 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         friendId = conversation.friendId
     }
 
-    private var webConversationData:LiveData<DataState<Conversation?>>? = null
+    private var webConversationData: LiveData<DataState<Conversation?>>? = null
 
-    fun refreshConversation(){
-        friendId?.let{id->
+    fun refreshConversation() {
+        friendId?.let { id ->
             val userLocal = localUserRepository.getLoggedInUser()
             webConversationData?.let {
                 conversation.removeSource(it)
             }
-            webConversationData = conversationRepository?.queryConversation(userLocal.token!!, userLocal.id!!,id)
+            webConversationData = conversationRepository?.queryConversation(userLocal.token!!, userLocal.id!!, id)
             webConversationData?.let {
-                conversation.addSource(it){data->
-                    if(data.state==DataState.STATE.SUCCESS){
+                conversation.addSource(it) { data ->
+                    if (data.state == DataState.STATE.SUCCESS) {
                         conversation.value = data.data
                     }
                 }
@@ -354,16 +346,11 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    init {
-        friendStateController = Transformations.map(chatRepository.friendsStateController) { input: FriendStateTrigger ->
-            Log.e("apply", input.online.toString())
-            if (friendId == null) {
-                return@map FriendStateTrigger.still
-            }
-            if (input.id == friendId) {
-                return@map FriendStateTrigger.getActioning(input.id, input.online)
-            }
-            FriendStateTrigger.still
-        }
+    /**
+     * 开始语音识别
+     */
+    fun startTTS(message:ChatMessage) {
+        ttsController.value = message
     }
+    
 }

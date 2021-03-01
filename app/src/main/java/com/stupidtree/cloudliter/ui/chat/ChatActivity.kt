@@ -191,7 +191,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         viewModel.conversation.observe(this, { conversation: Conversation? ->
             conversation?.let { setConversationViews(it) }
         })
-        viewModel.getListData(this).observe(this, { listDataState: DataState<List<ChatMessage>?> ->
+        viewModel.listData.observe(this, { listDataState: DataState<List<ChatMessage>?> ->
             binding.refresh.isRefreshing = false
             //Log.e("ChatActivity列表变动", listDataState.listAction.toString() + "》》" + listDataState.data!!.size)
             if (listDataState.state === DataState.STATE.SUCCESS) {
@@ -231,7 +231,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                 }
             }
         })
-        viewModel.friendStateLiveData!!.observe(this, { friendStateDataState: DataState<FriendState> ->
+        viewModel.friendStateLiveData.observe(this, { friendStateDataState: DataState<FriendState> ->
             if (friendStateDataState.state === DataState.STATE.SUCCESS) {
                 when (friendStateDataState.data!!.state) {
                     FriendState.STATE.ONLINE -> {
@@ -264,18 +264,22 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         viewModel.getImageSentResult().observe(this, { })
         viewModel.getVoiceSentResult().observe(this, { })
         //消息成功发送后反馈给列表
-        viewModel.messageSentState!!.observe(this, { chatMessageDataState ->
+        viewModel.messageSentState.observe(this, { chatMessageDataState ->
             if (chatMessageDataState!!.state === DataState.STATE.SUCCESS) {
                 binding.list.let { listAdapter.messageSent(it, chatMessageDataState!!.data!!) }
             }
         })
         //消息被对方读取后反馈给列表
-        viewModel.messageReadState!!.observe(this, { messageReadNotificationDataState ->
+        viewModel.messageReadState.observe(this, { messageReadNotificationDataState ->
             Log.e("messageRead", messageReadNotificationDataState!!.data.toString())
             if (messageReadNotificationDataState.state === DataState.STATE.SUCCESS) {
                 binding.list.let { listAdapter.messageRead(it, messageReadNotificationDataState.data!!) }
             }
         })
+        viewModel.ttsResultLiveData.observe(this) {
+            listAdapter.changeTTSState(binding.list, it.second.id, if (it.first.state == DataState.STATE.SUCCESS)
+                ChatMessage.TTS_STATE.SUCCESS else ChatMessage.TTS_STATE.FAILED)
+        }
     }
 
     override fun onBackPressed() {
@@ -342,6 +346,13 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
             }
 
         })
+        listAdapter.onTTSButtonClickListener = object : ChatListAdapter.OnTTSButtonClickListener {
+            override fun onClick(v: View, data: ChatMessage, position: Int) {
+                viewModel.startTTS(data)
+                listAdapter
+            }
+
+        }
     }
 
     //初始化各种按钮
@@ -446,13 +457,19 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         } else {
             binding.typeIcon.visibility = View.VISIBLE
             when (conversation.friendType) {
-                1 -> { binding.accessibilityIcon.visibility = View.VISIBLE }
-                2 -> { binding.accessibilityIcon2.visibility = View.VISIBLE }
+                1 -> {
+                    binding.accessibilityIcon.visibility = View.VISIBLE
+                }
+                2 -> {
+                    binding.accessibilityIcon2.visibility = View.VISIBLE
+                }
                 3 -> {
                     binding.accessibilityIcon.visibility = View.VISIBLE
                     binding.accessibilityIcon2.visibility = View.VISIBLE
                 }
-                4 -> { binding.accessibilityIcon3.visibility = View.VISIBLE }
+                4 -> {
+                    binding.accessibilityIcon3.visibility = View.VISIBLE
+                }
                 5 -> {
                     binding.accessibilityIcon.visibility = View.VISIBLE
                     binding.accessibilityIcon3.visibility = View.VISIBLE

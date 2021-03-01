@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ChatMessage
@@ -22,8 +23,7 @@ import kotlin.math.abs
  */
 @SuppressLint("ParcelCreator")
 internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableList<ChatMessage>) : BaseListAdapterClassic<ChatMessage, ChatListAdapter.CHolder>(chatActivity, mBeans) {
-
-
+    var onTTSButtonClickListener: OnTTSButtonClickListener? = null
 
     override fun getLayoutId(viewType: Int): Int {
         return when (viewType) {
@@ -167,7 +167,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         for (index in indexes) {
             mBeans[index].read = true
             val holder = list.findViewHolderForAdapterPosition(index) as CHolder?
-            if(!mBeans[index].sensitive)holder?.showRead()
+            if (!mBeans[index].sensitive) holder?.showRead()
         }
     }
 
@@ -218,6 +218,24 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         }
     }
 
+
+    /**
+     * 语音识别状态变更
+     */
+    fun changeTTSState(list: RecyclerView, id: String, action: ChatMessage.TTS_STATE) {
+        var index = -1
+        for (i in mBeans.indices.reversed()) {
+            if (mBeans[i].id == id) {
+                index = i
+                break
+            }
+        }
+        if (index >= 0) {
+            mBeans[index].ttsState = action
+            val holder = list.findViewHolderForAdapterPosition(index) as CHolder?
+            holder?.bindVoiceState(mBeans[index])
+        }
+    }
 
     /**
      * 清空列表
@@ -322,21 +340,23 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
     }
 
     internal inner class CHolder(itemView: View, var viewType: Int) : RecyclerView.ViewHolder(itemView) {
-        
+
         var content: EmoticonsTextView? = itemView.findViewById(R.id.content)
         var avatar: ImageView? = itemView.findViewById(R.id.avatar)
         var bubble: View? = itemView.findViewById(R.id.bubble)
         var progress: View? = itemView.findViewById(R.id.progress)
 
         var see //点击查看敏感消息
-                : ImageView? =  itemView.findViewById(R.id.see)
+                : ImageView? = itemView.findViewById(R.id.see)
 
-        var emotion: ImageView? =  itemView.findViewById(R.id.emotion)
+        var emotion: ImageView? = itemView.findViewById(R.id.emotion)
 
         var image //图片
-                : ImageView? =  itemView.findViewById(R.id.image)
+                : ImageView? = itemView.findViewById(R.id.image)
+        var ttsButton: ImageView? = itemView.findViewById(R.id.tts)//语音识别按钮
+        var ttsResult: TextView? = itemView.findViewById(R.id.tts_result)//语音识别结果
 
-        var read: View? =  itemView.findViewById(R.id.read)
+        var read: View? = itemView.findViewById(R.id.read)
 
 
         var imageSensitivePlaceHolder: ViewGroup? = itemView.findViewById(R.id.image_sensitive)
@@ -395,7 +415,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                 }
             } else if (data.getTypeEnum() == ChatMessage.TYPE.TXT) {
                 if (data.sensitive) {
-                    read?.let{it.visibility = View.GONE}
+                    read?.let { it.visibility = View.GONE }
                     see?.visibility = View.VISIBLE
                     emotion?.visibility = View.GONE
                     see?.setImageResource(R.drawable.ic_baseline_visibility_24)
@@ -450,16 +470,38 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                     }
                 }
             }
+            if (ttsButton != null) {
+                when (data.ttsState) {
+                    ChatMessage.TTS_STATE.STOPPED -> {
+                        ttsResult?.visibility = View.GONE
+                    }
+                    ChatMessage.TTS_STATE.SUCCESS -> {
+                        ttsResult?.visibility = View.VISIBLE
+                        ttsResult?.text = data.ttsResult
+                    }
+                    ChatMessage.TTS_STATE.FAILED -> {
+                        ttsResult?.visibility = View.VISIBLE
+                        ttsResult?.text = "转文字失败"
+                    }
+                    ChatMessage.TTS_STATE.PROCESSING -> {
+                        ttsResult?.visibility = View.VISIBLE
+                        ttsResult?.text = "转换中..."
+                    }
+                }
+            }
 
         }
 
         //绑定点击事件
         fun bindClickAction(data: ChatMessage, position: Int) {
             if (mOnItemLongClickListener != null && bubble != null) {
-                bubble?.setOnLongClickListener { view: View? -> mOnItemLongClickListener?.onItemLongClick(data, view, position)!!}
+                bubble?.setOnLongClickListener { view: View? -> mOnItemLongClickListener?.onItemLongClick(data, view, position)!! }
             }
             if (mOnItemClickListener != null && bubble != null) {
                 bubble?.setOnClickListener { view: View? -> mOnItemClickListener?.onItemClick(data, view, position) }
+            }
+            ttsButton?.setOnClickListener {
+                onTTSButtonClickListener?.onClick(it, data, position)
             }
         }
 
@@ -469,6 +511,10 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             }
         }
 
+    }
+
+    interface OnTTSButtonClickListener {
+        fun onClick(v: View, data: ChatMessage, position: Int)
     }
 
     companion object {

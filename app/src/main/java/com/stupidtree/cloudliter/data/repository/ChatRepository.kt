@@ -256,6 +256,12 @@ class ChatRepository(context: Context) {
     }
 
 
+    /**
+     *
+     */
+    fun startTTS(token:String,message:ChatMessage):LiveData<DataState<String>>{
+        return chatMessageWebSource.startTTS(token,message.id)
+    }
 
     fun bindService(context: Context) {
         val IF = IntentFilter()
@@ -297,6 +303,7 @@ class ChatRepository(context: Context) {
 
     val messageReadState: MutableLiveData<DataState<MessageReadNotification>>
         get() = socketWebSource.messageReadState
+
 
     companion object {
         //不采用单例模式

@@ -51,6 +51,17 @@ interface ChatMessageService {
     @POST("/message/send_voice")
     fun sendVoiceMessage(@Header("token") token: String, @Query("toId") toId: String, @Part file: MultipartBody.Part, @Query("uuid") uuid: String?,@Query("seconds")seconds:Int): LiveData<ApiResponse<ChatMessage?>?>
 
+
+    /**
+     * 消息语音识别
+     * @param token 令牌
+     * @param messageId 消息id
+     * @return 获取结果
+     */
+    @FormUrlEncoded
+    @POST("/ai/voice/tts")
+    fun startTTS(@Header("token") token: String, @Field("id") messageId:String): LiveData<ApiResponse<String>>
+
 }
 
 

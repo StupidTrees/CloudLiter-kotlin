@@ -56,10 +56,17 @@ class ChatMessage : Serializable {
     @Ignore
     var isProgressing: Boolean
 
+    //语音识别结果
+    var ttsResult: String? = ""
+
     enum class VOICE_STATE { PLAYING, PAUSED, STOPPED }
+    enum class TTS_STATE { STOPPED, PROCESSING, SUCCESS, FAILED }
 
     @Ignore
     var playing: VOICE_STATE = VOICE_STATE.STOPPED
+
+    @Ignore
+    var ttsState: TTS_STATE = TTS_STATE.STOPPED
 
     @Ignore
     var uuid: String? = null
