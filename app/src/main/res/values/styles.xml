@@ -55,6 +55,8 @@
     <style name="rippleControl">
         <item name="android:radius">24dp</item>
     </style>
-
+    <style name="rippleControlSmall">
+        <item name="android:radius">16dp</item>
+    </style>
 
 </resources>

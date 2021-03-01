@@ -40,8 +40,8 @@ class ObjectDetectSource(application: Application) {
     fun detectImage(bitmap: Bitmap): LiveData<DataState<List<Classifier.Recognition>>> {
         val result = MutableLiveData<DataState<List<Classifier.Recognition>>>()
         Thread {
-//            val imgData = aiBoost.getInputTensor(0)
-//            imgData.rewind()
+            val imgData = aiBoost.getInputTensor(0)
+            imgData.rewind()
 //            bitmap.getPixels(intValues, 0, attr.bitmap.getWidth(), 0, 0, attr.bitmap.getWidth(), attr.bitmap.getHeight())
 //            var pixel = 0
 //            for (i in 0 until IMAGE_SIZE_X) {

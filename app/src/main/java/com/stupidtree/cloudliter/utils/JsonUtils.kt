@@ -1,33 +1,46 @@
 package com.stupidtree.cloudliter.utils
 
 import com.google.gson.JsonObject
+import org.json.JSONException
+import org.json.JSONObject
 
 /**
  * 此类整合了一些JSON格式数据解析有关的函数
  */
 object JsonUtils {
-    fun getIntegerData(jo: JsonObject, key: String?): Int? {
+    fun getIntegerData(jo: JsonObject?, key: String?): Int? {
         return try {
-            jo[key].asInt
+            jo?.get(key)?.asInt?:0
         } catch (e: Exception) {
             e.printStackTrace()
             null
         }
     }
 
-    fun getStringData(jo: JsonObject, key: String?): String? {
+    fun getStringData(jo: JsonObject?, key: String?): String? {
         return try {
-            jo[key].asString
+            jo?.get(key)?.asString
         } catch (ignored: Exception) {
             null
         }
     }
 
-    fun getObjectData(jo: JsonObject, key: String?): JsonObject? {
+    fun getObjectData(jo: JsonObject?, key: String?): JsonObject? {
         return try {
-            jo[key].asJsonObject
+            jo?.get(key)?.asJsonObject
         } catch (e: Exception) {
             e.printStackTrace()
+            null
+        }
+    }
+
+
+    fun getJSONObject(str: String?): JSONObject? {
+        return try {
+            str?.let {
+                JSONObject(it)
+            }
+        } catch (e: JSONException) {
             null
         }
     }

@@ -3,13 +3,16 @@ package com.stupidtree.cloudliter.data.source.websource
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import com.google.gson.JsonObject
 import com.stupidtree.cloudliter.data.model.ApiResponse
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.source.websource.service.ChatMessageService
 import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.codes
 import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.cloudliter.utils.JsonUtils
 import okhttp3.MultipartBody
+import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -117,13 +120,14 @@ class ChatMessageWebSource : BaseWebSource<ChatMessageService>(Retrofit.Builder(
     }
 
     fun startTTS(token: String, id: String):LiveData<DataState<String>>{
-        return Transformations.map(service.startTTS(token,id)){input->
+        return Transformations.map(service.startTTS(token,id)){input:ApiResponse<JsonObject>?->
             Log.e("语音合成结果", input.toString())
+           // val jo = JsonUtils.getJSONObject(input?.data)
             if (input == null) {
                 return@map DataState<String>(DataState.STATE.FETCH_FAILED)
             }
             when (input.code) {
-                codes.SUCCESS -> return@map DataState(input.data!!)
+                codes.SUCCESS -> return@map DataState(JsonUtils.getStringData(input.data,"result")?:"")
                 codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
                 else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
             }

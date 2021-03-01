@@ -257,7 +257,7 @@ class ChatRepository(context: Context) {
 
 
     /**
-     *
+     * 开始语音合成
      */
     fun startTTS(token:String,message:ChatMessage):LiveData<DataState<String>>{
         return chatMessageWebSource.startTTS(token,message.id)

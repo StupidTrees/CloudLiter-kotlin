@@ -60,7 +60,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="16dp"
                     android:layout_marginBottom="8dp"
                     android:lineSpacingExtra="4sp"
                     android:maxEms="8"
@@ -72,12 +72,13 @@
                     android:id="@+id/tts"
                     android:layout_width="32dp"
                     android:layout_height="match_parent"
+                    android:layout_marginStart="-8dp"
                     android:layout_marginEnd="4dp"
-                    android:alpha="0.6"
+                    android:alpha="0.4"
                     android:clickable="true"
                     android:foreground="?attr/selectableItemBackground"
-                    android:padding="6dp"
-                    android:theme="@style/rippleControl"
+                    android:padding="7dp"
+                    android:theme="@style/rippleControlSmall"
                     app:srcCompat="@drawable/ic_tts" />
 
             </LinearLayout>

@@ -39,8 +39,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
      * 获取聊天列表状态数据
      * 注意：并不是存放完整的聊天列表，而是动作，比如插入、删除等
      */
-    val listData: LiveData<DataState<List<ChatMessage>?>> =  Transformations.map(chatRepository.getListDataState()) { input2: DataState<List<ChatMessage>?> ->
-        if (input2.data != null && input2.data?.isNotEmpty()==true) {
+    val listData: LiveData<DataState<List<ChatMessage>?>> = Transformations.map(chatRepository.getListDataState()) { input2: DataState<List<ChatMessage>?> ->
+        if (input2.data != null && input2.data?.isNotEmpty() == true) {
             when (input2.listAction) {
                 LIST_ACTION.APPEND_ONE -> {
                     Log.e("listAppendOne", input2.data.toString())
@@ -115,20 +115,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         input
     }
 
-    private val ttsController = MutableLiveData<ChatMessage>()
-    val ttsResultLiveData:LiveData<Pair<DataState<String>,ChatMessage>> = Transformations.switchMap(ttsController){message->
-        val userLocal = localUserRepository.getLoggedInUser()
-        if (userLocal.isValid) {
-            return@switchMap Transformations.switchMap(chatRepository.startTTS(userLocal.token!!,message)){
-                MutableLiveData(Pair(it,message))
-            }
-        }else{
-            return@switchMap MutableLiveData(Pair(DataState(DataState.STATE.NOT_LOGGED_IN),message))
-        }
-
-    }
-
+    val ttsResultLiveData: MediatorLiveData<Pair<DataState<String>, ChatMessage>> = MediatorLiveData()
     var messageReadState: LiveData<DataState<MessageReadNotification>> = Transformations.map(chatRepository.messageReadState) { input: DataState<MessageReadNotification> -> input }
+
     //控制↑的刷新
     private val imageSendController = MutableLiveData<StringTrigger>()
     private val voiceSendController = MutableLiveData<VoiceMessageTrigger>()
@@ -137,7 +126,6 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     private var topTime: Timestamp? = null
     private var bottomId: String? = null
     private var bottomUUID: String? = null
-
 
 
     //状态数据：图片消息发送
@@ -349,8 +337,27 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * 开始语音识别
      */
-    fun startTTS(message:ChatMessage) {
-        ttsController.value = message
+    fun startTTS(message: ChatMessage) {
+        val dt = getTTSOneTaskLiveData(message)
+        ttsResultLiveData.addSource(dt) {
+            ttsResultLiveData.value = it
+            ttsResultLiveData.removeSource(dt)//移除任务
+        }
     }
-    
+
+    /**
+     * 获取某个语音合成任务的livedata
+     */
+    private fun getTTSOneTaskLiveData(message: ChatMessage): LiveData<Pair<DataState<String>, ChatMessage>> {
+        val userLocal = localUserRepository.getLoggedInUser()
+        return if (userLocal.isValid) {
+            Transformations.switchMap(chatRepository.startTTS(userLocal.token!!, message)) {
+                message.ttsResult = it.data
+                MutableLiveData(Pair(it, message))
+            }
+        } else {
+            MutableLiveData(Pair(DataState(DataState.STATE.NOT_LOGGED_IN), message))
+        }
+    }
+
 }

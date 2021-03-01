@@ -1,8 +1,11 @@
 package com.stupidtree.cloudliter.ui.chat
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Interpolator
+import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -222,7 +225,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
     /**
      * 语音识别状态变更
      */
-    fun changeTTSState(list: RecyclerView, id: String, action: ChatMessage.TTS_STATE) {
+    fun changeTTSState(list: RecyclerView, id: String, result:String?,action: ChatMessage.TTS_STATE) {
         var index = -1
         for (i in mBeans.indices.reversed()) {
             if (mBeans[i].id == id) {
@@ -231,6 +234,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             }
         }
         if (index >= 0) {
+            mBeans[index].ttsResult = result
             mBeans[index].ttsState = action
             val holder = list.findViewHolderForAdapterPosition(index) as CHolder?
             holder?.bindVoiceState(mBeans[index])
@@ -340,6 +344,15 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
     }
 
     internal inner class CHolder(itemView: View, var viewType: Int) : RecyclerView.ViewHolder(itemView) {
+        private val ttsButtonAnimation: ValueAnimator = ValueAnimator.ofFloat(0f,360f)
+        init {
+            ttsButtonAnimation.repeatCount = -1
+            ttsButtonAnimation.addUpdateListener {
+                ttsButton?.rotation = it.animatedValue as Float
+            }
+            ttsButtonAnimation.duration = 500
+            ttsButtonAnimation.interpolator = LinearInterpolator()
+        }
 
         var content: EmoticonsTextView? = itemView.findViewById(R.id.content)
         var avatar: ImageView? = itemView.findViewById(R.id.avatar)
@@ -473,17 +486,25 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             if (ttsButton != null) {
                 when (data.ttsState) {
                     ChatMessage.TTS_STATE.STOPPED -> {
+                        ttsButton?.visibility = View.VISIBLE
                         ttsResult?.visibility = View.GONE
+                        ttsButtonAnimation.cancel()
                     }
                     ChatMessage.TTS_STATE.SUCCESS -> {
+                        ttsButton?.visibility = View.GONE
                         ttsResult?.visibility = View.VISIBLE
                         ttsResult?.text = data.ttsResult
+                        ttsButtonAnimation.cancel()
                     }
                     ChatMessage.TTS_STATE.FAILED -> {
+                        ttsButton?.visibility = View.VISIBLE
                         ttsResult?.visibility = View.VISIBLE
                         ttsResult?.text = "转文字失败"
+                        ttsButtonAnimation.cancel()
                     }
                     ChatMessage.TTS_STATE.PROCESSING -> {
+                        ttsButton?.visibility = View.VISIBLE
+                        ttsButtonAnimation.start()
                         ttsResult?.visibility = View.VISIBLE
                         ttsResult?.text = "转换中..."
                     }
