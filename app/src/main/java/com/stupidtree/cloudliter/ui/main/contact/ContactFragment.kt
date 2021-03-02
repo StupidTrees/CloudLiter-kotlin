@@ -8,7 +8,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.databinding.FragmentContactBinding
-import com.stupidtree.cloudliter.service.socket.SocketIOClientService.Companion.ACTION_RELATION_EVENT
+import com.stupidtree.cloudliter.service.socket.SocketIOClientService.Companion.RECEIVE_RELATION_EVENT
 import com.stupidtree.cloudliter.ui.base.BaseFragmentWithReceiver
 import com.stupidtree.cloudliter.ui.base.BaseTabAdapter
 import com.stupidtree.cloudliter.ui.base.DataState
@@ -31,7 +31,7 @@ class ContactFragment : BaseFragmentWithReceiver<ContactViewModel,FragmentContac
     }
 
     override fun getIntentFilter(): IntentFilter {
-        return IntentFilter(ACTION_RELATION_EVENT)
+        return IntentFilter(RECEIVE_RELATION_EVENT)
     }
 
     override fun getViewModelClass(): Class<ContactViewModel> {

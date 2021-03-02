@@ -42,16 +42,8 @@ class SocketIOClientService : Service() {
     private val incomingMessage = HashMap<String, Int>()
     var socket: Socket? = null
     var receiver: BroadcastReceiver? = null
-    private val binders = HashMap<String?, JWebSocketClientBinder>()
+    //private val binders = HashMap<String?, JWebSocketClientBinder>()
 
-
-    interface OnUnreadFetchedListener {
-        fun onUnreadFetched(unread: HashMap<String, Int>)
-    }
-
-    interface OnMessageReadListener {
-        fun onMessageRead(map: HashMap<String, Int>)
-    }
 
     private fun initReceiver() {
         receiver = object : BroadcastReceiver() {
@@ -62,26 +54,26 @@ class SocketIOClientService : Service() {
                         val userId = intent.getStringExtra("userId")
                         val friendId = intent.getStringExtra("friendId")
                         val conversationId = intent.getStringExtra("conversationId")
-                        socket!!.emit("into_conversation", userId, friendId, conversationId)
-                        socket!!.emit("query_online", userId, friendId)
+                        socket?.emit("into_conversation", userId, friendId, conversationId)
+                        socket?.emit("query_online", userId, friendId)
                         currentFriendId = friendId
                     }
                     ACTION_LEFT_CONVERSATION -> {
                         val conversationId = intent.getStringExtra("conversationId")
                         val userId = intent.getStringExtra("userId")
-                        socket!!.emit("left_conversation", userId, conversationId)
+                        socket?.emit("left_conversation", userId, conversationId)
                         currentFriendId = null
                     }
                     ACTION_ONLINE -> if (intent.getStringExtra("userId") != null) {
                         val id = intent.getStringExtra("userId")
                         loggedInUserId = id
                         Log.e("请求上线", id.toString())
-                        socket!!.emit("login", id)
+                        socket?.emit("login", id)
                     }
                     ACTION_OFFLINE -> {
                         loggedInUserId = null
                         if (intent.getStringExtra("userId") != null) {
-                            socket!!.emit("logout", intent.getStringExtra("userId"))
+                            socket?.emit("logout", intent.getStringExtra("userId"))
                         }
                     }
                     ACTION_MARK_ALL_READ -> {
@@ -90,43 +82,28 @@ class SocketIOClientService : Service() {
                         val topTime = intent.getLongExtra("topTime", -1)
                         val num = intent.getIntExtra("num", -1)
                         val userId = intent.getStringExtra("userId")
-                        Log.e("mark_all_read", incomingMessage.toString())
-                        for (binder in binders.values) {
-                            if (binder.onMessageReadListener != null) {
-                                val map = HashMap<String, Int>()
-                                map[conversationId!!] = num
-                                binder.onMessageReadListener!!.onMessageRead(map)
-                            }
-                        }
                         val oldCount0 = incomingMessage[conversationId]
                         if (oldCount0 != null && oldCount0 <= num) {
                             incomingMessage.remove(conversationId)
                         } else if (oldCount0 != null) {
-                            incomingMessage[conversationId!!] = oldCount0 - num
+                            incomingMessage[conversationId ?: ""] = oldCount0 - num
                         }
                         incomingMessage.remove(conversationId)
                         if (topTime > 0) {
-                            socket!!.emit("mark_all_read", userId, conversationId, topTime)
+                            socket?.emit("mark_all_read", userId, conversationId, topTime)
                         }
                     }
                     ACTION_MARK_READ -> {
                         val messageId = intent.getStringExtra("messageId")
                         val userId = intent.getStringExtra("userId")
                         val conversationId = intent.getStringExtra("conversationId")
-                        Log.e("emit_mark_read", userId + "," + conversationId + "," + messageId)
-                        socket!!.emit("mark_read", userId, conversationId, messageId)
+                        Log.e("emit_mark_read", "$userId,$conversationId,$messageId")
+                        socket?.emit("mark_read", userId, conversationId, messageId)
                         val oldCount = incomingMessage[conversationId]
                         if (oldCount != null && oldCount <= 1) {
                             incomingMessage.remove(conversationId)
                         } else if (oldCount != null) {
-                            incomingMessage[conversationId!!] = oldCount - 1
-                        }
-                        for (binder in binders.values) {
-                            if (binder.onMessageReadListener != null) {
-                                val map = HashMap<String, Int>()
-                                map[conversationId!!] = 1
-                                binder.onMessageReadListener!!.onMessageRead(map)
-                            }
+                            incomingMessage[conversationId ?: ""] = oldCount - 1
                         }
                     }
                 }
@@ -135,14 +112,14 @@ class SocketIOClientService : Service() {
     }
 
     private fun registerReceiver() {
-        val IF = IntentFilter()
-        IF.addAction(ACTION_INTO_CONVERSATION)
-        IF.addAction(ACTION_ONLINE)
-        IF.addAction(ACTION_OFFLINE)
-        IF.addAction(ACTION_LEFT_CONVERSATION)
-        IF.addAction(ACTION_MARK_ALL_READ)
-        IF.addAction(ACTION_MARK_READ)
-        registerReceiver(receiver, IF)
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(ACTION_INTO_CONVERSATION)
+        intentFilter.addAction(ACTION_ONLINE)
+        intentFilter.addAction(ACTION_OFFLINE)
+        intentFilter.addAction(ACTION_LEFT_CONVERSATION)
+        intentFilter.addAction(ACTION_MARK_ALL_READ)
+        intentFilter.addAction(ACTION_MARK_READ)
+        registerReceiver(receiver, intentFilter)
     }
 
     override fun onCreate() {
@@ -163,45 +140,35 @@ class SocketIOClientService : Service() {
     //连接到Server
     private fun socketConn() {
         val onConnectError = Emitter.Listener { args: Array<Any?>? -> Log.e("连接错误", Arrays.toString(args)) }
-        socket!!.on(Socket.EVENT_CONNECT_ERROR, onConnectError)
-        socket!!.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError)
-        socket!!.on("message") { args: Array<Any> ->
+        socket?.on(Socket.EVENT_CONNECT_ERROR, onConnectError)
+        socket?.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError)
+        socket?.on("message") { args: Array<Any> ->
             val chatMessage = Gson().fromJson(args[0].toString(), ChatMessage::class.java)
             val oldCount = incomingMessage[chatMessage.conversationId]
             if (oldCount == null) {
-                incomingMessage[chatMessage.conversationId!!] = 1
+                incomingMessage[chatMessage.conversationId ?: ""] = 1
             } else {
-                incomingMessage[chatMessage.conversationId!!] = oldCount + 1
+                incomingMessage[chatMessage.conversationId ?: ""] = oldCount + 1
             }
             Log.e("收到消息", chatMessage.toString())
-            val i = Intent(ACTION_RECEIVE_MESSAGE)
+            val i = Intent(RECEIVE_RECEIVE_MESSAGE)
             val b = Bundle()
             b.putSerializable("message", chatMessage)
             i.putExtras(b)
             sendBroadcast(i)
             //当前聊天的新消息，不发送通知
             if (currentFriendId != chatMessage.fromId) {
-                sendNotification_NewMessage(chatMessage)
+                sendNotificationNewMessage(chatMessage)
             }
         }
-        //消息发送成功
-        socket!!.on("message_sent") { args: Array<Any> ->
-            val chatMessage = Gson().fromJson(args[0].toString(), ChatMessage::class.java)
-            Log.e("sent", chatMessage.toString())
-            val i = Intent(ACTION_MESSAGE_SENT)
-            val b = Bundle()
-            b.putSerializable("message", chatMessage)
-            i.putExtras(b)
-            sendBroadcast(i)
-        }
-        socket!!.on("friend_read_all") { args: Array<Any> ->
+        socket?.on("friend_read_all") { args: Array<Any> ->
             if (args.size == 3) {
                 try {
                     val userId = args[0].toString()
                     val conversationId = args[1].toString()
                     val fromTime = Timestamp(args[2].toString().toLong())
                     Log.e("messageAllRead", "$userId-$fromTime")
-                    val i = Intent(ACTION_MESSAGE_READ)
+                    val i = Intent(RECEIVE_MESSAGE_READ)
                     val b = Bundle()
                     b.putSerializable("read", MessageReadNotification(userId, conversationId, fromTime))
                     i.putExtras(b)
@@ -211,14 +178,14 @@ class SocketIOClientService : Service() {
                 }
             }
         }
-        socket!!.on("friend_read_one") { args: Array<Any> ->
+        socket?.on("friend_read_one") { args: Array<Any> ->
             if (args.size == 3) {
                 try {
                     val userId = args[0].toString()
                     val conversationId = args[1].toString()
                     val id = args[2].toString()
                     Log.e("messageOneRead", "$userId-$id")
-                    val i = Intent(ACTION_MESSAGE_READ)
+                    val i = Intent(RECEIVE_MESSAGE_READ)
                     val b = Bundle()
                     b.putSerializable("read", MessageReadNotification(userId, conversationId, id))
                     i.putExtras(b)
@@ -228,43 +195,38 @@ class SocketIOClientService : Service() {
                 }
             }
         }
-        socket!!.on("relation_event") { _: Array<Any> ->
-            val i = Intent(ACTION_RELATION_EVENT)
+        socket?.on("relation_event") { _: Array<Any> ->
+            val i = Intent(RECEIVE_RELATION_EVENT)
             sendBroadcast(i)
         }
-        socket!!.on("unread_message") { args: Array<Any> ->
+        socket?.on("unread_message") { args: Array<Any> ->
             if (args.isNotEmpty()) {
                 try {
-                    try {
-                        incomingMessage.clear()
-                        val jo: ApiResponse<*> = Gson().fromJson(args[0].toString(), ApiResponse::class.java)
-                        Log.e("推送未读消息", jo.toString())
-                        val m: HashMap<String, *> = Gson().fromJson<HashMap<String, *>>(jo.data.toString(), HashMap::class.java)
-                        for ((key, value) in m) {
-                            incomingMessage[key] = value.toString().toFloat().toInt()
-                        }
-                    } catch (e: JsonSyntaxException) {
-                        e.printStackTrace()
-                    } catch (e: NumberFormatException) {
-                        e.printStackTrace()
+                    incomingMessage.clear()
+                    val jo: ApiResponse<*> = Gson().fromJson(args[0].toString(), ApiResponse::class.java)
+                    Log.e("推送未读消息", jo.toString())
+                    val m: HashMap<String, *> = Gson().fromJson<HashMap<String, *>>(jo.data.toString(), HashMap::class.java)
+                    for ((key, value) in m) {
+                        incomingMessage[key] = value.toString().toFloat().toInt()
                     }
-                    for (binder in binders.values) {
-                        if (binder.onUnreadFetchedListener != null) {
-                            binder.onUnreadFetchedListener!!.onUnreadFetched(
-                                    incomingMessage)
-                        }
-                    }
+                    val i = Intent(RECEIVE_UNREAD_MESSAGE)
+                    val b = Bundle()
+                    b.putSerializable("map", incomingMessage)
+                    i.putExtras(b)
+                    sendBroadcast(i)
                 } catch (e: JsonSyntaxException) {
+                    e.printStackTrace()
+                } catch (e: NumberFormatException) {
                     e.printStackTrace()
                 }
             }
         }
-        socket!!.on("query_online_result") { args: Array<Any> ->
+        socket?.on("query_online_result") { args: Array<Any> ->
             try {
                 val friendId = args[0].toString()
                 val isOnline = args[1].toString()
                 Log.d("查询好友在线结果", "$friendId:$isOnline")
-                val i = Intent(ACTION_FRIEND_STATE_CHANGED)
+                val i = Intent(RECEIVE_FRIEND_STATE_CHANGED)
                 i.putExtra("id", friendId)
                 i.putExtra("online", isOnline)
                 sendBroadcast(i)
@@ -272,11 +234,11 @@ class SocketIOClientService : Service() {
                 e.printStackTrace()
             }
         }
-        socket!!.connect()
+        socket?.connect()
     }
 
     private var notificationManager: NotificationManager? = null
-    fun initNotification() {
+    private fun initNotification() {
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel("cloudLiterMessageChanel", "云升", NotificationManager.IMPORTANCE_DEFAULT)
@@ -285,7 +247,7 @@ class SocketIOClientService : Service() {
             channel.enableVibration(false)
             channel.vibrationPattern = longArrayOf(0)
             channel.setSound(null, null)
-            notificationManager!!.createNotificationChannels(listOf(channel))
+            notificationManager?.createNotificationChannels(listOf(channel))
             // notificationManager.createNotificationChannels();
         }
     }
@@ -295,17 +257,17 @@ class SocketIOClientService : Service() {
      *
      * @param message 消息对象
      */
-    private fun sendNotification_NewMessage(message: ChatMessage) {
+    private fun sendNotificationNewMessage(message: ChatMessage) {
         val rv = RemoteViews(packageName, R.layout.remote_notification)
         val notificationId = System.currentTimeMillis().toInt()
         rv.setImageViewResource(R.id.logo, R.drawable.logo)
         //将消息中的表情替换为文字
         var newContent = message.content
         val pattern = EmoticonsTextView.buildPattern()
-        val matcher = pattern.matcher(message.content)
+        val matcher = pattern.matcher(message.content ?: "")
         while (matcher.find()) {
             val faceText = matcher.group()
-            newContent = newContent!!.replace(faceText, getString(R.string.place_holder_yunmoji))
+            newContent = newContent?.replace(faceText, getString(R.string.place_holder_yunmoji))
         }
         if (message.getTypeEnum() === ChatMessage.TYPE.IMG) {
             newContent = getString(R.string.place_holder_image)
@@ -328,8 +290,8 @@ class SocketIOClientService : Service() {
             }
             val n = notificationBuilder.build()
             val notificationTarget = NotificationTarget(this, R.id.avatar, rv, n, notificationId)
-            ImageUtils.loadAvatarIntoNotification(this, message.friendAvatar!!, notificationTarget)
-            notificationManager!!.notify(notificationId, n)
+            message.friendAvatar?.let { ImageUtils.loadAvatarIntoNotification(this, it, notificationTarget) }
+            notificationManager?.notify(notificationId, n)
         } else {
             val notificationBuilder = NotificationCompat.Builder(this, "cloudLiterMessageChanel")
             notificationBuilder.setSmallIcon(R.drawable.ic_logo_notification)
@@ -347,24 +309,23 @@ class SocketIOClientService : Service() {
             }
             val n = notificationBuilder.build()
             val notificationTarget = NotificationTarget(this, R.id.avatar, rv, n, notificationId)
-            ImageUtils.loadAvatarIntoNotification(this, message.friendAvatar!!, notificationTarget)
-            notificationManager!!.notify(notificationId, n)
+            ImageUtils.loadAvatarIntoNotification(this, message.friendAvatar
+                    ?: "", notificationTarget)
+            notificationManager?.notify(notificationId, n)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.e("service_destroy","DS!")
-        socket!!.disconnect()
+        Log.e("service_destroy", "DS!")
+        socket?.disconnect()
         unregisterReceiver(receiver)
     }
 
-    override fun onBind(intent: Intent): IBinder? {
-        val binder = JWebSocketClientBinder()
-        binders[intent.action] = binder
-        Log.e("绑定服务", binders.toString())
-        return binder
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
     }
+
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
@@ -373,48 +334,15 @@ class SocketIOClientService : Service() {
         return START_STICKY
     }
 
-
-    override fun onUnbind(intent: Intent): Boolean {
-//        binders.remove(intent.getAction());
-//        Log.e("解绑服务:"+intent.getAction(), String.valueOf(binders));
-        return super.onUnbind(intent)
-    }
-
-    //用于Activity和service通讯
-    inner class JWebSocketClientBinder : Binder() {
-        var onUnreadFetchedListener: OnUnreadFetchedListener? = null
-        var onMessageReadListener: OnMessageReadListener? = null
-
-
-        val service: SocketIOClientService
-            get() = this@SocketIOClientService
-
-        /**
-         * 是否上线
-         */
-        val isConnected: Boolean
-            get() = socket!!.connected()
-
-        /**
-         * 发送信息
-         *
-         * @param message 消息
-         */
-        fun sendMessage(message: ChatMessage) {
-            Log.e("消息发送", message.toString())
-            socket!!.emit("message", message)
-        }
-    }
-
     //重连调用可以在主线程中进行
     private var mHandler = Handler(Looper.getMainLooper())
     private val heartBeatRunnable: Runnable = object : Runnable {
         override fun run() {
             if (socket != null) {
-                socket!!.connect()
+                socket?.connect()
                 Log.e("心跳重连", "--")
-                if(loggedInUserId!=null){
-                    socket!!.emit("login", loggedInUserId)
+                if (loggedInUserId != null) {
+                    socket?.emit("login", loggedInUserId)
                 }
             }
             //定时对长连接进行心跳检测
@@ -423,11 +351,12 @@ class SocketIOClientService : Service() {
     }
 
     companion object {
-        const val ACTION_RECEIVE_MESSAGE = "CLOUD_LITER_RECEIVE_MESSAGE"
-        const val ACTION_FRIEND_STATE_CHANGED = "CLOUD_LITER_FRIEND_STATE_CHANGE"
-        const val ACTION_MESSAGE_SENT = "CLOUD_LITER_MESSAGE_SENT"
-        const val ACTION_MESSAGE_READ = "CLOUD_LITER_MESSAGE_READ"
-        const val ACTION_RELATION_EVENT = "CLOUD_LITER_RELATION_EVENT"
+        const val RECEIVE_RECEIVE_MESSAGE = "CLOUD_LITER_RECEIVE_MESSAGE"
+        const val RECEIVE_FRIEND_STATE_CHANGED = "CLOUD_LITER_FRIEND_STATE_CHANGE"
+        const val RECEIVE_MESSAGE_READ = "CLOUD_LITER_MESSAGE_READ"
+        const val RECEIVE_RELATION_EVENT = "CLOUD_LITER_RELATION_EVENT"
+        const val RECEIVE_UNREAD_MESSAGE = "CLOUD_LITER_UNREAD_FETCHED"
+
 
         const val ACTION_INTO_CONVERSATION = "CLOUD_LITER_INTO_CONVERSATION"
         const val ACTION_LEFT_CONVERSATION = "CLOUD_LITER_LEFT_CONVERSATION"
@@ -435,8 +364,7 @@ class SocketIOClientService : Service() {
         const val ACTION_OFFLINE = "CLOUD_LITER_OFFLINE"
         const val ACTION_MARK_ALL_READ = "CLOUD_LITER_MARK_ALL_READ"
         const val ACTION_MARK_READ = "CLOUD_LITER_MARK_READ"
-        private const val HEART_BEAT_RATE = 10 * 1000 //每隔10秒进行一次对长连接的心跳检测
-                .toLong()
-        private var loggedInUserId:String? =  null;
+        private const val HEART_BEAT_RATE = 10 * 1000.toLong() //每隔10秒进行一次对长连接的心跳检测
+        private var loggedInUserId: String? = null;
     }
 }

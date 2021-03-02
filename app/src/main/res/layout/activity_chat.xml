@@ -253,12 +253,14 @@
                     android:backgroundTint="?attr/backgroundColorBottomAsTint"
                     android:backgroundTintMode="src_over"
                     android:contentDescription="@string/description_text_input"
-                    android:imeOptions="actionSearch"
+                    android:focusableInTouchMode="true"
+                    android:imeOptions="actionSend"
+                    android:importantForAccessibility="yes"
                     android:paddingStart="16dp"
                     android:paddingTop="5dp"
                     android:paddingEnd="16dp"
                     android:paddingBottom="5dp"
-                    android:singleLine="false"
+                    android:singleLine="true"
                     android:textColor="?attr/textColorPrimary"
                     android:textColorHint="?attr/textColorSecondary" />
 

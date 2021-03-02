@@ -19,17 +19,28 @@ class AiRepository(application: Application) {
     var aiWebSource: AiWebSource = AiWebSource.instance!!
     val yoloSource: YOLOSource = YOLOSource.getInstance(application)
 
-    
+
     /**
-     * 进行图片分类
+     * 进行图片分类（上传图片文件形式）
      *
      * @param token    令牌
      * @param bitmap 图片bitmap
      * @return 返回结果
      */
-    fun imageClassify(token: String, bitmap: Bitmap): LiveData<DataState<JsonObject>> {
-        val body = MultipartBody.Part.createFormData("upload","hello.jpg",BitmapRequestBody(bitmap))
-        return aiWebSource.imageClassify(token,body)
+    fun imageClassifyDirect(token: String, bitmap: Bitmap): LiveData<DataState<JsonObject>> {
+        val body = MultipartBody.Part.createFormData("upload", "hello.jpg", BitmapRequestBody(bitmap))
+        return aiWebSource.imageClassifyDirect(token, body)
+    }
+
+    /**
+     * 进行图片分类
+     *
+     * @param token    令牌
+     * @param messageId 消息id
+     * @return 返回结果
+     */
+    fun imageClassify(token: String, messageId: String): LiveData<DataState<JsonObject>> {
+        return aiWebSource.imageClassify(token, messageId)
     }
 
 

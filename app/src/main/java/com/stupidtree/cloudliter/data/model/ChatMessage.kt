@@ -1,5 +1,4 @@
 package com.stupidtree.cloudliter.data.model
-
 import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -54,9 +53,9 @@ class ChatMessage : Serializable {
      */
     //是否正在发送
     @Ignore
-    var isProgressing: Boolean
+    var sendingState: SEND_STATE = SEND_STATE.SUCCESS
 
-
+    enum class SEND_STATE{SENDING,SUCCESS,FAILED}
     enum class VOICE_STATE { PLAYING, PAUSED, STOPPED }
     enum class TTS_STATE { STOPPED, PROCESSING, SUCCESS, FAILED }
 
@@ -67,10 +66,9 @@ class ChatMessage : Serializable {
     var ttsState: TTS_STATE = TTS_STATE.STOPPED
 
     @Ignore
-    var uuid: String? = null
+    var uuid: String = UUID.randomUUID().toString()
 
     constructor() {
-        isProgressing = false
     }
 
     @Ignore
@@ -85,8 +83,7 @@ class ChatMessage : Serializable {
             TextUtils.getP2PIdOrdered(fromId, toId)
         }
         createdAt = Timestamp(System.currentTimeMillis())
-        uuid = UUID.randomUUID().toString()
-        isProgressing = true
+        sendingState = SEND_STATE.SENDING
     }
 
     override fun toString(): String {

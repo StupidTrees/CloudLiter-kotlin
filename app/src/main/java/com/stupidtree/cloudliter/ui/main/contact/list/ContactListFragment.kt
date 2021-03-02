@@ -48,7 +48,7 @@ class ContactListFragment : BaseFragmentWithReceiver<ContactListViewModel,Fragme
     }
 
     override fun getIntentFilter(): IntentFilter {
-        return IntentFilter(SocketIOClientService.ACTION_RELATION_EVENT)
+        return IntentFilter(SocketIOClientService.RECEIVE_RELATION_EVENT)
     }
 
     override fun getViewModelClass(): Class<ContactListViewModel> {

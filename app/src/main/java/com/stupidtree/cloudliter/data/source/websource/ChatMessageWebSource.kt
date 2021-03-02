@@ -3,16 +3,13 @@ package com.stupidtree.cloudliter.data.source.websource
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.google.gson.JsonObject
 import com.stupidtree.cloudliter.data.model.ApiResponse
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.source.websource.service.ChatMessageService
 import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.codes
 import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.utils.JsonUtils
 import okhttp3.MultipartBody
-import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -60,7 +57,7 @@ class ChatMessageWebSource : BaseWebSource<ChatMessageService>(Retrofit.Builder(
      * @param afterId 查询该id之后的消息
      * @return 获取结果
      */
-    fun getMessagesAfter(token: String, id: String, afterId: String?, includeBound: Boolean): LiveData<DataState<List<ChatMessage>?>>? {
+    fun getMessagesAfter(token: String, id: String, afterId: String?, includeBound: Boolean): LiveData<DataState<List<ChatMessage>?>> {
         return Transformations.map(service.getMessagesAfter(token,id,afterId,includeBound)){
             input: ApiResponse<List<ChatMessage>?>? ->
             if (null == input) {
@@ -74,6 +71,24 @@ class ChatMessageWebSource : BaseWebSource<ChatMessageService>(Retrofit.Builder(
         }
 
     }
+    /**
+     * 发送文字
+     *
+     * @param token 令牌
+     * @return 返回结果
+     */
+    fun sendTextMessage(token: String, fromId:String,toId: String,content:String,uuid:String): LiveData<DataState<ChatMessage?>> {
+        return Transformations.map(service.sendTextMessage(token,fromId,toId,content,uuid)) { input ->
+            if (input == null) {
+                return@map DataState<ChatMessage?>(DataState.STATE.FETCH_FAILED)
+            }
+            when (input.code) {
+                codes.SUCCESS -> return@map DataState(input.data)
+                codes.TOKEN_INVALID -> return@map DataState<ChatMessage?>(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState<ChatMessage?>(DataState.STATE.FETCH_FAILED, input.message)
+            }
+        }
+    }
 
     /**
      * 发送图片
@@ -84,8 +99,7 @@ class ChatMessageWebSource : BaseWebSource<ChatMessageService>(Retrofit.Builder(
      * @return 返回结果
      */
     fun sendImageMessage(token: String, toId: String, file: MultipartBody.Part, uuid: String?): LiveData<DataState<ChatMessage?>> {
-        return Transformations.map(service.sendImageMessage(token, toId, file, uuid)) { input: ApiResponse<ChatMessage?>? ->
-            Log.e("发送图片结果", input.toString())
+        return Transformations.map(service.sendImageMessage(token, toId, file, uuid)) { input ->
             if (input == null) {
                 return@map DataState<ChatMessage?>(DataState.STATE.FETCH_FAILED)
             }
@@ -121,8 +135,6 @@ class ChatMessageWebSource : BaseWebSource<ChatMessageService>(Retrofit.Builder(
 
     fun startTTS(token: String, id: String):LiveData<DataState<ChatMessage?>>{
         return Transformations.map(service.startTTS(token,id)){input->
-            Log.e("语音合成结果", input.toString())
-           // val jo = JsonUtils.getJSONObject(input?.data)
             if (input == null) {
                 return@map DataState(DataState.STATE.FETCH_FAILED)
             }

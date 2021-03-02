@@ -4,22 +4,28 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.model.Conversation
-import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.data.model.Yunmoji
 import com.stupidtree.cloudliter.databinding.ActivityChatBinding
 import com.stupidtree.cloudliter.ui.base.BaseActivity
@@ -28,7 +34,6 @@ import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpTextMessageDetail
 import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectBottomFragment
 import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
-import com.stupidtree.cloudliter.ui.widgets.PopUpText
 import com.stupidtree.cloudliter.utils.*
 import java.util.*
 
@@ -61,7 +66,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                 viewModel.markAllRead(getThis())
                 //定时对长连接进行心跳检测
                 Log.e("对话：心跳声明", "--")
-                mHandler.postDelayed(this, 5 * 1000)
+                mHandler.postDelayed(this, 8 * 1000)
             }
         }
     }
@@ -128,7 +133,6 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
     //每次页面失去焦点时，退出对话，解绑服务
     override fun onStop() {
         super.onStop()
-        Log.e("ChatActivity", "onStop")
         viewModel.leftConversation(this)
         viewModel.unbindService(this)
         mHandler.removeCallbacks(heartBeatRunnable)
@@ -260,13 +264,10 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                 }
             }
         })
-        viewModel.getImageSentResult().observe(this, { })
-        viewModel.getVoiceSentResult().observe(this, { })
         //消息成功发送后反馈给列表
         viewModel.messageSentState.observe(this, { chatMessageDataState ->
-            if (chatMessageDataState!!.state === DataState.STATE.SUCCESS) {
-                binding.list.let { listAdapter.messageSent(it, chatMessageDataState!!.data!!) }
-            }
+            listAdapter.messageSent(binding.list, chatMessageDataState.first.data, chatMessageDataState.second, chatMessageDataState.first
+                    .state)
         })
         //消息被对方读取后反馈给列表
         viewModel.messageReadState.observe(this, { messageReadNotificationDataState ->
@@ -276,9 +277,8 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
             }
         })
         viewModel.ttsResultLiveData.observe(this) {
-            listAdapter.changeTTSState(binding.list, it.data, if (it.state == DataState.STATE.SUCCESS)
+            listAdapter.changeTTSState(binding.list, it.second, it.first.data, if (it.first.state == DataState.STATE.SUCCESS)
                 ChatMessage.TTS_STATE.SUCCESS else ChatMessage.TTS_STATE.FAILED)
-
         }
     }
 
@@ -348,7 +348,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         })
         listAdapter.onTTSButtonClickListener = object : ChatListAdapter.OnTTSButtonClickListener {
             override fun onClick(v: View, data: ChatMessage, position: Int) {
-                listAdapter.changeTTSState(binding.list,data,ChatMessage.TTS_STATE.PROCESSING)
+                listAdapter.changeTTSState(binding.list, data.id, data, ChatMessage.TTS_STATE.PROCESSING)
                 viewModel.startTTS(data)
             }
 
@@ -410,12 +410,47 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                     collapseBottomPanel(collapseKeyboard = false, animate = true)
                     unlockContentHeight()
                 }
-
             }
             false
         }
+
+        binding.input.setOnEditorActionListener (object : TextView.OnEditorActionListener {
+            override fun onEditorAction(textView: TextView, i: Int, keyEvent: KeyEvent?): Boolean {
+                if (textView.text.toString().isBlank()) return false
+                if (i == EditorInfo.IME_ACTION_GO || i == EditorInfo.IME_ACTION_SEND) {
+                    binding.send.callOnClick()
+                    return true
+                }
+                return false
+            }
+        })
+        setSendButtonEnabled(false)
+        binding.input.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                setSendButtonEnabled(!s.isNullOrEmpty())
+            }
+
+        })
     }
 
+
+    private fun setSendButtonEnabled(enable: Boolean) {
+        if (!enable) {
+            binding.send.isEnabled = false
+            binding.send.setCardBackgroundColor(Color.parseColor("#55bbbbbb"))
+        } else {
+            binding.send.isEnabled = true
+            binding.send.setCardBackgroundColor(getColorPrimary())
+        }
+    }
 
     //初始化表情列表
     private fun setUpYunmojiList() {
@@ -520,6 +555,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
     private fun voiceMessageReady() {
         if (!TextUtils.isEmpty(voiceHelper.filePath)) {
             binding.voiceCancel.visibility = View.VISIBLE
+            setSendButtonEnabled(true)
         } else {
             refreshVoiceBubble()
         }
@@ -529,11 +565,9 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
     //发送语音消息
     private fun voiceMessageSend() {
         if (!TextUtils.isEmpty(voiceHelper.filePath)) {
-//            viewModel.sendVoiceMessage(voiceHelper.filePath, voiceHelper.timeCount)
             voiceHelper.let {
                 viewModel.conversation.value?.let { conversation ->
                     if (conversation.friendType == 2 || conversation.friendType == 3 || conversation.friendType == 6 || conversation.friendType == 7) {
-                        //TODO
                         viewModel.sendVoiceMessage(it.filePath, it.timeCount)
                     } else {
                         viewModel.sendVoiceMessage(it.filePath, it.timeCount)
@@ -556,9 +590,10 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
 
     //重置语音输入气泡状态
     private fun refreshVoiceBubble() {
-//
         binding.recorfingText.text = TextUtils.getVoiceTimeText(this, voiceHelper.timeCount)
-        if (voiceHelper.state == AudioRecordHelper.STATE.DONE && voiceHelper.timeCount > 0) {
+        val b = voiceHelper.state == AudioRecordHelper.STATE.DONE && voiceHelper.timeCount > 0
+        setSendButtonEnabled(if (textInput || !b) !binding.input.text.isNullOrEmpty() else b)
+        if (b) {
             binding.voiceCancel.visibility = View.VISIBLE
             if (textInput) {
                 binding.voiceBubble.visibility = View.GONE
@@ -571,6 +606,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
             binding.voiceCancel.visibility = View.GONE
             binding.input.visibility = View.VISIBLE
         }
+
     }
 
 

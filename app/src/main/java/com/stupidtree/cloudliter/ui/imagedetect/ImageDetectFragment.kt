@@ -2,7 +2,6 @@ package com.stupidtree.cloudliter.ui.imagedetect
 
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -12,7 +11,6 @@ import com.stupidtree.cloudliter.databinding.FragmentImageDedectBinding
 import com.stupidtree.cloudliter.ui.base.BaseFragment
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpImageMessageDetail
-import kotlinx.android.synthetic.main.fragment_image_dedect.*
 
 class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDedectBinding>() {
 

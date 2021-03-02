@@ -8,7 +8,6 @@ import android.content.IntentFilter
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.stupidtree.cloudliter.R
@@ -16,7 +15,7 @@ import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.databinding.FragmentConversationsBinding
 import com.stupidtree.cloudliter.databinding.FragmentConversationsListItemBinding
-import com.stupidtree.cloudliter.service.socket.SocketIOClientService.Companion.ACTION_RELATION_EVENT
+import com.stupidtree.cloudliter.service.socket.SocketIOClientService.Companion.RECEIVE_RELATION_EVENT
 import com.stupidtree.cloudliter.ui.base.*
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
@@ -27,7 +26,7 @@ import java.util.*
  * “消息”页面
  */
 @SuppressLint("NonConstantResourceId")
-class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel,FragmentConversationsBinding>() {
+class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel, FragmentConversationsBinding>() {
 
     /**
      * 广播区
@@ -51,7 +50,7 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel,Fr
 
     override fun getIntentFilter(): IntentFilter {
         val iF = IntentFilter("android.net.conn.CONNECTIVITY_CHANGE")
-        iF.addAction(ACTION_RELATION_EVENT)
+        iF.addAction(RECEIVE_RELATION_EVENT)
         return iF
     }
 
@@ -66,13 +65,13 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel,Fr
         })
 
         //设置下拉刷新
-       binding?.refresh?.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent)
-       binding?.refresh?.setOnRefreshListener { viewModel.startRefresh() }
+        binding?.refresh?.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent)
+        binding?.refresh?.setOnRefreshListener { viewModel.startRefresh() }
 
 
         // searchBar.setOnClickListener(view1 -> ActivityUtils.startSearchActivity(requireActivity()));
         viewModel.listData?.observe(this, { listDataState ->
-           binding?.refresh?.isRefreshing = false
+            binding?.refresh?.isRefreshing = false
             if (listDataState.data != null && listDataState.data!!.isNotEmpty()) {
                 val listD = listDataState.data!!
                 listD.sortWith { conversation: Conversation, t1: Conversation ->
@@ -126,14 +125,11 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel,Fr
                 }
             }
         })
-        viewModel.unreadMessageState?.observe(this, Observer { listDataState ->
+        viewModel.unreadMessageState.observe(this) {
             //refreshLayout.setRefreshing(true);
             viewModel.startRefresh()
-        })
+        }
     }
-
-
-
 
 
     override fun onStart() {
@@ -155,7 +151,6 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel,Fr
         var unreadMap: HashMap<String, Int> = HashMap()
 
 
-
         override fun bindHolder(holder: CHolder, data: Conversation?, position: Int) {
             if (data != null) {
                 ImageUtils.loadAvatarInto(mContext, data.friendAvatar, holder.binding.avatar)
@@ -173,10 +168,10 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel,Fr
                 } else {
                     holder.binding.unread.visibility = View.INVISIBLE
                 }
-                if(data.friendTypePermission==UserLocal.TYPEPERMISSION.PRIVATE){
+                if (data.friendTypePermission == UserLocal.TYPEPERMISSION.PRIVATE) {
 //                if(data.friendType==0){
                     holder.binding.accessibilityIcon.visibility = View.GONE
-                }else{
+                } else {
                     holder.binding.accessibilityIcon.visibility = View.VISIBLE
                 }
                 holder.binding.updatedAt.text = TextUtils.getConversationTimeText(mContext, data.updatedAt)
@@ -203,7 +198,7 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel,Fr
         inner class CHolder(itemView: FragmentConversationsListItemBinding) : BaseViewHolder<FragmentConversationsListItemBinding>(itemView)
 
         override fun getViewBinding(parent: ViewGroup, viewType: Int): ViewBinding {
-            return FragmentConversationsListItemBinding.inflate(layoutInflater,parent,false)
+            return FragmentConversationsListItemBinding.inflate(layoutInflater, parent, false)
         }
 
         override fun createViewHolder(viewBinding: ViewBinding, viewType: Int): CHolder {

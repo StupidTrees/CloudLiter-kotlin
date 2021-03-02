@@ -2,9 +2,9 @@ package com.stupidtree.cloudliter.ui.chat
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Interpolator
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import android.widget.TextView
@@ -13,6 +13,7 @@ import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter
 import com.stupidtree.cloudliter.ui.base.BaseListAdapterClassic
+import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.widgets.EmoticonsTextView
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
@@ -27,7 +28,6 @@ import kotlin.math.abs
 @SuppressLint("ParcelCreator")
 internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableList<ChatMessage>) : BaseListAdapterClassic<ChatMessage, ChatListAdapter.CHolder>(chatActivity, mBeans) {
     var onTTSButtonClickListener: OnTTSButtonClickListener? = null
-
     override fun getLayoutId(viewType: Int): Int {
         return when (viewType) {
             TYPE_MINE -> R.layout.activity_chat_message_text_mine
@@ -83,13 +83,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                     chatActivity.viewModel.friendAvatar?.let { ImageUtils.loadAvatarInto(chatActivity, it, holder.avatar!!) }
                 }
                 holder.avatar?.setOnClickListener { data.fromId?.let { ActivityUtils.startProfileActivity(chatActivity, it) } }
-                if (holder.progress != null) {
-                    if (data.isProgressing) {
-                        holder.progress?.visibility = View.VISIBLE
-                    } else {
-                        holder.progress?.visibility = View.GONE
-                    }
-                }
+                holder.setSendState(data)
                 //图片消息
                 if (data.getTypeEnum() == ChatMessage.TYPE.IMG) {
                     if (holder.progress != null) {
@@ -180,24 +174,43 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
      * @param list        recyclerview
      * @param sentMessage 已发送消息实体
      */
-    fun messageSent(list: RecyclerView, sentMessage: ChatMessage) {
+    fun messageSent(list: RecyclerView, sentMessage: ChatMessage?, uuid: String, state: DataState.STATE) {
         var index = -1
         for (i in mBeans.indices.reversed()) {
-            if (mBeans[i].uuid == sentMessage.uuid) {
+            if (mBeans[i].uuid == uuid) {
                 index = i
                 break
             }
         }
         if (index >= 0) {
-            mBeans[index] = sentMessage
+            val sendState = if (state == DataState.STATE.SUCCESS) ChatMessage.SEND_STATE.SUCCESS else ChatMessage.SEND_STATE.FAILED
+            sentMessage?.sendingState = sendState
+            mBeans[index].sendingState = sendState
+            if (sentMessage != null) {
+                mBeans[index] = sentMessage
+            }
             val holder = list.findViewHolderForAdapterPosition(index) as CHolder?
             if (holder != null) {
-                holder.hideProgress()
-                holder.bindSensitiveAndEmotion(sentMessage)
-                holder.bindClickAction(sentMessage, index)
-                if (sentMessage.getTypeEnum() == ChatMessage.TYPE.IMG) {
-                    holder.updateImage(sentMessage)
+                holder.setSendState(mBeans[index])
+                sentMessage?.let {
+                    holder.bindSensitiveAndEmotion(it)
+                    holder.bindClickAction(it, index)
+                    if (it.getTypeEnum() == ChatMessage.TYPE.IMG) {
+                        holder.updateImage(it)
+                    }
                 }
+            } else {
+                list.postDelayed({
+                    val h = list.findViewHolderForAdapterPosition(index) as CHolder?
+                    h?.setSendState(mBeans[index])
+                    sentMessage?.let {
+                        h?.bindSensitiveAndEmotion(it)
+                        h?.bindClickAction(it, index)
+                        if (it.getTypeEnum() == ChatMessage.TYPE.IMG) {
+                            h?.updateImage(it)
+                        }
+                    }
+                }, 100)
             }
         }
     }
@@ -225,10 +238,10 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
     /**
      * 语音识别状态变更
      */
-    fun changeTTSState(list: RecyclerView, chatMessage:ChatMessage?, action: ChatMessage.TTS_STATE) {
+    fun changeTTSState(list: RecyclerView, id: String, chatMessage: ChatMessage?, action: ChatMessage.TTS_STATE) {
         var index = -1
         for (i in mBeans.indices.reversed()) {
-            if (mBeans[i].id == chatMessage?.id) {
+            if (mBeans[i].id == id) {
                 index = i
                 break
             }
@@ -239,8 +252,8 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                 mBeans[index].extra = it.extra
                 mBeans[index].emotion = it.emotion
                 mBeans[index].sensitive = it.sensitive
-                mBeans[index].ttsState = action
             }
+            mBeans[index].ttsState = action
             val holder = list.findViewHolderForAdapterPosition(index) as CHolder?
             holder?.bindVoiceState(mBeans[index])
         }
@@ -364,6 +377,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         var avatar: ImageView? = itemView.findViewById(R.id.avatar)
         var bubble: View? = itemView.findViewById(R.id.bubble)
         var progress: View? = itemView.findViewById(R.id.progress)
+        var fail: View? = itemView.findViewById(R.id.fail)
 
         var see //点击查看敏感消息
                 : ImageView? = itemView.findViewById(R.id.see)
@@ -382,11 +396,23 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         var sensitiveExpanded = false
 
 
-        //隐藏加载圈圈
-        fun hideProgress() {
-            if (progress != null) {
-                progress?.visibility = View.GONE
+        //设置发送状态
+        fun setSendState(data: ChatMessage) {
+            when (data.sendingState) {
+                ChatMessage.SEND_STATE.SENDING -> {
+                    fail?.visibility = View.GONE
+                    progress?.visibility = View.VISIBLE
+                }
+                ChatMessage.SEND_STATE.SUCCESS -> {
+                    fail?.visibility = View.GONE
+                    progress?.visibility = View.GONE
+                }
+                ChatMessage.SEND_STATE.FAILED -> {
+                    fail?.visibility = View.VISIBLE
+                    progress?.visibility = View.GONE
+                }
             }
+
         }
 
         fun showRead() {

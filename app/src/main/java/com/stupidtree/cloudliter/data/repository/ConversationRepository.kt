@@ -3,20 +3,17 @@ package com.stupidtree.cloudliter.data.repository
 import android.app.Application
 import android.content.Context
 import android.content.IntentFilter
-import android.text.TextUtils
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.model.UserLocal
-import com.stupidtree.cloudliter.data.model.UserRelation
 import com.stupidtree.cloudliter.data.source.dao.ConversationDao
 import com.stupidtree.cloudliter.data.source.websource.ConversationWebSource
 import com.stupidtree.cloudliter.data.source.websource.SocketWebSource
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
 import com.stupidtree.cloudliter.ui.base.DataState
 import java.util.*
-import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * 层次：Repository
@@ -24,27 +21,28 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 class ConversationRepository(context: Context) {
     //数据源1：网络类型数据，对话的网络数据源
-    var conversationWebSource: ConversationWebSource = ConversationWebSource.instance!!
+    private var conversationWebSource: ConversationWebSource = ConversationWebSource.instance!!
 
     //数据源2：长连接数据源
     var socketWebSource: SocketWebSource = SocketWebSource()
 
     //数据源3：对话的本地存储
-    var conversationDao: ConversationDao = AppDatabase.getDatabase(context).conversationDao()
+    private var conversationDao: ConversationDao = AppDatabase.getDatabase(context).conversationDao()
 
     val unreadMessageState: LiveData<DataState<HashMap<String, Int>>>
-        get() = socketWebSource.unreadMessageState
+        get() = SocketWebSource.unreadMessageState
 
     fun bindService(context: Context) {
-        val IF = IntentFilter()
-        IF.addAction(SocketIOClientService.ACTION_RECEIVE_MESSAGE)
-        IF.addAction(SocketIOClientService.ACTION_FRIEND_STATE_CHANGED)
-        context.registerReceiver(socketWebSource, IF)
-        socketWebSource.bindService("conversation", context)
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(SocketIOClientService.RECEIVE_RECEIVE_MESSAGE)
+        intentFilter.addAction(SocketIOClientService.RECEIVE_FRIEND_STATE_CHANGED)
+        intentFilter.addAction(SocketIOClientService.RECEIVE_UNREAD_MESSAGE)
+        context.registerReceiver(socketWebSource, intentFilter)
+        //socketWebSource.bindService("conversation", context)
     }
 
     fun unbindService(context: Context) {
-        socketWebSource.unbindService(context)
+       // socketWebSource.unbindService(context)
         context.unregisterReceiver(socketWebSource)
     }
 
@@ -141,11 +139,11 @@ class ConversationRepository(context: Context) {
         private var instance: ConversationRepository? = null
 
         @JvmStatic
-        fun getInstance(application: Application): ConversationRepository? {
+        fun getInstance(application: Application): ConversationRepository {
             if (instance == null) {
                 instance = ConversationRepository(application.applicationContext)
             }
-            return instance
+            return instance!!
         }
     }
 

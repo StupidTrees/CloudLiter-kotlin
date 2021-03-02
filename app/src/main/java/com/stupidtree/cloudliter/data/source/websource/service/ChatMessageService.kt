@@ -39,6 +39,19 @@ interface ChatMessageService {
     fun getMessagesAfter(@Header("token") token: String, @Query("conversationId") conversationId: String, @Query("afterId") afterId: String?, @Query("includeBound") includeBond: Boolean): LiveData<ApiResponse<List<ChatMessage>?>?>
 
     /**
+     * 发送消息
+     * @param token 令牌
+     * @param fromId
+     * @param toId
+     *
+     * @return 返回结果
+     */
+    @FormUrlEncoded
+    @POST("/message/send_text")
+    fun sendTextMessage(@Header("token") token: String, @Field("fromId") fromId: String, @Field("toId") toId:String, @Field("content") content:String,@Field("uuid") uuid: String): LiveData<ApiResponse<ChatMessage?>?>
+
+
+    /**
      * 发送图片
      * @param token 令牌
      * @param toId 朋友id

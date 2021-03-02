@@ -106,58 +106,33 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
 
     //状态数据：消息发送结果
-    var messageSentState: LiveData<DataState<ChatMessage>> = Transformations.map(chatRepository.messageSentSate) { input: DataState<ChatMessage> ->
-        input.data?.let {
-            if (it.uuid == bottomUUID) {
+    //first为成功后的message，second为uuid
+    var messageSentLiveData = MediatorLiveData<Pair<DataState<ChatMessage?>, String>>()
+    var messageSentState: LiveData<Pair<DataState<ChatMessage?>, String>> = Transformations.map(messageSentLiveData) {input->
+        input.first.data?.let {
+            if (input.second == bottomUUID) {
                 bottomId = it.id
             }
         }
         input
     }
 
-    val ttsResultLiveData: MediatorLiveData<DataState<ChatMessage?>> = MediatorLiveData()
-    var messageReadState: LiveData<DataState<MessageReadNotification>> = Transformations.map(chatRepository.messageReadState) { input: DataState<MessageReadNotification> -> input }
+    val ttsResultLiveData: MediatorLiveData<Pair<DataState<ChatMessage?>, String>> = MediatorLiveData()
+    var messageReadState: LiveData<DataState<MessageReadNotification>> = Transformations.map(chatRepository.messageReadState) { input: DataState<MessageReadNotification>
+        ->
+        if (input.data?.userId == friendId) {
+            input
+        } else {
+            DataState(DataState.STATE.NOTHING)
+        }
+    }
 
-    //控制↑的刷新
-    private val imageSendController = MutableLiveData<StringTrigger>()
-    private val voiceSendController = MutableLiveData<VoiceMessageTrigger>()
     private val pageSize = 15
     private var topId: String? = null
     private var topTime: Timestamp? = null
     private var bottomId: String? = null
     private var bottomUUID: String? = null
 
-
-    //状态数据：图片消息发送
-    fun getImageSentResult(): LiveData<DataState<ChatMessage?>> {
-        return Transformations.switchMap(imageSendController) { input: StringTrigger ->
-            if (input.isActioning) {
-                val userLocal = localUserRepository.getLoggedInUser()
-                if (userLocal.isValid && friendId != null) {
-                    return@switchMap chatRepository.ActionSendImageMessage(getApplication(), userLocal.token!!, userLocal.id!!, friendId!!, input.data)
-                } else {
-                    return@switchMap MutableLiveData(DataState<ChatMessage?>(DataState.STATE.NOT_LOGGED_IN))
-                }
-            }
-            MutableLiveData(DataState(DataState.STATE.NOTHING))
-        }
-    }
-
-
-    //状态数据：语音消息发送
-    fun getVoiceSentResult(): LiveData<DataState<ChatMessage?>> {
-        return Transformations.switchMap(voiceSendController) { input: VoiceMessageTrigger ->
-            if (input.isActioning) {
-                val userLocal = localUserRepository.getLoggedInUser()
-                if (userLocal.isValid && friendId != null) {
-                    return@switchMap chatRepository.actionSendVoiceMessage(userLocal.token!!, userLocal.id!!, friendId!!, input.path!!, input.seconds)
-                } else {
-                    return@switchMap MutableLiveData(DataState<ChatMessage?>(DataState.STATE.NOT_LOGGED_IN))
-                }
-            }
-            MutableLiveData(DataState(DataState.STATE.NOTHING))
-        }
-    }
 
     /**
      * 发送消息
@@ -166,11 +141,15 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun sendMessage(content: String?) {
         val userLocal = localUserRepository.getLoggedInUser()
-        if (userLocal.isValid && friendId != null) {
-            val message = ChatMessage(userLocal.id,
-                    friendId, content)
-            //通知仓库发送消息
-            chatRepository.ActionSendMessage(message)
+        val liveData = if (userLocal.isValid && friendId != null) {
+            chatRepository.sendTextMessage(userLocal.token!!, userLocal.id!!, friendId!!, content
+                    ?: "")
+        } else {
+            MutableLiveData(Pair(DataState(DataState.STATE.NOT_LOGGED_IN),""))
+        }
+        messageSentLiveData.addSource(liveData) {
+            messageSentLiveData.value = it
+            messageSentLiveData.removeSource(liveData)
         }
     }
 
@@ -178,14 +157,34 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
      * 发送图片
      */
     fun sendImageMessage(path: String) {
-        imageSendController.value = StringTrigger.getActioning(path)
+        val userLocal = localUserRepository.getLoggedInUser()
+        val liveData = if (userLocal.isValid && friendId != null) {
+            chatRepository.sendImageMessage(getApplication(), userLocal.token!!, userLocal.id!!, friendId!!, path)
+        } else {
+            MutableLiveData(Pair(DataState(DataState.STATE.NOT_LOGGED_IN),""))
+        }
+        messageSentLiveData.addSource(liveData) {
+            messageSentLiveData.value = it
+            messageSentLiveData.removeSource(liveData)
+        }
+
     }
+
 
     /**
      * 发送语音
      */
     fun sendVoiceMessage(path: String, time: Int) {
-        voiceSendController.value = VoiceMessageTrigger.getActioning(path, time)
+        val userLocal = localUserRepository.getLoggedInUser()
+        val liveData = if (userLocal.isValid && friendId != null) {
+            chatRepository.actionSendVoiceMessage(userLocal.token!!, userLocal.id!!, friendId!!, path, time)
+        } else {
+            MutableLiveData(Pair(DataState(DataState.STATE.NOT_LOGGED_IN),""))
+        }
+        messageSentLiveData.addSource(liveData) {
+            messageSentLiveData.value = it
+            messageSentLiveData.removeSource(liveData)
+        }
     }
 
     fun bindService(context: Context?) {
@@ -203,7 +202,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {
             conversationId?.let {
-                chatRepository.ActionFetchMessages(
+                chatRepository.actionFetchMessages(
                         userLocal.token!!,
                         it,
                         null,
@@ -222,7 +221,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {
             conversationId?.let {
-                chatRepository.ActionFetchNewMessages(
+                chatRepository.actionFetchNewMessages(
                         userLocal.token!!,
                         it,
                         bottomId
@@ -238,7 +237,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {
             conversationId?.let {
-                chatRepository.ActionFetchMessages(
+                chatRepository.actionFetchMessages(
                         userLocal.token!!,
                         it,
                         topId,
@@ -277,7 +276,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun getIntoConversation(context: Context) {
         if (friendId != null && conversationId != null && localUserRepository.isUserLoggedIn) {
-            chatRepository.ActionGetIntoConversation(context, localUserRepository.getLoggedInUser().id!!,
+            chatRepository.actionGetIntoConversation(context, localUserRepository.getLoggedInUser().id!!,
                     friendId!!, conversationId!!)
         }
     }
@@ -287,7 +286,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun leftConversation(context: Context) {
         if (conversationId != null && localUserRepository.isUserLoggedIn) {
-            chatRepository.ActionLeftConversation(context, localUserRepository.getLoggedInUser().id!!,
+            chatRepository.actionLeftConversation(context, localUserRepository.getLoggedInUser().id!!,
                     conversationId!!)
         }
     }
@@ -295,7 +294,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     fun markAllRead(context: Context) {
         if (conversationId != null && localUserRepository.isUserLoggedIn) {
             if (topTime != null && conversationId != null && myId != null) {
-                chatRepository.ActionMarkAllRead(context, myId!!, conversationId!!,
+                chatRepository.actionMarkAllRead(context, myId!!, conversationId!!,
                         topTime!!, pageSize)
             }
 
@@ -305,7 +304,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     fun markRead(context: Context, chatMessage: ChatMessage) {
         chatMessage.toId?.let {
             chatMessage.conversationId?.let { it1 ->
-                chatRepository.ActionMarkRead(context, it, chatMessage.id, it1)
+                chatRepository.actionMarkRead(context, it, chatMessage.id, it1)
             }
         }
     }
@@ -323,7 +322,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             webConversationData?.let {
                 conversation.removeSource(it)
             }
-            webConversationData = conversationRepository?.queryConversation(userLocal.token!!, userLocal.id!!, id)
+            webConversationData = conversationRepository.queryConversation(userLocal.token!!, userLocal.id!!, id)
             webConversationData?.let {
                 conversation.addSource(it) { data ->
                     if (data.state == DataState.STATE.SUCCESS) {
@@ -341,7 +340,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         val dt = getTTSOneTaskLiveData(message)
         ttsResultLiveData.addSource(dt) {
             it.data?.id = message.id
-            ttsResultLiveData.value = it
+            ttsResultLiveData.value = Pair(it, message.id)
             ttsResultLiveData.removeSource(dt) //移除任务
         }
     }

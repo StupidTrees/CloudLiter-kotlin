@@ -21,7 +21,6 @@ import com.stupidtree.cloudliter.ui.base.BaseActivityWithReceiver
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.group.pick.PickGroupDialog
 import com.stupidtree.cloudliter.ui.widgets.PopUpEditText
-import com.stupidtree.cloudliter.ui.widgets.PopUpMultipleCheckableList
 import com.stupidtree.cloudliter.ui.widgets.PopUpText
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
@@ -44,7 +43,7 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
     }
 
     override fun getIntentFilter(): IntentFilter {
-        return IntentFilter(SocketIOClientService.ACTION_RELATION_EVENT)
+        return IntentFilter(SocketIOClientService.RECEIVE_RELATION_EVENT)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

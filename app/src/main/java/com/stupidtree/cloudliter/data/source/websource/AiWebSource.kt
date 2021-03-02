@@ -25,8 +25,29 @@ class AiWebSource : BaseWebSource<AiService>(Retrofit.Builder()
      * @param file 文件
      * @return 操作结果
      */
-    fun imageClassify(token: String, upload: MultipartBody.Part): LiveData<DataState<JsonObject>> {
-        return Transformations.map(service.imageClassify(token, upload)) { input->
+    fun imageClassifyDirect(token: String, upload: MultipartBody.Part): LiveData<DataState<JsonObject>> {
+        return Transformations.map(service.imageClassifyDirect(token, upload)) { input->
+            //Log.e("resp", input.toString())
+            if (input == null) {
+                return@map DataState(DataState.STATE.FETCH_FAILED)
+            }
+            when (input.code) {
+                codes.SUCCESS -> return@map DataState(input.data!!)
+                codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
+            }
+        }
+    }
+
+
+    /**
+     * 对某个聊天图片进行图片分类
+     * @param token 令牌
+     * @param messageId 消息id
+     * @return 操作结果
+     */
+    fun imageClassify(token: String, messageId:String): LiveData<DataState<JsonObject>> {
+        return Transformations.map(service.imageClassify(token, messageId)) { input->
             //Log.e("resp", input.toString())
             if (input == null) {
                 return@map DataState(DataState.STATE.FETCH_FAILED)

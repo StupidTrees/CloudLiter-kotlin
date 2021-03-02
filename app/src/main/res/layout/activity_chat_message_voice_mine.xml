@@ -8,6 +8,15 @@
     android:paddingBottom="8dp">
 
 
+    <ImageView
+        android:id="@+id/fail"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center|top"
+        android:layout_marginTop="16dp"
+        app:srcCompat="@android:drawable/stat_sys_warning"
+        app:tint="@color/profileOrange" />
+
     <ProgressBar
         android:id="@+id/progress"
         style="?android:attr/progressBarStyle"
@@ -83,8 +92,9 @@
 
                     <ImageView
                         android:id="@+id/tts"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
                         android:layout_marginStart="-8dp"
                         android:layout_marginEnd="4dp"
                         android:alpha="0.9"
@@ -136,5 +146,5 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:contentDescription="@string/content_description_avatar"
-        android:src="@drawable/ic_baseline_emoji_emotions_24" />
+        android:src="@drawable/place_holder_avatar" />
 </LinearLayout>

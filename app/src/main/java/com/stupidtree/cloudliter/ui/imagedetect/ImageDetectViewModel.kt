@@ -24,13 +24,21 @@ class ImageDetectViewModel(application: Application) : AndroidViewModel(applicat
     var detectionResult = Transformations.switchMap(imageLiveData) {
         return@switchMap aiRepository.detectImage(it)
     }
-    var imageClassifyResult = Transformations.switchMap(imageLiveData) { input ->
+
+//    var imageClassifyResult = Transformations.switchMap(imageLiveData) { input ->
+//        val userLocal = localUserRepository.getLoggedInUser()
+//        if (userLocal.isValid) {
+//            return@switchMap aiRepository.imageClassify(userLocal.token!!, input)
+//        } else {
+//            return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
+//        }
+//    }
+    var imageClassifyResult = Transformations.switchMap(chatMessageLiveData) { input ->
         val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {
-            return@switchMap aiRepository.imageClassify(userLocal.token!!, input)
+            return@switchMap aiRepository.imageClassify(userLocal.token!!, input?.id ?: "")
         } else {
             return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
         }
     }
-
 }

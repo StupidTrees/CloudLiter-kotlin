@@ -72,7 +72,7 @@ class ChatRepository(context: Context) {
      * @param pageSize       分页大小
      * @param action         操作：全部刷新或在头部插入
      */
-    fun ActionFetchMessages(token: String, conversationId: String, topId: String?, topTime: Timestamp?, pageSize: Int, action: LIST_ACTION) {
+    fun actionFetchMessages(token: String, conversationId: String, topId: String?, topTime: Timestamp?, pageSize: Int, action: LIST_ACTION) {
         localListState?.let { listDataState.removeSource(it) }
         Log.e("fromId", topId.toString())
         localListState = if (topId == null) {
@@ -90,7 +90,7 @@ class ChatRepository(context: Context) {
                 listDataState.addSource(webListState!!) { result ->
                     if (result.state === DataState.STATE.SUCCESS && result.data!!.isNotEmpty()) {
                         listDataState.removeSource(localListState!!)
-                        saveMessageAsync(ArrayList(result.data))
+                        saveMessageAsync(result.data?.toList())
                         listDataState.value = result.setRetry(true).setListAction(action)
                     }
                 }
@@ -100,7 +100,7 @@ class ChatRepository(context: Context) {
                 listDataState.addSource(webListState!!) { result ->
                     if (result.state === DataState.STATE.SUCCESS && result.data!!.isNotEmpty()) {
                         listDataState.removeSource(localListState!!)
-                        saveMessageAsync(ArrayList(result.data))
+                        saveMessageAsync(result.data?.toList())
                         if (chatMessages != null) {
                             listDataState.value = result.setListAction(action).setRetry(chatMessages.isNotEmpty())
                         }
@@ -118,7 +118,7 @@ class ChatRepository(context: Context) {
      * @param conversationId 对话id
      * @param afterId        现有列表底部的消息id
      */
-    fun ActionFetchNewMessages(token: String, conversationId: String, afterId: String?) {
+    fun actionFetchNewMessages(token: String, conversationId: String, afterId: String?) {
         webListState?.let { listDataState.removeSource(it) }
         webListState = chatMessageWebSource.getMessagesAfter(token, conversationId, afterId, false)
         listDataState.addSource(webListState!!) { result ->
@@ -132,23 +132,13 @@ class ChatRepository(context: Context) {
     }
 
     /**
-     * 动作：发消息
-     *
-     * @param message 消息
-     */
-    fun ActionSendMessage(message: ChatMessage) {
-        socketWebSource.sendMessage(message)
-        listDataState.value = DataState(listOf(message) as List?).setListAction(LIST_ACTION.APPEND_ONE)
-    }
-
-    /**
      * 动作：标记对话全部已读
      *
      * @param context        上下文，为了发广播
      * @param userId         用户id
      * @param conversationId 对话id
      */
-    fun ActionMarkAllRead(context: Context, userId: String, conversationId: String, topTime: Timestamp, num: Int) {
+    fun actionMarkAllRead(context: Context, userId: String, conversationId: String, topTime: Timestamp, num: Int) {
         socketWebSource.markAllRead(context, userId, conversationId, topTime, num)
     }
 
@@ -159,7 +149,7 @@ class ChatRepository(context: Context) {
      * @param messageId      消息id
      * @param conversationId 对话id
      */
-    fun ActionMarkRead(context: Context, userId: String, messageId: String, conversationId: String) {
+    fun actionMarkRead(context: Context, userId: String, messageId: String, conversationId: String) {
         socketWebSource.markRead(context, userId, messageId, conversationId)
     }
 
@@ -171,7 +161,7 @@ class ChatRepository(context: Context) {
      * @param friendId       朋友id
      * @param conversationId 对话id
      */
-    fun ActionGetIntoConversation(context: Context, userId: String, friendId: String, conversationId: String) {
+    fun actionGetIntoConversation(context: Context, userId: String, friendId: String, conversationId: String) {
         socketWebSource.getIntoConversation(context, userId, friendId, conversationId)
     }
 
@@ -182,8 +172,17 @@ class ChatRepository(context: Context) {
      * @param userId         用户id
      * @param conversationId 对话id
      */
-    fun ActionLeftConversation(context: Context, userId: String, conversationId: String) {
+    fun actionLeftConversation(context: Context, userId: String, conversationId: String) {
         socketWebSource.leftConversation(context, userId, conversationId)
+    }
+
+
+    fun sendTextMessage(token: String, fromId: String, toId: String, content: String): LiveData<Pair<DataState<ChatMessage?>, String>> {
+        val message = ChatMessage(fromId, toId, content)
+        listDataState.value = DataState(listOf(message) as List?).setListAction(LIST_ACTION.APPEND_ONE)
+        return Transformations.switchMap(chatMessageWebSource.sendTextMessage(token, fromId, toId, content, message.uuid)) {
+            return@switchMap MutableLiveData(Pair(it, message.uuid))
+        }
     }
 
     /**
@@ -194,8 +193,8 @@ class ChatRepository(context: Context) {
      * @param filePath 文件
      * @return 返回结果
      */
-    fun ActionSendImageMessage(context: Context, token: String, fromId: String, toId: String, filePath: String): LiveData<DataState<ChatMessage?>> {
-        val result = MediatorLiveData<DataState<ChatMessage?>>()
+    fun sendImageMessage(context: Context, token: String, fromId: String, toId: String, filePath: String): LiveData<Pair<DataState<ChatMessage?>, String>> {
+        val result = MediatorLiveData<Pair<DataState<ChatMessage?>, String>>()
         //读取图片文件
         val f = File(filePath)
         val tempMsg = ChatMessage(fromId, toId, filePath)
@@ -217,8 +216,8 @@ class ChatRepository(context: Context) {
                         //构造一个图片格式的POST表单
                         val body = MultipartBody.Part.createFormData("upload", file.name, requestFile)
                         val sendResult = chatMessageWebSource.sendImageMessage(token, toId, body, tempMsg.uuid)
-                        result.addSource(sendResult) { value ->
-                            result.setValue(value)
+                        result.addSource(sendResult) { v ->
+                            result.value = Pair(v, tempMsg.uuid)
                         }
                     }
 
@@ -238,8 +237,8 @@ class ChatRepository(context: Context) {
      * @param filePath 文件
      * @return 返回结果
      */
-    fun actionSendVoiceMessage(token: String, fromId: String, toId: String, filePath: String, voiceSeconds: Int): LiveData<DataState<ChatMessage?>> {
-        val result = MediatorLiveData<DataState<ChatMessage?>>()
+    fun actionSendVoiceMessage(token: String, fromId: String, toId: String, filePath: String, voiceSeconds: Int): LiveData<Pair<DataState<ChatMessage?>, String>> {
+        val result = MediatorLiveData<Pair<DataState<ChatMessage?>, String>>()
         //读取图片文件
         val f = File(filePath)
         val tempMsg = ChatMessage(fromId, toId, filePath)
@@ -250,8 +249,8 @@ class ChatRepository(context: Context) {
         //构造一个图片格式的POST表单
         val body = MultipartBody.Part.createFormData("upload", f.name, requestFile)
         val sendResult = chatMessageWebSource.sendVoiceMessage(token, toId, body, tempMsg.uuid, voiceSeconds)
-        result.addSource(sendResult) { value ->
-            result.setValue(value)
+        result.addSource(sendResult) { v ->
+            result.value = Pair(v, tempMsg.uuid)
         }
         return result
     }
@@ -267,25 +266,25 @@ class ChatRepository(context: Context) {
                     cm.id = message.id
                     saveMessageAsync(cm)
                 }
-
             }
             return@map it
         }
     }
 
+
     fun bindService(context: Context) {
         val IF = IntentFilter()
-        IF.addAction(SocketIOClientService.ACTION_RECEIVE_MESSAGE)
-        IF.addAction(SocketIOClientService.ACTION_MESSAGE_SENT)
-        IF.addAction(SocketIOClientService.ACTION_FRIEND_STATE_CHANGED)
-        IF.addAction(SocketIOClientService.ACTION_MESSAGE_READ)
+        IF.addAction(SocketIOClientService.RECEIVE_RECEIVE_MESSAGE)
+        IF.addAction(SocketIOClientService.RECEIVE_FRIEND_STATE_CHANGED)
+        IF.addAction(SocketIOClientService.RECEIVE_MESSAGE_READ)
+        IF.addAction(SocketIOClientService.RECEIVE_UNREAD_MESSAGE)
         context.registerReceiver(socketWebSource, IF)
-        socketWebSource.bindService("Chat", context)
+        //socketWebSource.bindService("Chat", context)
     }
 
     fun unbindService(context: Context) {
         context.unregisterReceiver(socketWebSource)
-        socketWebSource.unbindService(context)
+        // socketWebSource.unbindService(context)
     }
 
     private fun saveMessageAsync(chatMessage: ChatMessage) {
@@ -298,11 +297,10 @@ class ChatRepository(context: Context) {
         } else {
             Thread { notification.id?.let { chatMessageDao.messageRead(it) } }.start()
         }
-        //new Thread(() -> chatMessageDao.saveMessage(Collections.singletonList(chatMessage))).start();
     }
 
     private fun saveMessageAsync(chatMessages: List<ChatMessage>?) {
-        Thread { chatMessages?.let { chatMessageDao.saveMessage(it) } }.start()
+        Thread { chatMessages?.let { chatMessageDao.saveMessage(it.toList()) } }.start()
     }
 
     val messageSentSate: MutableLiveData<DataState<ChatMessage>>
