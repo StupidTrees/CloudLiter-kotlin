@@ -2,7 +2,6 @@ package com.stupidtree.cloudliter.ui.chat
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
@@ -88,12 +87,12 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                 if (data.getTypeEnum() == ChatMessage.TYPE.IMG) {
                     if (holder.progress != null) {
                         if (holder.progress?.visibility != View.VISIBLE) {
-                            data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
+                            data.fileId?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
                         } else {
                             holder.image?.setImageResource(R.drawable.place_holder_loading)
                         }
                     } else {
-                        data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
+                        data.fileId?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
                     }
                 } else if (data.getTypeEnum() == ChatMessage.TYPE.VOICE) {
                     holder.bindVoiceState(data)
@@ -122,10 +121,9 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             val res: MutableList<String> = ArrayList()
             for (cm in mBeans) {
                 if (!cm.isTimeStamp && cm.getTypeEnum() == ChatMessage.TYPE.IMG) {
-                    cm.content?.let {
+                    cm.fileId?.let {
                         res.add(ImageUtils.getChatMessageImageUrl(it))
                     }
-
                 }
             }
             return res
@@ -570,7 +568,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
 
         fun updateImage(data: ChatMessage) {
             if (image != null) {
-                data.content?.let { ImageUtils.loadChatMessageInto(chatActivity, it, image!!) }
+                data.fileId?.let { ImageUtils.loadChatMessageInto(chatActivity, it, image!!) }
             }
         }
 

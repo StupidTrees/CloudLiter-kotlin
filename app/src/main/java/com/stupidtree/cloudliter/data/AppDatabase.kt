@@ -4,20 +4,17 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.stupidtree.cloudliter.data.model.ChatMessage
-import com.stupidtree.cloudliter.data.model.Conversation
-import com.stupidtree.cloudliter.data.model.UserProfile
-import com.stupidtree.cloudliter.data.model.UserRelation
+import com.stupidtree.cloudliter.data.model.*
 import com.stupidtree.cloudliter.data.source.dao.*
 
-@Database(entities = [ChatMessage::class, Conversation::class, UserRelation::class, UserProfile::class], version = 1)
+@Database(entities = [ChatMessage::class, Conversation::class, UserRelation::class, UserProfile::class, Image::class], version = 1)
 @androidx.room.TypeConverters(TypeConverters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun chatMessageDao(): ChatMessageDao
     abstract fun conversationDao(): ConversationDao
     abstract fun userRelationDao():UserRelationDao
     abstract fun userProfileDao(): UserProfileDao
-
+    abstract fun imageDao(): ImageDao
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null

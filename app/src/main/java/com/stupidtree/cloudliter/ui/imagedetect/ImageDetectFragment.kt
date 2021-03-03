@@ -11,6 +11,7 @@ import com.stupidtree.cloudliter.databinding.FragmentImageDedectBinding
 import com.stupidtree.cloudliter.ui.base.BaseFragment
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpImageMessageDetail
+import com.stupidtree.cloudliter.utils.ImageUtils
 
 class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDedectBinding>() {
 
@@ -28,7 +29,8 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
 
     override fun onStart() {
         super.onStart()
-        viewModel.imageUrl.value = arguments?.getString("url")
+        viewModel.imageIdLiveData.value = Pair(arguments?.getString("id")?:"",arguments?.getBoolean("local")?:false)
+
     }
 
     override fun initViews(view: View) {
@@ -36,17 +38,22 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
         binding?.list?.adapter = listAdapter
         binding?.list?.layoutManager = LinearLayoutManager(requireContext())
         binding?.sensitiveCard?.setOnClickListener {
-            viewModel.chatMessageLiveData.value?.let {
+            viewModel.imageEntityLiveData.value?.data?.let {
                 PopUpImageMessageDetail().setChatMessage(it).show(parentFragmentManager, "sens")
             }
         }
-        viewModel.imageUrl.observe(this) {
-            Thread {
-                val myBitmap: Bitmap = Glide.with(requireContext())
-                        .asBitmap()
-                        .load(it).submit().get()
-                viewModel.imageLiveData.postValue(myBitmap)
-            }.start()
+        viewModel.imageIdLiveData.observe(this) {
+                Thread {
+                    try {
+                        val myBitmap: Bitmap = Glide.with(requireContext())
+                                .asBitmap()
+                                .load(if(it.second)it.first else ImageUtils.getChatMessageImageUrl(it.first))
+                                .submit().get()
+                        viewModel.imageLiveData.postValue(myBitmap)
+                    } catch (e: Exception) {
+                    }
+                }.start()
+
         }
         viewModel.imageLiveData.observe(this) {
             binding?.labeledImageView?.setImage(it)
@@ -71,36 +78,37 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
                 binding?.labeledImageView?.announceForAccessibility(announce)
             }
         }
-        viewModel.chatMessageLiveData.observe(this) {
-            if (it == null) {
-                binding?.sensitiveCard?.visibility = View.GONE
-            } else {
-                binding?.sensitiveCard?.visibility = View.VISIBLE
-                val map = it.getExtraAsImageAnalyse()
-                val per = 1f - (map["Neutral"]!! + map["Drawing"]!!) / (
-                        map["Porn"]!! + map["Hentai"]!! + map["Sexy"]!! + map["Neutral"]!! + map["Drawing"]!!
-                        )
-                binding?.sensitiveText?.text = getString(R.string.sensitive_result, per * 100)
-            }
-        }
         // 图片分类
         viewModel.imageClassifyResult.observe(this) {
-            if (it.state!=DataState.STATE.SUCCESS) {
+            if (it.state != DataState.STATE.SUCCESS) {
                 binding?.classifyCard?.visibility = View.GONE
             } else {
-                binding?.kindText?.text = getString(R.string.scene_classify_result_test,it.data?.get("class_cn")?.asString)
+                binding?.kindText?.text = getString(R.string.scene_classify_result_test, it.data?.get("class_cn")?.asString)
                 binding?.classifyCard?.visibility = View.VISIBLE
             }
         }
 
-        viewModel.chatMessageLiveData.value = arguments?.getSerializable("message") as ChatMessage?
+        viewModel.imageEntityLiveData.observe(this) {
+            if (it == null) {
+                binding?.sensitiveCard?.visibility = View.GONE
+            } else {
+                binding?.sensitiveCard?.visibility = View.VISIBLE
+                it.data?.let { image->
+                    val map = image.getExtraAsImageAnalyse()
+                    val per = 1f - (map["Neutral"]!! + map["Drawing"]!!) / (
+                            map["Porn"]!! + map["Hentai"]!! + map["Sexy"]!! + map["Neutral"]!! + map["Drawing"]!!
+                            )
+                    binding?.sensitiveText?.text = getString(R.string.sensitive_result, per * 100)
+                }
+            }
+        }
     }
 
     companion object {
-        fun newInstance(url: String, chatMessage: ChatMessage?): ImageDetectFragment {
+        fun newInstance(url: String,local:Boolean): ImageDetectFragment {
             val args = Bundle()
-            args.putString("url", url)
-            args.putSerializable("message", chatMessage)
+            args.putString("id", url)
+            args.putBoolean("local",local)
             val fragment = ImageDetectFragment()
             fragment.arguments = args
             return fragment

@@ -12,7 +12,6 @@ import com.stupidtree.cloudliter.data.repository.ConversationRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.base.DataState.LIST_ACTION
-import com.stupidtree.cloudliter.ui.base.StringTrigger
 import com.stupidtree.cloudliter.utils.TextUtils
 import java.sql.Timestamp
 

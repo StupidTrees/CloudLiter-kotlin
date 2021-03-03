@@ -66,23 +66,23 @@ object ImageUtils {
     /**
      * 加载聊天文件
      * @param context 上下文
-     * @param filename 图片路径
+     * @param imageId 图片id
      * @param target 目标ImageView
      */
-    fun loadChatMessageInto(context: Context, filename: String, target: ImageView) {
-        if (isEmpty(filename)) {
+    fun loadChatMessageInto(context: Context, imageId: String, target: ImageView) {
+        if (isEmpty(imageId)) {
             target.setImageResource(R.drawable.place_holder_loading)
         } else {
-            val glideUrl = GlideUrl(getChatMessageImageUrl(filename), LazyHeaders.Builder().addHeader("device-type", "android").build())
+            val glideUrl = GlideUrl(getChatMessageImageUrl(imageId), LazyHeaders.Builder().addHeader("device-type", "android").build())
             Glide.with(context).load(glideUrl)
                     .placeholder(R.drawable.place_holder_loading) //.apply(RequestOptions.bitmapTransform(new CornerTransform(context,dp2px(context,12))))
                     .into(target)
         }
     }
 
-    fun getChatMessageImageUrl(filename: String): String {
-        return "http://hita.store:3000/message/image?path=" +
-                filename
+    fun getChatMessageImageUrl(imageId: String): String {
+        return "http://hita.store:3000/message/image?imageId=" +
+                imageId
     }
 
     fun loadAvatarIntoNotification(context: Context, filename: String, target: NotificationTarget) {
@@ -110,7 +110,7 @@ object ImageUtils {
         }
     }
 
-    fun loadUserAvatar(context: Context, filename: String?):MutableLiveData<Bitmap?>{
+    fun loadUserAvatar(context: Context, filename: String?): MutableLiveData<Bitmap?> {
         val result = MutableLiveData<Bitmap?>()
         val glideUrl = GlideUrl("http://hita.store:3000/user/profile/avatar?path=" +
                 filename, LazyHeaders.Builder().addHeader("device-type", "android").build())
@@ -120,7 +120,7 @@ object ImageUtils {
                 .apply(RequestOptions.bitmapTransform(CircleCrop()))
                 .placeholder(R.drawable.place_holder_avatar)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .into(object :CustomTarget<Bitmap>() {
+                .into(object : CustomTarget<Bitmap>() {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                         result.value = resource
                     }

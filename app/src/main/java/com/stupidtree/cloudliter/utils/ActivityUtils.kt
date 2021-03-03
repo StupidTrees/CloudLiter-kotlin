@@ -126,14 +126,11 @@ object ActivityUtils {
     /**
      * 圖片識別
      * @param from 上下文
-     * @param url 图片链接
+     * @param imageId 图片id
      */
-    fun startImageDetectionActivity(from: Context, url: String, chatMessage: ChatMessage) {
+    fun startImageDetectionActivity(from: Context, imageId: String) {
         val it = Intent(from, ImageDetectActivity::class.java)
-        it.putExtra("url", url)
-        val b = Bundle()
-        b.putSerializable("message",chatMessage)
-        it.putExtras(b)
+        it.putExtra("id", imageId)
         from.startActivity(it)
     }
 

@@ -5,8 +5,8 @@ import android.graphics.Bitmap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.repository.AiRepository
+import com.stupidtree.cloudliter.data.repository.ImageRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.ui.base.DataState
 
@@ -17,15 +17,25 @@ class ImageDetectViewModel(application: Application) : AndroidViewModel(applicat
      */
     private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
     private val aiRepository: AiRepository = AiRepository.getInstance(application)
+    private val imageRepository = ImageRepository.getInstance(application)
 
-    var imageUrl = MutableLiveData<String>()
+
+    var imageIdLiveData = MutableLiveData<Pair<String,Boolean>>()
     var imageLiveData = MutableLiveData<Bitmap>()
-    var chatMessageLiveData = MutableLiveData<ChatMessage?>()
     var detectionResult = Transformations.switchMap(imageLiveData) {
         return@switchMap aiRepository.detectImage(it)
     }
 
-//    var imageClassifyResult = Transformations.switchMap(imageLiveData) { input ->
+    val imageEntityLiveData = Transformations.switchMap(imageIdLiveData) {
+        val userLocal = localUserRepository.getLoggedInUser()
+        if (userLocal.isValid) {
+            return@switchMap imageRepository.getImageInfo(userLocal.token!!, it.first)
+        } else {
+            return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
+        }
+    }
+
+    //    var imageClassifyResult = Transformations.switchMap(imageLiveData) { input ->
 //        val userLocal = localUserRepository.getLoggedInUser()
 //        if (userLocal.isValid) {
 //            return@switchMap aiRepository.imageClassify(userLocal.token!!, input)
@@ -33,10 +43,10 @@ class ImageDetectViewModel(application: Application) : AndroidViewModel(applicat
 //            return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
 //        }
 //    }
-    var imageClassifyResult = Transformations.switchMap(chatMessageLiveData) { input ->
+    var imageClassifyResult = Transformations.switchMap(imageIdLiveData) { input ->
         val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {
-            return@switchMap aiRepository.imageClassify(userLocal.token!!, input?.id ?: "")
+            return@switchMap aiRepository.imageClassify(userLocal.token!!, input.first)
         } else {
             return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
         }

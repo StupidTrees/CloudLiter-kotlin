@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
@@ -317,8 +316,8 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                     PopUpTextMessageDetail().setChatMessage(data)
                             .show(supportFragmentManager, "detail")
                 } else if (data.getTypeEnum() == ChatMessage.TYPE.IMG && !data.isTimeStamp) {
-                    data.content?.let {
-                        ActivityUtils.startImageDetectionActivity(getThis(), ImageUtils.getChatMessageImageUrl(it), data)
+                    data.fileId?.let {
+                        ActivityUtils.startImageDetectionActivity(getThis(), it)
                     }
                 }
                 return true
@@ -328,7 +327,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
             override fun onItemClick(data: ChatMessage, card: View?, position: Int) {
                 if (data.getTypeEnum() == ChatMessage.TYPE.IMG && !data.isTimeStamp) {
                     val urls = listAdapter.imageUrls
-                    ActivityUtils.showMultipleImages(getThis(), urls, urls.indexOf(data.content?.let { ImageUtils.getChatMessageImageUrl(it) })
+                    ActivityUtils.showMultipleImages(getThis(), urls, urls.indexOf(data.fileId?.let { ImageUtils.getChatMessageImageUrl(it) })
                     )
                 } else if (data.getTypeEnum() == ChatMessage.TYPE.VOICE && !data.isTimeStamp) {
                     if (audioPlayHelper.playingId != null) {

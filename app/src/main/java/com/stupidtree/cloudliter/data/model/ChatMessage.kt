@@ -1,4 +1,5 @@
 package com.stupidtree.cloudliter.data.model
+
 import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -47,6 +48,7 @@ class ChatMessage : Serializable {
     var updatedAt: Timestamp? = null
     var extra: String? = null
     var ttsResult: String? = ""    //语音识别结果
+    var fileId: String? = null//文件id
 
     /**
      * 服务器上不保存的属性
@@ -55,7 +57,7 @@ class ChatMessage : Serializable {
     @Ignore
     var sendingState: SEND_STATE = SEND_STATE.SUCCESS
 
-    enum class SEND_STATE{SENDING,SUCCESS,FAILED}
+    enum class SEND_STATE { SENDING, SUCCESS, FAILED }
     enum class VOICE_STATE { PLAYING, PAUSED, STOPPED }
     enum class TTS_STATE { STOPPED, PROCESSING, SUCCESS, FAILED }
 
@@ -141,23 +143,7 @@ class ChatMessage : Serializable {
         return result
     }
 
-    /**
-     * 将extra字段解析为图片敏感检测结果
-     *
-     * @return 检测结果
-     */
-    fun getExtraAsImageAnalyse(): HashMap<String, Float> {
-        val result = HashMap<String, Float>()
-        try {
-            val jo = Gson().fromJson(extra.toString(), JsonObject::class.java)
-            for ((key, value) in jo.entrySet()) {
-                result[key] = java.lang.Float.valueOf(value.asFloat.toString())
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return result
-    }
+
 
     companion object {
         fun getTimeStampHolderInstance(timestamp: Timestamp?): ChatMessage {

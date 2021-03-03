@@ -54,7 +54,7 @@ class ImageDetectBottomFragment : TransparentBottomSheetDialog<FragmentImageDete
     override fun initViews(v: View) {
         url?.let {
             childFragmentManager.beginTransaction().replace(R.id.fragment,
-                    ImageDetectFragment.newInstance(it, message)).commit()
+                    ImageDetectFragment.newInstance(it,true)).commit()
         }
         binding.title.text = title.toString()
         binding.subtitle.text = subtitle.toString()

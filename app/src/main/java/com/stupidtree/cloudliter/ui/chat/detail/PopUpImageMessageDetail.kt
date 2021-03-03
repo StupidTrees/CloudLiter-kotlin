@@ -3,7 +3,7 @@ package com.stupidtree.cloudliter.ui.chat.detail
 import android.annotation.SuppressLint
 import android.view.View
 import com.stupidtree.cloudliter.R
-import com.stupidtree.cloudliter.data.model.ChatMessage
+import com.stupidtree.cloudliter.data.model.Image
 import com.stupidtree.cloudliter.databinding.ActivityChatPopupImageMessageDetailBinding
 import com.stupidtree.cloudliter.ui.widgets.TransparentBottomSheetDialog
 import java.text.DecimalFormat
@@ -18,9 +18,9 @@ class PopUpImageMessageDetail : TransparentBottomSheetDialog<ActivityChatPopupIm
     /**
      * 不得已放在UI里的数据
      */
-    private lateinit var chatMessage: ChatMessage
-    fun setChatMessage(chatMessage: ChatMessage): PopUpImageMessageDetail {
-        this.chatMessage = chatMessage
+    private lateinit var imageEntity: Image
+    fun setChatMessage(imageEntity:Image): PopUpImageMessageDetail {
+        this.imageEntity = imageEntity
         return this
     }
 
@@ -30,7 +30,7 @@ class PopUpImageMessageDetail : TransparentBottomSheetDialog<ActivityChatPopupIm
 
     override fun initViews(v: View) {
         val df = DecimalFormat("#.####")
-        val map = chatMessage.getExtraAsImageAnalyse()
+        val map = imageEntity.getExtraAsImageAnalyse()
         binding.neutral.text = df.format(map["Neutral"])
         binding.drawing.text = df.format(map["Drawing"])
         binding.porn.text = df.format(map["Porn"])

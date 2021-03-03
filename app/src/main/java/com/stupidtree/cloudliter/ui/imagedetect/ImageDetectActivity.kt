@@ -2,7 +2,6 @@ package com.stupidtree.cloudliter.ui.imagedetect
 
 import android.os.Bundle
 import com.stupidtree.cloudliter.R
-import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.databinding.ActivityImageDetailBinding
 import com.stupidtree.cloudliter.ui.base.BaseActivity
 
@@ -26,7 +25,7 @@ class ImageDetectActivity : BaseActivity<ImageDetectViewModel, ActivityImageDeta
     override fun initViews() {
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment, ImageDetectFragment.newInstance(
-                        intent.getStringExtra("url")!!, intent.extras?.getSerializable("message") as ChatMessage), "detect"
+                        intent.getStringExtra("id")?:"",false), "detect"
                 ).commit()
     }
 
