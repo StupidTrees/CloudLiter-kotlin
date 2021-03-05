@@ -1,10 +1,12 @@
 package com.stupidtree.cloudliter.data.source.websource.service
 
 import androidx.lifecycle.LiveData
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.stupidtree.cloudliter.data.model.ApiResponse
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import okhttp3.MultipartBody
+import org.json.JSONArray
 import retrofit2.http.*
 
 interface AiService {
@@ -28,6 +30,19 @@ interface AiService {
     @FormUrlEncoded
     @POST("/ai/image/classify")
     fun imageClassify(@Header("token") token: String,@Field("imageId") id:String): LiveData<ApiResponse<JsonObject>>
+
+
+
+    /**
+     * 对某个聊天消息的图片进行图片分类
+     * @param token 令牌
+     * @param id 消息id
+     * @return 操作结果
+     */
+    @FormUrlEncoded
+    @POST("/ai/face/recognize")
+    fun imageFaceRecognition(@Header("token") token: String,@Field("imageId") id:String,@Field("rects") rects:JSONArray): LiveData<ApiResponse<List<Map<String?,String?>>>>
+
 
 
     /**

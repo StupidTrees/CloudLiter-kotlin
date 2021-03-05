@@ -424,7 +424,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             sensitiveExpanded = !sensitiveExpanded
             if (see == null) return
             if (sensitiveExpanded) {
-                content?.text = data.content
+                content?.text = data.content?:""
                 see?.setImageResource(R.drawable.ic_baseline_visibility_off_24)
                 if (data.getTypeEnum() == ChatMessage.TYPE.IMG && image != null && imageSensitivePlaceHolder != null) {
                     image?.visibility = View.VISIBLE

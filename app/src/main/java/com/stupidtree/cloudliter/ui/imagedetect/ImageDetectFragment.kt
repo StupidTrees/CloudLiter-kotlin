@@ -4,13 +4,16 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.databinding.FragmentImageDedectBinding
 import com.stupidtree.cloudliter.ui.base.BaseFragment
+import com.stupidtree.cloudliter.ui.base.BaseListAdapter
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpImageMessageDetail
+import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import java.text.DecimalFormat
 
@@ -33,11 +36,11 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
         refresh()
     }
 
-    fun refresh(){
-        if(arguments?.getBoolean("local") == true){
+    fun refresh() {
+        if (arguments?.getBoolean("local") == true) {
             binding?.sceneCard?.visibility = View.GONE
             binding?.sensitiveCard?.visibility = View.GONE
-        }else{
+        } else {
             binding?.sceneCard?.visibility = View.VISIBLE
             binding?.sensitiveCard?.visibility = View.VISIBLE
         }
@@ -49,7 +52,8 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
 
         binding?.loadingSensitive?.visibility = View.VISIBLE
         binding?.sensitiveResult?.text = getString(R.string.sensitive_progressing)
-        viewModel.imageIdLiveData.value = Pair(arguments?.getString("id")?:"",arguments?.getBoolean("local")?:false)
+        viewModel.imageIdLiveData.value = Pair(arguments?.getString("id")
+                ?: "", arguments?.getBoolean("local") ?: false)
 
     }
 
@@ -64,16 +68,16 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
             }
         }
         viewModel.imageIdLiveData.observe(this) {
-                Thread {
-                    try {
-                        val myBitmap: Bitmap = Glide.with(requireContext())
-                                .asBitmap()
-                                .load(if(it.second)it.first else ImageUtils.getChatMessageImageUrl(it.first))
-                                .submit().get()
-                        viewModel.imageLiveData.postValue(myBitmap)
-                    } catch (e: Exception) {
-                    }
-                }.start()
+            Thread {
+                try {
+                    val myBitmap: Bitmap = Glide.with(requireContext())
+                            .asBitmap()
+                            .load(if (it.second) it.first else ImageUtils.getChatMessageImageUrl(it.first))
+                            .submit().get()
+                    viewModel.imageLiveData.postValue(myBitmap)
+                } catch (e: Exception) {
+                }
+            }.start()
 
         }
         viewModel.imageLiveData.observe(this) {
@@ -82,7 +86,7 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
         viewModel.detectionResult.observe(this) {
             binding?.loadingDetect?.visibility = View.GONE
             if (it.data != null && viewModel.imageLiveData.value != null) {
-                binding?.labeledImageView?.setLabels(it.data)
+                binding?.labeledImageView?.updateLabels(it.data!!)
                 val bitmap = viewModel.imageLiveData.value
                 var announce = if (!it.data.isNullOrEmpty()) {
                     getString(R.string.description_image_total_detected, it.data!!.size)
@@ -90,8 +94,8 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
                     getString(R.string.description_image_none_detected)
                 }
                 binding?.detectTitle?.text = announce
-                viewModel.imageLiveData.value?.let {bitmap->
-                    listAdapter?.notifyItemChangedSmooth(it.data!!,bitmap)
+                viewModel.imageLiveData.value?.let { bitmap ->
+                    listAdapter?.notifyItemChangedSmooth(it.data!!, bitmap)
                 }
 
                 bitmap?.let { it1 ->
@@ -102,7 +106,7 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
                     }
                 }
                 binding?.labeledImageView?.announceForAccessibility(announce)
-            }else{
+            } else {
                 binding?.detectTitle?.text = getString(R.string.detect_failed)
             }
 
@@ -112,7 +116,7 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
             binding?.loadingScene?.visibility = View.GONE
             binding?.sceneResult?.visibility = View.VISIBLE
             if (it.state != DataState.STATE.SUCCESS) {
-                binding?.sceneResult?.text =  getString(R.string.scene_classify_failed)
+                binding?.sceneResult?.text = getString(R.string.scene_classify_failed)
             } else {
                 binding?.sceneResult?.text = it.data?.get("class_cn")?.asString
             }
@@ -124,24 +128,33 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
                 binding?.sensitiveCard?.visibility = View.GONE
             } else {
                 binding?.sensitiveCard?.visibility = View.VISIBLE
-                it.data?.let { image->
+                it.data?.let { image ->
                     val map = image.getExtraAsImageAnalyse()
                     val per = 1f - (map["Neutral"]!! + map["Drawing"]!!) / (
                             map["Porn"]!! + map["Hentai"]!! + map["Sexy"]!! + map["Neutral"]!! + map["Drawing"]!!
                             )
                     val df = DecimalFormat("#0.00")
                     binding?.sensitiveResult?.visibility = View.VISIBLE
-                    binding?.sensitiveResult?.text = "${df.format(per*100)}%"
+                    binding?.sensitiveResult?.text = "${df.format(per * 100)}%"
                 }
             }
         }
+        viewModel.faceRecognitionResult.observe(this) {
+            it.data?.let { it1 -> listAdapter?.setFriendInfo(it1) }
+        }
+        listAdapter?.setOnItemClickListener(object :BaseListAdapter.OnItemClickListener<DetectResult>{
+            override fun onItemClick(data: DetectResult, card: View?, position: Int) {
+                data.friendId?.let { ActivityUtils.startProfileActivity(requireContext(), it) }
+            }
+
+        })
     }
 
     companion object {
-        fun newInstance(url: String,local:Boolean): ImageDetectFragment {
+        fun newInstance(url: String, local: Boolean): ImageDetectFragment {
             val args = Bundle()
             args.putString("id", url)
-            args.putBoolean("local",local)
+            args.putBoolean("local", local)
             val fragment = ImageDetectFragment()
             fragment.arguments = args
             return fragment

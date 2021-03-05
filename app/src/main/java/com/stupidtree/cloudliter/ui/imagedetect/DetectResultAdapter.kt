@@ -3,6 +3,7 @@ package com.stupidtree.cloudliter.ui.imagedetect
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.view.View
 import android.view.ViewGroup
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
@@ -16,12 +17,27 @@ import com.stupidtree.cloudliter.ui.base.BaseViewHolder
 import kotlinx.android.synthetic.main.activity_chat.view.*
 import java.text.DecimalFormat
 
-class DetectResultAdapter(mContext: Context, mBeans: MutableList<Classifier.Recognition>) : BaseListAdapter<Classifier.Recognition, DetectResultAdapter.DHolder>(mContext, mBeans) {
+class DetectResultAdapter(mContext: Context, mBeans: MutableList<DetectResult>) : BaseListAdapter<DetectResult, DetectResultAdapter.DHolder>(mContext, mBeans) {
     var bitmap: Bitmap? = null
 
     class DHolder(viewBinding: ActivityImageDetailListItemBinding) : BaseViewHolder<ActivityImageDetailListItemBinding>(viewBinding)
 
-    fun notifyItemChangedSmooth(newL: List<Classifier.Recognition>, bitmap: Bitmap) {
+    fun setFriendInfo(list:List<Map<String?,String?>>){
+        val map = mutableMapOf<String?,Map<String?,String?>>()
+        for(l in list){
+            if(l["state"] =="success"){
+                map[l["id"]] = l
+            }
+        }
+        for(item in mBeans){
+            if(map.keys.contains(item.id)){
+                item.setFriendInfo(map[item.id]?.get("userId"),map[item.id]?.get("userName"))
+            }
+        }
+        notifyItemChangedSmooth(newL = mBeans)
+    }
+
+    fun notifyItemChangedSmooth(newL: List<DetectResult>, bitmap: Bitmap) {
         this.bitmap = bitmap
         super.notifyItemChangedSmooth(newL)
     }
@@ -35,19 +51,28 @@ class DetectResultAdapter(mContext: Context, mBeans: MutableList<Classifier.Reco
     }
 
     @SuppressLint("SetTextI18n")
-    override fun bindHolder(holder: DHolder, data: Classifier.Recognition?, position: Int) {
-        holder.binding.name.text = data?.title
+    override fun bindHolder(holder: DHolder, data: DetectResult?, position: Int) {
+        holder.binding.name.text = data?.name
         holder.binding.percentage.text = DecimalFormat("00.00").format(100f * data?.confidence!!) + "%"
         val xF = (bitmap?.width ?: 0f).toFloat() / 416f
         val yF = (bitmap?.height ?: 0f).toFloat() / 416f
         data.let {
-            val rec = it.location
+            val rec = it.rect
             val cropped = bitmap?.let { bm ->
                 Bitmap.createBitmap(bm, (xF * rec.left).toInt(), (yF * rec.top).toInt(), (rec.width() * xF).toInt(), (rec.height() * yF).toInt())
             }
             Glide.with(mContext).load(cropped)
                     .apply(RequestOptions.bitmapTransform(CircleCrop()))
                     .into(holder.binding.image)
+            if (it.isFriend) {
+                holder.binding.userName.text = data.friendName
+                holder.binding.userName.visibility = View.VISIBLE
+            } else {
+                holder.binding.userName.visibility = View.GONE
+            }
+        }
+        holder.binding.item.setOnClickListener {
+            mOnItemClickListener?.onItemClick(data,it,position)
         }
 
     }

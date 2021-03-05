@@ -28,13 +28,8 @@
         android:textColor="?attr/textColorPrimary"
         android:textSize="16sp" />
 
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
-
     <TextView
-        android:id="@+id/percentage"
+        android:id="@+id/user_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -46,7 +41,28 @@
         android:paddingTop="4dp"
         android:paddingEnd="8dp"
         android:paddingBottom="4dp"
-        android:text="37%"
+        android:text="用户名"
         android:textColor="?attr/colorPrimary" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/percentage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/element_rounded_bar_grey"
+        android:backgroundTint="?attr/backgroundColorBottomAsTint"
+        android:backgroundTintMode="src_over"
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="4dp"
+        android:text="37%"
+        android:textColor="?attr/colorControlNormal" />
 
 </LinearLayout>

@@ -3,6 +3,7 @@ package com.stupidtree.cloudliter.ui.imagedetect
 import android.app.Application
 import android.graphics.Bitmap
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.repository.AiRepository
@@ -20,10 +21,18 @@ class ImageDetectViewModel(application: Application) : AndroidViewModel(applicat
     private val imageRepository = ImageRepository.getInstance(application)
 
 
-    var imageIdLiveData = MutableLiveData<Pair<String,Boolean>>()
+    var imageIdLiveData = MutableLiveData<Pair<String, Boolean>>()
     var imageLiveData = MutableLiveData<Bitmap>()
-    var detectionResult = Transformations.switchMap(imageLiveData) {
-        return@switchMap aiRepository.detectImage(it)
+    var detectionResult: LiveData<DataState<List<DetectResult>>> = Transformations.switchMap(imageLiveData) {
+        return@switchMap Transformations.switchMap(aiRepository.detectImage(it)) { d ->
+            val r = mutableListOf<DetectResult>()
+            d.data?.let { list ->
+                for (x in list) {
+                    r.add(DetectResult(x))
+                }
+            }
+            return@switchMap MutableLiveData(DataState(r))
+        }
     }
 
     val imageEntityLiveData = Transformations.switchMap(imageIdLiveData) {
@@ -42,5 +51,20 @@ class ImageDetectViewModel(application: Application) : AndroidViewModel(applicat
         } else {
             return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
         }
+    }
+
+
+    val faceRecognitionResult = Transformations.switchMap(detectionResult) { list ->
+        val userLocal = localUserRepository.getLoggedInUser()
+        if (userLocal.isValid) {
+            imageIdLiveData.value?.let { id ->
+                return@switchMap list.data?.let { aiRepository.imageFaceRecognition(userLocal.token!!, id.first, it) }
+            } ?: run {
+                return@switchMap MutableLiveData(DataState(DataState.STATE.FETCH_FAILED))
+            }
+        } else {
+            return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
+        }
+
     }
 }

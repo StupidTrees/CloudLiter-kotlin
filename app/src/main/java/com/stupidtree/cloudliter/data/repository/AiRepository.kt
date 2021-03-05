@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.stupidtree.cloudliter.data.AppDatabase
@@ -17,9 +18,11 @@ import com.stupidtree.cloudliter.data.source.ai.yolo.YOLOSource
 import com.stupidtree.cloudliter.data.source.websource.AiWebSource
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.imagedetect.BitmapRequestBody
+import com.stupidtree.cloudliter.ui.imagedetect.DetectResult
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import org.json.JSONArray
 import retrofit2.http.Multipart
 import top.zibin.luban.Luban
 import top.zibin.luban.OnCompressListener
@@ -78,6 +81,14 @@ class AiRepository(application: Application) {
 
 
     /**
+     * 进行人脸识别
+     */
+    fun imageFaceRecognition(token: String, imageId:String,rectList:List<DetectResult>): LiveData<DataState<List<Map<String?,String?>>>> {
+        return aiWebSource.imageFaceRecognition(token,imageId,rectList)
+    }
+
+
+        /**
      * 上传人脸图片
      *
      * @param token    令牌

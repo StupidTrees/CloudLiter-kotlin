@@ -2,12 +2,17 @@ package com.stupidtree.cloudliter.data.source.websource
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.stupidtree.cloudliter.data.source.ai.yolo.Classifier
 import com.stupidtree.cloudliter.data.source.websource.service.AiService
 import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.codes
 import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.cloudliter.ui.imagedetect.DetectResult
 import okhttp3.MultipartBody
+import org.json.JSONArray
+import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -24,7 +29,7 @@ class AiWebSource : BaseWebSource<AiService>(Retrofit.Builder()
      * @return 操作结果
      */
     fun imageClassifyDirect(token: String, upload: MultipartBody.Part): LiveData<DataState<JsonObject>> {
-        return Transformations.map(service.imageClassifyDirect(token, upload)) { input->
+        return Transformations.map(service.imageClassifyDirect(token, upload)) { input ->
             //Log.e("resp", input.toString())
             if (input == null) {
                 return@map DataState(DataState.STATE.FETCH_FAILED)
@@ -44,13 +49,44 @@ class AiWebSource : BaseWebSource<AiService>(Retrofit.Builder()
      * @param messageId 消息id
      * @return 操作结果
      */
-    fun imageClassify(token: String, messageId:String): LiveData<DataState<JsonObject>> {
-        return Transformations.map(service.imageClassify(token, messageId)) { input->
+    fun imageClassify(token: String, messageId: String): LiveData<DataState<JsonObject>> {
+        return Transformations.map(service.imageClassify(token, messageId)) { input ->
             if (input == null) {
                 return@map DataState(DataState.STATE.FETCH_FAILED)
             }
             when (input.code) {
                 codes.SUCCESS -> return@map DataState(input.data!!)
+                codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
+            }
+        }
+    }
+
+
+    /**
+     * 对某个文件的指定位置进行人脸检测
+     * @param token 令牌
+     * @return 操作结果
+     */
+    fun imageFaceRecognition(token: String, imageId: String, rectList: List<DetectResult>): LiveData<DataState<List<Map<String?,String?>>>> {
+        val ja = JSONArray()
+        val xRel = 1f / 416f
+        val yRel = 1f / 416f
+        for (rect in rectList) {
+            val jo = JSONObject()
+            jo.put("id", rect.id)
+            jo.put("x", xRel*rect.rect.left)
+            jo.put("y", yRel*rect.rect.top)
+            jo.put("width", xRel* rect.rect.width())
+            jo.put("height", yRel*rect.rect.width())
+            ja.put(jo)
+        }
+        return Transformations.map(service.imageFaceRecognition(token, imageId, ja)) { input ->
+            if (input == null) {
+                return@map DataState(DataState.STATE.FETCH_FAILED)
+            }
+            when (input.code) {
+                codes.SUCCESS -> return@map input.data?.let { DataState(it) }?: DataState(DataState.STATE.FETCH_FAILED)
                 codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
                 else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
             }

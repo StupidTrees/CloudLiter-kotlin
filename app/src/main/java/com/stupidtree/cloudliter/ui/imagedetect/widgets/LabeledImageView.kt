@@ -1,114 +1,92 @@
-package com.stupidtree.cloudliter.ui.imagedetect.widgets;
+package com.stupidtree.cloudliter.ui.imagedetect.widgets
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
-import android.util.AttributeSet;
-import android.view.View;
-import android.view.ViewGroup;
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.util.AttributeSet
+import android.view.View
+import android.view.ViewGroup
+import com.stupidtree.cloudliter.ui.imagedetect.DetectResult
 
-import com.stupidtree.cloudliter.data.source.ai.yolo.Classifier;
+class LabeledImageView : ViewGroup {
+    var imageBitmap: Bitmap? = null
+    var mWidth = 0
+    var mHeight = 0
+    private var labels: List<DetectResult>? = null
 
-import java.util.List;
+    constructor(context: Context?) : super(context) {}
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {}
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {}
 
-public class LabeledImageView extends ViewGroup {
-    Bitmap imageBitmap = null;
-    int width, height;
-    List<Classifier.Recognition> labels;
-
-
-    public LabeledImageView(Context context) {
-        super(context);
-    }
-
-    public LabeledImageView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public LabeledImageView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
-    public LabeledImageView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-    }
-
-    public void setImage(Bitmap image) {
-        this.imageBitmap = image;
-        removeAllViews();
-        requestLayout();
-        setBackground(new BitmapDrawable(image));
-//        ImageView imageView = new ImageView(getContext());
+    fun setImage(image: Bitmap?) {
+        imageBitmap = image
+        removeAllViews()
+        requestLayout()
+        background = BitmapDrawable(image)
+        //        ImageView imageView = new ImageView(getContext());
 //        imageView.setImageBitmap(imageBitmap);
         // addView(imageView);
         //invalidate();
     }
 
-    public void setLabels(List<Classifier.Recognition> labels) {
-        this.labels = labels;
-        removeAllLabels();
-        for (Classifier.Recognition r : labels) {
-            View v = new DetectionRectView(getContext(), r,width);
-            v.setContentDescription(r.getTitle());
-            addView(v);
+    fun updateLabels(labels: List<DetectResult>) {
+        this.labels = labels
+        removeAllLabels()
+        for (r in labels) {
+            val v: View = DetectionRectView(context, r, mWidth.toFloat())
+            v.contentDescription = r.name
+            addView(v)
         }
     }
 
-    private void removeAllLabels() {
-        for (int i = 0; i < getChildCount(); i++) {
-            View child = getChildAt(i);
-            if (child instanceof DetectionRectView) {
-                removeView(child);
-            }
+    private fun removeAllLabels() {
+        for (i in 0 until childCount) {
+            val child = getChildAt(i)
+            (child as? DetectionRectView)?.let { removeView(it) }
         }
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        float ratio = 1f;
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        var ratio = 1f
         if (imageBitmap == null) {
-            setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.makeMeasureSpec(heightMeasureSpec, MeasureSpec.EXACTLY));
-            height = 0;
-            width = 0;
+            setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.makeMeasureSpec(heightMeasureSpec, MeasureSpec.EXACTLY))
+            mHeight = 0
+            mWidth = 0
         } else {
-            ratio = (float)imageBitmap.getHeight()/(float) imageBitmap.getWidth();
-            width = MeasureSpec.makeMeasureSpec(widthMeasureSpec,MeasureSpec.UNSPECIFIED);
-            height = (int) (width*ratio);
-            setMeasuredDimension(width,height);
+            ratio = imageBitmap!!.height.toFloat() / imageBitmap!!.width.toFloat()
+            mWidth = MeasureSpec.makeMeasureSpec(widthMeasureSpec, MeasureSpec.UNSPECIFIED)
+            mHeight = (mWidth * ratio).toInt()
+            setMeasuredDimension(mWidth, mHeight)
         }
-        float ratioW = width / 416f;
-        float ratioH = height/ 416f;
-        final int count = getChildCount();
-        for (int i = 0; i < count; i++) {
-            View child = getChildAt(i);
-            if (child instanceof DetectionRectView) {
-                DetectionRectView rv = (DetectionRectView) child;
-                RectF loc = rv.recognition.getLocation();
-                int cw = MeasureSpec.makeMeasureSpec((int) (ratioW * loc.width()), MeasureSpec.EXACTLY);
-                int cH = MeasureSpec.makeMeasureSpec((int) (ratioH * loc.height()), MeasureSpec.EXACTLY);
-                child.measure(cw, cH);
+        val ratioW = mWidth / 416f
+        val ratioH = mHeight / 416f
+        val count = childCount
+        for (i in 0 until count) {
+            val child = getChildAt(i)
+            if (child is DetectionRectView) {
+                val loc = child.recognition!!.rect
+                val cw = MeasureSpec.makeMeasureSpec((ratioW * loc.width()).toInt(), MeasureSpec.EXACTLY)
+                val cH = MeasureSpec.makeMeasureSpec((ratioH * loc.height()).toInt(), MeasureSpec.EXACTLY)
+                child.measure(cw, cH)
             }
         }
     }
 
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int count = getChildCount();//获得子控件个数
-        float ratioW = width/ 416f;
-        float ratioH = height/ 416f;
-
-        for (int i = 0; i < count; i++) {
-            View child = getChildAt(i);
-            if (child instanceof DetectionRectView) {
-                DetectionRectView dr = (DetectionRectView) child;
-                RectF loc = dr.recognition.getLocation();
-                int left = (int) (ratioW * (loc.centerX() - loc.width() / 2));
-                int right = (int) (ratioW * (loc.centerX() + loc.width() / 2));
-                int top = (int) (ratioH * (loc.centerY() - loc.height() / 2));
-                int bottom = (int) (ratioH * (loc.centerY() + loc.height() / 2));
-                child.layout(left, top, right, bottom);
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        val count = childCount //获得子控件个数
+        val ratioW = mWidth / 416f
+        val ratioH = mHeight / 416f
+        for (i in 0 until count) {
+            val child = getChildAt(i)
+            if (child is DetectionRectView) {
+                val loc = child.recognition!!.rect
+                val left = (ratioW * (loc.centerX() - loc.width() / 2)).toInt()
+                val right = (ratioW * (loc.centerX() + loc.width() / 2)).toInt()
+                val top = (ratioH * (loc.centerY() - loc.height() / 2)).toInt()
+                val bottom = (ratioH * (loc.centerY() + loc.height() / 2)).toInt()
+                child.layout(left, top, right, bottom)
             }
         }
     }
