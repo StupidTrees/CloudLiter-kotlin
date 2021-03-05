@@ -1,17 +1,12 @@
 package com.stupidtree.cloudliter.data.source.websource
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.google.gson.JsonObject
-import com.stupidtree.cloudliter.data.model.ApiResponse
-import com.stupidtree.cloudliter.data.model.Image
-import com.stupidtree.cloudliter.data.source.websource.service.AiService
+import com.stupidtree.cloudliter.data.model.ImageEntity
 import com.stupidtree.cloudliter.data.source.websource.service.ImageService
 import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.codes
 import com.stupidtree.cloudliter.ui.base.DataState
-import okhttp3.MultipartBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -27,7 +22,7 @@ class ImageWebSource : BaseWebSource<ImageService>(Retrofit.Builder()
      * @param imageId 图片id
      * @return 操作结果
      */
-    fun getImageEntity(token: String, imageId: String): LiveData<DataState<Image>> {
+    fun getImageEntity(token: String, imageId: String): LiveData<DataState<ImageEntity>> {
         return Transformations.map(service.getImageEntity(token, imageId)) { input ->
             //Log.e("resp", input.toString())
             if (input == null) {

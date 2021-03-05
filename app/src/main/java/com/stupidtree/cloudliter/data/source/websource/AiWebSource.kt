@@ -1,10 +1,8 @@
 package com.stupidtree.cloudliter.data.source.websource
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.google.gson.JsonObject
-import com.stupidtree.cloudliter.data.model.ApiResponse
 import com.stupidtree.cloudliter.data.source.websource.service.AiService
 import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.codes
@@ -48,12 +46,32 @@ class AiWebSource : BaseWebSource<AiService>(Retrofit.Builder()
      */
     fun imageClassify(token: String, messageId:String): LiveData<DataState<JsonObject>> {
         return Transformations.map(service.imageClassify(token, messageId)) { input->
-            Log.e("resp", input.toString())
             if (input == null) {
                 return@map DataState(DataState.STATE.FETCH_FAILED)
             }
             when (input.code) {
                 codes.SUCCESS -> return@map DataState(input.data!!)
+                codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
+            }
+        }
+    }
+
+
+    /**
+     * 上传人脸文件
+     *
+     * @param token 令牌
+     * @param file  文件
+     * @return 返回结果
+     */
+    fun uploadFaceImage(token: String, file: MultipartBody.Part): LiveData<DataState<String?>> {
+        return Transformations.map(service.uploadFaceImage(token, file)) { input ->
+            if (input == null) {
+                return@map DataState(DataState.STATE.FETCH_FAILED)
+            }
+            when (input.code) {
+                codes.SUCCESS -> return@map DataState(DataState.STATE.SUCCESS)
                 codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
                 else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
             }

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b4d063a60dd0b8d9a771759b85f6c330",
+    "identityHash": "33ff5facdaa23e201cc5f960561d8e4f",
     "entities": [
       {
         "tableName": "message",
@@ -399,7 +399,7 @@
       },
       {
         "tableName": "image",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `fromId` TEXT NOT NULL, `toId` TEXT NOT NULL, `fileName` TEXT NOT NULL, `sensitive` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `fromId` TEXT NOT NULL, `toId` TEXT NOT NULL, `fileName` TEXT NOT NULL, `sensitive` TEXT NOT NULL, `scene` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -430,6 +430,12 @@
             "columnName": "sensitive",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "scene",
+            "columnName": "scene",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -445,7 +451,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b4d063a60dd0b8d9a771759b85f6c330')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '33ff5facdaa23e201cc5f960561d8e4f')"
     ]
   }
 }

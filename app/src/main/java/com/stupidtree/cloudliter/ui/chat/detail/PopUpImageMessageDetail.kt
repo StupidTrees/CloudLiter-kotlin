@@ -3,7 +3,7 @@ package com.stupidtree.cloudliter.ui.chat.detail
 import android.annotation.SuppressLint
 import android.view.View
 import com.stupidtree.cloudliter.R
-import com.stupidtree.cloudliter.data.model.Image
+import com.stupidtree.cloudliter.data.model.ImageEntity
 import com.stupidtree.cloudliter.databinding.ActivityChatPopupImageMessageDetailBinding
 import com.stupidtree.cloudliter.ui.widgets.TransparentBottomSheetDialog
 import java.text.DecimalFormat
@@ -18,8 +18,8 @@ class PopUpImageMessageDetail : TransparentBottomSheetDialog<ActivityChatPopupIm
     /**
      * 不得已放在UI里的数据
      */
-    private lateinit var imageEntity: Image
-    fun setChatMessage(imageEntity:Image): PopUpImageMessageDetail {
+    private lateinit var imageEntity: ImageEntity
+    fun setChatMessage(imageEntity:ImageEntity): PopUpImageMessageDetail {
         this.imageEntity = imageEntity
         return this
     }

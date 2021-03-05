@@ -12,12 +12,11 @@
     android:paddingBottom="16dp">
 
     <ImageView
-        android:id="@+id/icon"
-        android:layout_width="10dp"
-        android:layout_height="10dp"
-        android:layout_gravity="center"
-        android:layout_marginStart="16dp"
-        app:srcCompat="@drawable/element_round_primary" />
+        android:id="@+id/image"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/ic_baseline_accessibility_24" />
 
     <TextView
         android:id="@+id/name"

@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.stupidtree.cloudliter.data.model.*
 import com.stupidtree.cloudliter.data.source.dao.*
 
-@Database(entities = [ChatMessage::class, Conversation::class, UserRelation::class, UserProfile::class, Image::class], version = 1)
+@Database(entities = [ChatMessage::class, Conversation::class, UserRelation::class, UserProfile::class, ImageEntity::class], version = 1)
 @androidx.room.TypeConverters(TypeConverters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun chatMessageDao(): ChatMessageDao

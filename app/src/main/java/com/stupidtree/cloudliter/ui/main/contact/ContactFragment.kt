@@ -39,7 +39,10 @@ class ContactFragment : BaseFragmentWithReceiver<ContactViewModel,FragmentContac
     }
 
     private fun setUpButtons() {
-        binding?.searchFriend?.setOnClickListener { ActivityUtils.startSearchActivity(requireActivity()) }
+        binding?.searchFriend?.setOnClickListener {
+            //ActivityUtils.startSearchActivity(requireActivity())
+            ActivityUtils.startMyFaceActivity(requireContext())
+        }
         binding?.relationEvent?.setOnClickListener { ActivityUtils.startRelationEventActivity(requireContext()) }
         binding?.editGroup?.setOnClickListener { ActivityUtils.startGroupEditorActivity(requireActivity()) }
         binding?.scanQr?.setOnClickListener { ActivityUtils.startQRCodeActivity(requireContext()) }

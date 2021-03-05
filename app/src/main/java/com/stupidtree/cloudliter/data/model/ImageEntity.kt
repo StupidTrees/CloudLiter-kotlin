@@ -7,13 +7,14 @@ import com.google.gson.JsonObject
 import java.util.HashMap
 
 @Entity(tableName = "image")
-class Image {
+class ImageEntity {
     @PrimaryKey
     var id:String = ""
     var fromId:String = ""
     var toId:String = ""
     var fileName:String = ""
     var sensitive:String = ""
+    var scene:String? = null
    // var tags:List<String> = listOf()
 
     /**

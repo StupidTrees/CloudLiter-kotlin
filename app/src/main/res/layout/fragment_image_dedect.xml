@@ -36,84 +36,198 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:padding="16dp">
+            android:orientation="horizontal">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/sensitive_card"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="start"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:backgroundTint="?attr/backgroundColorBottomAsTint"
-                android:backgroundTintMode="src_over"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="?attr/colorControlNormal"
-                app:cardCornerRadius="16dp"
+                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                app:cardBackgroundColor="?attr/backgroundColorSecond"
+                app:cardCornerRadius="24dp"
                 app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:paddingStart="8dp"
-                    android:paddingTop="4dp"
-                    android:paddingEnd="8dp"
-                    android:paddingBottom="4dp">
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/element_round_primary_light"
+                        android:padding="12dp"
+                        app:srcCompat="@drawable/ic_block_sensitive"
+                        app:tint="?attr/colorPrimary" />
 
                     <TextView
-                        android:id="@+id/sensitive_text"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="敏感概率：0.01%" />
+                        android:layout_marginBottom="2dp"
+                        android:text="@string/sensitive_result"
+                        android:textColor="?attr/textColorSecondary"
+                        android:textSize="14sp"
+                        android:textStyle="normal" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.stupidtree.cloudliter.ui.widgets.FocusTextView
+                            android:id="@+id/sensitive_result"
+                            android:ellipsize="marquee"
+                            android:marqueeRepeatLimit="marquee_forever"
+                            android:singleLine="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:backgroundTintMode="src_over"
+                            android:text="办公室"
+                            android:textColor="?attr/textColorPrimary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <ProgressBar
+                            android:id="@+id/loading_sensitive"
+                            style="?android:attr/progressBarStyle"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="3dp" />
+                    </LinearLayout>
                 </LinearLayout>
+
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/classify_card"
-                android:layout_width="wrap_content"
+                android:id="@+id/scene_card"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="start"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginEnd="8dp"
-                android:backgroundTint="?attr/backgroundColorBottomAsTint"
-                android:backgroundTintMode="src_over"
-                android:foreground="?attr/selectableItemBackground"
-                android:visibility="gone"
-                app:cardBackgroundColor="?attr/colorControlNormal"
-                app:cardCornerRadius="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                app:cardBackgroundColor="?attr/backgroundColorSecond"
+                app:cardCornerRadius="24dp"
                 app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:paddingStart="8dp"
-                    android:paddingTop="4dp"
-                    android:paddingEnd="8dp"
-                    android:paddingBottom="4dp">
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/element_round_primary_light"
+                        android:padding="12dp"
+                        app:srcCompat="@drawable/ic_block_scene"
+                        app:tint="?attr/colorPrimary" />
 
                     <TextView
-                        android:id="@+id/kind_text"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="图片分类：XXXX" />
+                        android:layout_marginBottom="2dp"
+                        android:text="@string/scene_classify_result_test"
+                        android:textColor="?attr/textColorSecondary"
+                        android:textSize="14sp"
+                        android:textStyle="normal" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.stupidtree.cloudliter.ui.widgets.FocusTextView
+                            android:id="@+id/scene_result"
+                            android:ellipsize="marquee"
+                            android:marqueeRepeatLimit="marquee_forever"
+                            android:singleLine="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:backgroundTintMode="src_over"
+                            android:text="办公室"
+                            android:textColor="?attr/textColorPrimary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <ProgressBar
+                            android:id="@+id/loading_scene"
+                            style="?android:attr/progressBarStyle"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="3dp" />
+                    </LinearLayout>
                 </LinearLayout>
+
             </androidx.cardview.widget.CardView>
+
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/list"
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:overScrollMode="never" />
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            app:cardBackgroundColor="?attr/backgroundColorSecond"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/detect_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:layout_weight="1"
+                        android:textColor="?attr/textColorPrimary"
+                        android:textSize="16sp"
+                        android:textStyle="normal" />
+
+                    <ProgressBar
+                        android:id="@+id/loading_detect"
+                        style="?android:attr/progressBarStyle"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="16dp" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:overScrollMode="never" />
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -1,10 +1,8 @@
 package com.stupidtree.cloudliter.data.source.websource.service
 
 import androidx.lifecycle.LiveData
-import com.google.gson.JsonObject
 import com.stupidtree.cloudliter.data.model.ApiResponse
-import com.stupidtree.cloudliter.data.model.Image
-import okhttp3.MultipartBody
+import com.stupidtree.cloudliter.data.model.ImageEntity
 import retrofit2.http.*
 
 interface ImageService {
@@ -16,6 +14,6 @@ interface ImageService {
      * @return 操作结果
      */
     @GET("/image/get_entity")
-    fun getImageEntity(@Header("token") token: String, @Query("imageId")imageId:String): LiveData<ApiResponse<Image>>
+    fun getImageEntity(@Header("token") token: String, @Query("imageId")imageId:String): LiveData<ApiResponse<ImageEntity>>
 
 }

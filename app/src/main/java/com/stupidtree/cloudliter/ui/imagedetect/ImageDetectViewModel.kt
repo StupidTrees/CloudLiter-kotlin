@@ -35,14 +35,6 @@ class ImageDetectViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    //    var imageClassifyResult = Transformations.switchMap(imageLiveData) { input ->
-//        val userLocal = localUserRepository.getLoggedInUser()
-//        if (userLocal.isValid) {
-//            return@switchMap aiRepository.imageClassify(userLocal.token!!, input)
-//        } else {
-//            return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
-//        }
-//    }
     var imageClassifyResult = Transformations.switchMap(imageIdLiveData) { input ->
         val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {

@@ -64,6 +64,7 @@
             android:launchMode="singleTask" />
         <activity android:name=".ui.imagedetect.ImageDetectActivity" />
         <activity android:name=".ui.wordcloud.WordCloudActivity" />
+        <activity android:name=".ui.face.MyFaceActivity" />
 
         <provider
             android:name=".MFileProvider"

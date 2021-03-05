@@ -9,6 +9,7 @@ import com.stupidtree.cloudliter.data.model.Conversation.Companion.fromNewMessag
 import com.stupidtree.cloudliter.data.model.Conversation.Companion.fromUserRelationAndProfile
 import com.stupidtree.cloudliter.ui.chat.ChatActivity
 import com.stupidtree.cloudliter.ui.conversation.ConversationActivity
+import com.stupidtree.cloudliter.ui.face.MyFaceActivity
 import com.stupidtree.cloudliter.ui.group.GroupEditorActivity
 import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectActivity
 import com.stupidtree.cloudliter.ui.main.MainActivity
@@ -167,5 +168,11 @@ object ActivityUtils {
         from.startActivity(it)
     }
 
-
+    /**
+     * 进入人脸管理
+     */
+    fun startMyFaceActivity(from:Context){
+        val it = Intent(from,MyFaceActivity::class.java)
+        from.startActivity(it)
+    }
 }

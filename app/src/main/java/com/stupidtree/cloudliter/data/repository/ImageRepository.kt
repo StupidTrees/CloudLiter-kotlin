@@ -1,25 +1,17 @@
 package com.stupidtree.cloudliter.data.repository
 
 import android.app.Application
-import android.content.Context
-import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
-import com.google.gson.JsonObject
-import com.stupidtree.cloudliter.data.model.Image
-import com.stupidtree.cloudliter.data.source.ai.yolo.Classifier
-import com.stupidtree.cloudliter.data.source.ai.yolo.YOLOSource
-import com.stupidtree.cloudliter.data.source.websource.AiWebSource
+import androidx.lifecycle.MediatorLiveData
+import com.stupidtree.cloudliter.data.AppDatabase
+import com.stupidtree.cloudliter.data.model.ImageEntity
 import com.stupidtree.cloudliter.data.source.websource.ImageWebSource
 import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.imagedetect.BitmapRequestBody
-import okhttp3.MultipartBody
-import retrofit2.http.Multipart
-import java.io.ByteArrayOutputStream
 
 class ImageRepository(application: Application) {
     //数据源1：网络类型数据，消息记录的网络数据源
-    var imageWebSource: ImageWebSource = ImageWebSource.getInstance()
-
+    private val imageWebSource: ImageWebSource = ImageWebSource.getInstance()
+    val imageDao = AppDatabase.getDatabase(application).imageDao()
 
     /**
      * 进行图片分类（上传图片文件形式）
@@ -28,8 +20,22 @@ class ImageRepository(application: Application) {
      * @param imageId 图片id
      * @return 返回结果
      */
-    fun getImageInfo(token: String, imageId:String): LiveData<DataState<Image>> {
-        return imageWebSource.getImageEntity(token,imageId)
+    fun getImageInfo(token: String, imageId: String): LiveData<DataState<ImageEntity>> {
+        val res = MediatorLiveData<DataState<ImageEntity>>()
+        val cache = imageDao.findImageById(imageId)
+        res.addSource(cache) {
+            it?.let {
+                res.value = DataState(it)
+            }
+        }
+        res.addSource(imageWebSource.getImageEntity(token, imageId)) {
+            it.data?.let { image ->
+                Thread {
+                    imageDao.saveImageSync(image)
+                }.start()
+            }
+        }
+        return res
     }
 
     companion object {

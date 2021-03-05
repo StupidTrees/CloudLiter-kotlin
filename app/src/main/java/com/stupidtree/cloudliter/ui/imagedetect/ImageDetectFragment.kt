@@ -1,17 +1,18 @@
 package com.stupidtree.cloudliter.ui.imagedetect
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.stupidtree.cloudliter.R
-import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.databinding.FragmentImageDedectBinding
 import com.stupidtree.cloudliter.ui.base.BaseFragment
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpImageMessageDetail
 import com.stupidtree.cloudliter.utils.ImageUtils
+import java.text.DecimalFormat
 
 class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDedectBinding>() {
 
@@ -29,10 +30,30 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
 
     override fun onStart() {
         super.onStart()
+        refresh()
+    }
+
+    fun refresh(){
+        if(arguments?.getBoolean("local") == true){
+            binding?.sceneCard?.visibility = View.GONE
+            binding?.sensitiveCard?.visibility = View.GONE
+        }else{
+            binding?.sceneCard?.visibility = View.VISIBLE
+            binding?.sensitiveCard?.visibility = View.VISIBLE
+        }
+        binding?.loadingDetect?.visibility = View.VISIBLE
+        binding?.detectTitle?.text = getString(R.string.detect_progressing)
+
+        binding?.loadingScene?.visibility = View.VISIBLE
+        binding?.sceneResult?.text = getString(R.string.scene_progressing)
+
+        binding?.loadingSensitive?.visibility = View.VISIBLE
+        binding?.sensitiveResult?.text = getString(R.string.sensitive_progressing)
         viewModel.imageIdLiveData.value = Pair(arguments?.getString("id")?:"",arguments?.getBoolean("local")?:false)
 
     }
 
+    @SuppressLint("SetTextI18n")
     override fun initViews(view: View) {
         listAdapter = DetectResultAdapter(requireContext(), mutableListOf())
         binding?.list?.adapter = listAdapter
@@ -59,6 +80,7 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
             binding?.labeledImageView?.setImage(it)
         }
         viewModel.detectionResult.observe(this) {
+            binding?.loadingDetect?.visibility = View.GONE
             if (it.data != null && viewModel.imageLiveData.value != null) {
                 binding?.labeledImageView?.setLabels(it.data)
                 val bitmap = viewModel.imageLiveData.value
@@ -67,7 +89,11 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
                 } else {
                     getString(R.string.description_image_none_detected)
                 }
-                listAdapter?.notifyItemChangedSmooth(it.data!!)
+                binding?.detectTitle?.text = announce
+                viewModel.imageLiveData.value?.let {bitmap->
+                    listAdapter?.notifyItemChangedSmooth(it.data!!,bitmap)
+                }
+
                 bitmap?.let { it1 ->
                     announce += if ((it1.width.toFloat() / it1.height.toFloat()) > 1.3f) {
                         getString(R.string.hint_horizontal_screen)
@@ -76,19 +102,24 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
                     }
                 }
                 binding?.labeledImageView?.announceForAccessibility(announce)
+            }else{
+                binding?.detectTitle?.text = getString(R.string.detect_failed)
             }
+
         }
         // 图片分类
         viewModel.imageClassifyResult.observe(this) {
+            binding?.loadingScene?.visibility = View.GONE
+            binding?.sceneResult?.visibility = View.VISIBLE
             if (it.state != DataState.STATE.SUCCESS) {
-                binding?.classifyCard?.visibility = View.GONE
+                binding?.sceneResult?.text =  getString(R.string.scene_classify_failed)
             } else {
-                binding?.kindText?.text = getString(R.string.scene_classify_result_test, it.data?.get("class_cn")?.asString)
-                binding?.classifyCard?.visibility = View.VISIBLE
+                binding?.sceneResult?.text = it.data?.get("class_cn")?.asString
             }
         }
 
         viewModel.imageEntityLiveData.observe(this) {
+            binding?.loadingSensitive?.visibility = View.GONE
             if (it == null) {
                 binding?.sensitiveCard?.visibility = View.GONE
             } else {
@@ -98,7 +129,9 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
                     val per = 1f - (map["Neutral"]!! + map["Drawing"]!!) / (
                             map["Porn"]!! + map["Hentai"]!! + map["Sexy"]!! + map["Neutral"]!! + map["Drawing"]!!
                             )
-                    binding?.sensitiveText?.text = getString(R.string.sensitive_result, per * 100)
+                    val df = DecimalFormat("#0.00")
+                    binding?.sensitiveResult?.visibility = View.VISIBLE
+                    binding?.sensitiveResult?.text = "${df.format(per*100)}%"
                 }
             }
         }
