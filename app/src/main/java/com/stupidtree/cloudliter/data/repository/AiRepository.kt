@@ -46,6 +46,20 @@ class AiRepository(application: Application) {
     }
 
     /**
+     * 进行语音识别（上传语音文件形式）
+     * @param token    令牌
+     * @param bitmap 语音bitmap
+     * @return 返回结果
+     */
+    fun voiceTTSDirect(token: String, filePath: String): LiveData<DataState<String?>> {
+        val f = File(filePath)
+        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), f)
+        //构造一个图片格式的POST表单
+        val body = MultipartBody.Part.createFormData("upload", f.name, requestFile)
+        return aiWebSource.voiceTTSDirect(token, body)
+    }
+
+    /**
      * 进行图片分类
      *
      * @param token    令牌

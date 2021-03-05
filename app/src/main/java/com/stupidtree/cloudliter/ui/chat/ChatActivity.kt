@@ -567,7 +567,8 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
             voiceHelper.let {
                 viewModel.conversation.value?.let { conversation ->
                     if (conversation.friendType == 2 || conversation.friendType == 3 || conversation.friendType == 6 || conversation.friendType == 7) {
-                        viewModel.sendVoiceMessage(it.filePath, it.timeCount)
+//                        viewModel.sendVoiceMessage(it.filePath, it.timeCount)
+                        viewModel.voiceTTSDirect(it.filePath)
                     } else {
                         viewModel.sendVoiceMessage(it.filePath, it.timeCount)
                     }

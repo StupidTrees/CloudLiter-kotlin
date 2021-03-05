@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.model.Conversation
+import com.stupidtree.cloudliter.data.repository.AiRepository
 import com.stupidtree.cloudliter.data.repository.ChatRepository
 import com.stupidtree.cloudliter.data.repository.ChatRepository.Companion.getInstance
 import com.stupidtree.cloudliter.data.repository.ConversationRepository
@@ -20,6 +21,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
      * 仓库区
      */
     private val chatRepository: ChatRepository = getInstance(application)
+    private val aiRepository: AiRepository = AiRepository(application)
     private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
     private val conversationRepository = ConversationRepository.getInstance(application)
 
@@ -183,6 +185,15 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         messageSentLiveData.addSource(liveData) {
             messageSentLiveData.value = it
             messageSentLiveData.removeSource(liveData)
+        }
+    }
+
+    fun voiceTTSDirect(path: String) {
+        val userLocal = localUserRepository.getLoggedInUser()
+        val liveData = if (userLocal.isValid && friendId != null) {
+            aiRepository.voiceTTSDirect(userLocal.token!!, path)
+        } else {
+            MutableLiveData(DataState(DataState.STATE.FETCH_FAILED))
         }
     }
 

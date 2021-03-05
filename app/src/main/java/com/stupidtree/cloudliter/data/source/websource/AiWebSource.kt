@@ -1,5 +1,6 @@
 package com.stupidtree.cloudliter.data.source.websource
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.google.gson.JsonObject
@@ -51,6 +52,27 @@ class AiWebSource : BaseWebSource<AiService>(Retrofit.Builder()
             }
             when (input.code) {
                 codes.SUCCESS -> return@map DataState(input.data!!)
+                codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
+            }
+        }
+    }
+
+    /**
+     * 上传语音音频文件
+     * @param token 令牌
+     * @param file 文件
+     * @return 操作结果
+     */
+    fun voiceTTSDirect(token: String, file: MultipartBody.Part): LiveData<DataState<String?>> {
+        return Transformations.map(service.voiceTTSDirect(token, file)) { input->
+            // TODO
+            // 后端未完成，没得测试
+            if (input == null) {
+                return@map DataState(DataState.STATE.FETCH_FAILED)
+            }
+            when (input.code) {
+                codes.SUCCESS -> return@map DataState(DataState.STATE.SUCCESS)
                 codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
                 else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
             }
