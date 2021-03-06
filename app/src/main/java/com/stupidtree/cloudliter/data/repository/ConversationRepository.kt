@@ -43,7 +43,10 @@ class ConversationRepository(context: Context) {
 
     fun unbindService(context: Context) {
        // socketWebSource.unbindService(context)
-        context.unregisterReceiver(socketWebSource)
+        try {
+            context.unregisterReceiver(socketWebSource)
+        } catch (e: Exception) {
+        }
     }
 
 

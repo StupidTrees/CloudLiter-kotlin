@@ -19,7 +19,7 @@
             android:paddingStart="16dp"
             android:paddingTop="16dp"
             android:paddingEnd="16dp"
-            android:paddingBottom="8dp"
+            android:paddingBottom="16dp"
             app:layout_scrollFlags="scroll">
 
             <FrameLayout
@@ -64,28 +64,6 @@
             </FrameLayout>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/edit_group"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="16dp"
-                android:clickable="true"
-                android:focusable="auto"
-                android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:visibility="gone"
-                app:cardBackgroundColor="?attr/colorPrimary"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="0dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:padding="12dp"
-                    app:srcCompat="@drawable/ic_group_button"
-                    app:tint="@android:color/white" />
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
                 android:id="@+id/search_friend"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
@@ -128,43 +106,56 @@
                     app:srcCompat="@drawable/ic_scan"
                     app:tint="@android:color/white" />
             </androidx.cardview.widget.CardView>
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
         </LinearLayout>
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="6dp"
+            android:background="@drawable/element_rounded_bar_grey_24"
+            android:backgroundTint="?attr/backgroundColorBottomAsTint"
+            android:backgroundTintMode="src_over"
             android:overScrollMode="never"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="8dp"
-            app:tabGravity="start"
+            app:tabGravity="fill"
             app:tabIndicator="@android:color/transparent"
-            app:tabIndicatorFullWidth="false"
-            app:tabIndicatorGravity="bottom"
-            app:tabMode="scrollable">
+            app:tabIndicatorColor="#00000000"
+            app:tabIndicatorGravity="center"
+            app:tabMode="scrollable"
+            app:tabPaddingEnd="0dp"
+            app:tabPaddingStart="0dp"
+            app:tabSelectedTextColor="?attr/textColorPrimary"
+            app:tabTextColor="?attr/textColorSecondary"
+            app:tabUnboundedRipple="true">
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Monday" />
+                android:text="@string/contact_friend_list" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tuesday" />
+                android:text="@string/contact_friend_group" />
 
         </com.google.android.material.tabs.TabLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.viewpager.widget.ViewPager
+    <FrameLayout
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:overScrollMode="never"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-    </androidx.viewpager.widget.ViewPager>
+    </FrameLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

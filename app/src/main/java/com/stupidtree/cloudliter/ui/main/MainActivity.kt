@@ -121,7 +121,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 binding.title.setText(when(position){
                     0->R.string.title_home
                     1->R.string.title_contact
-                    else->R.string.title_contact
+                    else->R.string.title_me
                 })
                 //Objects.requireNonNull(getSupportActionBar()).setTitle(item.getTitle());
             }

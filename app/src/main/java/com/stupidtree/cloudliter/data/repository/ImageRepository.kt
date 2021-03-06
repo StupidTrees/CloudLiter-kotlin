@@ -7,6 +7,7 @@ import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.model.ImageEntity
 import com.stupidtree.cloudliter.data.source.websource.ImageWebSource
 import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.cloudliter.ui.wordcloud.FaceEntity
 
 class ImageRepository(application: Application) {
     //数据源1：网络类型数据，消息记录的网络数据源
@@ -14,7 +15,7 @@ class ImageRepository(application: Application) {
     val imageDao = AppDatabase.getDatabase(application).imageDao()
 
     /**
-     * 进行图片分类（上传图片文件形式）
+     * 获得图片信息
      *
      * @param token    令牌
      * @param imageId 图片id
@@ -36,6 +37,20 @@ class ImageRepository(application: Application) {
             }
         }
         return res
+    }
+
+    /**
+     * 获取所有人脸
+     */
+    fun getFacesOfUser(token:String):LiveData<DataState<List<FaceEntity>>>{
+        return imageWebSource.getFaces(token)
+    }
+
+    /**
+     * 删除人脸
+     */
+    fun deleteFace(token:String,faceId:String):LiveData<DataState<String?>>{
+        return imageWebSource.deleteFace(token,faceId)
     }
 
     companion object {

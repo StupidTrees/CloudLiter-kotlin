@@ -38,6 +38,8 @@ import java.util.*
  * 以及各种图形函数
  */
 object ImageUtils {
+
+
     fun loadAvatarNoCacheInto(context: Context, filename: String?, target: ImageView) {
         if (isEmpty(filename)) {
             target.setImageResource(R.drawable.place_holder_avatar)
@@ -131,6 +133,24 @@ object ImageUtils {
                 });
         // p.edit().putString("my_avatar","normal").apply();
         return result
+    }
+
+    /**
+     * 加载人脸文件
+     */
+    fun loadFaceImageInto(context: Context,token:String,faceId: String, target: ImageView) {
+        if (isEmpty(faceId)) {
+            target.setImageResource(R.drawable.place_holder_loading)
+        } else {
+            val glideUrl = GlideUrl("http://hita.store:3000/image/face?faceId=$faceId", LazyHeaders.Builder()
+                    .addHeader("device-type", "android")
+                    .addHeader("token",token)
+                    .build())
+            Glide.with(context).load(glideUrl)
+                    .placeholder(R.drawable.place_holder_loading)
+                    .apply(RequestOptions.bitmapTransform(CircleCrop()))
+                    .into(target)
+        }
     }
 
     /**

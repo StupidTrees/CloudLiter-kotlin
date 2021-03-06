@@ -73,8 +73,8 @@
             android:layout_width="140dp"
             android:layout_height="140dp"
             android:src="@drawable/ic_cloudliter_baseline"
-            android:tint="?attr/colorControlNormal"
-            android:tintMode="src_in" />
+            android:tintMode="src_in"
+            app:tint="?attr/colorControlNormal" />
 
         <TextView
             android:id="@+id/place_holder_text"

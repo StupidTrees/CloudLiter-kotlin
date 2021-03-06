@@ -29,8 +29,7 @@ class WordCloudActivity : BaseActivity<WordCloudViewModel, ActivityWordCloudBind
         listAdapter = WordCloudListAdapter(this, mutableListOf())
         binding.list.adapter = listAdapter
         binding.list.layoutManager = LinearLayoutManager(this)
-
-
+        binding.refresh.setColorSchemeColors(getColorPrimary())
         viewModel.wordCloudLiveData.observe(this) {
             binding.refresh.isRefreshing = false
             if (it.state == DataState.STATE.SUCCESS) {
@@ -41,12 +40,17 @@ class WordCloudActivity : BaseActivity<WordCloudViewModel, ActivityWordCloudBind
                 listAdapter?.notifyItemChangedSmooth(newList)
             }
         }
-
-        binding.refresh.setColorSchemeColors(getColorPrimary())
+        binding.refresh.setOnRefreshListener {
+            refresh()
+        }
     }
 
+    fun refresh(){
+        viewModel.startRefresh()
+        binding.refresh.isRefreshing = true
+    }
     override fun onStart() {
         super.onStart()
-        viewModel.startRefresh()
+        refresh()
     }
 }

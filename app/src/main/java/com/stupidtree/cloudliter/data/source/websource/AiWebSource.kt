@@ -129,6 +129,7 @@ class AiWebSource : BaseWebSource<AiService>(Retrofit.Builder()
             }
             when (input.code) {
                 codes.SUCCESS -> return@map DataState(DataState.STATE.SUCCESS)
+                codes.IMAGE_NO_FACE->return@map DataState(DataState.STATE.SPECIAL)
                 codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
                 else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
             }

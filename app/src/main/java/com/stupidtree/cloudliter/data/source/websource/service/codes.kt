@@ -13,4 +13,5 @@ object codes {
     const val TOKEN_INVALID = 7000
     const val RELATION_NOT_EXIST = 3014
     const val WORD_CLOUD_PRIVATE = 3021
+    const val IMAGE_NO_FACE = 3022
 }

@@ -334,6 +334,13 @@
     <string name="hint_vertical_screen">，图片比例较长，建议保持竖屏触摸该图片</string>
     <string name="detect_failed">实体检测失败</string>
     <string name="sensitive_progressing">获取敏感判定…</string>
+    <string name="my_face_manager">我的人脸</string>
+    <string name="upload_success">上传成功</string>
+    <string name="no_face">该图片中没有人脸！</string>
+    <string name="delete_face_ok">删除人脸成功</string>
+    <string name="ensure_delete_face">确认删除人脸？</string>
+    <string name="accessibility_setting">无障碍</string>
+    <string name="privacy_setting">隐私</string>
     <string-array name="yunmoji_descriptions">
         <item>狗</item>
         <item>狗</item>

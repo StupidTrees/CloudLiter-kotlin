@@ -5,13 +5,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
+import com.stupidtree.cloudliter.R
+import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.databinding.FragmentConversationsBinding
 import com.stupidtree.cloudliter.databinding.FragmentNavigationBinding
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
 import com.stupidtree.cloudliter.ui.base.BaseFragmentWithReceiver
 import com.stupidtree.cloudliter.ui.main.conversations.ConversationsFragment
 import com.stupidtree.cloudliter.utils.ActivityUtils
+import com.stupidtree.cloudliter.utils.ImageUtils
 
 class NavigationFragment : BaseFragmentWithReceiver<NavigationViewModel, FragmentNavigationBinding>() {
 
@@ -22,6 +26,11 @@ class NavigationFragment : BaseFragmentWithReceiver<NavigationViewModel, Fragmen
         override fun onReceive(context: Context?, intent: Intent?) {
 
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.startRefresh()
     }
 
     override fun getIntentFilter(): IntentFilter {
@@ -35,13 +44,29 @@ class NavigationFragment : BaseFragmentWithReceiver<NavigationViewModel, Fragmen
     }
 
     override fun initViews(view: View) {
-        binding?.searchFriend?.setOnClickListener {
-            //ActivityUtils.startSearchActivity(requireActivity())
+        viewModel.localUserLiveData.observe(this) { userLocalInfo ->
+            if (userLocalInfo.isValid) { //如果已登录
+                //装载头像
+                binding?.avatar?.let { ImageUtils.loadLocalAvatarInto(requireContext(), userLocalInfo.avatar, it) }
+                //设置各种文字
+                binding?.username?.text = userLocalInfo.username
+                binding?.nickname?.text = userLocalInfo.nickname
+                binding?.userLayout?.setOnClickListener { ActivityUtils.startProfileActivity(requireContext(), userLocalInfo.id!!) }
+            } else {
+                //未登录的信息显示
+                binding?.username?.setText(R.string.not_logged_in)
+                binding?.nickname?.setText(R.string.please_log_in)
+                binding?.avatar?.setImageResource(R.drawable.place_holder_avatar)
+                binding?.userLayout?.setOnClickListener { ActivityUtils.startLoginActivity(requireContext()) }
+            }
+
+        }
+        binding?.faceLayout?.setOnClickListener {
             ActivityUtils.startMyFaceActivity(requireContext())
         }
-        binding?.relationEvent?.setOnClickListener { ActivityUtils.startRelationEventActivity(requireContext()) }
-        binding?.editGroup?.setOnClickListener { ActivityUtils.startGroupEditorActivity(requireActivity()) }
-        binding?.scanQr?.setOnClickListener { ActivityUtils.startQRCodeActivity(requireContext()) }
+        binding?.wordCloudLayout?.setOnClickListener {
+            ActivityUtils.startWordCloudActivity(requireContext())
+        }
     }
 
     companion object {

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.google.android.material.tabs.TabLayout
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.databinding.FragmentContactBinding
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService.Companion.RECEIVE_RELATION_EVENT
@@ -19,7 +20,10 @@ import com.stupidtree.cloudliter.utils.ActivityUtils
 /**
  * 联系人页面的Fragment
  */
-class ContactFragment : BaseFragmentWithReceiver<ContactViewModel,FragmentContactBinding>() {
+class ContactFragment : BaseFragmentWithReceiver<ContactViewModel, FragmentContactBinding>() {
+
+    var listFragment: ContactListFragment? = null
+    var groupFragment: ContactGroupFragment? = null
 
     /**
      * 广播区
@@ -40,11 +44,10 @@ class ContactFragment : BaseFragmentWithReceiver<ContactViewModel,FragmentContac
 
     private fun setUpButtons() {
         binding?.searchFriend?.setOnClickListener {
-            //ActivityUtils.startSearchActivity(requireActivity())
-            ActivityUtils.startMyFaceActivity(requireContext())
+            ActivityUtils.startSearchActivity(requireActivity())
+            //ActivityUtils.startMyFaceActivity(requireContext())
         }
         binding?.relationEvent?.setOnClickListener { ActivityUtils.startRelationEventActivity(requireContext()) }
-        binding?.editGroup?.setOnClickListener { ActivityUtils.startGroupEditorActivity(requireActivity()) }
         binding?.scanQr?.setOnClickListener { ActivityUtils.startQRCodeActivity(requireContext()) }
     }
 
@@ -62,24 +65,62 @@ class ContactFragment : BaseFragmentWithReceiver<ContactViewModel,FragmentContac
                 binding?.unread?.visibility = View.GONE
             }
         })
-        binding?.pager?.adapter = object : BaseTabAdapter(childFragmentManager, 2) {
-            override fun initItem(position: Int): Fragment {
-                return if (position == 0) {
-                    ContactListFragment.newInstance()
-                } else {
-                    ContactGroupFragment.newInstance()
+        binding?.tabs?.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                when (tab?.position) {
+                    0 -> showListFragment()
+                    else -> showGroupFragment()
                 }
             }
-            override fun getPageTitle(position: Int): CharSequence {
-                return if (position == 0) getString(R.string.contact_friend_list) else getString(R.string.contact_friend_group)
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+
+            }
+
+        })
+    }
+
+    fun showListFragment(){
+        if(listFragment==null){
+            listFragment = ContactListFragment.newInstance()
+        }
+        listFragment?.let {
+            switchFragment(it,"list")
+        }
+    }
+    fun showGroupFragment(){
+        if(groupFragment==null){
+            groupFragment = ContactGroupFragment.newInstance()
+        }
+        groupFragment?.let {
+            switchFragment(it,"group")
+        }
+    }
+    private fun switchFragment(fragment: Fragment, tag: String) {
+        val trans = childFragmentManager.beginTransaction()
+        if (!fragment.isAdded) {
+            trans.add(R.id.pager, fragment, tag)
+        }
+        for (f in childFragmentManager.fragments) {
+            if (f != fragment) {
+                trans.hide(f)
             }
         }
-        binding?.tabs?.setupWithViewPager(binding?.pager)
+        trans.setCustomAnimations(android.R.anim.fade_in,android.R.anim.fade_out).show(fragment).commit()
     }
+
 
     override fun onStart() {
         super.onStart()
         viewModel.startFetchUnread()
+        when (binding?.tabs?.selectedTabPosition) {
+            0 -> showListFragment()
+            else -> showGroupFragment()
+        }
     }
 
 

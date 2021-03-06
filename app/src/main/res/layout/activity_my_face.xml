@@ -19,7 +19,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            app:title="@string/title_word_cloud" />
+            app:title="@string/my_face_manager" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -33,7 +33,9 @@
             android:id="@+id/list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:overScrollMode="never" />
+            android:overScrollMode="never"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
