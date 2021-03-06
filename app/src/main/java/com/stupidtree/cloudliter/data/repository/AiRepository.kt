@@ -8,11 +8,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.stupidtree.cloudliter.data.AppDatabase
-import com.stupidtree.cloudliter.data.model.ChatMessage
+import com.stupidtree.cloudliter.data.model.FaceResult
 import com.stupidtree.cloudliter.data.source.ai.yolo.Classifier
 import com.stupidtree.cloudliter.data.source.ai.yolo.YOLOSource
 import com.stupidtree.cloudliter.data.source.websource.AiWebSource
@@ -22,11 +21,8 @@ import com.stupidtree.cloudliter.ui.imagedetect.DetectResult
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import org.json.JSONArray
-import retrofit2.http.Multipart
 import top.zibin.luban.Luban
 import top.zibin.luban.OnCompressListener
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.lang.Exception
 
@@ -35,6 +31,7 @@ class AiRepository(application: Application) {
     var aiWebSource: AiWebSource = AiWebSource.instance!!
     val yoloSource: YOLOSource = YOLOSource.getInstance(application)
     val imageDao = AppDatabase.getDatabase(application).imageDao()
+    val faceResultDao = AppDatabase.getDatabase(application).faceResultDao()
 
     /**
      * 进行图片分类（上传图片文件形式）
@@ -57,21 +54,21 @@ class AiRepository(application: Application) {
      */
     fun imageClassify(token: String, imageId: String): LiveData<DataState<JsonObject>> {
         val res = MediatorLiveData<DataState<JsonObject>>()
-        val cache = Transformations.switchMap(imageDao.getSceneBtId(imageId)){
-            return@switchMap try{
+        val cache = Transformations.switchMap(imageDao.getSceneBtId(imageId)) {
+            return@switchMap try {
                 MutableLiveData(JsonParser().parse(it).asJsonObject)
-            }catch(e:Exception){
+            } catch (e: Exception) {
                 MutableLiveData()
             }
         }
-        res.addSource(cache){
+        res.addSource(cache) {
             res.value = DataState(it)
         }
-        res.addSource(aiWebSource.imageClassify(token, imageId)){
-            if(it.state==DataState.STATE.SUCCESS){
-                Thread{
-                    it.data?.let{jo->
-                        imageDao.updateSceneSync(imageId,jo.toString())
+        res.addSource(aiWebSource.imageClassify(token, imageId)) {
+            if (it.state == DataState.STATE.SUCCESS) {
+                Thread {
+                    it.data?.let { jo ->
+                        imageDao.updateSceneSync(imageId, jo.toString())
                     }
                 }.start()
             }
@@ -83,12 +80,21 @@ class AiRepository(application: Application) {
     /**
      * 进行人脸识别
      */
-    fun imageFaceRecognition(token: String, imageId:String,rectList:List<DetectResult>): LiveData<DataState<List<Map<String?,String?>>>> {
-        return aiWebSource.imageFaceRecognition(token,imageId,rectList)
+    fun imageFaceRecognition(token: String, imageId: String, rectList: List<DetectResult>): LiveData<DataState<List<FaceResult>>> {
+        val result = MediatorLiveData<DataState<List<FaceResult>>>()
+        result.addSource(faceResultDao.findFaceResults(imageId)) {
+            result.value = DataState(it)
+        }
+        result.addSource(aiWebSource.imageFaceRecognition(token, imageId, rectList)) {
+            it.data?.let { it1 ->
+                Thread { faceResultDao.saveFaceResultsSync(it1) }.start()
+            }
+        }
+        return result
     }
 
 
-        /**
+    /**
      * 上传人脸图片
      *
      * @param token    令牌
@@ -110,7 +116,7 @@ class AiRepository(application: Application) {
 
                     override fun onSuccess(file: File) {
                         Log.e("luban", "压缩成功")
-                         val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+                        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
                         //构造一个图片格式的POST表单
                         val body = MultipartBody.Part.createFormData("upload", file.name, requestFile)
                         val sendResult = aiWebSource.uploadFaceImage(token, body)

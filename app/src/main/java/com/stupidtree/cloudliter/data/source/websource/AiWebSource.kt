@@ -2,9 +2,8 @@ package com.stupidtree.cloudliter.data.source.websource
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.stupidtree.cloudliter.data.source.ai.yolo.Classifier
+import com.stupidtree.cloudliter.data.model.FaceResult
 import com.stupidtree.cloudliter.data.source.websource.service.AiService
 import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.codes
@@ -68,7 +67,7 @@ class AiWebSource : BaseWebSource<AiService>(Retrofit.Builder()
      * @param token 令牌
      * @return 操作结果
      */
-    fun imageFaceRecognition(token: String, imageId: String, rectList: List<DetectResult>): LiveData<DataState<List<Map<String?,String?>>>> {
+    fun imageFaceRecognition(token: String, imageId: String, rectList: List<DetectResult>): LiveData<DataState<List<FaceResult>>> {
         val ja = JSONArray()
         val xRel = 1f / 416f
         val yRel = 1f / 416f

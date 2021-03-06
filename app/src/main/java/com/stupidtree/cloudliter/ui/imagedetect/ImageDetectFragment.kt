@@ -4,10 +4,10 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.stupidtree.cloudliter.R
+import com.stupidtree.cloudliter.data.model.FaceResult
 import com.stupidtree.cloudliter.databinding.FragmentImageDedectBinding
 import com.stupidtree.cloudliter.ui.base.BaseFragment
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter
@@ -140,9 +140,9 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
             }
         }
         viewModel.faceRecognitionResult.observe(this) {
-            it.data?.let { it1 -> listAdapter?.setFriendInfo(it1) }
+            it.data?.let { it1: List<FaceResult> -> listAdapter?.setFriendInfo(it1) }
         }
-        listAdapter?.setOnItemClickListener(object :BaseListAdapter.OnItemClickListener<DetectResult>{
+        listAdapter?.setOnItemClickListener(object : BaseListAdapter.OnItemClickListener<DetectResult> {
             override fun onItemClick(data: DetectResult, card: View?, position: Int) {
                 data.friendId?.let { ActivityUtils.startProfileActivity(requireContext(), it) }
             }

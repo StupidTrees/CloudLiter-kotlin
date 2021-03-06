@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "33ff5facdaa23e201cc5f960561d8e4f",
+    "identityHash": "7de26c7f0e9e2f280e3d0ceb28f75e8a",
     "entities": [
       {
         "tableName": "message",
@@ -446,12 +446,57 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "face_result",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`imageId` TEXT NOT NULL, `rectId` TEXT NOT NULL, `userId` TEXT, `userName` TEXT, `confidence` REAL NOT NULL, PRIMARY KEY(`imageId`, `rectId`))",
+        "fields": [
+          {
+            "fieldPath": "imageId",
+            "columnName": "imageId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rectId",
+            "columnName": "rectId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userName",
+            "columnName": "userName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "confidence",
+            "columnName": "confidence",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "imageId",
+            "rectId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '33ff5facdaa23e201cc5f960561d8e4f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7de26c7f0e9e2f280e3d0ceb28f75e8a')"
     ]
   }
 }

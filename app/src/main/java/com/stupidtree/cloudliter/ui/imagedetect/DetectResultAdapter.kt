@@ -7,14 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
-import com.stupidtree.cloudliter.data.source.ai.yolo.Classifier
+import com.stupidtree.cloudliter.data.model.FaceResult
 import com.stupidtree.cloudliter.databinding.ActivityImageDetailListItemBinding
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter
 import com.stupidtree.cloudliter.ui.base.BaseViewHolder
-import kotlinx.android.synthetic.main.activity_chat.view.*
 import java.text.DecimalFormat
 
 class DetectResultAdapter(mContext: Context, mBeans: MutableList<DetectResult>) : BaseListAdapter<DetectResult, DetectResultAdapter.DHolder>(mContext, mBeans) {
@@ -22,16 +20,14 @@ class DetectResultAdapter(mContext: Context, mBeans: MutableList<DetectResult>) 
 
     class DHolder(viewBinding: ActivityImageDetailListItemBinding) : BaseViewHolder<ActivityImageDetailListItemBinding>(viewBinding)
 
-    fun setFriendInfo(list:List<Map<String?,String?>>){
-        val map = mutableMapOf<String?,Map<String?,String?>>()
-        for(l in list){
-            if(l["state"] =="success"){
-                map[l["id"]] = l
-            }
+    fun setFriendInfo(list: List<FaceResult>) {
+        val map = mutableMapOf<String?, FaceResult>()
+        for (l in list) {
+            map[l.rectId] = l
         }
-        for(item in mBeans){
-            if(map.keys.contains(item.id)){
-                item.setFriendInfo(map[item.id]?.get("userId"),map[item.id]?.get("userName"))
+        for (item in mBeans) {
+            if (map.keys.contains(item.id)) {
+                item.setFriendInfo(map[item.id]?.userId, map[item.id]?.userName)
             }
         }
         notifyItemChangedSmooth(newL = mBeans)
@@ -72,7 +68,7 @@ class DetectResultAdapter(mContext: Context, mBeans: MutableList<DetectResult>) 
             }
         }
         holder.binding.item.setOnClickListener {
-            mOnItemClickListener?.onItemClick(data,it,position)
+            mOnItemClickListener?.onItemClick(data, it, position)
         }
 
     }

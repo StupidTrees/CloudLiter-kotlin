@@ -5,6 +5,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.stupidtree.cloudliter.data.model.ApiResponse
 import com.stupidtree.cloudliter.data.model.ChatMessage
+import com.stupidtree.cloudliter.data.model.FaceResult
 import okhttp3.MultipartBody
 import org.json.JSONArray
 import retrofit2.http.*
@@ -41,7 +42,7 @@ interface AiService {
      */
     @FormUrlEncoded
     @POST("/ai/face/recognize")
-    fun imageFaceRecognition(@Header("token") token: String,@Field("imageId") id:String,@Field("rects") rects:JSONArray): LiveData<ApiResponse<List<Map<String?,String?>>>>
+    fun imageFaceRecognition(@Header("token") token: String,@Field("imageId") id:String,@Field("rects") rects:JSONArray): LiveData<ApiResponse<List<FaceResult>>>
 
 
 
