@@ -23,6 +23,7 @@ import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.BaseTabAdapter
 import com.stupidtree.cloudliter.ui.main.contact.ContactFragment
 import com.stupidtree.cloudliter.ui.main.conversations.ConversationsFragment
+import com.stupidtree.cloudliter.ui.main.navigation.NavigationFragment
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.NotificationUtils
@@ -99,11 +100,13 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         setUpDrawer()
         binding.title.text = getString(R.string.title_home)
         //Objects.requireNonNull(getSupportActionBar()).setTitle(navView.getMenu().getItem(0).getTitle());
-        binding.pager.adapter = object : BaseTabAdapter(supportFragmentManager, 2) {
+        binding.pager.adapter = object : BaseTabAdapter(supportFragmentManager, 3) {
             override fun initItem(position: Int): Fragment {
                 return if (position == 0) {
                     ConversationsFragment.newInstance()
-                } else ContactFragment.newInstance()
+                } else if (position == 1) {
+                    ContactFragment.newInstance()
+                } else NavigationFragment.newInstance()
             }
 
             override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
@@ -117,6 +120,7 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                 binding.navView.itemActiveIndex = position
                 binding.title.setText(when(position){
                     0->R.string.title_home
+                    1->R.string.title_contact
                     else->R.string.title_contact
                 })
                 //Objects.requireNonNull(getSupportActionBar()).setTitle(item.getTitle());

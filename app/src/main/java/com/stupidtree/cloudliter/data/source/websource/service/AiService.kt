@@ -56,5 +56,15 @@ interface AiService {
     @POST("/ai/face/upload")
     fun uploadFaceImage(@Header("token") token: String,@Part file: MultipartBody.Part): LiveData<ApiResponse<String?>?>
 
+    /**
+     * 上传语音文件（.m4a）进行转文字
+     * @param token 令牌
+     * @param file 文件
+     * @return 操作结果
+     */
+    @Multipart
+    @POST("/ai/voice/ttsdir")
+    fun voiceTTSDirect(@Header("token") token: String, @Part upload: MultipartBody.Part): LiveData<ApiResponse<String?>?>
+
 
 }

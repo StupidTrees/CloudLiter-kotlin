@@ -11,9 +11,9 @@
         android:icon="@drawable/ic_baseline_contact_24"
         android:title="@string/title_contact" />
 
-<!--    <item-->
-<!--        android:id="@+id/navigation_notifications"-->
-<!--        android:icon="@drawable/ic_baseline_person_24"-->
-<!--        android:title="@string/title_me" />-->
+    <item
+        android:id="@+id/navigation_navigation"
+        android:icon="@drawable/ic_baseline_person_24"
+        android:title="@string/title_word_cloud" />
 
 </menu>
