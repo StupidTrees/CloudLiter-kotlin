@@ -6,6 +6,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import com.stupidtree.cloudliter.data.source.ai.detect.ObjectDetectSource.Companion.IMAGE_SIZE
 import com.stupidtree.cloudliter.ui.imagedetect.DetectResult
 
 class LabeledImageView : ViewGroup {
@@ -60,8 +61,8 @@ class LabeledImageView : ViewGroup {
             mHeight = (mWidth * ratio).toInt()
             setMeasuredDimension(mWidth, mHeight)
         }
-        val ratioW = mWidth / 416f
-        val ratioH = mHeight / 416f
+        val ratioW = mWidth / IMAGE_SIZE
+        val ratioH = mHeight / IMAGE_SIZE
         val count = childCount
         for (i in 0 until count) {
             val child = getChildAt(i)
@@ -76,8 +77,8 @@ class LabeledImageView : ViewGroup {
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val count = childCount //获得子控件个数
-        val ratioW = mWidth / 416f
-        val ratioH = mHeight / 416f
+        val ratioW = mWidth / IMAGE_SIZE
+        val ratioH = mHeight / IMAGE_SIZE
         for (i in 0 until count) {
             val child = getChildAt(i)
             if (child is DetectionRectView) {

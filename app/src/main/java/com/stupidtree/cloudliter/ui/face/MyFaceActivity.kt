@@ -2,12 +2,10 @@ package com.stupidtree.cloudliter.ui.face
 
 import android.app.Activity
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.databinding.ActivityMyFaceBinding
 import com.stupidtree.cloudliter.ui.base.BaseActivity

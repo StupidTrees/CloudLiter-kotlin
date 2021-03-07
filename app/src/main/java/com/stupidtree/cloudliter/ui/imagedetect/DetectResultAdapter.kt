@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
 import com.stupidtree.cloudliter.data.model.FaceResult
+import com.stupidtree.cloudliter.data.source.ai.detect.ObjectDetectSource.Companion.IMAGE_SIZE
 import com.stupidtree.cloudliter.databinding.ActivityImageDetailListItemBinding
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter
 import com.stupidtree.cloudliter.ui.base.BaseViewHolder
@@ -50,8 +51,8 @@ class DetectResultAdapter(mContext: Context, mBeans: MutableList<DetectResult>) 
     override fun bindHolder(holder: DHolder, data: DetectResult?, position: Int) {
         holder.binding.name.text = data?.name
         holder.binding.percentage.text = DecimalFormat("00.00").format(100f * data?.confidence!!) + "%"
-        val xF = (bitmap?.width ?: 0f).toFloat() / 416f
-        val yF = (bitmap?.height ?: 0f).toFloat() / 416f
+        val xF = (bitmap?.width ?: 0f).toFloat() / IMAGE_SIZE
+        val yF = (bitmap?.height ?: 0f).toFloat() / IMAGE_SIZE
         data.let {
             val rec = it.rect
             val cropped = bitmap?.let { bm ->

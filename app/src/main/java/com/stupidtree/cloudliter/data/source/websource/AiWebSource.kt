@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.google.gson.JsonObject
 import com.stupidtree.cloudliter.data.model.FaceResult
+import com.stupidtree.cloudliter.data.source.ai.detect.ObjectDetectSource.Companion.IMAGE_SIZE
 import com.stupidtree.cloudliter.data.source.websource.service.AiService
 import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.codes
@@ -91,8 +92,8 @@ class AiWebSource : BaseWebSource<AiService>(Retrofit.Builder()
      */
     fun imageFaceRecognition(token: String, imageId: String, rectList: List<DetectResult>): LiveData<DataState<List<FaceResult>>> {
         val ja = JSONArray()
-        val xRel = 1f / 416f
-        val yRel = 1f / 416f
+        val xRel = 1f / IMAGE_SIZE
+        val yRel = 1f / IMAGE_SIZE
         for (rect in rectList) {
             val jo = JSONObject()
             jo.put("id", rect.id)

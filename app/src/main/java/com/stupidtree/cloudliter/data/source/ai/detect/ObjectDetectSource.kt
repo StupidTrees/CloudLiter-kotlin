@@ -59,6 +59,7 @@ class ObjectDetectSource(application: Application) {
 
 
     companion object {
+        const val IMAGE_SIZE = 416f
         //单例模式
         @Volatile
         var instance: ObjectDetectSource? = null
