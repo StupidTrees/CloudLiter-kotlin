@@ -27,8 +27,8 @@ class ObjectDetectSource(application: Application) {
         val DIM_BATCH_SIZE = 1
         val DIM_PIXEL_SIZE = 3
         val BYTE_NUM_PER_CHANNEL = 1
-        val IMAGE_SIZE_X = 224
-        val IMAGE_SIZE_Y = 224
+        val IMAGE_SIZE_X = 416
+        val IMAGE_SIZE_Y = 416
         val input_shapes = arrayOf(intArrayOf(DIM_BATCH_SIZE, IMAGE_SIZE_Y, IMAGE_SIZE_X, DIM_PIXEL_SIZE))
         val options = AiBoostInterpreter.Options()
         options.setNumThreads(1)
@@ -52,7 +52,6 @@ class ObjectDetectSource(application: Application) {
 //                    imgData.put((`val` and 0xFF).toByte())
 //                }
 //            }
-
         }.start()
         return result
     }

@@ -17,8 +17,12 @@ class YOLOSource(private var application: Application) {
             try {
                 if (classifier == null) init()
                 val cropped = Utils.processBitmap(bitmap, 416)
-                val r = classifier!!.recognizeImage(cropped)
-                result.postValue(DataState(r))
+                val r = classifier?.recognizeImage(cropped)
+                r?.let {
+                    result.postValue(DataState(it))
+                } ?: run {
+                    result.postValue(DataState(DataState.STATE.FETCH_FAILED))
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 result.postValue(DataState(DataState.STATE.FETCH_FAILED))
@@ -29,7 +33,7 @@ class YOLOSource(private var application: Application) {
 
     @WorkerThread
     private fun init() {
-       classifier = YoloV4Classifier.create(
+        classifier = AiBoostClassifier.create(
                 application.applicationContext.assets,
                 "yolov4-416-fp32.tflite",
                 "file:///android_asset/coco.txt",
