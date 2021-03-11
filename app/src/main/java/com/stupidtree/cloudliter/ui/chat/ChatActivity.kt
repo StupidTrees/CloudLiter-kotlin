@@ -33,6 +33,7 @@ import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpTextMessageDetail
 import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectBottomFragment
 import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
+import com.stupidtree.cloudliter.ui.widgets.PopUpText
 import com.stupidtree.cloudliter.utils.*
 import java.util.*
 
@@ -568,7 +569,16 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                 viewModel.conversation.value?.let { conversation ->
                     if (conversation.friendType == 2 || conversation.friendType == 3 || conversation.friendType == 6 || conversation.friendType == 7) {
 //                        viewModel.sendVoiceMessage(it.filePath, it.timeCount)
-                        viewModel.voiceTTSDirect(it.filePath)
+//                        viewModel.voiceTTSDirect(it.filePath)
+                        val filePath = it.filePath
+                        val timeCount = it.timeCount
+                        PopUpText().setTitle(R.string.hint_accessibility_sure_to_send_title)
+                                .setText(getString(R.string.hint_type_visual_sure_to_send_subtitle))
+                                .setOnConfirmListener(object : PopUpText.OnConfirmListener {
+                                    override fun OnConfirm() {
+                                        viewModel.sendVoiceMessage(filePath, timeCount)
+                                    }
+                                }).show(supportFragmentManager, "send")
                     } else {
                         viewModel.sendVoiceMessage(it.filePath, it.timeCount)
                     }

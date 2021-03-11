@@ -188,13 +188,14 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun voiceTTSDirect(path: String) {
+    fun voiceTTSDirect(path: String): LiveData<DataState<String?>> {
         val userLocal = localUserRepository.getLoggedInUser()
         val liveData = if (userLocal.isValid && friendId != null) {
             aiRepository.voiceTTSDirect(userLocal.token!!, path)
         } else {
             MutableLiveData(DataState(DataState.STATE.FETCH_FAILED))
         }
+        return liveData
     }
 
     fun bindService(context: Context?) {
