@@ -11,6 +11,7 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import com.bm.library.PhotoView
 import com.bumptech.glide.Glide
+import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.databinding.ActivityPhotoDetailBinding
 import com.stupidtree.cloudliter.ui.base.BaseActivity
 
@@ -67,6 +68,7 @@ class PhotoDetailActivity : BaseActivity<PhotoDetailActivity.PhotoViewModel,Acti
                 v.transitionName = "image"
                 Glide.with(getThis()).load(urls!![position]).timeout(10000).into(v)
                 v.adjustViewBounds = false
+                v.contentDescription = getString(R.string.image)
                 v.enable()
                 container.addView(v)
                 v.setOnClickListener { finish() }

@@ -58,6 +58,7 @@ class ConversationActivity : BaseActivity<ConversationViewModel,ActivityConversa
                     binding.wordCloud.alpha = 1f
                 }
                 binding.wordCloud.setTags(tag)
+                binding.wordCloud.contentDescription = tag.toString()
             }
         })
     }

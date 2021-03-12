@@ -45,6 +45,7 @@
             android:clickable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             android:text="@android:string/cancel"
+            android:contentDescription="@string/cancel"
             app:cardBackgroundColor="?attr/colorControlDisabled"
             app:cardCornerRadius="24dp"
             app:cardElevation="0dp">
@@ -68,6 +69,7 @@
             android:clickable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             android:text="@string/confirm"
+            android:contentDescription="@string/confirm"
             app:cardBackgroundColor="?attr/colorPrimary"
             app:cardCornerRadius="24dp"
             app:cardElevation="0dp">

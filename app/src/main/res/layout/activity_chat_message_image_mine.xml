@@ -14,6 +14,7 @@
         android:layout_height="24dp"
         android:layout_gravity="center|top"
         android:layout_marginTop="16dp"
+        android:contentDescription="@string/voice_send_failed"
         app:srcCompat="@android:drawable/stat_sys_warning"
         app:tint="@color/profileOrange" />
 

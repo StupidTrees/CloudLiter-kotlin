@@ -39,6 +39,8 @@
 
     <string name="female">female</string>
 
+    <string name="select">select</string>
+
 
     <string name="title_activity_welcome">WelcomeActivity</string>
 
@@ -96,7 +98,7 @@
 
     <string name="choose_gender">Choose Gender</string>
 
-    <string name="choose_color">Choose Color</string>
+    <string name="choose_word_cloud_permission">Choose Word Cloud Permission</string>
 
     <string name="send">Send</string>
 
@@ -198,6 +200,8 @@
 
     <string name="content_description_avatar">User Avatar</string>
 
+    <string name="content_description_friend_avatar">Friend Avatar</string>
+
     <string name="back">Back</string>
 
     <string name="user_state">User State</string>
@@ -213,6 +217,8 @@
     <string name="contact_friend_group">Group</string>
 
     <string name="connection_failed">Connect Failed</string>
+
+    <string name="voice_send_failed">Voice Send Failed</string>
 
     <string name="place_holder_image">[image]</string>
 
@@ -277,6 +283,10 @@
     <string name="word_cloud_public">Show</string>
     <string name="set_success">set success</string>
     <string name="private_word_cloud">私密</string>
+    <string name="delete_text_in_searchview">删除输入内容</string>
+    <string name="delete_word_cloud">删除该词云</string>
+    <string name="delete_voice">删除输入框中即将发送的语音信息</string>
+    <string name="delete_group">删除该分组</string>
     <string name="label_conversation_met">We became friends at</string>
     <string name="label_conversation_last_chat">We recently chatted at</string>
     <string name="label_conversation_since_met">You\'ve been friends for</string>
@@ -287,7 +297,10 @@
     <string name="select_image">发送图片</string>
     <string name="chat_detail_menu">聊天详情菜单</string>
     <string name="switch_to_text">切换到文字输入</string>
+    <string name="voice_to_text">语音转文字</string>
+    <string name="voice_message">语音消息</string>
     <string name="image_message_description">图片消息，长按进行实体检测</string>
+    <string name="image">图片</string>
     <string name="description_text_input">聊天文字输入框</string>
     <string name="description_expand_menu">展开主页抽屉</string>
     <string name="description_search">发现新朋友</string>
@@ -305,7 +318,7 @@
     <string name="type_permission_private">仅自己可见</string>
     <string name="type_permission_protected">仅好友可见</string>
     <string name="type_permission_public">所有人可见</string>
-    <string name="type_permission">无障碍隐私类型</string>
+    <string name="type_permission">无障碍隐私</string>
     <string name="type">用户类型</string>
     <string name="type_normal">健全</string>
     <string name="type_visual">视力障碍</string>
@@ -335,9 +348,11 @@
     <string name="detect_failed">实体检测失败</string>
     <string name="sensitive_progressing">获取敏感判定…</string>
     <string name="my_face_manager">我的人脸</string>
+    <string name="add_my_face">新增我的人脸</string>
     <string name="upload_success">上传成功</string>
     <string name="no_face">该图片中没有人脸！</string>
     <string name="delete_face_ok">删除人脸成功</string>
+    <string name="delete_face">删除人脸</string>
     <string name="ensure_delete_face">确认删除人脸？</string>
     <string name="accessibility_setting">无障碍</string>
     <string name="privacy_setting">隐私</string>

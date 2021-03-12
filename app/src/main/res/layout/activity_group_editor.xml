@@ -38,5 +38,6 @@
         android:layout_margin="16dp"
         android:clickable="true"
         android:tint="@android:color/white"
+        android:contentDescription="@string/add_group"
         app:srcCompat="@drawable/ic_baseline_add_24" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -74,6 +74,7 @@
                     android:padding="6dp"
                     android:theme="@style/ripplePrimaryTiny"
                     android:tintMode="src_in"
+                    android:contentDescription="@string/delete_text_in_searchview"
                     app:srcCompat="@drawable/ic_cancel" />
 
 

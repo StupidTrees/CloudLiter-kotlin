@@ -248,11 +248,13 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
                     binding.wordstagLayout.alpha = 1f
                 }
                 binding.wordstagLayout.setTags(tag)
+                binding.wordstagLayout.contentDescription = tag.toString()
             } else if (listDataState.state == DataState.STATE.SPECIAL) {//词云为私密
                 val tag = ArrayList<String>()
                 for (i in 0 until 5) tag.add(getString(R.string.private_word_cloud))
                 binding.wordstagLayout.setTags(tag)
                 binding.wordstagLayout.alpha = 0.3f
+                binding.wordstagLayout.contentDescription = getString(R.string.word_cloud_accessibility)
             }
         })
     }
@@ -288,8 +290,10 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
             }
             if (userInfo.gender == UserLocal.GENDER.MALE) {
                 binding.iconGender.setImageResource(R.drawable.ic_male_blue_24)
+                binding.iconGender.contentDescription = getString(R.string.male)
             } else {
                 binding.iconGender.setImageResource(R.drawable.ic_female_pink_24)
+                binding.iconGender.contentDescription = getString(R.string.female)
             }
             if (userInfo.wordCloudPrivate) {
                 binding.lock.visibility = View.VISIBLE

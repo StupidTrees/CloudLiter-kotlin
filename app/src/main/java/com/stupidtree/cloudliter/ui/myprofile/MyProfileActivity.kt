@@ -235,7 +235,7 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
             viewModel.userProfileLiveData!!.value?.let {
                 if (it.data != null) {
                     PopUpSelectableList<Boolean>()
-                            .setTitle(R.string.choose_color)
+                            .setTitle(R.string.choose_word_cloud_permission)
                             .setInitValue(it.data!!.wordCloudPrivate)
                             .setListData(
                                     listOf(getString(R.string.word_cloud_public),
