@@ -42,6 +42,9 @@
 
     <string name="title_activity_welcome">WelcomeActivity</string>
 
+    <string name="ensure_delete_word_cloud">sure to delete this word cloud ?</string>
+
+    <string name="delete_word_cloud_ok">delete word cloud succeed</string>
 
     <string name="not_logged_in">Not login yet</string>
 

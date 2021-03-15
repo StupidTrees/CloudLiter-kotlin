@@ -23,6 +23,9 @@ class WordCloudListAdapter(mContext: Context, mBeans: MutableList<Pair<String, F
 
     override fun bindHolder(holder: WHolder, data: Pair<String, Float?>?, position: Int) {
         holder.binding.name.text = data?.first
+        holder.binding.delete.setOnClickListener {
+            data?.let { it1 -> mOnItemClickListener?.onItemClick(it1,it,position) }
+        }
     }
 
 }

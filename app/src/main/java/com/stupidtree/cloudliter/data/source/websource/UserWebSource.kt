@@ -11,6 +11,7 @@ import com.stupidtree.cloudliter.data.model.UserProfile
 import com.stupidtree.cloudliter.data.model.UserSearched
 import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.UserService
+import com.stupidtree.cloudliter.data.source.websource.service.codes
 import com.stupidtree.cloudliter.data.source.websource.service.codes.SUCCESS
 import com.stupidtree.cloudliter.data.source.websource.service.codes.TOKEN_INVALID
 import com.stupidtree.cloudliter.data.source.websource.service.codes.USER_ALREADY_EXISTS
@@ -341,6 +342,23 @@ class UserWebSource : BaseWebSource<UserService>(Retrofit.Builder()
                 }
             }
             DataState(DataState.STATE.FETCH_FAILED)
+        }
+    }
+
+    /**
+     * 删除词云（未完善）
+     */
+    fun deleteWordCloud(token: String,userId: String,word:String): LiveData<DataState<String?>> {
+        return Transformations.map(service.deleteWordCloud(token,userId,word)) { input ->
+            //Log.e("resp", input.toString())
+            if (input == null) {
+                return@map DataState(DataState.STATE.FETCH_FAILED)
+            }
+            when (input.code) {
+                codes.SUCCESS -> return@map DataState(DataState.STATE.SUCCESS)
+                codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
+            }
         }
     }
 

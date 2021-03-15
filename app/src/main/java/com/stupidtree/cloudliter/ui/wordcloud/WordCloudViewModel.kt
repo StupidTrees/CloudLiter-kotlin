@@ -1,13 +1,17 @@
 package com.stupidtree.cloudliter.ui.wordcloud
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository
 import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.cloudliter.ui.base.PairTrigger
+import com.stupidtree.cloudliter.ui.base.StringTrigger
 import com.stupidtree.cloudliter.ui.base.Trigger
+import kotlin.math.log
 
 class WordCloudViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -22,6 +26,7 @@ class WordCloudViewModel(application: Application) : AndroidViewModel(applicatio
      * 数据区
      */
     private val wordCloudRefreshController = MutableLiveData<Trigger>()
+    private var deleteController = MutableLiveData<StringTrigger>()
     val wordCloudLiveData = Transformations.switchMap(wordCloudRefreshController) {
         val user = localUserRepository.getLoggedInUser()
         if (user.isValid) {
@@ -30,7 +35,17 @@ class WordCloudViewModel(application: Application) : AndroidViewModel(applicatio
             return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
         }
     }
-
+    /**
+     * 词云删除结果
+     */
+    var deleteResult = Transformations.switchMap(deleteController){
+        val userLocal = localUserRepository.getLoggedInUser()
+        if (userLocal.isValid) {
+            return@switchMap profileRepository.deleteWordCloud(userLocal.token!!,userLocal.id!!,it.data)
+        } else {
+            return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
+        }
+    }
 
     /**
      * 进行刷新
@@ -38,6 +53,14 @@ class WordCloudViewModel(application: Application) : AndroidViewModel(applicatio
     fun startRefresh() {
         wordCloudRefreshController.value = Trigger.actioning
     }
+
+    /**
+     * 进行词云删除
+     */
+    fun deleteWordCloud(word:String){
+        deleteController.value = StringTrigger.getActioning(word)
+    }
+
 
 
 }
