@@ -47,5 +47,5 @@
         android:clickable="true"
         android:tint="@android:color/white"
         app:srcCompat="@drawable/ic_baseline_add_24"
-        android:contentDescription="TODO" />
+        android:contentDescription="@string/add_my_face" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -16,7 +16,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="8dp"
-        android:contentDescription="@string/content_description_avatar"
+        android:contentDescription="@string/content_description_friend_avatar"
         android:src="@drawable/ic_baseline_emoji_emotions_24" />
 
     <androidx.cardview.widget.CardView

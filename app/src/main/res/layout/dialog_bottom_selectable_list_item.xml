@@ -32,6 +32,7 @@
         android:id="@+id/selected"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/select"
         app:srcCompat="@drawable/ic_baseline_check_24"
         app:tint="?attr/colorPrimary" />
 

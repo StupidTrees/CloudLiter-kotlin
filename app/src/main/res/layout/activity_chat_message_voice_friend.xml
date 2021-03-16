@@ -49,6 +49,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:contentDescription="@string/voice_message"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -86,6 +87,7 @@
                         android:foreground="?attr/selectableItemBackground"
                         android:padding="7dp"
                         android:theme="@style/rippleControlSmall"
+                        android:contentDescription="@string/voice_to_text"
                         app:srcCompat="@drawable/ic_tts" />
 
                 </LinearLayout>

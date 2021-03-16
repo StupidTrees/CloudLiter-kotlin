@@ -123,6 +123,11 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
                     1->R.string.title_contact
                     else->R.string.title_me
                 })
+                binding.navView.contentDescription = when (position) {
+                    0 -> { getString(R.string.title_home) }
+                    1 -> { getString(R.string.title_contact) }
+                    else -> { getString(R.string.title_me) }
+                }
                 //Objects.requireNonNull(getSupportActionBar()).setTitle(item.getTitle());
             }
 

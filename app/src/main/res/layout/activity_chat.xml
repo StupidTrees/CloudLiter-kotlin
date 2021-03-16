@@ -312,6 +312,7 @@
                             android:padding="6dp"
                             android:theme="@style/ripplePrimaryTiny"
                             android:tintMode="src_in"
+                            android:contentDescription="@string/delete_voice"
                             app:srcCompat="@drawable/ic_cancel" />
                     </LinearLayout>
 
@@ -438,6 +439,7 @@
                         android:layout_gravity="center"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
+                        android:contentDescription="@string/voice_button_hint_press"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?attr/selectableItemBackgroundBorderless"

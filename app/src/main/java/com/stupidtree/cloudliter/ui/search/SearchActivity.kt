@@ -56,9 +56,11 @@ class SearchActivity : BaseActivity<SearchViewModel, ActivitySearchBinding>() {
     private fun onSearchModeSwitched(wordCloudSearch: Boolean) {
         if (wordCloudSearch) {
             binding.modeButton.setImageResource(R.drawable.ic_bt_wordcloud)
+            binding.modeButton.contentDescription = getString(R.string.search_hint_word_cloud)
             binding.searchview.setHint(R.string.search_hint_word_cloud)
         } else {
             binding.modeButton.setImageResource(R.drawable.ic_bt_id)
+            binding.modeButton.contentDescription = getString(R.string.search_hint)
             binding.searchview.setHint(R.string.search_hint)
         }
         AnimationUtils.rotate(binding.modeButton)
