@@ -1,6 +1,7 @@
 package com.stupidtree.cloudliter.data.repository
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Transformations
@@ -181,6 +182,13 @@ class ProfileRepository(application: Application) {
             return instance!!
         }
 
+    }
+
+    /**
+     * 删除词云（未完善）
+     */
+    fun deleteWordCloud(token:String,userId:String,word:String):LiveData<DataState<String?>>{
+        return userWebSource.deleteWordCloud(token,userId,word)
     }
 
 }

@@ -152,4 +152,14 @@ interface UserService {
      */
     @GET("/user/profile/word_cloud")
     fun getWordCloud(@Header("token") token: String?, @Query("userId") userId: String?): LiveData<ApiResponse<HashMap<String, Float?>?>?>
+
+    /**
+     * 删除用户词云
+     * @param token 登录状态的token
+     * @param wordCloud 词云数据
+     * @return 搜索结果
+     */
+    @FormUrlEncoded
+    @POST("/conversation/delete_wordcloud")
+    fun deleteWordCloud(@Header("token") token: String?, @Field("cloudId") wordId: String?,@Field("wordId") cloudId:String?): LiveData<ApiResponse<Any>>
 }

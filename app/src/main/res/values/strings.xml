@@ -119,6 +119,8 @@
     <string name="assign_group_success">设置分组成功</string>
     <string name="no_word_cloud_yet">词云空</string>
     <string name="label_conversation_word_cloud">我们的聊天词云</string>
+    <string name="ensure_delete_word_cloud">确认删除该词云吗</string>
+    <string name="delete_word_cloud_ok">删除词云成功</string>
     <string name="add_group">添加好友分组</string>
     <string name="add_ok">添加分组成功</string>
     <string name="delete_ok">删除分组成功</string>

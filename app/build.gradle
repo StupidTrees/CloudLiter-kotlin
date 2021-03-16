@@ -6,13 +6,14 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 30
     buildToolsVersion '31.0.0-rc1'
-
+    kotlinOptions { jvmTarget = 1.8}
     defaultConfig {
         applicationId 'com.stupidtree.cloudliter'
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 20210306
         versionName "1.36"
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -28,6 +29,7 @@ android {
             doNotStrip '*/arm64-v8a/libhexagon_nn_skel*.so'
             doNotStrip '*/armeabi-v7a/libhexagon_nn_skel*.so'
         }
+
 
     }
 

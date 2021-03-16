@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.GridLayoutManager
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.databinding.ActivityMyFaceBinding
