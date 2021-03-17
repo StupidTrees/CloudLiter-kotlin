@@ -14,7 +14,6 @@ import com.stupidtree.cloudliter.ui.base.BaseListAdapter
 import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
 import com.stupidtree.cloudliter.ui.widgets.PopUpText
-import com.stupidtree.cloudliter.ui.wordcloud.FaceEntity
 import com.stupidtree.cloudliter.utils.FileProviderUtils
 import com.stupidtree.cloudliter.utils.GalleryPicker
 

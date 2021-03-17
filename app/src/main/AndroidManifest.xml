@@ -65,6 +65,9 @@
         <activity android:name=".ui.imagedetect.ImageDetectActivity" />
         <activity android:name=".ui.wordcloud.WordCloudActivity" />
         <activity android:name=".ui.face.MyFaceActivity" />
+        <activity android:name=".ui.gallery.album.AlbumActivity" />
+        <activity android:name=".ui.gallery.ScenesActivity" />
+        <activity android:name=".ui.accessibility.AccessibilityActivity" />
 
         <provider
             android:name=".MFileProvider"

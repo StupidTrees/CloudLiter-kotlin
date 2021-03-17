@@ -82,24 +82,15 @@
             android:layout_marginBottom="56dp"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
-        <me.ibrahimsn.lib.SmoothBottomBar
+        <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/nav_view"
             android:layout_width="match_parent"
             android:layout_height="64dp"
             android:layout_gravity="bottom"
-            android:contentDescription="@string/title_home"
-            app:backgroundColor="?attr/backgroundColorSecond"
-            app:duration="180"
-            app:iconSize="24dp"
-            app:iconTint="?attr/colorPrimaryDisabled"
-            app:iconTintActive="?attr/colorPrimary"
-            app:indicatorColor="#11304ffe"
-            app:indicatorRadius="24dp"
-            app:itemPadding="8dp"
-            app:menu="@menu/bottom_nav_menu"
-            app:sideMargins="24dp"
-            app:textColor="?attr/colorPrimary"
-            app:textSize="13sp" />
+            android:background="?attr/backgroundColorSecond"
+            android:elevation="0dp"
+            app:elevation="0dp"
+            app:menu="@menu/bottom_nav_menu" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -124,11 +115,9 @@
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/drawer_navigationview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_gravity="bottom|center|start"
-
             android:layout_weight="1"
-
             android:background="#00000000"
             android:overScrollMode="never"
             app:elevation="0dp"
@@ -151,8 +140,9 @@
             <LinearLayout
                 android:id="@+id/exit_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:clickable="true"
+                android:focusable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:gravity="center|start"
                 android:orientation="horizontal"
@@ -171,7 +161,7 @@
                     app:tint="?attr/colorControlNormal" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginStart="18dp"

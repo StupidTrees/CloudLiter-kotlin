@@ -21,9 +21,6 @@ class SocketWebSource : BroadcastReceiver() {
     var newMessageState = MutableLiveData<ChatMessage>()
     var friendStateController = MutableLiveData<FriendStateTrigger>()
 
-    //消息发送结果
-    var messageSentSate = MutableLiveData<DataState<ChatMessage>>()
-
     //消息已读通知
     var messageReadState = MutableLiveData<DataState<MessageReadNotification>>()
     override fun onReceive(context: Context, intent: Intent) {
@@ -31,11 +28,9 @@ class SocketWebSource : BroadcastReceiver() {
         when (intent.action) {
             SocketIOClientService.RECEIVE_RECEIVE_MESSAGE -> if (intent.extras != null) {
                 val message = intent.extras!!.getSerializable("message") as ChatMessage?
-                Log.e("unreadMessaged.add", message.toString())
                 if (message != null) {
                     newMessageState.value = message
-                    //                        unreadMessages.setValue(new DataState<>(Collections.singletonList(message)).setListAction(DataState.LIST_ACTION.APPEND));
-                    val map = HashMap<String, Int>()
+                     val map = HashMap<String, Int>()
                     message.conversationId?.let {
                         map[it] = 1
                     }
@@ -49,7 +44,6 @@ class SocketWebSource : BroadcastReceiver() {
             }
             SocketIOClientService.RECEIVE_MESSAGE_READ -> if (intent.extras != null) {
                 val notification = intent.extras!!.getSerializable("read") as MessageReadNotification?
-                Log.e("SocketWebSource-消息被读", notification.toString())
                 if (notification != null) {
                     messageReadState.value = DataState(notification)
                 }

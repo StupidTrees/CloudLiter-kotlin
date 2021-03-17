@@ -61,8 +61,14 @@ class NavigationFragment : BaseFragmentWithReceiver<NavigationViewModel, Fragmen
             }
 
         }
-        binding?.faceLayout?.setOnClickListener {
-            ActivityUtils.startMyFaceActivity(requireContext())
+//        binding?.faceLayout?.setOnClickListener {
+//            ActivityUtils.startMyFaceActivity(requireContext())
+//        }
+        binding?.accessibilityLayout?.setOnClickListener {
+            ActivityUtils.startAccessibilityActivity(requireContext())
+        }
+        binding?.sceneGalleryLayout?.setOnClickListener {
+            ActivityUtils.startGalleryActivity(requireContext())
         }
         binding?.wordCloudLayout?.setOnClickListener {
             ActivityUtils.startWordCloudActivity(requireContext())

@@ -327,7 +327,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
             override fun onItemClick(data: ChatMessage, card: View?, position: Int) {
                 if (data.getTypeEnum() == ChatMessage.TYPE.IMG && !data.isTimeStamp) {
                     val urls = listAdapter.imageUrls
-                    ActivityUtils.showMultipleImages(getThis(), urls, urls.indexOf(data.fileId?.let { ImageUtils.getChatMessageImageUrl(it) })
+                    ActivityUtils.showMultipleImages(getThis(), urls, urls.indexOf(data.fileId?.let { ImageUtils.getCloudImageUrl(it) })
                     )
                 } else if (data.getTypeEnum() == ChatMessage.TYPE.VOICE && !data.isTimeStamp) {
                     if (audioPlayHelper.playingId != null) {

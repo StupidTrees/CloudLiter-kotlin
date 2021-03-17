@@ -1,17 +1,14 @@
 package com.stupidtree.cloudliter.ui.wordcloud
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository
 import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.PairTrigger
 import com.stupidtree.cloudliter.ui.base.StringTrigger
 import com.stupidtree.cloudliter.ui.base.Trigger
-import kotlin.math.log
 
 class WordCloudViewModel(application: Application) : AndroidViewModel(application) {
 

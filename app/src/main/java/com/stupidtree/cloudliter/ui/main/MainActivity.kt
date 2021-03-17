@@ -71,6 +71,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         drawerHeader = headerView.findViewById(R.id.drawer_header)
         drawerNickname = headerView.findViewById(R.id.nickname)
         drawerUsername = headerView.findViewById(R.id.username)
+        headerView.findViewById<View>(R.id.close_layout)?.setOnClickListener {
+            binding.drawer.closeDrawer(GravityCompat.END)
+        }
         binding.drawer.addDrawerListener(object : DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
                 //offset 偏移值
@@ -99,7 +102,6 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
 
         setUpDrawer()
         binding.title.text = getString(R.string.title_home)
-        //Objects.requireNonNull(getSupportActionBar()).setTitle(navView.getMenu().getItem(0).getTitle());
         binding.pager.adapter = object : BaseTabAdapter(supportFragmentManager, 3) {
             override fun initItem(position: Int): Fragment {
                 return if (position == 0) {
@@ -117,29 +119,26 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         binding.pager.addOnPageChangeListener(object : OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageSelected(position: Int) {
-                binding.navView.itemActiveIndex = position
                 binding.title.setText(when(position){
                     0->R.string.title_home
                     1->R.string.title_contact
                     else->R.string.title_me
                 })
-                binding.navView.contentDescription = when (position) {
-                    0 -> { getString(R.string.title_home) }
-                    1 -> { getString(R.string.title_contact) }
-                    else -> { getString(R.string.title_me) }
-                }
+                val item = binding.navView.menu.getItem(position)
+                item.isChecked = true
                 //Objects.requireNonNull(getSupportActionBar()).setTitle(item.getTitle());
             }
 
             override fun onPageScrollStateChanged(state: Int) {}
         })
-        binding.navView.onItemSelectedListener = object:OnItemSelectedListener {
-            override fun onItemSelect(pos: Int): Boolean {
-                binding.navView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-                binding.pager.currentItem = pos
-                return true
+        binding.navView.setOnNavigationItemSelectedListener {
+            binding.navView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            binding.pager.currentItem = when(it.itemId){
+                R.id.navigation_home->0
+                R.id.navigation_dashboard->1
+                else->2
             }
-
+            return@setOnNavigationItemSelectedListener true
         }
 //        binding.navView.setOnNavigationItemSelectedListener { item: MenuItem ->
 //            when (item.itemId) {

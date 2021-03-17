@@ -16,10 +16,6 @@ class UserLocal : Serializable {
         MALE, FEMALE
     }
 
-    enum class ACCESSIBILITY {
-        NO, YES_PUBLIC,YES_PRIVATE
-    }
-
     enum class TYPEPERMISSION {
         PRIVATE, PUBLIC, PROTECTED
     }
@@ -40,8 +36,6 @@ class UserLocal : Serializable {
     var avatar //用户头像链接
             : String? = null
 
-    var accessibility: ACCESSIBILITY = ACCESSIBILITY.NO
-
     var type // 用户类型
             : Int? = null
     var subType // 无障碍二级分类
@@ -58,9 +52,6 @@ class UserLocal : Serializable {
 
     fun setGender(gender: String?) {
         this.gender = if (gender == "MALE") GENDER.MALE else GENDER.FEMALE
-    }
-    fun setAccessibility(accessibility: String?) {
-        accessibility?.let { this.accessibility = ACCESSIBILITY.valueOf(it) }
     }
     fun setTypePermission(typePermission: String?) {
         typePermission?.let { this.typePermission = TYPEPERMISSION.valueOf(it) }
@@ -88,7 +79,6 @@ class UserLocal : Serializable {
                 val signature = JsonUtils.getStringData(info, "signature")
                 val gender = JsonUtils.getStringData(info, "gender")
                 val avatar = JsonUtils.getStringData(info, "avatar")
-                val accessibility = JsonUtils.getStringData(info, "accessibility")
                 val type = JsonUtils.getIntegerData(info, "type")
                 val subType = JsonUtils.getStringData(info, "subType")
                 val typePermission = JsonUtils.getStringData(info, "typePermission")
@@ -99,7 +89,6 @@ class UserLocal : Serializable {
                 userLocal.avatar = avatar
                 userLocal.token = token
                 userLocal.id = id
-                accessibility?.let { userLocal.accessibility = ACCESSIBILITY.valueOf(it) }
                 userLocal.type = type
                 userLocal.subType = subType
                 typePermission?.let { userLocal.typePermission = TYPEPERMISSION.valueOf(it) }

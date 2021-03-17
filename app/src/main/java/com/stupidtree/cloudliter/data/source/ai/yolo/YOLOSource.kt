@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.stupidtree.cloudliter.data.source.ai.detect.ObjectDetectSource.Companion.IMAGE_SIZE
 import com.stupidtree.cloudliter.ui.base.DataState
 
 class YOLOSource(private var application: Application) {
@@ -16,8 +17,13 @@ class YOLOSource(private var application: Application) {
         Thread {
             try {
                 if (classifier == null) init()
-                val cropped = Utils.processBitmap(bitmap, 416)
-                val r = classifier?.recognizeImage(cropped)
+                val cropped = Utils.processBitmap(bitmap, IMAGE_SIZE.toInt())
+                val r:List<Classifier.Recognition>? = try {
+                    classifier?.recognizeImage(cropped)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
                 r?.let {
                     result.postValue(DataState(it))
                 } ?: run {
@@ -33,8 +39,8 @@ class YOLOSource(private var application: Application) {
 
     @WorkerThread
     private fun init() {
-        classifier = AiBoostClassifier.create(
-                application.applicationContext.assets,
+        classifier = YoloV4Classifier.create(
+                application.assets,
                 "yolov4-416-fp32.tflite",
                 "file:///android_asset/coco.txt",
                 false)

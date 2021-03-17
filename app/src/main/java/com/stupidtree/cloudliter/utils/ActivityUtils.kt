@@ -7,9 +7,12 @@ import android.os.Bundle
 import com.stupidtree.cloudliter.data.model.*
 import com.stupidtree.cloudliter.data.model.Conversation.Companion.fromNewMessage
 import com.stupidtree.cloudliter.data.model.Conversation.Companion.fromUserRelationAndProfile
+import com.stupidtree.cloudliter.ui.accessibility.AccessibilityActivity
 import com.stupidtree.cloudliter.ui.chat.ChatActivity
 import com.stupidtree.cloudliter.ui.conversation.ConversationActivity
 import com.stupidtree.cloudliter.ui.face.MyFaceActivity
+import com.stupidtree.cloudliter.ui.gallery.ScenesActivity
+import com.stupidtree.cloudliter.ui.gallery.album.AlbumActivity
 import com.stupidtree.cloudliter.ui.group.GroupEditorActivity
 import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectActivity
 import com.stupidtree.cloudliter.ui.main.MainActivity
@@ -173,6 +176,30 @@ object ActivityUtils {
      */
     fun startMyFaceActivity(from:Context){
         val it = Intent(from,MyFaceActivity::class.java)
+        from.startActivity(it)
+    }
+
+    /**
+     * 进入类别
+     */
+    fun startGalleryActivity(from: Context){
+        val it = Intent(from,ScenesActivity::class.java)
+        from.startActivity(it)
+    }
+    /**
+     * 进入类别相册
+     */
+    fun startAlbumActivity(from: Context,key:String){
+        val it = Intent(from,AlbumActivity::class.java)
+        it.putExtra("key",key)
+        from.startActivity(it)
+    }
+
+    /**
+     * 进入无障碍管理页面
+     */
+    fun startAccessibilityActivity(from: Context){
+        val it = Intent(from,AccessibilityActivity::class.java)
         from.startActivity(it)
     }
 }

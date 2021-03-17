@@ -22,8 +22,21 @@
         android:paddingBottom="16dp">
 
         <TextView
+            android:id="@+id/rank"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/element_round_primary"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="10"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <TextView
             android:id="@+id/name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginEnd="16dp"
@@ -31,21 +44,22 @@
             android:maxLines="1"
             android:text="TextView"
             android:textColor="?attr/textColorPrimary"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/element_round_primary_light"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/element_round_grey_light"
             android:clickable="true"
+            android:contentDescription="@string/delete_word_cloud"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp"
+            android:padding="6dp"
             android:theme="@style/ripplePrimaryTiny"
-            android:contentDescription="@string/delete_word_cloud"
             app:srcCompat="@drawable/ic_baseline_delete_24"
-            app:tint="?attr/colorPrimary" />
+            app:tint="?attr/colorControlNormal" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

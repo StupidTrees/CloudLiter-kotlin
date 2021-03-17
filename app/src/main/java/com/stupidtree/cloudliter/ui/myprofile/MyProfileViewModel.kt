@@ -19,28 +19,34 @@ import java.util.*
  */
 class MyProfileViewModel(application: Application) : AndroidViewModel(application) {
     /**
+     * 仓库区
+     */
+    //仓库1：用户资料仓库
+    private val profileRepository: ProfileRepository? = instance
+
+    //仓库2：本地用户仓库
+    private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
+
+
+
+    /**
      * 数据区
      */
-    //数据本体：我的用户资料
-    var userProfileLiveData: LiveData<DataState<UserProfile?>>? = null
-        get() {
-            if (field == null) {
-                //controller改变的时候，通知userProfile改变
-                userProfileLiveData = Transformations.switchMap(profileController) { input ->
-                    val userLocal = localUserRepository.getLoggedInUser()
-                    if (userLocal.isValid) {
-                        //从用户资料仓库总取出数据
-                        return@switchMap profileRepository!!.getUserProfile(userLocal.id!!, userLocal.token!!)
-                    } else {
-                        return@switchMap MutableLiveData(DataState<UserProfile?>(DataState.STATE.NOT_LOGGED_IN))
-                    }
-                }
-            }
-            return field!!
-        }
 
     //Trigger：控制↑的刷新
     var profileController = MutableLiveData<StringTrigger>()
+    //数据本体：我的用户资料
+    var userProfileLiveData: LiveData<DataState<UserProfile?>> = Transformations.switchMap(profileController) { input ->
+        val userLocal = localUserRepository.getLoggedInUser()
+        if (userLocal.isValid) {
+            //从用户资料仓库总取出数据
+            return@switchMap profileRepository!!.getUserProfile(userLocal.id!!, userLocal.token!!)
+        } else {
+            return@switchMap MutableLiveData(DataState<UserProfile?>(DataState.STATE.NOT_LOGGED_IN))
+        }
+    }
+
+
 
     //状态数据：更改头像的结果
     var changeAvatarResult: LiveData<DataState<String?>>? = null
@@ -182,17 +188,16 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
     var changeTypeController = MutableLiveData<TypeTrigger>()
 
 
-
     //状态数据：更改签名的结果
     var setWCAccessibilityResult: LiveData<DataState<String?>>? = null
         get() {
             if (field == null) {
                 //也是一样的
-                setWCAccessibilityResult = Transformations.switchMap(changeWCAccessibilityController) { input->
+                setWCAccessibilityResult = Transformations.switchMap(changeWCAccessibilityController) { input ->
                     if (input.isActioning) {
                         val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
-                            return@switchMap profileRepository!!.setWordCloudAccessibility(userLocal.token!!,input.data)
+                            return@switchMap profileRepository!!.setWordCloudAccessibility(userLocal.token!!, input.data)
                         } else {
                             return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -205,15 +210,6 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
 
     //Trigger：控制↑
     var changeWCAccessibilityController = MutableLiveData<BooleanTrigger>()
-
-    /**
-     * 仓库区
-     */
-    //仓库1：用户资料仓库
-    private val profileRepository: ProfileRepository?
-
-    //仓库2：本地用户仓库
-    private val localUserRepository: LocalUserRepository
 
 
     /**
@@ -241,14 +237,6 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
         changeGenderController.value = StringTrigger.getActioning(genderStr)
     }
 
-    /**
-     * 发起更换无障碍用户类型请求
-     * @param Accessibility 无障碍类型
-     */
-    fun startChangeAccessibility(Accessibility: UserLocal.ACCESSIBILITY) {
-        val AccessibilityStr = Accessibility.name
-        changeAccessibilityController.value = StringTrigger.getActioning(AccessibilityStr)
-    }
 
     /**
      * 发起更换用户类型及隐私类型请求
@@ -271,7 +259,7 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
     /**
      * 发起更改词云可见性请求
      */
-    fun startChangeWCAccessibility(private:Boolean) {
+    fun startChangeWCAccessibility(private: Boolean) {
         changeWCAccessibilityController.value = BooleanTrigger.getActioning(private)
     }
 
@@ -280,14 +268,10 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
      */
     fun startRefresh() {
         val userLocal = localUserRepository.getLoggedInUser()
-        userLocal.id?.let{
+        userLocal.id?.let {
             profileController.value = StringTrigger.getActioning(it)
         }
 
     }
 
-    init {
-        profileRepository = instance
-        localUserRepository = LocalUserRepository.getInstance(application)
-    }
 }

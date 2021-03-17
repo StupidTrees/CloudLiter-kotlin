@@ -359,6 +359,19 @@
     <string name="ensure_delete_face">确认删除人脸？</string>
     <string name="accessibility_setting">无障碍</string>
     <string name="privacy_setting">隐私</string>
+    <string name="title_scene_gallery">场景相册</string>
+    <string name="close_drawer">close drawer</string>
+    <string name="title_me">Me</string>
+    <string name="cd_image_item">图片对象</string>
+    <string name="scene_gallery">场景相册</string>
+    <string name="contact_gallery">亲友相册</string>
+    <string name="title_accessibility">云升无障碍</string>
+    <string name="label_my_face">亲友人脸关怀</string>
+    <string name="hint_my_face">上传自己的人脸数据，开放给好友供其识图</string>
+    <string name="label_my_face_management">管理我的人脸</string>
+    <string name="label_face_permission">人脸权限管理</string>
+    <string name="label_my_accessibility">我的无障碍设置</string>
+    <string name="hint_my_accessibility">标记自身的无障碍属性，系统将为您提供更合适的服务</string>
     <string-array name="yunmoji_descriptions">
         <item>狗</item>
         <item>狗</item>

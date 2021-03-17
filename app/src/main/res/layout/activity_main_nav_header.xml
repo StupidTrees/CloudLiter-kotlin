@@ -9,10 +9,43 @@
     android:layout_marginBottom="12dp"
     android:clickable="true"
     android:fitsSystemWindows="true"
+    android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    android:orientation="vertical"
-    android:paddingTop="36dp"
-    android:focusable="true">
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/close_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:gravity="center|start"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:paddingStart="32dp"
+        android:paddingEnd="8dp">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:alpha="0.8"
+            android:tintMode="src_in"
+            android:visibility="visible"
+            app:srcCompat="@drawable/ic_baseline_arrow_back_ios_24"
+            app:tint="?attr/colorControlNormal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="18dp"
+            android:layout_weight="1"
+            android:text="@string/close_drawer"
+            android:textColor="?attr/textColorSecondary"
+            android:textSize="16sp" />
+
+    </LinearLayout>
 
     <androidx.cardview.widget.CardView
         android:layout_width="72dp"
@@ -67,9 +100,9 @@
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
         android:alpha="0.08"
         android:background="?android:attr/listDivider" />
 

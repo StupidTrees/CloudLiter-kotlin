@@ -66,23 +66,23 @@ object ImageUtils {
     }
 
     /**
-     * 加载聊天文件
+     * 加载图片文件
      * @param context 上下文
      * @param imageId 图片id
      * @param target 目标ImageView
      */
-    fun loadChatMessageInto(context: Context, imageId: String, target: ImageView) {
+    fun loadCloudImageInto(context: Context, imageId: String?, target: ImageView) {
         if (isEmpty(imageId)) {
             target.setImageResource(R.drawable.place_holder_loading)
         } else {
-            val glideUrl = GlideUrl(getChatMessageImageUrl(imageId), LazyHeaders.Builder().addHeader("device-type", "android").build())
+            val glideUrl = GlideUrl(getCloudImageUrl(imageId!!), LazyHeaders.Builder().addHeader("device-type", "android").build())
             Glide.with(context).load(glideUrl)
                     .placeholder(R.drawable.place_holder_loading) //.apply(RequestOptions.bitmapTransform(new CornerTransform(context,dp2px(context,12))))
                     .into(target)
         }
     }
 
-    fun getChatMessageImageUrl(imageId: String): String {
+    fun getCloudImageUrl(imageId: String): String {
         return "http://hita.store:3000/message/image?imageId=" +
                 imageId
     }

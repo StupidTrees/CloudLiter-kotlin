@@ -1,4 +1,4 @@
-package com.stupidtree.cloudliter.ui.wordcloud
+package com.stupidtree.cloudliter.ui.face
 
 class FaceEntity:Comparable<FaceEntity>{
     var id: String? = ""

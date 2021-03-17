@@ -30,7 +30,7 @@ interface AiService {
      */
     @FormUrlEncoded
     @POST("/ai/image/classify")
-    fun imageClassify(@Header("token") token: String,@Field("imageId") id:String): LiveData<ApiResponse<JsonObject>>
+    fun imageClassify(@Header("token") token: String,@Field("imageId") id:String): LiveData<ApiResponse<String>>
 
 
 

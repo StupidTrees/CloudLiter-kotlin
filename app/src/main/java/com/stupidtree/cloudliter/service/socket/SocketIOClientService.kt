@@ -42,8 +42,6 @@ class SocketIOClientService : Service() {
     private val incomingMessage = HashMap<String, Int>()
     var socket: Socket? = null
     var receiver: BroadcastReceiver? = null
-    //private val binders = HashMap<String?, JWebSocketClientBinder>()
-
 
     private fun initReceiver() {
         receiver = object : BroadcastReceiver() {

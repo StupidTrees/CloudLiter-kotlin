@@ -50,7 +50,7 @@ class AiWebSource : BaseWebSource<AiService>(Retrofit.Builder()
      * @param messageId 消息id
      * @return 操作结果
      */
-    fun imageClassify(token: String, messageId: String): LiveData<DataState<JsonObject>> {
+    fun imageClassify(token: String, messageId: String): LiveData<DataState<String>> {
         return Transformations.map(service.imageClassify(token, messageId)) { input ->
             if (input == null) {
                 return@map DataState(DataState.STATE.FETCH_FAILED)

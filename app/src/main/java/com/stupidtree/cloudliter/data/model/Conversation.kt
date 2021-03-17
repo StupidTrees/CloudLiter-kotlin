@@ -22,7 +22,6 @@ class Conversation : Serializable {
     var friendNickname: String? = null
     var friendAvatar: String? = null
     var friendRemark: String? = null
-    var friendAccessibility:UserLocal.ACCESSIBILITY = UserLocal.ACCESSIBILITY.NO
     var friendTypePermission:UserLocal.TYPEPERMISSION = UserLocal.TYPEPERMISSION.PRIVATE
     var friendType: Int = 0
     var friendSubType: String? = null
@@ -43,7 +42,6 @@ class Conversation : Serializable {
                 relationId == that.relationId &&
                 createdAt == that.createdAt &&
                 updatedAt == that.updatedAt&&
-                friendAccessibility  == that.friendAccessibility&&
                 friendTypePermission == that.friendTypePermission&&
                 friendType == that.friendType&&
                 friendSubType == that.friendSubType
@@ -63,7 +61,6 @@ class Conversation : Serializable {
             conversation.friendRemark = message.friendRemark
             conversation.id = message.conversationId!!
             conversation.relationId = message.relationId
-            conversation.friendAccessibility = message.friendAccessibility
             conversation.friendTypePermission = message.friendTypePermission
             conversation.friendType = message.friendType
             conversation.friendSubType = message.friendSubType
@@ -77,9 +74,8 @@ class Conversation : Serializable {
             conversation.friendId = friendProfile.id
             conversation.friendRemark = userRelation.remark
             conversation.friendNickname = friendProfile.nickname
-            conversation.id = TextUtils.getP2PIdOrdered(friendProfile.id.toString(), userLocal.id.toString())
+            conversation.id = TextUtils.getP2PIdOrdered(friendProfile.id, userLocal.id.toString())
             conversation.relationId = userRelation.friendId
-            conversation.friendAccessibility = friendProfile.accessibility
             conversation.friendTypePermission = friendProfile.typePermission
             conversation.friendType = friendProfile.type
             conversation.friendSubType = friendProfile.subType

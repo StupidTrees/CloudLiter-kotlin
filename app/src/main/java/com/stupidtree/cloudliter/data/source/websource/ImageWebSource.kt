@@ -7,7 +7,8 @@ import com.stupidtree.cloudliter.data.source.websource.service.ImageService
 import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.codes
 import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.wordcloud.FaceEntity
+import com.stupidtree.cloudliter.ui.face.FaceEntity
+import com.stupidtree.cloudliter.ui.gallery.SceneEntity
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -65,6 +66,38 @@ class ImageWebSource : BaseWebSource<ImageService>(Retrofit.Builder()
             }
             when (input.code) {
                 codes.SUCCESS -> return@map DataState(DataState.STATE.SUCCESS)
+                codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
+            }
+        }
+    }
+
+    /**
+     * 获取某一类型的所有图片id
+     */
+    fun getImagesOfClass(token: String,classKey:String,pageSize:Int,pageNum:Int):LiveData<DataState<List<String>>>{
+        return Transformations.map(service.getImagesOfClass(token,classKey,pageSize,pageNum)) { input ->
+            if (input == null) {
+                return@map DataState(DataState.STATE.FETCH_FAILED)
+            }
+            when (input.code) {
+                codes.SUCCESS -> return@map DataState(input.data?: listOf())
+                codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
+            }
+        }
+    }
+
+    /**
+     * 获取所有类型
+     */
+    fun getALlClasses(token: String):LiveData<DataState<List<SceneEntity>>>{
+        return Transformations.map(service.getAllClasses(token)) { input ->
+            if (input == null) {
+                return@map DataState(DataState.STATE.FETCH_FAILED)
+            }
+            when (input.code) {
+                codes.SUCCESS -> return@map DataState(input.data?: listOf())
                 codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
                 else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
             }

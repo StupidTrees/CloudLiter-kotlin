@@ -19,5 +19,5 @@ interface ImageDao {
     fun updateSceneSync(id:String,scene:String)
 
     @Query("select scene from image where id is :id")
-    fun getSceneBtId(id:String):LiveData<String>
+    fun getSceneBtId(id:String):LiveData<String?>
 }

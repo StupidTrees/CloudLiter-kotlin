@@ -12,6 +12,7 @@ limitations under the License.
 
 package com.stupidtree.cloudliter.data.source.ai.yolo;
 
+import android.app.Application;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
@@ -57,6 +58,7 @@ public class AiBoostClassifier implements Classifier {
      * @param isQuantized   Boolean representing model is quantized or not
      */
     public static Classifier create(
+            final Application context,
             final AssetManager assetManager,
             final String modelFilename,
             final String labelFilename,
@@ -77,25 +79,9 @@ public class AiBoostClassifier implements Classifier {
         try {
             AiBoostInterpreter.Options options = new AiBoostInterpreter.Options();
             options.setNumThreads(NUM_THREADS);
-            if (isNNAPI) {
-                NnApiDelegate nnApiDelegate = null;
-                // Initialize interpreter with NNAPI delegate for Android Pie or above
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    nnApiDelegate = new NnApiDelegate();
-                    //options.addDelegate(nnApiDelegate);
-                    options.setNumThreads(NUM_THREADS);
-                    //options.setUseNNAPI(false);
-                    //options.setAllowFp16PrecisionForFp32(true);
-                    //options.setAllowBufferHandleOutput(true);
-                    //options.setUseNNAPI(true);
-                }
-            }
-            if (isGPU) {
-                GpuDelegate gpuDelegate = new GpuDelegate();
-                options.setDeviceType(AiBoostInterpreter.Device.GPU);
-                //options.addDelegate(gpuDelegate);
-            }
-
+            options.setDeviceType(AiBoostInterpreter.Device.QUALCOMM_DSP);
+            options.setQComPowerLevel(AiBoostInterpreter.QCOMPowerLEVEL.QCOM_TURBO);
+            options.setNativeLibPath(context.getApplicationInfo().nativeLibraryDir);
             InputStream input = assetManager.open(modelFilename);
             int length = input.available();
             byte[] buffer = new byte[length];
@@ -103,7 +89,7 @@ public class AiBoostClassifier implements Classifier {
             ByteBuffer modelbuf = ByteBuffer.allocateDirect(length);
             modelbuf.order(ByteOrder.nativeOrder());
             modelbuf.put(buffer);
-            Object[] input_shapes = new Object[]{new int[]{BATCH_SIZE,INPUT_SIZE,INPUT_SIZE,PIXEL_SIZE}};
+            int[][] input_shapes = new int[][]{{BATCH_SIZE,INPUT_SIZE,INPUT_SIZE,PIXEL_SIZE}};
             d.aiBoost = new AiBoostInterpreter(modelbuf, input_shapes, options);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -172,7 +158,7 @@ public class AiBoostClassifier implements Classifier {
     private static final int NUM_BOXES_PER_BLOCK = 3;
 
     // Number of threads in the java app
-    private static final int NUM_THREADS = 4;
+    private static final int NUM_THREADS = 1;
     private static boolean isNNAPI = false;
     private static boolean isGPU = true;
 

@@ -1,7 +1,6 @@
 package com.stupidtree.cloudliter.ui.wordcloud
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.observe
@@ -11,7 +10,6 @@ import com.stupidtree.cloudliter.databinding.ActivityWordCloudBinding
 import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter
 import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.profile.WordCloudListAdapter
 import com.stupidtree.cloudliter.ui.widgets.PopUpText
 
 class WordCloudActivity : BaseActivity<WordCloudViewModel, ActivityWordCloudBinding>() {
@@ -37,12 +35,15 @@ class WordCloudActivity : BaseActivity<WordCloudViewModel, ActivityWordCloudBind
         binding.list.adapter = listAdapter
         binding.list.layoutManager = LinearLayoutManager(this)
         binding.refresh.setColorSchemeColors(getColorPrimary())
-        viewModel.wordCloudLiveData.observe(this) {
+        viewModel.wordCloudLiveData.observe(this) { it ->
             binding.refresh.isRefreshing = false
             if (it.state == DataState.STATE.SUCCESS) {
-                val newList = mutableListOf<Pair<String, Float?>>()
+                val newList = mutableListOf<WordCloudEntity>()
                 for (key in it.data!!.keys) {
-                    newList.add(Pair(key, it.data!![key]))
+                    val we = WordCloudEntity()
+                    we.name = key
+                    we.frequency = it.data!![key]?:0f
+                    newList.add(we)
                 }
                 listAdapter?.notifyItemChangedSmooth(newList)
             }
@@ -51,12 +52,12 @@ class WordCloudActivity : BaseActivity<WordCloudViewModel, ActivityWordCloudBind
         binding.refresh.setOnRefreshListener {
             refresh()
         }
-        listAdapter?.setOnItemClickListener(object : BaseListAdapter.OnItemClickListener<Pair<String, Float?>> {
-            override fun onItemClick(data: Pair<String, Float?>, card: View?, position: Int) {
+        listAdapter?.setOnItemClickListener(object : BaseListAdapter.OnItemClickListener<WordCloudEntity> {
+            override fun onItemClick(data: WordCloudEntity, card: View?, position: Int) {
                 PopUpText().setTitle(R.string.ensure_delete_word_cloud)
                         .setOnConfirmListener(object : PopUpText.OnConfirmListener {
                             override fun OnConfirm() {
-                                data.let { viewModel.deleteWordCloud(it.first) }//这里使用删除函数（viewmodel中的）
+                                data.let { viewModel.deleteWordCloud(it.name) }//这里使用删除函数（viewmodel中的）
                             }
                         }).show(supportFragmentManager, "delete")
             }

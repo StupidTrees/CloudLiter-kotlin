@@ -32,17 +32,7 @@ object TypeConverters {
         return UserLocal.GENDER.valueOf(str)
     }
 
-    @JvmStatic
-    @TypeConverter
-    fun accessibilityToString(date: UserLocal.ACCESSIBILITY): String {
-        return date.name
-    }
 
-    @JvmStatic
-    @TypeConverter
-    fun stringToAccessibility(str:String): UserLocal.ACCESSIBILITY {
-        return UserLocal.ACCESSIBILITY.valueOf(str)
-    }
 
     @JvmStatic
     @TypeConverter

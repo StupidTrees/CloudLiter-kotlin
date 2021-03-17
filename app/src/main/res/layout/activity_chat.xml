@@ -383,6 +383,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:visibility="gone"
                 app:cardBackgroundColor="?attr/colorPrimary"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">

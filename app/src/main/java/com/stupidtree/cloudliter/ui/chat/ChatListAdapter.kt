@@ -87,12 +87,12 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
                 if (data.getTypeEnum() == ChatMessage.TYPE.IMG) {
                     if (holder.progress != null) {
                         if (holder.progress?.visibility != View.VISIBLE) {
-                            data.fileId?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
+                            data.fileId?.let { ImageUtils.loadCloudImageInto(chatActivity, it, holder.image!!) }
                         } else {
                             holder.image?.setImageResource(R.drawable.place_holder_loading)
                         }
                     } else {
-                        data.fileId?.let { ImageUtils.loadChatMessageInto(chatActivity, it, holder.image!!) }
+                        data.fileId?.let { ImageUtils.loadCloudImageInto(chatActivity, it, holder.image!!) }
                     }
                 } else if (data.getTypeEnum() == ChatMessage.TYPE.VOICE) {
                     holder.bindVoiceState(data)
@@ -122,7 +122,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             for (cm in mBeans) {
                 if (!cm.isTimeStamp && cm.getTypeEnum() == ChatMessage.TYPE.IMG) {
                     cm.fileId?.let {
-                        res.add(ImageUtils.getChatMessageImageUrl(it))
+                        res.add(ImageUtils.getCloudImageUrl(it))
                     }
                 }
             }
@@ -568,7 +568,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
 
         fun updateImage(data: ChatMessage) {
             if (image != null) {
-                data.fileId?.let { ImageUtils.loadChatMessageInto(chatActivity, it, image!!) }
+                data.fileId?.let { ImageUtils.loadCloudImageInto(chatActivity, it, image!!) }
             }
         }
 

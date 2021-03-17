@@ -51,11 +51,6 @@ class ChatRepository(context: Context) {
                 saveMessageAsync(message)
             }
         }
-        listDataState.addSource(messageSentSate) { chatMessageDataState: DataState<ChatMessage> ->
-            listDataState.removeSource(localListState!!)
-            val sentMessage = chatMessageDataState.data
-            sentMessage?.let { saveMessageAsync(it) }
-        }
         listDataState.addSource(messageReadState) { messageReadNotificationDataState: DataState<MessageReadNotification> ->
             listDataState.removeSource(localListState!!)
             markMessageReadAsync(messageReadNotificationDataState.data)
@@ -74,7 +69,6 @@ class ChatRepository(context: Context) {
      */
     fun actionFetchMessages(token: String, conversationId: String, topId: String?, topTime: Timestamp?, pageSize: Int, action: LIST_ACTION) {
         localListState?.let { listDataState.removeSource(it) }
-        Log.e("fromId", topId.toString())
         localListState = if (topId == null) {
             chatMessageDao.getMessages(conversationId, pageSize)
         } else {
@@ -302,9 +296,6 @@ class ChatRepository(context: Context) {
     private fun saveMessageAsync(chatMessages: List<ChatMessage>?) {
         Thread { chatMessages?.let { chatMessageDao.saveMessage(it.toList()) } }.start()
     }
-
-    val messageSentSate: MutableLiveData<DataState<ChatMessage>>
-        get() = socketWebSource.messageSentSate
 
     val friendsStateController: MutableLiveData<FriendStateTrigger>
         get() = socketWebSource.friendStateController

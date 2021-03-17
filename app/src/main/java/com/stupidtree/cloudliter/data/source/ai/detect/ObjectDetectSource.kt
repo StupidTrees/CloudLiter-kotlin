@@ -1,6 +1,5 @@
 package com.stupidtree.cloudliter.data.source.ai.detect
 
-import android.R.attr
 import android.app.Application
 import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
@@ -14,7 +13,7 @@ import java.nio.ByteOrder
 
 
 class ObjectDetectSource(application: Application) {
-    private var aiBoost: AiBoostInterpreter
+    private var aiBoost: AiBoostInterpreter?
 
     init {
         val input: InputStream = application.assets.open("yolov4-416-fp32.tflite")
@@ -34,14 +33,19 @@ class ObjectDetectSource(application: Application) {
         options.setNumThreads(1)
         options.setDeviceType(AiBoostInterpreter.Device.QUALCOMM_DSP)
         options.setQComPowerLevel(AiBoostInterpreter.QCOMPowerLEVEL.QCOM_TURBO)
-        aiBoost = AiBoostInterpreter(modelbuf, input_shapes, options)
+        aiBoost = try {
+            AiBoostInterpreter(modelbuf, input_shapes, options)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
     fun detectImage(bitmap: Bitmap): LiveData<DataState<List<Classifier.Recognition>>> {
         val result = MutableLiveData<DataState<List<Classifier.Recognition>>>()
         Thread {
-            val imgData = aiBoost.getInputTensor(0)
-            imgData.rewind()
+            //val imgData = aiBoost.getInputTensor(0)
+            //imgData.rewind()
 //            bitmap.getPixels(intValues, 0, attr.bitmap.getWidth(), 0, 0, attr.bitmap.getWidth(), attr.bitmap.getHeight())
 //            var pixel = 0
 //            for (i in 0 until IMAGE_SIZE_X) {

@@ -8,6 +8,9 @@ import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.data.model.UserLocal.GENDER
 import com.stupidtree.cloudliter.data.model.UserProfile
+import com.stupidtree.cloudliter.data.model.UserProfile.Companion.HEARING
+import com.stupidtree.cloudliter.data.model.UserProfile.Companion.LIMB
+import com.stupidtree.cloudliter.data.model.UserProfile.Companion.VISUAL
 import com.stupidtree.cloudliter.databinding.ActivityMyProfileBinding
 import com.stupidtree.cloudliter.ui.base.BaseActivity
 import com.stupidtree.cloudliter.ui.base.DataState
@@ -45,11 +48,11 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
         binding.avatarLayout.setOnClickListener { GalleryPicker.choosePhoto(getThis(), false) }
 
         //当viewModel的UserProfile数据发生变更时，通知UI更新
-        viewModel.userProfileLiveData?.observe(this, { userProfileDataState: DataState<UserProfile?> ->
+        viewModel.userProfileLiveData.observe(this, { userProfileDataState: DataState<UserProfile?> ->
             if (userProfileDataState.state === DataState.STATE.SUCCESS) {
                 setUserProfile(userProfileDataState.data)
             } else {
-                Toast.makeText(getThis(), "加载失败", Toast.LENGTH_SHORT).show()
+                Toast.makeText(getThis(), R.string.connection_failed, Toast.LENGTH_SHORT).show()
             }
         })
         viewModel.changeAvatarResult?.observe(this, { stringDataState ->
@@ -110,7 +113,7 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
             }
         })
         binding.nicknameLayout.setOnClickListener {
-            val up = viewModel.userProfileLiveData?.value
+            val up = viewModel.userProfileLiveData.value
             if (up != null && up.state === DataState.STATE.SUCCESS) {
                 PopUpEditText()
                         .setTitle(R.string.set_nickname)
@@ -127,7 +130,7 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
 
         //点击更改性别，弹出选择框
         binding.genderLayout.setOnClickListener {
-            val up = viewModel.userProfileLiveData?.value
+            val up = viewModel.userProfileLiveData.value
             if (up != null && up.state === DataState.STATE.SUCCESS) {
                 PopUpSelectableList<GENDER>()
                         .setTitle(R.string.choose_gender)
@@ -145,32 +148,9 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
             }
         }
 
-        //点击更改颜色，弹出选择框
-//        binding.accessibilityLayout.setOnClickListener {
-//            val up = viewModel.userProfileLiveData?.value
-//            if (up != null && up.state === DataState.STATE.SUCCESS) {
-//                PopUpSelectableList<UserLocal.ACCESSIBILITY>()
-//                        .setTitle(R.string.choose_color)
-//                        .setInitValue(up.data!!.accessibility)
-//                        .setListData(
-//                                listOf(getString(R.string.accessibility_off),
-//                                        getString(R.string.accessibility_on_public),
-//                                        getString(R.string.accessibility_on_private)),
-//                                listOf(UserLocal.ACCESSIBILITY.NO,
-//                                UserLocal.ACCESSIBILITY.YES_PUBLIC,
-//                                UserLocal.ACCESSIBILITY.YES_PRIVATE)
-//                        ).setOnConfirmListener(object : PopUpSelectableList.OnConfirmListener<UserLocal.ACCESSIBILITY> {
-//
-//                            override fun onConfirm(title: String?, key: UserLocal.ACCESSIBILITY) {
-//                                viewModel.startChangeAccessibility(key)
-//                            }
-//                        }).show(supportFragmentManager, "select")
-//            }
-//        }
-
         // 点击更换无障碍隐私类型，弹出选择框
         binding.typePermissionLayout.setOnClickListener {
-            val up = viewModel.userProfileLiveData?.value
+            val up = viewModel.userProfileLiveData.value
             if (up != null && up.state === DataState.STATE.SUCCESS) {
                 PopUpSelectableList<UserLocal.TYPEPERMISSION>()
                         .setTitle(R.string.type_permission)
@@ -192,31 +172,29 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
 
         //点击更改用户类型，弹出多选框
         binding.typeLayout.setOnClickListener {
-            viewModel.userProfileLiveData!!.value?.let {
-                if (it.data != null) {
+            viewModel.userProfileLiveData.value?.data?.let {
                     PopUpMultipleCheckableList<Int>(R.string.type, 0, 0)
-                            .setInitValues(it.data!!.getTypeList(it.data!!.type))
+                            .setInitValues(it.getTypeList(it.type))
                             .setListData(
                                     listOf(getString(R.string.type_visual),
                                             getString(R.string.type_hearing),
                                             getString(R.string.type_limb)),
-                                    listOf(it.data!!.VISUAL,
-                                            it.data!!.HEARING,
-                                            it.data!!.LIMB)
+                                    listOf(VISUAL,
+                                            HEARING,
+                                            LIMB)
                             ).setOnConfirmListener(object : PopUpMultipleCheckableList.OnConfirmListener<Int> {
                                 override fun onConfirm(titles: List<String?>, data: List<Int>) {
                                     var key = 0
                                     for (d in data) {
                                         key = d xor key
                                     }
-                                    viewModel.startChangeType(key, it.data!!.subType, it.data!!.typePermission)
+                                    viewModel.startChangeType(key, it.subType, it.typePermission)
                                 }
                             }).show(supportFragmentManager, "select")
-                }
             }
         }
         binding.signatureLayout.setOnClickListener {
-            val up = viewModel.userProfileLiveData?.value
+            val up = viewModel.userProfileLiveData.value
             if (up != null && up.state === DataState.STATE.SUCCESS) {
                 PopUpEditText()
                         .setTitle(R.string.choose_signature)

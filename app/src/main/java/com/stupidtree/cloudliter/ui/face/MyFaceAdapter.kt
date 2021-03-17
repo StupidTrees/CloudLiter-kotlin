@@ -7,9 +7,8 @@ import androidx.viewbinding.ViewBinding
 import com.stupidtree.cloudliter.databinding.ActivityMyFaceListItemBinding
 import com.stupidtree.cloudliter.ui.base.BaseListAdapter
 import com.stupidtree.cloudliter.ui.base.BaseViewHolder
-import com.stupidtree.cloudliter.ui.wordcloud.FaceEntity
 
-class MyFaceAdapter(mContext: Context, mBeans: MutableList<FaceEntity>,val viewModel:MyFaceViewModel) : BaseListAdapter<FaceEntity, MyFaceAdapter.MHolder>(mContext, mBeans) {
+class MyFaceAdapter(mContext: Context, mBeans: MutableList<FaceEntity>, val viewModel:MyFaceViewModel) : BaseListAdapter<FaceEntity, MyFaceAdapter.MHolder>(mContext, mBeans) {
 
     class MHolder(viewBinding: ActivityMyFaceListItemBinding) :BaseViewHolder<ActivityMyFaceListItemBinding>(viewBinding)
 

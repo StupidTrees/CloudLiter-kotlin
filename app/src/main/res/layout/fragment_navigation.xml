@@ -20,7 +20,7 @@
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
             android:orientation="horizontal"
-            android:padding="16dp"
+            android:padding="24dp"
             tools:ignore="UseCompoundDrawables">
 
             <ImageView
@@ -74,137 +74,174 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <androidx.cardview.widget.CardView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="86dp"
-                android:layout_margin="16dp"
-                app:cardBackgroundColor="?attr/colorPrimary"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="18dp">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
 
-                <LinearLayout
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/accessibility_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp">
 
                     <LinearLayout
-                        android:id="@+id/accessibility_layout"
                         android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_gravity="center"
-                        android:layout_margin="16dp"
-                        android:layout_weight="1"
-                        android:clickable="true"
-                        android:foreground="?attr/selectableItemBackgroundBorderless"
-                        android:gravity="center"
+                        android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:theme="@style/rippleWhite">
+                        android:padding="16dp">
 
                         <ImageView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
+                            android:id="@+id/imageView3"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/element_round_primary_light"
+                            android:padding="6dp"
                             android:src="@drawable/ic_baseline_accessibility_24"
-                            app:tint="@android:color/white" />
+                            app:tint="?attr/colorPrimary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:gravity="center"
+                            android:layout_marginTop="12dp"
                             android:text="@string/accessibility_setting"
-                            android:textColor="@android:color/white"
-                            android:textSize="12sp" />
+                            android:textColor="?attr/textColorPrimary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:id="@+id/face_layout"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_gravity="center"
-                        android:layout_margin="16dp"
-                        android:layout_weight="1"
-                        android:clickable="true"
-                        android:foreground="?attr/selectableItemBackgroundBorderless"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:theme="@style/rippleWhite">
+                </androidx.cardview.widget.CardView>
 
-                        <ImageView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:src="@drawable/ic_baseline_face_24"
-                            app:tint="@android:color/white" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:gravity="center"
-                            android:text="@string/my_face_manager"
-                            android:textColor="@android:color/white"
-                            android:textSize="12sp" />
-                    </LinearLayout>
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/word_cloud_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp">
 
                     <LinearLayout
-                        android:id="@+id/word_cloud_layout"
                         android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_gravity="center"
-                        android:layout_margin="16dp"
-                        android:layout_weight="1"
-                        android:clickable="true"
-                        android:foreground="?attr/selectableItemBackgroundBorderless"
-                        android:gravity="center"
+                        android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:theme="@style/rippleWhite">
+                        android:padding="16dp">
 
                         <ImageView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/element_round_primary_light"
+                            android:padding="5dp"
                             android:src="@drawable/ic_bt_wordcloud"
-                            app:tint="@android:color/white" />
+                            app:tint="?attr/colorPrimary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:gravity="center"
+                            android:layout_marginTop="12dp"
                             android:text="@string/title_word_cloud"
-                            android:textColor="@android:color/white"
-                            android:textSize="12sp" />
+                            android:textColor="?attr/textColorPrimary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/scene_gallery_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp">
 
                     <LinearLayout
-                        android:id="@+id/privacy_layout"
                         android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_gravity="center"
-                        android:layout_margin="16dp"
-                        android:layout_weight="1"
-                        android:clickable="true"
-                        android:foreground="?attr/selectableItemBackgroundBorderless"
-                        android:gravity="center"
+                        android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:theme="@style/rippleWhite">
+                        android:padding="16dp">
 
                         <ImageView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:src="@drawable/ic_baseline_privacy_tip_24"
-                            app:tint="@android:color/white" />
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/element_round_primary_light"
+                            android:padding="6dp"
+                            android:src="@drawable/ic_block_scene"
+                            app:tint="?attr/colorPrimary" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:gravity="center"
-                            android:text="@string/privacy_setting"
-                            android:textColor="@android:color/white"
-                            android:textSize="12sp" />
+                            android:layout_marginTop="12dp"
+                            android:text="@string/scene_gallery"
+                            android:textColor="?attr/textColorPrimary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
 
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/contact_gallery_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:background="@drawable/element_round_primary_light"
+                            android:padding="5dp"
+                            android:src="@drawable/ic_baseline_face_24"
+                            app:tint="?attr/colorPrimary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="@string/contact_gallery"
+                            android:textColor="?attr/textColorPrimary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

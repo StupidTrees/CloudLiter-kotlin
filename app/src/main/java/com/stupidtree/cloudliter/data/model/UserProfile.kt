@@ -15,11 +15,6 @@ import com.stupidtree.cloudliter.data.model.UserLocal.GENDER
 class UserProfile {
 
     @PrimaryKey
-    var NORMAL : Int = 0
-    var VISUAL : Int = 1
-    var HEARING : Int = 2
-    var LIMB : Int = 4
-
     var id //用户id
             : String = ""
     var username //用户名
@@ -32,8 +27,6 @@ class UserProfile {
             : String? = null
     var avatar //头像
             : String? = null
-    var accessibility //颜色
-            : UserLocal.ACCESSIBILITY = UserLocal.ACCESSIBILITY.NO
     var type
             : Int = 0
     var subType
@@ -44,18 +37,8 @@ class UserProfile {
     var wordCloudPrivate:Boolean = false//词云私密性
 
 
-    fun getAccessibilityName():Int{
-        return when (accessibility) {
-            UserLocal.ACCESSIBILITY.NO -> {
-                R.string.accessibility_off
-            }
-            UserLocal.ACCESSIBILITY.YES_PUBLIC -> {
-                R.string.accessibility_on_public
-            }
-            else -> {
-                R.string.accessibility_on_private
-            }
-        }
+    fun isType(typeT: Int):Boolean{
+        return type.and(typeT)!=0
     }
 
     fun getTypeList(typeT:Int):List<Int>{
@@ -96,5 +79,12 @@ class UserProfile {
                 R.string.type_permission_public
             }
         }
+    }
+
+    companion object{
+        const val NORMAL : Int = 0
+        const val VISUAL : Int = 1
+        const val HEARING : Int = 2
+        const val LIMB : Int = 4
     }
 }

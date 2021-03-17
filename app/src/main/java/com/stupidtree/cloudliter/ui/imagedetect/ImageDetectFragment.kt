@@ -15,6 +15,7 @@ import com.stupidtree.cloudliter.ui.base.DataState
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpImageMessageDetail
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
+import com.stupidtree.cloudliter.utils.PlacesUtils
 import java.text.DecimalFormat
 
 class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDedectBinding>() {
@@ -72,7 +73,7 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
                 try {
                     val myBitmap: Bitmap = Glide.with(requireContext())
                             .asBitmap()
-                            .load(if (it.second) it.first else ImageUtils.getChatMessageImageUrl(it.first))
+                            .load(if (it.second) it.first else ImageUtils.getCloudImageUrl(it.first))
                             .submit().get()
                     viewModel.imageLiveData.postValue(myBitmap)
                 } catch (e: Exception) {
@@ -118,7 +119,7 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
             if (it.state != DataState.STATE.SUCCESS) {
                 binding?.sceneResult?.text = getString(R.string.scene_classify_failed)
             } else {
-                binding?.sceneResult?.text = it.data?.get("class_cn")?.asString
+                binding?.sceneResult?.text = PlacesUtils.getNameForSceneKey(requireContext(),it.data?:"")
             }
         }
 

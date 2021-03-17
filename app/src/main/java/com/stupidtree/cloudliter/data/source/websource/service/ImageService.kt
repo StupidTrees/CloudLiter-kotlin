@@ -3,7 +3,8 @@ package com.stupidtree.cloudliter.data.source.websource.service
 import androidx.lifecycle.LiveData
 import com.stupidtree.cloudliter.data.model.ApiResponse
 import com.stupidtree.cloudliter.data.model.ImageEntity
-import com.stupidtree.cloudliter.ui.wordcloud.FaceEntity
+import com.stupidtree.cloudliter.ui.face.FaceEntity
+import com.stupidtree.cloudliter.ui.gallery.SceneEntity
 import retrofit2.http.*
 
 interface ImageService {
@@ -29,4 +30,17 @@ interface ImageService {
     @FormUrlEncoded
     @POST("/image/delete_face")
     fun deleteFace(@Header("token") token:String,@Field("faceId")faceId:String):LiveData<ApiResponse<String?>>
+
+    /**
+     * 获取某类别的图片
+     */
+    @GET("/image/by_class")
+    fun getImagesOfClass(@Header("token") token: String,@Query("classKey")classKey:String,@Query("pageSize")pageSize:Int,@Query("pageNum")pageNum:Int):LiveData<ApiResponse<List<String>>>
+
+    /**
+     * 获取某类别的图片
+     */
+    @GET("/image/classes")
+    fun getAllClasses(@Header("token") token: String):LiveData<ApiResponse<List<SceneEntity>>>
+
 }

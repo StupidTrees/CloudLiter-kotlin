@@ -66,17 +66,19 @@ class AiRepository(application: Application) {
      * @param imageId 图片id
      * @return 返回结果
      */
-    fun imageClassify(token: String, imageId: String): LiveData<DataState<JsonObject>> {
-        val res = MediatorLiveData<DataState<JsonObject>>()
+    fun imageClassify(token: String, imageId: String): LiveData<DataState<String>> {
+        val res = MediatorLiveData<DataState<String>>()
         val cache = Transformations.switchMap(imageDao.getSceneBtId(imageId)) {
             return@switchMap try {
-                MutableLiveData(JsonParser().parse(it).asJsonObject)
+                MutableLiveData(it)
             } catch (e: Exception) {
                 MutableLiveData()
             }
         }
         res.addSource(cache) {
-            res.value = DataState(it)
+            it?.let {
+                res.value = DataState(it)
+            }
         }
         res.addSource(aiWebSource.imageClassify(token, imageId)) {
             if (it.state == DataState.STATE.SUCCESS) {
