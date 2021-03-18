@@ -1,2 +1,4 @@
+include ':component'
+include ':style'
 include ':app'
 rootProject.name = "CloudLiter-kotlin"
