@@ -4,11 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.model.ImageEntity
 import com.stupidtree.cloudliter.data.source.websource.service.ImageService
-import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.codes
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.face.FaceEntity
 import com.stupidtree.cloudliter.ui.gallery.SceneEntity
+import com.stupidtree.component.web.BaseWebSource
+import com.stupidtree.component.web.LiveDataCallAdapter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

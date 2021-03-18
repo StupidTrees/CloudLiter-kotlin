@@ -5,7 +5,7 @@ import android.view.View
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ImageEntity
 import com.stupidtree.cloudliter.databinding.ActivityChatPopupImageMessageDetailBinding
-import com.stupidtree.cloudliter.ui.widgets.TransparentBottomSheetDialog
+import com.stupidtree.style.widgets.TransparentBottomSheetDialog
 import java.text.DecimalFormat
 
 /**

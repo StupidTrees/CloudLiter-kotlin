@@ -27,13 +27,15 @@ import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.model.Yunmoji
 import com.stupidtree.cloudliter.databinding.ActivityChatBinding
-import com.stupidtree.cloudliter.ui.base.BaseActivity
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.style.base.BaseActivity
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpTextMessageDetail
 import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectBottomFragment
-import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
 import com.stupidtree.cloudliter.utils.*
+import com.stupidtree.style.picker.FileProviderUtils
+import com.stupidtree.style.picker.GalleryPicker
+import com.stupidtree.style.picker.GalleryPicker.RC_CHOOSE_PHOTO
 import java.util.*
 
 /**
@@ -706,7 +708,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         if (resultCode != Activity.RESULT_OK) {
             return
         }
-        if (requestCode == MyProfileActivity.RC_CHOOSE_PHOTO) { //选择图片返回
+        if (requestCode ==  RC_CHOOSE_PHOTO) { //选择图片返回
             if (null == data) {
                 Toast.makeText(this, R.string.no_image_selected, Toast.LENGTH_SHORT).show()
                 return

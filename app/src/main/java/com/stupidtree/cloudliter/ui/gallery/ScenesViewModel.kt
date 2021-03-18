@@ -6,9 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.repository.ImageRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.Trigger
-import com.stupidtree.cloudliter.ui.gallery.album.AlbumQuery
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.Trigger
 
 class ScenesViewModel(application: Application) : AndroidViewModel(application) {
 

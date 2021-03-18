@@ -2,10 +2,7 @@ package com.stupidtree.cloudliter.ui.widgets
 
 import android.content.Context
 import androidx.appcompat.widget.AppCompatTextView
-import android.widget.TextView.BufferType
 import android.text.SpannableString
-import com.stupidtree.cloudliter.ui.widgets.EmoticonsTextView
-import android.graphics.Bitmap
 import com.stupidtree.cloudliter.utils.ImageUtils
 import android.text.style.ImageSpan
 import android.text.Spannable

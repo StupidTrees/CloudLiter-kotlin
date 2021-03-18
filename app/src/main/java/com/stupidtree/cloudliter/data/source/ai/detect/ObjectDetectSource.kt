@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.ai.aiboost.AiBoostInterpreter
 import com.stupidtree.cloudliter.data.source.ai.yolo.Classifier
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder

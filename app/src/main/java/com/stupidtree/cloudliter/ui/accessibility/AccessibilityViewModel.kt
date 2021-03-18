@@ -8,8 +8,8 @@ import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.Trigger
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.Trigger
 import com.stupidtree.cloudliter.ui.myprofile.TypeTrigger
 
 class AccessibilityViewModel(application: Application) : AndroidViewModel(application) {

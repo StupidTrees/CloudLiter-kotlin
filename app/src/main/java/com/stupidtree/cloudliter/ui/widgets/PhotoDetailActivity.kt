@@ -13,9 +13,9 @@ import com.bm.library.PhotoView
 import com.bumptech.glide.Glide
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.databinding.ActivityPhotoDetailBinding
-import com.stupidtree.cloudliter.ui.base.BaseActivity
+import com.stupidtree.style.base.BaseActivity
 
-class PhotoDetailActivity : BaseActivity<PhotoDetailActivity.PhotoViewModel,ActivityPhotoDetailBinding>() {
+class PhotoDetailActivity : BaseActivity<PhotoDetailActivity.PhotoViewModel, ActivityPhotoDetailBinding>() {
 
     var initIndex = 0
     var urls: List<String>? = null

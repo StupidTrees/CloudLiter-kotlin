@@ -12,7 +12,7 @@ import com.stupidtree.cloudliter.data.source.dao.ConversationDao
 import com.stupidtree.cloudliter.data.source.websource.ConversationWebSource
 import com.stupidtree.cloudliter.data.source.websource.SocketWebSource
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 import java.util.*
 
 /**

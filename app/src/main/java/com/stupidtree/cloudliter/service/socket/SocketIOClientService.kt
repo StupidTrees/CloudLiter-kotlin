@@ -15,7 +15,7 @@ import com.bumptech.glide.request.target.NotificationTarget
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.stupidtree.cloudliter.R
-import com.stupidtree.cloudliter.data.model.ApiResponse
+import com.stupidtree.component.web.ApiResponse
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.ui.chat.MessageReadNotification

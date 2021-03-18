@@ -10,9 +10,9 @@ import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.databinding.ActivityChatPopupTextMessageDetailBinding
 import com.stupidtree.cloudliter.databinding.ActivityChatPopupTextMessageDetailSegmentationItemBinding
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.BaseViewHolder
-import com.stupidtree.cloudliter.ui.widgets.TransparentBottomSheetDialog
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.style.base.BaseViewHolder
+import com.stupidtree.style.widgets.TransparentBottomSheetDialog
 import java.text.DecimalFormat
 
 /**

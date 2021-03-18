@@ -1,7 +1,7 @@
 package com.stupidtree.cloudliter.ui.group
 
 
-import com.stupidtree.cloudliter.ui.base.Trigger
+import com.stupidtree.component.data.Trigger
 class RenameGroupTrigger : Trigger() {
     var groupId: String? = null
     var name: String? = null

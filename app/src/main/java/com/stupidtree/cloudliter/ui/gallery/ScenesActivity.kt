@@ -4,12 +4,12 @@ import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.stupidtree.cloudliter.databinding.ActivityScenesBinding
-import com.stupidtree.cloudliter.ui.base.BaseActivity
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.style.base.BaseActivity
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.utils.ActivityUtils
 
-class ScenesActivity:BaseActivity<ScenesViewModel,ActivityScenesBinding>() {
+class ScenesActivity: BaseActivity<ScenesViewModel, ActivityScenesBinding>() {
 
     lateinit var listAdapter:ScenesListAdapter
 
@@ -46,7 +46,7 @@ class ScenesActivity:BaseActivity<ScenesViewModel,ActivityScenesBinding>() {
         binding.refresh.setColorSchemeColors(getColorPrimary())
         viewModel.imagesLiveData.observe(this){
             binding.refresh.isRefreshing = false
-            if(it.state==DataState.STATE.SUCCESS){
+            if(it.state== DataState.STATE.SUCCESS){
                 listAdapter.notifyItemChangedSmooth(it.data!!,false)
             }
 

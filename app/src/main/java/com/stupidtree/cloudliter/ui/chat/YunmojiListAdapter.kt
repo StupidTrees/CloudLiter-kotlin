@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.viewbinding.ViewBinding
 import com.stupidtree.cloudliter.data.model.Yunmoji
 import com.stupidtree.cloudliter.databinding.ActivityChatYunmojiItemBinding
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.BaseViewHolder
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.style.base.BaseViewHolder
 import com.stupidtree.cloudliter.ui.chat.YunmojiListAdapter.YunmojiItemHolder
 
 /**

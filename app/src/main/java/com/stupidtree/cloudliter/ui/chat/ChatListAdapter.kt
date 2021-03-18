@@ -10,9 +10,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ChatMessage
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.BaseListAdapterClassic
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.style.base.BaseListAdapterClassic
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.widgets.EmoticonsTextView
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils

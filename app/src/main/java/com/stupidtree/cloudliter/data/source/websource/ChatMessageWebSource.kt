@@ -3,12 +3,13 @@ package com.stupidtree.cloudliter.data.source.websource
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.stupidtree.cloudliter.data.model.ApiResponse
+import com.stupidtree.component.web.ApiResponse
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.source.websource.service.ChatMessageService
-import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.codes
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.web.BaseWebSource
+import com.stupidtree.component.web.LiveDataCallAdapter
 import okhttp3.MultipartBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -32,7 +33,7 @@ class ChatMessageWebSource : BaseWebSource<ChatMessageService>(Retrofit.Builder(
      */
     fun getMessages(token: String, id: String, fromId: String?, pageSize: Int): LiveData<DataState<List<ChatMessage>?>> {
         // Log.e("getMes",token+"-"+fromId+"-"+pageSize);
-        return Transformations.map(this.service.getChatMessages(token,id,fromId,pageSize)) { input:ApiResponse<List<ChatMessage>?>?
+        return Transformations.map(this.service.getChatMessages(token,id,fromId,pageSize)) { input: ApiResponse<List<ChatMessage>?>?
             ->
             if (null == input) {
                 return@map DataState<List<ChatMessage>?>(DataState.STATE.FETCH_FAILED)

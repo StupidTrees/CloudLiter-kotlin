@@ -7,8 +7,8 @@ import com.stupidtree.cloudliter.data.model.RelationEvent.ACTION
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.RelationRepository
 import com.stupidtree.cloudliter.data.repository.RelationRepository.Companion.instance
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.Trigger
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.Trigger
 import java.util.*
 
 class RelationEventViewModel(application:Application) : AndroidViewModel(application) {

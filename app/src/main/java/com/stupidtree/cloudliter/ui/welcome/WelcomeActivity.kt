@@ -5,8 +5,8 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.databinding.ActivityWelcomeBinding
-import com.stupidtree.cloudliter.ui.base.BaseActivity
-import com.stupidtree.cloudliter.ui.base.BaseTabAdapter
+import com.stupidtree.style.base.BaseActivity
+import com.stupidtree.style.base.BaseTabAdapter
 import com.stupidtree.cloudliter.ui.welcome.login.LoginFragment
 import com.stupidtree.cloudliter.ui.welcome.signup.SignUpFragment
 import com.stupidtree.cloudliter.utils.AnimationUtils
@@ -16,7 +16,7 @@ import com.stupidtree.cloudliter.utils.AnimationUtils
  * 只是个空壳，不需要ViewModel
  */
 @SuppressLint("NonConstantResourceId")
-class WelcomeActivity : BaseActivity<WelcomeViewModel,ActivityWelcomeBinding>() {
+class WelcomeActivity : BaseActivity<WelcomeViewModel, ActivityWelcomeBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

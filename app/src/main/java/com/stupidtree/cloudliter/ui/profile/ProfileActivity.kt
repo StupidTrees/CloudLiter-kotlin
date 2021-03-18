@@ -18,11 +18,11 @@ import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.data.model.UserProfile
 import com.stupidtree.cloudliter.databinding.ActivityProfileBinding
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
-import com.stupidtree.cloudliter.ui.base.BaseActivityWithReceiver
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.style.base.BaseActivityWithReceiver
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.group.pick.PickGroupDialog
-import com.stupidtree.cloudliter.ui.widgets.PopUpEditText
-import com.stupidtree.cloudliter.ui.widgets.PopUpText
+import com.stupidtree.style.widgets.PopUpEditText
+import com.stupidtree.style.widgets.PopUpText
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils

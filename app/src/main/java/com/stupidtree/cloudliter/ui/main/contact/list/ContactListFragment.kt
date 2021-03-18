@@ -15,11 +15,11 @@ import com.stupidtree.cloudliter.data.model.UserRelation
 import com.stupidtree.cloudliter.databinding.FragmentContactListBinding
 import com.stupidtree.cloudliter.databinding.FragmentContactListItemBinding
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
-import com.stupidtree.cloudliter.ui.base.BaseFragmentWithReceiver
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter.RefreshJudge
-import com.stupidtree.cloudliter.ui.base.BaseViewHolder
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.style.base.BaseFragmentWithReceiver
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.style.base.BaseListAdapter.RefreshJudge
+import com.stupidtree.style.base.BaseViewHolder
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils
@@ -28,7 +28,7 @@ import java.util.*
 /**
  * 联系人页面的Fragment
  */
-class ContactListFragment : BaseFragmentWithReceiver<ContactListViewModel,FragmentContactListBinding>() {
+class ContactListFragment : BaseFragmentWithReceiver<ContactListViewModel, FragmentContactListBinding>() {
 
     /**
      * 适配器区

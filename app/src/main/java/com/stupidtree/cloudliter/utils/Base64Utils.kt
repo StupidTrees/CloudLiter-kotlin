@@ -185,7 +185,7 @@ object Base64Utils {
             try {
                 fis?.close()
                 `is`?.close()
-                baos?.close()
+                baos.close()
             } catch (e: Exception) {
                 println(e)
             }
@@ -201,7 +201,7 @@ object Base64Utils {
         try {
             fr = FileReader(file)
             `in` = BufferedReader(fr)
-            var count = 0
+            var count: Int
             val buf = CharArray(16384)
             while (`in`.read(buf).also { count = it } != -1) {
                 if (count > 0) {

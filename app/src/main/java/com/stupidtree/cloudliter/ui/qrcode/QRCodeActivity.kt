@@ -8,16 +8,16 @@ import com.king.zxing.CaptureFragment
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.databinding.ActivityQRCodeBinding
-import com.stupidtree.cloudliter.ui.base.BaseActivity
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.style.base.BaseActivity
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
-import com.stupidtree.cloudliter.utils.PermissionUtils
+import com.stupidtree.style.picker.PermissionUtils
 import com.stupidtree.cloudliter.utils.TextUtils
 
 
 @SuppressLint("NonConstantResourceId")
-class QRCodeActivity : BaseActivity<QRCodeViewModel,ActivityQRCodeBinding>() {
+class QRCodeActivity : BaseActivity<QRCodeViewModel, ActivityQRCodeBinding>() {
 
     lateinit var captureFragment: CaptureFragment
 

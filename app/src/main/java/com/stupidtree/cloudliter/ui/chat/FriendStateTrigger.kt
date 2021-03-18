@@ -1,6 +1,6 @@
 package com.stupidtree.cloudliter.ui.chat
 
-import com.stupidtree.cloudliter.ui.base.Trigger
+import com.stupidtree.component.data.Trigger
 
 class FriendStateTrigger : Trigger() {
     var id: String? = null

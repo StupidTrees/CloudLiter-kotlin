@@ -9,8 +9,8 @@ import com.stupidtree.cloudliter.data.model.UserSearched
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository
 import com.stupidtree.cloudliter.data.repository.UserRepository
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.Trigger
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.Trigger
 import com.stupidtree.cloudliter.ui.search.SearchTrigger.Companion.getSearchInstance
 
 /**
@@ -51,7 +51,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         }
 
     //数据本体：我的词云显示
-    var myWordCloudLiveData: LiveData<DataState<HashMap<String,Float?>?>>? = null
+    var myWordCloudLiveData: LiveData<DataState<HashMap<String, Float?>?>>? = null
         get() {
             if(field==null){
                 myWordCloudLiveData = Transformations.switchMap(myWordCloudController){

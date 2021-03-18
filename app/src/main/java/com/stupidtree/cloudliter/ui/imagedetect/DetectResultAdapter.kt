@@ -12,8 +12,8 @@ import com.bumptech.glide.request.RequestOptions
 import com.stupidtree.cloudliter.data.model.FaceResult
 import com.stupidtree.cloudliter.data.source.ai.detect.ObjectDetectSource.Companion.IMAGE_SIZE
 import com.stupidtree.cloudliter.databinding.ActivityImageDetailListItemBinding
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.BaseViewHolder
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.style.base.BaseViewHolder
 import java.text.DecimalFormat
 
 class DetectResultAdapter(mContext: Context, mBeans: MutableList<DetectResult>) : BaseListAdapter<DetectResult, DetectResultAdapter.DHolder>(mContext, mBeans) {

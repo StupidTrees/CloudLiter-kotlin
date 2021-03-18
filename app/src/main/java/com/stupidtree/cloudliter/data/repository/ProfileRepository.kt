@@ -1,14 +1,13 @@
 package com.stupidtree.cloudliter.data.repository
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.model.UserProfile
 import com.stupidtree.cloudliter.data.source.websource.UserWebSource
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -42,7 +41,7 @@ class ProfileRepository(application: Application) {
             }
         }
         result.addSource(userWebSource.getUserProfile(id, token)){
-            if(it.state==DataState.STATE.SUCCESS&&it.data!=null){
+            if(it.state== DataState.STATE.SUCCESS&&it.data!=null){
                 Thread{
                     userProfileDao.saveProfile(it.data!!)
                 }.start()

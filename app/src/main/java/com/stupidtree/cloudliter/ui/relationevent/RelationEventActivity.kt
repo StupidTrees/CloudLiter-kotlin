@@ -16,13 +16,13 @@ import com.stupidtree.cloudliter.data.model.RelationEvent
 import com.stupidtree.cloudliter.data.model.RelationEvent.ACTION
 import com.stupidtree.cloudliter.databinding.ActivityRelationEventBinding
 import com.stupidtree.cloudliter.databinding.ActivityRelationEventListItemBinding
-import com.stupidtree.cloudliter.ui.base.BaseActivity
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter.RefreshJudge
-import com.stupidtree.cloudliter.ui.base.BaseViewHolder
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.style.base.BaseActivity
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.style.base.BaseListAdapter.RefreshJudge
+import com.stupidtree.style.base.BaseViewHolder
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.relationevent.RelationEventActivity.RListAdapter.RHolder
-import com.stupidtree.cloudliter.ui.widgets.PopUpCheckableList
+import com.stupidtree.style.widgets.PopUpCheckableList
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils
@@ -32,7 +32,7 @@ import java.util.*
  * 好友关系页面
  */
 @SuppressLint("NonConstantResourceId")
-class RelationEventActivity : BaseActivity<RelationEventViewModel,ActivityRelationEventBinding>() {
+class RelationEventActivity : BaseActivity<RelationEventViewModel, ActivityRelationEventBinding>() {
     /**
      * 适配器
      */

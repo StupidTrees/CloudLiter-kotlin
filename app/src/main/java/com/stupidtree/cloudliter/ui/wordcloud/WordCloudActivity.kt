@@ -7,10 +7,10 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.databinding.ActivityWordCloudBinding
-import com.stupidtree.cloudliter.ui.base.BaseActivity
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.widgets.PopUpText
+import com.stupidtree.style.base.BaseActivity
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.component.data.DataState
+import com.stupidtree.style.widgets.PopUpText
 
 class WordCloudActivity : BaseActivity<WordCloudViewModel, ActivityWordCloudBinding>() {
 

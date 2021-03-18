@@ -3,12 +3,13 @@ package com.stupidtree.cloudliter.data.source.websource
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.stupidtree.cloudliter.data.model.ApiResponse
+import com.stupidtree.component.web.ApiResponse
 import com.stupidtree.cloudliter.data.model.RelationGroup
 import com.stupidtree.cloudliter.data.source.websource.service.GroupService
-import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.codes
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.web.BaseWebSource
+import com.stupidtree.component.web.LiveDataCallAdapter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -55,7 +56,7 @@ class GroupWebSource : BaseWebSource<GroupService>(Retrofit.Builder()
             } else {
                 when (input.code) {
                     codes.SUCCESS -> {
-                        return@map DataState(input.data,DataState.STATE.SUCCESS)
+                        return@map DataState(input.data, DataState.STATE.SUCCESS)
                     }
                     codes.TOKEN_INVALID -> {
                         return@map DataState<String?>(DataState.STATE.TOKEN_INVALID)
@@ -84,7 +85,7 @@ class GroupWebSource : BaseWebSource<GroupService>(Retrofit.Builder()
             } else {
                 when (input.code) {
                     codes.SUCCESS -> {
-                         return@map DataState(input.data,DataState.STATE.SUCCESS)
+                         return@map DataState(input.data, DataState.STATE.SUCCESS)
                     }
                     codes.TOKEN_INVALID -> {
                         return@map DataState<String?>(DataState.STATE.TOKEN_INVALID)
@@ -115,7 +116,7 @@ class GroupWebSource : BaseWebSource<GroupService>(Retrofit.Builder()
             } else {
                 when (input.code) {
                     codes.SUCCESS -> {
-                        return@map DataState(input.data,DataState.STATE.SUCCESS)
+                        return@map DataState(input.data, DataState.STATE.SUCCESS)
                     }
                     codes.TOKEN_INVALID -> {
                         return@map DataState<String?>(DataState.STATE.TOKEN_INVALID)
@@ -143,7 +144,7 @@ class GroupWebSource : BaseWebSource<GroupService>(Retrofit.Builder()
                 return@map DataState<Any>(DataState.STATE.FETCH_FAILED)
             } else {
                 when (input.code) {
-                    codes.SUCCESS -> return@map DataState(input.data,DataState.STATE.SUCCESS)
+                    codes.SUCCESS -> return@map DataState(input.data, DataState.STATE.SUCCESS)
                     codes.TOKEN_INVALID -> return@map DataState<Any>(DataState.STATE.TOKEN_INVALID)
                     else -> return@map DataState<Any>(DataState.STATE.FETCH_FAILED, input.message)
                 }

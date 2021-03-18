@@ -4,16 +4,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import com.stupidtree.cloudliter.R
-import com.stupidtree.cloudliter.data.model.UserLocal
-import com.stupidtree.cloudliter.databinding.FragmentConversationsBinding
 import com.stupidtree.cloudliter.databinding.FragmentNavigationBinding
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
-import com.stupidtree.cloudliter.ui.base.BaseFragmentWithReceiver
-import com.stupidtree.cloudliter.ui.main.conversations.ConversationsFragment
+import com.stupidtree.style.base.BaseFragmentWithReceiver
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 

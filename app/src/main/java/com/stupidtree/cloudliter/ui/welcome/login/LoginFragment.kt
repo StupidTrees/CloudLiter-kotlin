@@ -8,7 +8,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
 import com.stupidtree.cloudliter.databinding.FragmentLoginBinding
-import com.stupidtree.cloudliter.ui.base.BaseFragment
+import com.stupidtree.style.base.BaseFragment
 
 /**
  * 登录页面Fragment

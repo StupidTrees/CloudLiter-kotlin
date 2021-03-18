@@ -4,8 +4,8 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.viewbinding.ViewBinding
 import com.stupidtree.cloudliter.databinding.ActivityWordCloudListItemBinding
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.BaseViewHolder
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.style.base.BaseViewHolder
 
 class WordCloudListAdapter(mContext: Context, mBeans: MutableList<WordCloudEntity>) : BaseListAdapter<WordCloudEntity, WordCloudListAdapter.WHolder>(mContext, mBeans) {
 

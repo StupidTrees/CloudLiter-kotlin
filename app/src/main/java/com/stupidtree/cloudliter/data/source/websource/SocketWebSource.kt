@@ -3,12 +3,11 @@ package com.stupidtree.cloudliter.data.source.websource
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.chat.FriendStateTrigger
 import com.stupidtree.cloudliter.ui.chat.MessageReadNotification
 import java.sql.Timestamp

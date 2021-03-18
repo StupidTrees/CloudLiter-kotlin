@@ -6,8 +6,7 @@ import com.stupidtree.cloudliter.data.model.UserRelation
 import com.stupidtree.cloudliter.data.repository.FriendsRepository
 import com.stupidtree.cloudliter.data.repository.GroupRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.Trigger
+import com.stupidtree.component.data.DataState
 
 /**
  * 层次：ViewModel

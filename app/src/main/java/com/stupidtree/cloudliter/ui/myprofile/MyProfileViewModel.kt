@@ -8,9 +8,9 @@ import com.stupidtree.cloudliter.data.model.UserProfile
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository.Companion.instance
-import com.stupidtree.cloudliter.ui.base.BooleanTrigger
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.StringTrigger
+import com.stupidtree.component.data.BooleanTrigger
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.StringTrigger
 import java.util.*
 
 /**

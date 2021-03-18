@@ -7,7 +7,7 @@ import android.widget.Toast
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.databinding.FragmentSignUpBinding
-import com.stupidtree.cloudliter.ui.base.BaseFragment
+import com.stupidtree.style.base.BaseFragment
 
 class SignUpFragment : BaseFragment<SignUpViewModel, FragmentSignUpBinding>() {
 

@@ -9,7 +9,7 @@ import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.repository.AiRepository
 import com.stupidtree.cloudliter.data.repository.ImageRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 
 class ImageDetectViewModel(application: Application) : AndroidViewModel(application) {
 

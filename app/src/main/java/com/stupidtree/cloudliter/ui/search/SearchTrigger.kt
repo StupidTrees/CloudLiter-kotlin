@@ -1,6 +1,6 @@
 package com.stupidtree.cloudliter.ui.search
 
-import com.stupidtree.cloudliter.ui.base.Trigger
+import com.stupidtree.component.data.Trigger
 
 class SearchTrigger : Trigger() {
     var searchText: String? = null

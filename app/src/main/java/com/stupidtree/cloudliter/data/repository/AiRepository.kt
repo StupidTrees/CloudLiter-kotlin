@@ -9,13 +9,12 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.model.FaceResult
 import com.stupidtree.cloudliter.data.source.ai.yolo.Classifier
 import com.stupidtree.cloudliter.data.source.ai.yolo.YOLOSource
 import com.stupidtree.cloudliter.data.source.websource.AiWebSource
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.imagedetect.BitmapRequestBody
 import com.stupidtree.cloudliter.ui.imagedetect.DetectResult
 import okhttp3.MediaType

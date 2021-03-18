@@ -16,10 +16,13 @@ import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.databinding.FragmentConversationsBinding
 import com.stupidtree.cloudliter.databinding.FragmentConversationsListItemBinding
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService.Companion.RECEIVE_RELATION_EVENT
-import com.stupidtree.cloudliter.ui.base.*
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils
+import com.stupidtree.style.base.BaseFragmentWithReceiver
+import com.stupidtree.component.data.DataState
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.style.base.BaseViewHolder
 import java.util.*
 
 /**

@@ -12,15 +12,17 @@ import com.stupidtree.cloudliter.data.model.UserProfile.Companion.HEARING
 import com.stupidtree.cloudliter.data.model.UserProfile.Companion.LIMB
 import com.stupidtree.cloudliter.data.model.UserProfile.Companion.VISUAL
 import com.stupidtree.cloudliter.databinding.ActivityMyProfileBinding
-import com.stupidtree.cloudliter.ui.base.BaseActivity
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.widgets.PopUpEditText
-import com.stupidtree.cloudliter.ui.widgets.PopUpMultipleCheckableList
-import com.stupidtree.cloudliter.ui.widgets.PopUpSelectableList
-import com.stupidtree.cloudliter.utils.FileProviderUtils
-import com.stupidtree.cloudliter.utils.GalleryPicker
+import com.stupidtree.style.base.BaseActivity
+import com.stupidtree.component.data.DataState
+import com.stupidtree.style.widgets.PopUpEditText
+import com.stupidtree.style.widgets.PopUpMultipleCheckableList
+import com.stupidtree.style.widgets.PopUpSelectableList
+import com.stupidtree.style.picker.FileProviderUtils
+import com.stupidtree.style.picker.GalleryPicker
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils
+import com.stupidtree.style.picker.GalleryPicker.RC_CHOOSE_PHOTO
+import com.stupidtree.style.picker.GalleryPicker.RC_CROP_PHOTO
 
 /**
  * ”我的个人资料“ Activity
@@ -269,6 +271,7 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
             return
         }
         when (requestCode) {
+
             RC_CHOOSE_PHOTO -> {
                 //选择图片返回，要跳转到图片裁剪
                 if (null == data) {
@@ -291,14 +294,7 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
         }
     }
 
-    companion object {
-        /**
-         * 这些是调用系统相册选择、裁剪图片要用到的状态码
-         */
-        const val RC_CHOOSE_PHOTO = 10
-        const val RC_TAKE_PHOTO = 11
-        const val RC_CROP_PHOTO = 12
-    }
+
 
     override fun initViewBinding(): ActivityMyProfileBinding {
         return ActivityMyProfileBinding.inflate(layoutInflater)

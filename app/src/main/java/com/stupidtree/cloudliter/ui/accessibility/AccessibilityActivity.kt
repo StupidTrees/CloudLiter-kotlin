@@ -5,10 +5,10 @@ import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.data.model.UserProfile
 import com.stupidtree.cloudliter.databinding.ActivityAccessibilityBinding
-import com.stupidtree.cloudliter.ui.base.BaseActivity
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.widgets.PopUpMultipleCheckableList
-import com.stupidtree.cloudliter.ui.widgets.PopUpSelectableList
+import com.stupidtree.style.base.BaseActivity
+import com.stupidtree.component.data.DataState
+import com.stupidtree.style.widgets.PopUpMultipleCheckableList
+import com.stupidtree.style.widgets.PopUpSelectableList
 import com.stupidtree.cloudliter.utils.ActivityUtils
 
 class AccessibilityActivity : BaseActivity<AccessibilityViewModel, ActivityAccessibilityBinding>() {

@@ -3,13 +3,14 @@ package com.stupidtree.cloudliter.data.source.websource
 import androidx.arch.core.util.Function
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.stupidtree.cloudliter.data.model.ApiResponse
+import com.stupidtree.component.web.ApiResponse
 import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.source.websource.service.ConversationService
-import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.codes.SUCCESS
 import com.stupidtree.cloudliter.data.source.websource.service.codes.TOKEN_INVALID
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.web.BaseWebSource
+import com.stupidtree.component.web.LiveDataCallAdapter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*

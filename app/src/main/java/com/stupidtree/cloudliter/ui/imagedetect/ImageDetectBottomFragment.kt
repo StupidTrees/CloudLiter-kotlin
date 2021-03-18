@@ -5,7 +5,7 @@ import android.view.View
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.databinding.FragmentImageDetectPopupBinding
-import com.stupidtree.cloudliter.ui.widgets.TransparentBottomSheetDialog
+import com.stupidtree.style.widgets.TransparentBottomSheetDialog
 
 class ImageDetectBottomFragment : TransparentBottomSheetDialog<FragmentImageDetectPopupBinding>() {
 

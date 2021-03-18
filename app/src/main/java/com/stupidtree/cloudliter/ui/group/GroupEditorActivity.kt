@@ -7,15 +7,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.RelationGroup
 import com.stupidtree.cloudliter.databinding.ActivityGroupEditorBinding
-import com.stupidtree.cloudliter.ui.base.BaseActivity
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter.RefreshJudge
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.widgets.PopUpEditText
-import com.stupidtree.cloudliter.ui.widgets.PopUpText
+import com.stupidtree.style.base.BaseActivity
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.style.base.BaseListAdapter.RefreshJudge
+import com.stupidtree.component.data.DataState
+import com.stupidtree.style.widgets.PopUpEditText
+import com.stupidtree.style.widgets.PopUpText
 import java.util.*
 
-class GroupEditorActivity : BaseActivity<GroupEditorViewModel,ActivityGroupEditorBinding>() {
+class GroupEditorActivity : BaseActivity<GroupEditorViewModel, ActivityGroupEditorBinding>() {
 
 
     /**

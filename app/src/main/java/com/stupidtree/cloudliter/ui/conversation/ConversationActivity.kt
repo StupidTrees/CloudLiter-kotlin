@@ -4,15 +4,15 @@ import android.os.Bundle
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.databinding.ActivityConversationBinding
-import com.stupidtree.cloudliter.ui.base.BaseActivity
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.style.base.BaseActivity
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ConversationActivity : BaseActivity<ConversationViewModel,ActivityConversationBinding>() {
+class ConversationActivity : BaseActivity<ConversationViewModel, ActivityConversationBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

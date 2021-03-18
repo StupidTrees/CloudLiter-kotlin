@@ -12,8 +12,8 @@ import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository.Companion.getInstance
 import com.stupidtree.cloudliter.data.repository.RelationRepository
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.StringTrigger
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.StringTrigger
 import java.util.*
 
 /**

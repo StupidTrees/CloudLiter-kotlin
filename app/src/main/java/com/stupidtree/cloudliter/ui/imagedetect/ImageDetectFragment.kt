@@ -9,9 +9,9 @@ import com.bumptech.glide.Glide
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.FaceResult
 import com.stupidtree.cloudliter.databinding.FragmentImageDedectBinding
-import com.stupidtree.cloudliter.ui.base.BaseFragment
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.style.base.BaseFragment
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpImageMessageDetail
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils

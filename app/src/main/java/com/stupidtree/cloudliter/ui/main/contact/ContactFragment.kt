@@ -10,9 +10,8 @@ import com.google.android.material.tabs.TabLayout
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.databinding.FragmentContactBinding
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService.Companion.RECEIVE_RELATION_EVENT
-import com.stupidtree.cloudliter.ui.base.BaseFragmentWithReceiver
-import com.stupidtree.cloudliter.ui.base.BaseTabAdapter
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.style.base.BaseFragmentWithReceiver
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.main.contact.group.ContactGroupFragment
 import com.stupidtree.cloudliter.ui.main.contact.list.ContactListFragment
 import com.stupidtree.cloudliter.utils.ActivityUtils

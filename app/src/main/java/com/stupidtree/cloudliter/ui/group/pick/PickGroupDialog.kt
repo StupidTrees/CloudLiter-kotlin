@@ -11,11 +11,11 @@ import androidx.viewbinding.ViewBinding
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.RelationGroup
 import com.stupidtree.cloudliter.databinding.DialogBottomGroupListBinding
-import com.stupidtree.cloudliter.databinding.DialogBottomSelectableListItemBinding
-import com.stupidtree.cloudliter.ui.base.BaseViewHolder
-import com.stupidtree.cloudliter.ui.base.BasicSelectableListAdapter
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.widgets.TransparentBottomSheetDialog
+import com.stupidtree.style.base.BaseViewHolder
+import com.stupidtree.component.data.DataState
+import com.stupidtree.style.base.BasicSelectableListAdapter
+import com.stupidtree.style.databinding.DialogBottomSelectableListItemBinding
+import com.stupidtree.style.widgets.TransparentBottomSheetDialog
 import java.util.*
 
 /**

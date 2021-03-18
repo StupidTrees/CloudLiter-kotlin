@@ -1,6 +1,6 @@
 package com.stupidtree.cloudliter.ui.myprofile
 
-import com.stupidtree.cloudliter.ui.base.Trigger
+import com.stupidtree.component.data.Trigger
 
 class TypeTrigger : Trigger() {
     var type = 0

@@ -6,7 +6,7 @@ import androidx.lifecycle.MediatorLiveData
 import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.model.UserRelation
 import com.stupidtree.cloudliter.data.source.websource.RelationWebSource
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 
 /**
  * 层次：Repository层

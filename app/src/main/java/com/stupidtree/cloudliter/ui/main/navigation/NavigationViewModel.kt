@@ -6,9 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.model.UserLocal
-import com.stupidtree.cloudliter.data.repository.ConversationRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
-import com.stupidtree.cloudliter.ui.base.Trigger
+import com.stupidtree.component.data.Trigger
 
 class NavigationViewModel(application: Application) : AndroidViewModel(application) {
     /**

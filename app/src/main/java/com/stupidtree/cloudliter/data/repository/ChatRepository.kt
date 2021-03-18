@@ -13,8 +13,8 @@ import com.stupidtree.cloudliter.data.source.dao.ChatMessageDao
 import com.stupidtree.cloudliter.data.source.websource.ChatMessageWebSource
 import com.stupidtree.cloudliter.data.source.websource.SocketWebSource
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.DataState.LIST_ACTION
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.DataState.LIST_ACTION
 import com.stupidtree.cloudliter.ui.chat.FriendStateTrigger
 import com.stupidtree.cloudliter.ui.chat.MessageReadNotification
 import okhttp3.MediaType

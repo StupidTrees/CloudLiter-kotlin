@@ -2,12 +2,11 @@ package com.stupidtree.cloudliter.ui.main.contact
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.stupidtree.cloudliter.data.model.UserRelation
 import com.stupidtree.cloudliter.data.repository.FriendsRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.RelationRepository
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.Trigger
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.Trigger
 import java.util.*
 
 /**

@@ -1,7 +1,7 @@
 package com.stupidtree.cloudliter.data.source.websource.service
 
 import androidx.lifecycle.LiveData
-import com.stupidtree.cloudliter.data.model.ApiResponse
+import com.stupidtree.component.web.ApiResponse
 import com.stupidtree.cloudliter.data.model.Conversation
 import retrofit2.http.GET
 import retrofit2.http.Header

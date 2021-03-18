@@ -10,7 +10,7 @@ import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.repository.ConversationRepository
 import com.stupidtree.cloudliter.data.repository.ConversationRepository.Companion.getInstance
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 import java.util.*
 
 class ConversationsViewModel(application: Application) : AndroidViewModel(application) {

@@ -9,7 +9,7 @@ import com.stupidtree.cloudliter.data.model.RelationEvent
 import com.stupidtree.cloudliter.data.model.RelationEvent.ACTION
 import com.stupidtree.cloudliter.data.model.UserRelation
 import com.stupidtree.cloudliter.data.source.websource.RelationWebSource
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 
 class RelationRepository(application: Application) {
     /**
@@ -34,18 +34,18 @@ class RelationRepository(application: Application) {
         val localRes = relationDao.queryRelation(friendId)
         result.addSource(localRes){
             if(it!=null){
-                result.value = DataState(it,DataState.STATE.SUCCESS)
+                result.value = DataState(it, DataState.STATE.SUCCESS)
             }else{
-                result.value = DataState(it,DataState.STATE.NOT_EXIST)
+                result.value = DataState(it, DataState.STATE.NOT_EXIST)
             }
         }
         val webSource = relationWebSource.queryRelation(token, friendId)
         result.addSource(webSource){webResult->
-            if(webResult.state==DataState.STATE.SUCCESS&&webResult.data!=null){
+            if(webResult.state== DataState.STATE.SUCCESS&&webResult.data!=null){
                 Thread{
                     relationDao.saveRelation(webResult.data!!)
                 }.start()
-            }else if(webResult.state==DataState.STATE.NOT_EXIST){
+            }else if(webResult.state== DataState.STATE.NOT_EXIST){
                 Thread{
                     relationDao.deleteRelation(friendId)
                 }.start()

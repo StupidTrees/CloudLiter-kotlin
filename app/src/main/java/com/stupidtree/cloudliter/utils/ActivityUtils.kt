@@ -22,8 +22,8 @@ import com.stupidtree.cloudliter.ui.qrcode.QRCodeActivity
 import com.stupidtree.cloudliter.ui.relationevent.RelationEventActivity
 import com.stupidtree.cloudliter.ui.search.SearchActivity
 import com.stupidtree.cloudliter.ui.welcome.WelcomeActivity
-import com.stupidtree.cloudliter.ui.widgets.PhotoDetailActivity
 import com.stupidtree.cloudliter.ui.wordcloud.WordCloudActivity
+import com.stupidtree.cloudliter.ui.widgets.PhotoDetailActivity
 
 /**
  * 此类整合了跳转到各个Activity的入口

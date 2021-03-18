@@ -6,7 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.text.format.DateFormat
-import com.stupidtree.cloudliter.utils.PermissionUtils
+import com.stupidtree.style.picker.PermissionUtils
 import java.io.File
 import java.util.*
 

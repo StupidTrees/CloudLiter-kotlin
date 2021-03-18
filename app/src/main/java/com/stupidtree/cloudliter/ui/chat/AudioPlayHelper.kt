@@ -6,7 +6,7 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import com.stupidtree.cloudliter.utils.PermissionUtils
+import com.stupidtree.style.picker.PermissionUtils
 
 class AudioPlayHelper internal constructor(val context: Activity, val voicePlayListener: VoicePlayListener) {
     var mMediaPlayer: MediaPlayer? = null

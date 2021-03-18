@@ -5,11 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.google.gson.JsonObject
 import com.stupidtree.cloudliter.R
-import com.stupidtree.cloudliter.data.model.ApiResponse
+import com.stupidtree.component.web.ApiResponse
 import com.stupidtree.cloudliter.data.model.UserLocal.Companion.getFromResponseData
 import com.stupidtree.cloudliter.data.model.UserProfile
 import com.stupidtree.cloudliter.data.model.UserSearched
-import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.UserService
 import com.stupidtree.cloudliter.data.source.websource.service.codes
 import com.stupidtree.cloudliter.data.source.websource.service.codes.SUCCESS
@@ -18,10 +17,12 @@ import com.stupidtree.cloudliter.data.source.websource.service.codes.USER_ALREAD
 import com.stupidtree.cloudliter.data.source.websource.service.codes.WORD_CLOUD_PRIVATE
 import com.stupidtree.cloudliter.data.source.websource.service.codes.WRONG_PASSWORD
 import com.stupidtree.cloudliter.data.source.websource.service.codes.WRONG_USERNAME
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.welcome.login.LoginResult
 import com.stupidtree.cloudliter.ui.welcome.signup.SignUpResult
 import com.stupidtree.cloudliter.utils.JsonUtils
+import com.stupidtree.component.web.BaseWebSource
+import com.stupidtree.component.web.LiveDataCallAdapter
 import okhttp3.MultipartBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

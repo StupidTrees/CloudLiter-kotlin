@@ -18,11 +18,11 @@ import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserSearched
 import com.stupidtree.cloudliter.databinding.ActivitySearchBinding
 import com.stupidtree.cloudliter.databinding.ActivitySearchListItemBinding
-import com.stupidtree.cloudliter.ui.base.BaseActivity
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter.OnItemClickListener
-import com.stupidtree.cloudliter.ui.base.BaseViewHolder
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.style.base.BaseActivity
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.style.base.BaseListAdapter.OnItemClickListener
+import com.stupidtree.style.base.BaseViewHolder
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.search.SearchActivity.SListAdapter.SViewHolder
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.AnimationUtils

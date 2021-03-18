@@ -2,12 +2,11 @@ package com.stupidtree.cloudliter.data.source.ai.yolo
 
 import android.app.Application
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.stupidtree.cloudliter.data.source.ai.detect.ObjectDetectSource.Companion.IMAGE_SIZE
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 
 class YOLOSource(private var application: Application) {
     private var classifier: Classifier? = null

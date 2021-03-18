@@ -8,8 +8,8 @@ import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.repository.AiRepository
 import com.stupidtree.cloudliter.data.repository.ImageRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.StringTrigger
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.StringTrigger
 
 class MyFaceViewModel(application: Application) : AndroidViewModel(application) {
     val localUserRepository = LocalUserRepository.getInstance(application)

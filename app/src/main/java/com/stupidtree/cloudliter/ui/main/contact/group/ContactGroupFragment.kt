@@ -14,15 +14,15 @@ import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserRelation
 import com.stupidtree.cloudliter.databinding.FragmentContactListBinding
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
-import com.stupidtree.cloudliter.ui.base.BaseFragmentWithReceiver
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.style.base.BaseFragmentWithReceiver
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.utils.ActivityUtils
 
 /**
  * 联系人页面的Fragment
  */
 @SuppressLint("NonConstantResourceId")
-class ContactGroupFragment : BaseFragmentWithReceiver<ContactGroupViewModel,FragmentContactListBinding>() {
+class ContactGroupFragment : BaseFragmentWithReceiver<ContactGroupViewModel, FragmentContactListBinding>() {
 
 
     /**

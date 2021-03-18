@@ -3,7 +3,7 @@ package com.stupidtree.cloudliter.data.repository
 import androidx.lifecycle.LiveData
 import com.stupidtree.cloudliter.data.model.RelationGroup
 import com.stupidtree.cloudliter.data.source.websource.GroupWebSource
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 
 /**
  * 层次：Repository

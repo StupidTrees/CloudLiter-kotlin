@@ -19,11 +19,8 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true"
         tools:targetApi="q">
         <activity android:name=".ui.qrcode.QRCodeActivity" />
         <activity android:name=".ui.group.GroupEditorActivity" />
@@ -68,16 +65,6 @@
         <activity android:name=".ui.gallery.album.AlbumActivity" />
         <activity android:name=".ui.gallery.ScenesActivity" />
         <activity android:name=".ui.accessibility.AccessibilityActivity" />
-
-        <provider
-            android:name=".MFileProvider"
-            android:authorities="com.stupidtree.cloudliter.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider> <!-- 加上他，否则无法从相册选取图片 -->
         <service android:name=".service.socket.SocketIOClientService" />
     </application>
 

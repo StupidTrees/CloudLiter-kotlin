@@ -2,7 +2,7 @@ package com.stupidtree.cloudliter.data.source.websource.service
 
 import androidx.lifecycle.LiveData
 import com.google.gson.JsonObject
-import com.stupidtree.cloudliter.data.model.ApiResponse
+import com.stupidtree.component.web.ApiResponse
 import com.stupidtree.cloudliter.data.model.UserProfile
 import com.stupidtree.cloudliter.data.model.UserSearched
 import okhttp3.MultipartBody

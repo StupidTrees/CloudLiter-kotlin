@@ -3,13 +3,11 @@ package com.stupidtree.cloudliter.ui.qrcode
 import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.media.Image
 import androidx.lifecycle.*
-import com.google.gson.JsonObject
 import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.Trigger
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.Trigger
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils
 import java.util.*

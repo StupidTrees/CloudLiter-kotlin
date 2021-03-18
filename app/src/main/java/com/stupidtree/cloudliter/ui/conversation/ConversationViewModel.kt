@@ -1,7 +1,6 @@
 package com.stupidtree.cloudliter.ui.conversation
 
 import android.app.Application
-import androidx.arch.core.util.Function
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,8 +9,8 @@ import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.repository.ConversationRepository
 import com.stupidtree.cloudliter.data.repository.ConversationRepository.Companion.getInstance
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.StringTrigger
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.StringTrigger
 import java.util.*
 
 class ConversationViewModel(application: Application) : AndroidViewModel(application) {

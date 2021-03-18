@@ -3,14 +3,15 @@ package com.stupidtree.cloudliter.data.source.websource
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.stupidtree.cloudliter.data.model.ApiResponse
+import com.stupidtree.component.web.ApiResponse
 import com.stupidtree.cloudliter.data.model.RelationEvent
 import com.stupidtree.cloudliter.data.model.RelationEvent.ACTION
 import com.stupidtree.cloudliter.data.model.UserRelation
-import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.RelationService
 import com.stupidtree.cloudliter.data.source.websource.service.codes
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.web.BaseWebSource
+import com.stupidtree.component.web.LiveDataCallAdapter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

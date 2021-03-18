@@ -1,16 +1,16 @@
 package com.stupidtree.cloudliter.data.source.websource
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.google.gson.JsonObject
 import com.stupidtree.cloudliter.data.model.FaceResult
 import com.stupidtree.cloudliter.data.source.ai.detect.ObjectDetectSource.Companion.IMAGE_SIZE
 import com.stupidtree.cloudliter.data.source.websource.service.AiService
-import com.stupidtree.cloudliter.data.source.websource.service.LiveDataCallAdapter
 import com.stupidtree.cloudliter.data.source.websource.service.codes
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.imagedetect.DetectResult
+import com.stupidtree.component.web.BaseWebSource
+import com.stupidtree.component.web.LiveDataCallAdapter
 import okhttp3.MultipartBody
 import org.json.JSONArray
 import org.json.JSONObject

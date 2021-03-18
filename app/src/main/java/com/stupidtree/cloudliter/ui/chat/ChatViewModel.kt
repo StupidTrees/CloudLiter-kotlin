@@ -11,8 +11,8 @@ import com.stupidtree.cloudliter.data.repository.ChatRepository
 import com.stupidtree.cloudliter.data.repository.ChatRepository.Companion.getInstance
 import com.stupidtree.cloudliter.data.repository.ConversationRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.DataState.LIST_ACTION
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.DataState.LIST_ACTION
 import com.stupidtree.cloudliter.utils.TextUtils
 import java.sql.Timestamp
 
@@ -109,7 +109,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     //状态数据：消息发送结果
     //first为成功后的message，second为uuid
     var messageSentLiveData = MediatorLiveData<Pair<DataState<ChatMessage?>, String>>()
-    var messageSentState: LiveData<Pair<DataState<ChatMessage?>, String>> = Transformations.map(messageSentLiveData) {input->
+    var messageSentState: LiveData<Pair<DataState<ChatMessage?>, String>> = Transformations.map(messageSentLiveData) { input->
         input.first.data?.let {
             if (input.second == bottomUUID) {
                 bottomId = it.id

@@ -6,7 +6,7 @@ import androidx.lifecycle.MediatorLiveData
 import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.model.ImageEntity
 import com.stupidtree.cloudliter.data.source.websource.ImageWebSource
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.face.FaceEntity
 import com.stupidtree.cloudliter.ui.gallery.SceneEntity
 

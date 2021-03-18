@@ -8,8 +8,8 @@ import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.model.RelationGroup
 import com.stupidtree.cloudliter.data.repository.GroupRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.Trigger
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.Trigger
 
 class PickGroupViewModel(application: Application) : AndroidViewModel(application) {
     /**

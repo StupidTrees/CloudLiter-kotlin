@@ -1,13 +1,12 @@
 package com.stupidtree.cloudliter.ui.gallery.album
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.repository.ImageRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.component.data.DataState
 
 class AlbumViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -27,7 +26,7 @@ class AlbumViewModel(application: Application) : AndroidViewModel(application) {
         val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {
             return@switchMap Transformations.map(imageRepository.getImagesOfClass(userLocal.token!!, it.key, it.pageSize, it.pageNum)) { dt ->
-                if(it.nextPage && dt.state==DataState.STATE.SUCCESS && dt.data?.isNotEmpty()==true){
+                if(it.nextPage && dt.state== DataState.STATE.SUCCESS && dt.data?.isNotEmpty()==true){
                     currentPage++
                 }
                 return@map dt.setListAction(if (it.nextPage) DataState.LIST_ACTION.APPEND else DataState.LIST_ACTION.REPLACE_ALL)

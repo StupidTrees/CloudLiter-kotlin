@@ -8,7 +8,6 @@ import android.view.HapticFeedbackConstants
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.GravityCompat
@@ -19,15 +18,14 @@ import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.databinding.ActivityMainBinding
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
-import com.stupidtree.cloudliter.ui.base.BaseActivity
-import com.stupidtree.cloudliter.ui.base.BaseTabAdapter
+import com.stupidtree.style.base.BaseActivity
 import com.stupidtree.cloudliter.ui.main.contact.ContactFragment
 import com.stupidtree.cloudliter.ui.main.conversations.ConversationsFragment
 import com.stupidtree.cloudliter.ui.main.navigation.NavigationFragment
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.NotificationUtils
-import me.ibrahimsn.lib.OnItemSelectedListener
+import com.stupidtree.style.base.BaseTabAdapter
 
 /**
  * 很显然，这是主界面

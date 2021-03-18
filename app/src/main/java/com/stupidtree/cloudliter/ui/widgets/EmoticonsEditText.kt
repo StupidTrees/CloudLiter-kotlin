@@ -6,7 +6,6 @@ import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
-import com.stupidtree.cloudliter.ui.widgets.EmoticonsTextView
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils
 

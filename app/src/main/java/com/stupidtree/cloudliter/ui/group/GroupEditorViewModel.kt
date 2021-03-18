@@ -5,9 +5,9 @@ import androidx.lifecycle.*
 import com.stupidtree.cloudliter.data.model.RelationGroup
 import com.stupidtree.cloudliter.data.repository.GroupRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
-import com.stupidtree.cloudliter.ui.base.DataState
-import com.stupidtree.cloudliter.ui.base.StringTrigger
-import com.stupidtree.cloudliter.ui.base.Trigger
+import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.StringTrigger
+import com.stupidtree.component.data.Trigger
 import java.util.*
 
 class GroupEditorViewModel(application: Application) : AndroidViewModel(application) {

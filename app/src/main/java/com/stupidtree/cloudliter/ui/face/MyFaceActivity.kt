@@ -9,13 +9,15 @@ import androidx.lifecycle.observe
 import androidx.recyclerview.widget.GridLayoutManager
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.databinding.ActivityMyFaceBinding
-import com.stupidtree.cloudliter.ui.base.BaseActivity
-import com.stupidtree.cloudliter.ui.base.BaseListAdapter
-import com.stupidtree.cloudliter.ui.base.DataState
+import com.stupidtree.style.base.BaseActivity
+import com.stupidtree.style.base.BaseListAdapter
+import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
-import com.stupidtree.cloudliter.ui.widgets.PopUpText
-import com.stupidtree.cloudliter.utils.FileProviderUtils
-import com.stupidtree.cloudliter.utils.GalleryPicker
+import com.stupidtree.style.widgets.PopUpText
+import com.stupidtree.style.picker.FileProviderUtils
+import com.stupidtree.style.picker.GalleryPicker
+import com.stupidtree.style.picker.GalleryPicker.RC_CHOOSE_PHOTO
+import com.stupidtree.style.picker.GalleryPicker.RC_CROP_PHOTO
 
 class MyFaceActivity : BaseActivity<MyFaceViewModel, ActivityMyFaceBinding>() {
     lateinit var listAdapter: MyFaceAdapter
@@ -102,7 +104,7 @@ class MyFaceActivity : BaseActivity<MyFaceViewModel, ActivityMyFaceBinding>() {
             return
         }
         when (requestCode) {
-            MyProfileActivity.RC_CHOOSE_PHOTO -> {
+         RC_CHOOSE_PHOTO -> {
                 //选择图片返回，要跳转到图片裁剪
                 if (null == data) {
                     Toast.makeText(this, R.string.no_image_selected, Toast.LENGTH_SHORT).show()
@@ -116,7 +118,7 @@ class MyFaceActivity : BaseActivity<MyFaceViewModel, ActivityMyFaceBinding>() {
                 // 剪裁图片
                 GalleryPicker.cropPhoto(getThis(), FileProviderUtils.getFilePathByUri(getThis(), uri), 500)
             }
-            MyProfileActivity.RC_CROP_PHOTO -> {                //裁剪图片返回，此时通知viewModel请求更改头像
+            RC_CROP_PHOTO -> {                //裁剪图片返回，此时通知viewModel请求更改头像
                 val path = GalleryPicker.getCroppedCacheDir(this)?.let { FileProviderUtils.getFilePathByUri(this, it) }
                 // create RequestBody instance from file
                 path?.let { viewModel.startUploadFace(it) }

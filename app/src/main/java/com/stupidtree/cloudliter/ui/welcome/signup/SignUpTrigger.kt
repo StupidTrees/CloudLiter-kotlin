@@ -1,7 +1,7 @@
 package com.stupidtree.cloudliter.ui.welcome.signup
 
 import com.stupidtree.cloudliter.data.model.UserLocal.GENDER
-import com.stupidtree.cloudliter.ui.base.Trigger
+import com.stupidtree.component.data.Trigger
 
 class SignUpTrigger : Trigger() {
     var username: String? = null

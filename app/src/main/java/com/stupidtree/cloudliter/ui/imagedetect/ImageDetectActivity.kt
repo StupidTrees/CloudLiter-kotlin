@@ -3,7 +3,7 @@ package com.stupidtree.cloudliter.ui.imagedetect
 import android.os.Bundle
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.databinding.ActivityImageDetailBinding
-import com.stupidtree.cloudliter.ui.base.BaseActivity
+import com.stupidtree.style.base.BaseActivity
 
 class ImageDetectActivity : BaseActivity<ImageDetectViewModel, ActivityImageDetailBinding>() {
 

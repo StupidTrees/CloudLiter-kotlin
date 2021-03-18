@@ -8,7 +8,7 @@ import android.os.Build
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import com.stupidtree.cloudliter.R
-import com.stupidtree.cloudliter.ui.widgets.PopUpText
+import com.stupidtree.style.widgets.PopUpText
 
 object NotificationUtils {
     /**
