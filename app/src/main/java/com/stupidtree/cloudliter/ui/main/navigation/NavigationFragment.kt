@@ -65,6 +65,9 @@ class NavigationFragment : BaseFragmentWithReceiver<NavigationViewModel, Fragmen
         binding?.sceneGalleryLayout?.setOnClickListener {
             ActivityUtils.startGalleryActivity(requireContext())
         }
+        binding?.contactGalleryLayout?.setOnClickListener {
+            ActivityUtils.startFriendFacesActivity(requireContext())
+        }
         binding?.wordCloudLayout?.setOnClickListener {
             ActivityUtils.startWordCloudActivity(requireContext())
         }

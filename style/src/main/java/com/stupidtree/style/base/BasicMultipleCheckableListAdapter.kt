@@ -2,6 +2,7 @@ package com.stupidtree.style.base
 
 import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
+import java.util.*
 
 /**
  * 一个基本的可多项选择列表Adapter
@@ -30,6 +31,28 @@ abstract class BasicMultipleCheckableListAdapter<T, H : RecyclerView.ViewHolder>
         selectedIndex.clear()
         for (d in data) {
             selectedIndex.add(mBeans.indexOf(d))
+        }
+        notifyDataSetChanged()
+    }
+
+    interface TargetMatcher<T,B>{
+        fun match(target:T,value:B):Boolean
+    }
+
+    /**
+     * 设置选中项目
+     *
+     * @param data 选中数据
+     */
+    fun<B> setChecked(data: List<B>,f:TargetMatcher<T,B>) {
+        selectedIndex.clear()
+        for (d in data) {
+            for(i in 0 until mBeans.size){
+                if(f.match(mBeans[i],d)){
+                    selectedIndex.add(i)
+                    break
+                }
+            }
         }
         notifyDataSetChanged()
     }

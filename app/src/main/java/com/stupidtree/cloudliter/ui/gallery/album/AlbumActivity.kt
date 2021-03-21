@@ -26,9 +26,15 @@ class AlbumActivity : BaseActivity<AlbumViewModel, ActivityAlbumBinding>() {
 
     private fun refreshAll() {
         binding.refresh.isRefreshing = true
-        intent.getStringExtra("key")?.let {
-            binding.collapse.title = PlacesUtils.getNameForSceneKey(this, it)
-            viewModel.refreshAll(it)
+        intent.getStringExtra("key")?.let { key ->
+            intent.getStringExtra("mode")?.let {
+                val type = AlbumQuery.QType.valueOf(it)
+                if(type==AlbumQuery.QType.SCENE){
+                    binding.collapse.title = PlacesUtils.getNameForSceneKey(this, key)
+                }
+                viewModel.refreshAll(type, key)
+            }
+
         }
     }
 
@@ -40,6 +46,12 @@ class AlbumActivity : BaseActivity<AlbumViewModel, ActivityAlbumBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setWindowParams(statusBar = true, darkColor = true, navi = false)
+        intent.getStringExtra("title")?.let {
+            if (it.isNotEmpty()) {
+                binding.toolbar.title = it
+                binding.collapse.title = it
+            }
+        }
         setToolbarActionBack(binding.toolbar)
     }
 
@@ -47,7 +59,7 @@ class AlbumActivity : BaseActivity<AlbumViewModel, ActivityAlbumBinding>() {
     var firstStart = true
     override fun onStart() {
         super.onStart()
-        if(firstStart){
+        if (firstStart) {
             refreshAll()
             firstStart = false
         }
@@ -56,14 +68,14 @@ class AlbumActivity : BaseActivity<AlbumViewModel, ActivityAlbumBinding>() {
 
     override fun initViews() {
         listAdapter = AlbumListAdapter(this, mutableListOf())
-        listAdapter.setOnItemClickListener(object:BaseListAdapter.OnItemClickListener<String>{
+        listAdapter.setOnItemClickListener(object : BaseListAdapter.OnItemClickListener<String> {
             override fun onItemClick(data: String, card: View?, position: Int) {
-                ActivityUtils.startImageDetectionActivity(getThis(),data)
+                ActivityUtils.startImageDetectionActivity(getThis(), data)
             }
 
         })
         binding.list.adapter = listAdapter
-        binding.list.layoutManager = GridLayoutManager(this,3)
+        binding.list.layoutManager = GridLayoutManager(this, 3)
         binding.refresh.setOnRefreshListener {
             refreshAll()
         }

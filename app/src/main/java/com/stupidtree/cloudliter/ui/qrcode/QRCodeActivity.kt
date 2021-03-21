@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.Toast
 import androidx.fragment.app.FragmentTransaction
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.king.zxing.CaptureFragment
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.UserLocal
@@ -61,6 +64,18 @@ class QRCodeActivity : BaseActivity<QRCodeViewModel, ActivityQRCodeBinding>() {
         val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
         ft.add(R.id.scanner, captureFragment)
         ft.commit()
+        binding.bar.setOnClickListener {
+            val behavior = BottomSheetBehavior.from(binding.bottomLayout)
+            if(behavior.state== STATE_EXPANDED){
+                behavior.state = STATE_COLLAPSED
+                binding.bar.contentDescription = getString(R.string.qr_expand)
+            }else{
+                behavior.state = STATE_EXPANDED
+                binding.bar.contentDescription = getString(R.string.qr_collapse)
+            }
+
+        }
+
     }
 
     private fun setUserInfo(user: UserLocal) {

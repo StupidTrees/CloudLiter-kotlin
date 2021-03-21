@@ -7,7 +7,9 @@ import com.stupidtree.cloudliter.data.source.websource.service.ImageService
 import com.stupidtree.cloudliter.data.source.websource.service.codes
 import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.face.FaceEntity
-import com.stupidtree.cloudliter.ui.gallery.SceneEntity
+import com.stupidtree.cloudliter.ui.face.permission.FaceWhiteListEntity
+import com.stupidtree.cloudliter.ui.gallery.faces.FriendFaceEntity
+import com.stupidtree.cloudliter.ui.gallery.scene.SceneEntity
 import com.stupidtree.component.web.BaseWebSource
 import com.stupidtree.component.web.LiveDataCallAdapter
 import retrofit2.Retrofit
@@ -89,6 +91,24 @@ class ImageWebSource : BaseWebSource<ImageService>(Retrofit.Builder()
         }
     }
 
+
+    /**
+     * 获取包含某一好友所有图片id
+     */
+    fun getImagesOfFriend(token: String,friendId:String,pageSize:Int,pageNum:Int):LiveData<DataState<List<String>>>{
+        return Transformations.map(service.getImagesOfFriend(token,friendId,pageSize,pageNum)) { input ->
+            if (input == null) {
+                return@map DataState(DataState.STATE.FETCH_FAILED)
+            }
+            when (input.code) {
+                codes.SUCCESS -> return@map DataState(input.data?: listOf())
+                codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
+            }
+        }
+    }
+
+
     /**
      * 获取所有类型
      */
@@ -104,6 +124,71 @@ class ImageWebSource : BaseWebSource<ImageService>(Retrofit.Builder()
             }
         }
     }
+
+    /**
+     * 获取所有好友人脸
+     */
+    fun getFriendFaces(token: String):LiveData<DataState<List<FriendFaceEntity>>>{
+        return Transformations.map(service.getFriendFaces(token)) { input ->
+            if (input == null) {
+                return@map DataState(DataState.STATE.FETCH_FAILED)
+            }
+            when (input.code) {
+                codes.SUCCESS -> return@map DataState(input.data?: listOf())
+                codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
+            }
+        }
+    }
+
+    /**
+     * 获取人脸好友白名单
+     */
+    fun getFaceWhiteList(token: String):LiveData<DataState<List<FaceWhiteListEntity>>>{
+        return Transformations.map(service.getFaceWhiteList(token)) { input ->
+            if (input == null) {
+                return@map DataState(DataState.STATE.FETCH_FAILED)
+            }
+            when (input.code) {
+                codes.SUCCESS -> return@map DataState(input.data?: listOf())
+                codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
+            }
+        }
+    }
+
+    /**
+     * 获取人脸好友白名单
+     */
+    fun addToWhiteList(token: String,userIds:List<String>):LiveData<DataState<Any>>{
+        return Transformations.map(service.addWhiteList(token,userIds)) { input ->
+            if (input == null) {
+                return@map DataState(DataState.STATE.FETCH_FAILED)
+            }
+            when (input.code) {
+                codes.SUCCESS -> return@map DataState(DataState.STATE.SUCCESS)
+                codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
+            }
+        }
+    }
+
+    /**
+     * 获取人脸好友白名单
+     */
+    fun removeFromWhiteList(token: String,friendId: String):LiveData<DataState<Any>>{
+        return Transformations.map(service.removeFromWhiteList(token,friendId)) { input ->
+            if (input == null) {
+                return@map DataState(DataState.STATE.FETCH_FAILED)
+            }
+            when (input.code) {
+                codes.SUCCESS -> return@map DataState(DataState.STATE.SUCCESS)
+                codes.TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                else -> return@map DataState(DataState.STATE.FETCH_FAILED, input.message)
+            }
+        }
+    }
+
     override fun getServiceClass(): Class<ImageService> {
         return ImageService::class.java
     }

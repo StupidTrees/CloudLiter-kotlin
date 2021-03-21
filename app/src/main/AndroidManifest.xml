@@ -63,8 +63,11 @@
         <activity android:name=".ui.wordcloud.WordCloudActivity" />
         <activity android:name=".ui.face.MyFaceActivity" />
         <activity android:name=".ui.gallery.album.AlbumActivity" />
-        <activity android:name=".ui.gallery.ScenesActivity" />
+        <activity android:name=".ui.gallery.scene.ScenesActivity" />
         <activity android:name=".ui.accessibility.AccessibilityActivity" />
+        <activity android:name=".ui.gallery.faces.FriendFacesActivity" />
+        <activity android:name=".ui.face.permission.FaceWhiteListActivity" />
+
         <service android:name=".service.socket.SocketIOClientService" />
     </application>
 

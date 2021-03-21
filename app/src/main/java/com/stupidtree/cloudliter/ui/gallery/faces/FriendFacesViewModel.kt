@@ -1,4 +1,4 @@
-package com.stupidtree.cloudliter.ui.gallery
+package com.stupidtree.cloudliter.ui.gallery.faces
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -9,7 +9,7 @@ import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.component.data.DataState
 import com.stupidtree.component.data.Trigger
 
-class ScenesViewModel(application: Application) : AndroidViewModel(application) {
+class FriendFacesViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * 仓库区
@@ -25,7 +25,7 @@ class ScenesViewModel(application: Application) : AndroidViewModel(application) 
     val imagesLiveData = Transformations.switchMap(refreshController) {
         val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {
-            return@switchMap imageRepository.getAllScenes(userLocal.token!!)
+            return@switchMap imageRepository.getFriendFaces(userLocal.token!!)
         } else {
             return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
         }

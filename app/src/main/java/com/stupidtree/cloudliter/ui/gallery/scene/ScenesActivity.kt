@@ -1,9 +1,10 @@
-package com.stupidtree.cloudliter.ui.gallery
+package com.stupidtree.cloudliter.ui.gallery.scene
 
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.stupidtree.cloudliter.databinding.ActivityScenesBinding
+import com.stupidtree.cloudliter.ui.gallery.album.AlbumQuery
 import com.stupidtree.style.base.BaseActivity
 import com.stupidtree.style.base.BaseListAdapter
 import com.stupidtree.component.data.DataState
@@ -11,7 +12,7 @@ import com.stupidtree.cloudliter.utils.ActivityUtils
 
 class ScenesActivity: BaseActivity<ScenesViewModel, ActivityScenesBinding>() {
 
-    lateinit var listAdapter:ScenesListAdapter
+    lateinit var listAdapter: ScenesListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +35,7 @@ class ScenesActivity: BaseActivity<ScenesViewModel, ActivityScenesBinding>() {
         listAdapter = ScenesListAdapter(this, mutableListOf())
         listAdapter.setOnItemClickListener(object :BaseListAdapter.OnItemClickListener<SceneEntity>{
             override fun onItemClick(data: SceneEntity, card: View?, position: Int) {
-                ActivityUtils.startAlbumActivity(getThis(),data.key)
+                ActivityUtils.startAlbumActivity(getThis(),AlbumQuery.QType.SCENE,data.key)
             }
 
         })

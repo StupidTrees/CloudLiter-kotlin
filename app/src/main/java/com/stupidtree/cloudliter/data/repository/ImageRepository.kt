@@ -8,7 +8,9 @@ import com.stupidtree.cloudliter.data.model.ImageEntity
 import com.stupidtree.cloudliter.data.source.websource.ImageWebSource
 import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.face.FaceEntity
-import com.stupidtree.cloudliter.ui.gallery.SceneEntity
+import com.stupidtree.cloudliter.ui.face.permission.FaceWhiteListEntity
+import com.stupidtree.cloudliter.ui.gallery.faces.FriendFaceEntity
+import com.stupidtree.cloudliter.ui.gallery.scene.SceneEntity
 
 class ImageRepository(application: Application) {
     //数据源1：网络类型数据，消息记录的网络数据源
@@ -62,6 +64,13 @@ class ImageRepository(application: Application) {
         return imageWebSource.getImagesOfClass(token, classKey,pageSize,pageNum)
     }
 
+
+    /**
+     * 获取包含某一好友的所有图片
+     */
+    fun getImagesOfFriend(token: String, friendId: String,pageSize:Int,pageNum:Int): LiveData<DataState<List<String>>> {
+        return imageWebSource.getImagesOfFriend(token,friendId,pageSize,pageNum)
+    }
     /**
      * 获取所有类型
      */
@@ -69,7 +78,34 @@ class ImageRepository(application: Application) {
         return imageWebSource.getALlClasses(token)
     }
 
+    /**
+     * 获取所有好友人脸
+     */
+    fun getFriendFaces(token:String):LiveData<DataState<List<FriendFaceEntity>>>{
+        return imageWebSource.getFriendFaces(token)
+    }
 
+
+    /**
+     * 获取白名单
+     */
+    fun getWhiteList(token: String):LiveData<DataState<List<FaceWhiteListEntity>>>{
+        return imageWebSource.getFaceWhiteList(token)
+    }
+
+    /**
+     * 添加到白名单
+     */
+    fun addToWhiteList(token: String,ids:List<String>):LiveData<DataState<Any>>{
+        return imageWebSource.addToWhiteList(token,ids)
+    }
+
+    /**
+     * 从白名单中移除
+     */
+    fun deleteFromWhiteList(token: String,friendId: String):LiveData<DataState<Any>>{
+        return imageWebSource.removeFromWhiteList(token,friendId)
+    }
     companion object {
         //单例模式
         @JvmStatic

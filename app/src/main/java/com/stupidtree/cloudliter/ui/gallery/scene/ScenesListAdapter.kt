@@ -1,4 +1,4 @@
-package com.stupidtree.cloudliter.ui.gallery
+package com.stupidtree.cloudliter.ui.gallery.scene
 
 import android.content.Context
 import android.view.ViewGroup

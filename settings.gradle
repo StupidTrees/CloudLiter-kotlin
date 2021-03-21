@@ -1,3 +1,4 @@
+include ':accessibility'
 include ':component'
 include ':style'
 include ':app'

@@ -83,7 +83,7 @@ object ImageUtils {
     }
 
     fun getCloudImageUrl(imageId: String): String {
-        return "http://hita.store:3000/message/image?imageId=" +
+        return "http://hita.store:3000/image/get?imageId=" +
                 imageId
     }
 

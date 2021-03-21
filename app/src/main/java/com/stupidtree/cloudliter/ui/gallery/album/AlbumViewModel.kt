@@ -25,7 +25,13 @@ class AlbumViewModel(application: Application) : AndroidViewModel(application) {
     val imagesLiveData = Transformations.switchMap(queryLiveData) {
         val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {
-            return@switchMap Transformations.map(imageRepository.getImagesOfClass(userLocal.token!!, it.key, it.pageSize, it.pageNum)) { dt ->
+            return@switchMap Transformations.map(
+                    if(it.mode==AlbumQuery.QType.FRIEND){
+                        imageRepository.getImagesOfFriend(userLocal.token!!, it.key, it.pageSize, it.pageNum)
+                    }else{
+                        imageRepository.getImagesOfClass(userLocal.token!!, it.key, it.pageSize, it.pageNum)
+                    }
+            ) { dt ->
                 if(it.nextPage && dt.state== DataState.STATE.SUCCESS && dt.data?.isNotEmpty()==true){
                     currentPage++
                 }
@@ -40,9 +46,9 @@ class AlbumViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * 从头开始加载
      */
-    fun refreshAll(key: String) {
+    fun refreshAll(type:AlbumQuery.QType,key: String) {
         currentPage = 0
-        queryLiveData.value = AlbumQuery(key = key, pageNum = 0, pageSize = PAGE_SIZE, nextPage = false)
+        queryLiveData.value = AlbumQuery(key = key, pageNum = 0, mode=type,pageSize = PAGE_SIZE, nextPage = false)
     }
 
     /**

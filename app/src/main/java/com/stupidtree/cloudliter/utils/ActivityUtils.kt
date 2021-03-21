@@ -11,8 +11,11 @@ import com.stupidtree.cloudliter.ui.accessibility.AccessibilityActivity
 import com.stupidtree.cloudliter.ui.chat.ChatActivity
 import com.stupidtree.cloudliter.ui.conversation.ConversationActivity
 import com.stupidtree.cloudliter.ui.face.MyFaceActivity
-import com.stupidtree.cloudliter.ui.gallery.ScenesActivity
+import com.stupidtree.cloudliter.ui.face.permission.FaceWhiteListActivity
+import com.stupidtree.cloudliter.ui.gallery.scene.ScenesActivity
 import com.stupidtree.cloudliter.ui.gallery.album.AlbumActivity
+import com.stupidtree.cloudliter.ui.gallery.album.AlbumQuery
+import com.stupidtree.cloudliter.ui.gallery.faces.FriendFacesActivity
 import com.stupidtree.cloudliter.ui.group.GroupEditorActivity
 import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectActivity
 import com.stupidtree.cloudliter.ui.main.MainActivity
@@ -183,15 +186,25 @@ object ActivityUtils {
      * 进入类别
      */
     fun startGalleryActivity(from: Context){
-        val it = Intent(from,ScenesActivity::class.java)
+        val it = Intent(from, ScenesActivity::class.java)
+        from.startActivity(it)
+    }
+
+    /**
+     * 进入好友人脸相册
+     */
+    fun startFriendFacesActivity(from: Context){
+        val it = Intent(from, FriendFacesActivity::class.java)
         from.startActivity(it)
     }
     /**
      * 进入类别相册
      */
-    fun startAlbumActivity(from: Context,key:String){
+    fun startAlbumActivity(from: Context,mode:AlbumQuery.QType,key:String,title:String?=""){
         val it = Intent(from,AlbumActivity::class.java)
         it.putExtra("key",key)
+        it.putExtra("mode",mode.name)
+        it.putExtra("title",title)
         from.startActivity(it)
     }
 
@@ -200,6 +213,14 @@ object ActivityUtils {
      */
     fun startAccessibilityActivity(from: Context){
         val it = Intent(from,AccessibilityActivity::class.java)
+        from.startActivity(it)
+    }
+
+    /**
+     * 进入人脸白名单管理
+     */
+    fun startFaceWhitelistActivity(from: Context){
+        val it = Intent(from,FaceWhiteListActivity::class.java)
         from.startActivity(it)
     }
 }

@@ -47,8 +47,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:overScrollMode="never"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp" />
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

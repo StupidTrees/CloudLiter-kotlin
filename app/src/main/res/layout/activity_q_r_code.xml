@@ -34,6 +34,7 @@
 
 
     <LinearLayout
+        android:id="@+id/bottom_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="36dp"
@@ -46,11 +47,16 @@
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:alpha="0.8"
+            android:clickable="true"
+            android:contentDescription="@string/qr_expand"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:theme="@style/rippleControl"
             app:srcCompat="@drawable/ic_baseline_menu_24" />
 
         <ImageView

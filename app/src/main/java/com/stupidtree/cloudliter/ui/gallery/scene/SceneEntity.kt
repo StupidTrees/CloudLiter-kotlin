@@ -1,4 +1,4 @@
-package com.stupidtree.cloudliter.ui.gallery
+package com.stupidtree.cloudliter.ui.gallery.scene
 
 class SceneEntity {
 

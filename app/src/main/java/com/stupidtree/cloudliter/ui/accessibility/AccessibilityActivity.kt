@@ -81,9 +81,13 @@ class AccessibilityActivity : BaseActivity<AccessibilityViewModel, ActivityAcces
         binding.myFaceLayout.setOnClickListener {
             ActivityUtils.startMyFaceActivity(this)
         }
+        binding.facePermissionLayout.setOnClickListener {
+            ActivityUtils.startFaceWhitelistActivity(this)
+        }
         viewModel.changeTypeResult.observe(this) {
             viewModel.startRefresh()
         }
+
         viewModel.myProfileLiveData.observe(this) {
             if (it.state == DataState.STATE.SUCCESS) {
                 if (it.data?.isType(UserProfile.VISUAL) == true) {

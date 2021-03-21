@@ -128,7 +128,7 @@
     <string name="add_ok">添加分组成功</string>
     <string name="delete_ok">删除分组成功</string>
     <string name="delete_group">删除该分组</string>
-    <string name="ensure_delete">确认删除该分组吗</string>
+    <string name="ensure_delete">确认删除吗</string>
     <string name="not_assigned_group">未分组</string>
     <string name="qrcode_title">二维码</string>
     <string name="invalid_business_card">无效的名片！</string>
@@ -242,6 +242,12 @@
     <string name="label_face_permission">人脸权限管理</string>
     <string name="label_my_accessibility">我的无障碍设置</string>
     <string name="hint_my_accessibility">标记自身的无障碍属性，系统将为您提供更合适的服务</string>
+    <string name="title_friend_face">亲友相册</string>
+    <string name="title_face_permission">人脸权限名单</string>
+    <string name="add_success">添加成功</string>
+    <string name="pick_friends">选择好友</string>
+    <string name="qr_expand">显示我的二维码</string>
+    <string name="qr_collapse">隐藏我的二维码</string>
     <string-array name="yunmoji_descriptions">
         <item>企鹅</item>
         <item>兔子</item>

@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/backgroundColorSecond"
-    tools:context=".ui.group.GroupEditorActivity">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -22,7 +20,7 @@
             app:expandedTitleMargin="24dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:statusBarScrim="#00000000"
-            app:title="@string/title_word_cloud"
+            app:title="@string/title_friend_face"
             app:toolbarId="@id/toolbar">
 
 
@@ -50,5 +48,5 @@
             android:layout_height="match_parent"
             android:overScrollMode="never" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

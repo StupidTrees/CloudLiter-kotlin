@@ -22,7 +22,7 @@
             app:expandedTitleMargin="24dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:statusBarScrim="#00000000"
-            app:title="@string/title_word_cloud"
+            app:title="@string/title_face_permission"
             app:toolbarId="@id/toolbar">
 
 
@@ -50,5 +50,15 @@
             android:layout_height="match_parent"
             android:overScrollMode="never" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:tint="@android:color/white"
+        app:srcCompat="@drawable/ic_baseline_add_24" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
