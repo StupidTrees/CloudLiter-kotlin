@@ -248,6 +248,7 @@
     <string name="pick_friends">选择好友</string>
     <string name="qr_expand">显示我的二维码</string>
     <string name="qr_collapse">隐藏我的二维码</string>
+    <string name="notification">通知消息</string>
     <string-array name="yunmoji_descriptions">
         <item>企鹅</item>
         <item>兔子</item>

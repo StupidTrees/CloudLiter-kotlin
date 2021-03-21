@@ -56,6 +56,15 @@ class NavigationFragment : BaseFragmentWithReceiver<NavigationViewModel, Fragmen
             }
 
         }
+        binding?.profileLayout?.setOnClickListener {
+            ActivityUtils.startMyProfileActivity(requireContext())
+        }
+        binding?.qrLayout?.setOnClickListener {
+            ActivityUtils.startQRCodeActivity(requireContext())
+        }
+        binding?.notificationLayout?.setOnClickListener {
+            ActivityUtils.startRelationEventActivity(requireContext())
+        }
 //        binding?.faceLayout?.setOnClickListener {
 //            ActivityUtils.startMyFaceActivity(requireContext())
 //        }
