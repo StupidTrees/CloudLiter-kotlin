@@ -137,7 +137,7 @@ public class YoloV4Classifier implements Classifier {
 
     @Override
     public float getObjThresh() {
-        return 0.5f;
+        return 0.4f;
     }
 
 

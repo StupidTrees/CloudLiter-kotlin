@@ -7,6 +7,7 @@ import com.stupidtree.cloudliter.data.model.UserLocal.GENDER
 import com.stupidtree.cloudliter.data.model.UserProfile
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository
+import com.stupidtree.cloudliter.data.repository.ProfileRepository.Companion.getInstance
 import com.stupidtree.cloudliter.data.repository.ProfileRepository.Companion.instance
 import com.stupidtree.component.data.BooleanTrigger
 import com.stupidtree.component.data.DataState
@@ -22,7 +23,7 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
      * 仓库区
      */
     //仓库1：用户资料仓库
-    private val profileRepository: ProfileRepository? = instance
+    private val profileRepository: ProfileRepository = getInstance(application)
 
     //仓库2：本地用户仓库
     private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
@@ -40,7 +41,7 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
         val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {
             //从用户资料仓库总取出数据
-            return@switchMap profileRepository!!.getUserProfile(userLocal.id!!, userLocal.token!!)
+            return@switchMap profileRepository.getUserProfile(userLocal.id!!, userLocal.token!!)
         } else {
             return@switchMap MutableLiveData(DataState<UserProfile?>(DataState.STATE.NOT_LOGGED_IN))
         }
@@ -59,7 +60,7 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
                         val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
                             //通知用户资料仓库，开始更换头像
-                            return@switchMap profileRepository!!.changeAvatar(userLocal.token!!, input.data)
+                            return@switchMap profileRepository.changeAvatar(userLocal.token!!, input.data)
                         } else {
                             return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -83,7 +84,7 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
                     if (input.isActioning) {
                         val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
-                            return@switchMap profileRepository!!.changeNickname(userLocal.token!!, input.data)
+                            return@switchMap profileRepository.changeNickname(userLocal.token!!, input.data)
                         } else {
                             return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -106,7 +107,7 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
                     if (input.isActioning) {
                         val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
-                            return@switchMap profileRepository!!.changeGender(userLocal.token!!, input.data)
+                            return@switchMap profileRepository.changeGender(userLocal.token!!, input.data)
                         } else {
                             return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -128,7 +129,7 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
                     if (input.isActioning) {
                         val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
-                            return@switchMap profileRepository!!.changeUserAccessibility(userLocal.token!!, input.data)
+                            return@switchMap profileRepository.changeUserAccessibility(userLocal.token!!, input.data)
                         } else {
                             return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -151,7 +152,7 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
                     if (input.isActioning) {
                         val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
-                            return@switchMap profileRepository!!.changeSignature(userLocal.token!!, input.data)
+                            return@switchMap profileRepository.changeSignature(userLocal.token!!, input.data)
                         } else {
                             return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -173,7 +174,7 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
                     if (input.isActioning) {
                         val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
-                            return@switchMap profileRepository!!.changeUserType(userLocal.token!!, input.type, input.subType, input.typePermission)
+                            return@switchMap profileRepository.changeUserType(userLocal.token!!, input.type, input.subType, input.typePermission)
                         } else {
                             return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
                         }
@@ -197,7 +198,7 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
                     if (input.isActioning) {
                         val userLocal = localUserRepository.getLoggedInUser()
                         if (userLocal.isValid) {
-                            return@switchMap profileRepository!!.setWordCloudAccessibility(userLocal.token!!, input.data)
+                            return@switchMap profileRepository.setWordCloudAccessibility(userLocal.token!!, input.data)
                         } else {
                             return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
                         }

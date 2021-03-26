@@ -4,18 +4,19 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.FaceResult
 import com.stupidtree.cloudliter.databinding.FragmentImageDedectBinding
-import com.stupidtree.style.base.BaseFragment
-import com.stupidtree.style.base.BaseListAdapter
-import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpImageMessageDetail
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.PlacesUtils
+import com.stupidtree.component.data.DataState
+import com.stupidtree.style.base.BaseFragment
+import com.stupidtree.style.base.BaseListAdapter
 import java.text.DecimalFormat
 
 class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDedectBinding>() {
@@ -83,6 +84,10 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
         }
         viewModel.imageLiveData.observe(this) {
             binding?.labeledImageView?.setImage(it)
+        }
+        viewModel.iconClassifyResult.observe(this){
+            val res = it.data?.sorted()?.get(0)
+            Toast.makeText(requireContext(),res.toString(),Toast.LENGTH_SHORT).show()
         }
         viewModel.detectionResult.observe(this) {
             binding?.loadingDetect?.visibility = View.GONE

@@ -249,6 +249,11 @@
     <string name="qr_expand">显示我的二维码</string>
     <string name="qr_collapse">隐藏我的二维码</string>
     <string name="notification">通知消息</string>
+    <string name="title_light_engine">LightEngine</string>
+    <string name="label_icon_test">图标识别测试</string>
+    <string name="label_light_engine">LightEngine</string>
+    <string name="hint_light_engine">云升光引擎</string>
+    <string name="light_engine_settings">LightEngine设置</string>
     <string-array name="yunmoji_descriptions">
         <item>企鹅</item>
         <item>兔子</item>

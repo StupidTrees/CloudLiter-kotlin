@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import com.stupidtree.accessibility.ai.Classification
 import com.stupidtree.cloudliter.data.repository.AiRepository
 import com.stupidtree.cloudliter.data.repository.ImageRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
@@ -33,6 +34,9 @@ class ImageDetectViewModel(application: Application) : AndroidViewModel(applicat
             }
             return@switchMap MutableLiveData(DataState(r))
         }
+    }
+    var iconClassifyResult:LiveData<DataState<List<Classification>>> = Transformations.switchMap(imageLiveData) {
+        return@switchMap aiRepository.iconClassify(it)
     }
 
     val imageEntityLiveData = Transformations.switchMap(imageIdLiveData) {

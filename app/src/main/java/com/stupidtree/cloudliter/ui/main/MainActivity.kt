@@ -102,11 +102,15 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
         binding.title.text = getString(R.string.title_home)
         binding.pager.adapter = object : BaseTabAdapter(supportFragmentManager, 3) {
             override fun initItem(position: Int): Fragment {
-                return if (position == 0) {
-                    ConversationsFragment.newInstance()
-                } else if (position == 1) {
-                    ContactFragment.newInstance()
-                } else NavigationFragment.newInstance()
+                return when (position) {
+                    0 -> {
+                        ConversationsFragment.newInstance()
+                    }
+                    1 -> {
+                        ContactFragment.newInstance()
+                    }
+                    else -> NavigationFragment.newInstance()
+                }
             }
 
             override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {

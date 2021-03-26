@@ -9,11 +9,10 @@ android {
     kotlinOptions { jvmTarget = 1.8}
     defaultConfig {
         applicationId 'com.stupidtree.cloudliter'
-        minSdkVersion 23
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 20210318
         versionName "1.37"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -26,8 +25,8 @@ android {
             noCompress 'tflite'
         }
         packagingOptions{
-            doNotStrip '*/arm64-v8a/libhexagon_nn_skel*.so'
-            doNotStrip '*/armeabi-v7a/libhexagon_nn_skel*.so'
+            doNotStrip '*/arm64-v8a/libaiboost_skel*.so'
+            doNotStrip '*/armeabi-v7a/libaiboost_skel*.so'
         }
 
 
@@ -63,11 +62,12 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.4'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.4'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.annotation:annotation:1.2.0'
     implementation 'org.jetbrains:annotations-java5:15.0'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     implementation project(path: ':style')
     implementation project(path: ':component')
+    implementation project(path: ':accessibility')
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
@@ -78,9 +78,6 @@ dependencies {
     //retrofit2的gson转换器
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
 
-    //ButterKnifeView注入
-    //implementation 'com.jakewharton:butterknife:10.1.0'
-    //kapt 'com.jakewharton:butterknife-compiler:10.1.0'
 
     //Glide图片加载
     implementation 'com.github.bumptech.glide:glide:4.9.0'
@@ -111,7 +108,7 @@ dependencies {
 
 
     implementation "androidx.core:core-ktx:1.3.2"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
     //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 

@@ -84,6 +84,9 @@ class AccessibilityActivity : BaseActivity<AccessibilityViewModel, ActivityAcces
         binding.facePermissionLayout.setOnClickListener {
             ActivityUtils.startFaceWhitelistActivity(this)
         }
+        binding.lighEngineSettingLayout.setOnClickListener {
+            ActivityUtils.startLightEngineActivity(this)
+        }
         viewModel.changeTypeResult.observe(this) {
             viewModel.startRefresh()
         }

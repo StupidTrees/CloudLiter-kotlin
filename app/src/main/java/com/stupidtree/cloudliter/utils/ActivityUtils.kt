@@ -4,10 +4,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.stupidtree.accessibility.LightEngine
 import com.stupidtree.cloudliter.data.model.*
 import com.stupidtree.cloudliter.data.model.Conversation.Companion.fromNewMessage
 import com.stupidtree.cloudliter.data.model.Conversation.Companion.fromUserRelationAndProfile
 import com.stupidtree.cloudliter.ui.accessibility.AccessibilityActivity
+import com.stupidtree.cloudliter.ui.accessibility.egine.LightEngineActivity
 import com.stupidtree.cloudliter.ui.chat.ChatActivity
 import com.stupidtree.cloudliter.ui.conversation.ConversationActivity
 import com.stupidtree.cloudliter.ui.face.MyFaceActivity
@@ -221,6 +223,13 @@ object ActivityUtils {
      */
     fun startFaceWhitelistActivity(from: Context){
         val it = Intent(from,FaceWhiteListActivity::class.java)
+        from.startActivity(it)
+    }
+    /**
+     * 进入LightEngine面板
+     */
+    fun startLightEngineActivity(from: Context){
+        val it = Intent(from,LightEngineActivity::class.java)
         from.startActivity(it)
     }
 }

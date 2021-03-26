@@ -9,6 +9,8 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.google.gson.JsonObject
+import com.stupidtree.accessibility.ai.Classification
+import com.stupidtree.accessibility.ai.IconClassifierSource
 import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.model.FaceResult
 import com.stupidtree.cloudliter.data.source.ai.yolo.Classifier
@@ -29,6 +31,7 @@ class AiRepository(application: Application) {
     //数据源1：网络类型数据，消息记录的网络数据源
     var aiWebSource: AiWebSource = AiWebSource.instance!!
     val yoloSource: YOLOSource = YOLOSource.getInstance(application)
+    val iconClassifierSource = IconClassifierSource.getInstance(application)
     val imageDao = AppDatabase.getDatabase(application).imageDao()
     val faceResultDao = AppDatabase.getDatabase(application).faceResultDao()
 
@@ -150,6 +153,10 @@ class AiRepository(application: Application) {
 
     fun detectImage(bitmap: Bitmap): LiveData<DataState<List<Classifier.Recognition>>> {
         return yoloSource.detectImage(bitmap)
+    }
+
+    fun iconClassify(bitmap: Bitmap): LiveData<DataState<List<Classification>>> {
+        return iconClassifierSource.classifyIcon(bitmap)
     }
 
     companion object {

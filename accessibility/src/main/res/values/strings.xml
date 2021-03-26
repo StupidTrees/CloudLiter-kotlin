@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="drawer_left">左侧可打开抽屉</string>
+    <string name="drawer_right">右侧可打开抽屉</string>
+    <string name="drawer_opened">抽屉已打开</string>
+    <string name="drawer_closed">抽屉已关闭</string>
+</resources>
