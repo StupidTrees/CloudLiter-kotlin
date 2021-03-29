@@ -52,12 +52,12 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
         //当viewModel的UserProfile数据发生变更时，通知UI更新
         viewModel.userProfileLiveData.observe(this, { userProfileDataState: DataState<UserProfile?> ->
             if (userProfileDataState.state === DataState.STATE.SUCCESS) {
-                setUserProfile(userProfileDataState.data)
+                setUserProfile(userProfileDataState.data!!)
             } else {
                 Toast.makeText(getThis(), R.string.connection_failed, Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel.changeAvatarResult?.observe(this, { stringDataState ->
+        viewModel.changeAvatarResult.observe(this, { stringDataState ->
             if (stringDataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show()
                 viewModel.startRefresh()
@@ -212,7 +212,7 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
         }
 
         binding.wordcloudLayout.setOnClickListener {
-            viewModel.userProfileLiveData!!.value?.let {
+            viewModel.userProfileLiveData.value?.let {
                 if (it.data != null) {
                     PopUpSelectableList<Boolean>()
                             .setTitle(R.string.choose_word_cloud_permission)
@@ -238,9 +238,9 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
      *
      * @param profile 用户资料对象
      */
-    private fun setUserProfile(profile: UserProfile?) {
+    private fun setUserProfile(profile: UserProfile) {
         //设置头像
-        ImageUtils.loadLocalAvatarInto(getThis(), profile!!.avatar, binding.avatar)
+        ImageUtils.loadAvatarInto(getThis(), profile.avatar, binding.avatar)
         //设置各种文本信息
         binding.typePermission.setText(profile.getTypePermissionName())
         binding.type.setText(profile.getTypeName())

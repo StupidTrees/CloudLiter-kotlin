@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "ae3b166170b6b832cb8fd453915d0d87",
+    "identityHash": "c8bb4924e58244fe12a4caf61dc66ae3",
     "entities": [
       {
         "tableName": "message",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `fromId` TEXT, `toId` TEXT, `type` TEXT DEFAULT 'TXT', `content` TEXT, `friendTypePermission` TEXT NOT NULL, `friendType` INTEGER NOT NULL, `friendSubType` TEXT, `conversationId` TEXT, `relationId` TEXT, `read` INTEGER NOT NULL, `sensitive` INTEGER NOT NULL, `emotion` REAL NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `extra` TEXT, `ttsResult` TEXT, `fileId` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `fromId` TEXT, `type` TEXT DEFAULT 'TXT', `content` TEXT, `conversationId` TEXT NOT NULL, `read` INTEGER NOT NULL, `sensitive` INTEGER NOT NULL, `emotion` REAL NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `extra` TEXT, `ttsResult` TEXT, `fileId` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -17,12 +17,6 @@
           {
             "fieldPath": "fromId",
             "columnName": "fromId",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "toId",
-            "columnName": "toId",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -40,34 +34,10 @@
             "notNull": false
           },
           {
-            "fieldPath": "friendTypePermission",
-            "columnName": "friendTypePermission",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "friendType",
-            "columnName": "friendType",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "friendSubType",
-            "columnName": "friendSubType",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
             "fieldPath": "conversationId",
             "columnName": "conversationId",
             "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "relationId",
-            "columnName": "relationId",
-            "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "read",
@@ -129,7 +99,7 @@
       },
       {
         "tableName": "conversation",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `historyId` TEXT, `lastMessage` TEXT, `friendId` TEXT, `groupId` TEXT, `friendNickname` TEXT, `friendAvatar` TEXT, `friendRemark` TEXT, `friendTypePermission` TEXT NOT NULL, `friendType` INTEGER NOT NULL, `friendSubType` TEXT, `relationId` TEXT, `createdAt` INTEGER, `updatedAt` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `lastMessage` TEXT, `groupId` TEXT, `type` TEXT NOT NULL, `friendId` TEXT, `name` TEXT, `avatar` TEXT, `createdAt` INTEGER, `updatedAt` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -138,20 +108,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "historyId",
-            "columnName": "historyId",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
             "fieldPath": "lastMessage",
             "columnName": "lastMessage",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "friendId",
-            "columnName": "friendId",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -162,44 +120,26 @@
             "notNull": false
           },
           {
-            "fieldPath": "friendNickname",
-            "columnName": "friendNickname",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "friendAvatar",
-            "columnName": "friendAvatar",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "friendRemark",
-            "columnName": "friendRemark",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "friendTypePermission",
-            "columnName": "friendTypePermission",
+            "fieldPath": "type",
+            "columnName": "type",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "friendType",
-            "columnName": "friendType",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "friendSubType",
-            "columnName": "friendSubType",
+            "fieldPath": "friendId",
+            "columnName": "friendId",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "relationId",
-            "columnName": "relationId",
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "avatar",
+            "columnName": "avatar",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -227,7 +167,7 @@
       },
       {
         "tableName": "relation",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`friendNickname` TEXT, `friendAvatar` TEXT, `groupId` TEXT, `groupName` TEXT, `friendGender` TEXT, `friendId` TEXT NOT NULL, `remark` TEXT, PRIMARY KEY(`friendId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`friendNickname` TEXT, `friendAvatar` TEXT, `groupId` TEXT, `groupName` TEXT, `friendGender` TEXT, `conversationId` TEXT NOT NULL, `friendId` TEXT NOT NULL, `remark` TEXT, PRIMARY KEY(`friendId`))",
         "fields": [
           {
             "fieldPath": "friendNickname",
@@ -258,6 +198,12 @@
             "columnName": "friendGender",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "conversationId",
+            "columnName": "conversationId",
+            "affinity": "TEXT",
+            "notNull": true
           },
           {
             "fieldPath": "friendId",
@@ -357,7 +303,7 @@
       },
       {
         "tableName": "image",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `fromId` TEXT NOT NULL, `toId` TEXT NOT NULL, `fileName` TEXT NOT NULL, `sensitive` TEXT NOT NULL, `scene` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `fromId` TEXT, `toId` TEXT, `fileName` TEXT NOT NULL, `sensitive` TEXT, `scene` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -369,13 +315,13 @@
             "fieldPath": "fromId",
             "columnName": "fromId",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "toId",
             "columnName": "toId",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "fileName",
@@ -387,7 +333,7 @@
             "fieldPath": "sensitive",
             "columnName": "sensitive",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "scene",
@@ -454,7 +400,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ae3b166170b6b832cb8fd453915d0d87')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c8bb4924e58244fe12a4caf61dc66ae3')"
     ]
   }
 }

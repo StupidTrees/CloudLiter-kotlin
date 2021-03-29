@@ -29,6 +29,8 @@ class UserRelation {
     //性别
     var friendGender: GENDER? = null
 
+    var conversationId: String = ""
+
     @PrimaryKey
     //联系人的用户id
     var friendId: String = ""
@@ -48,7 +50,7 @@ class UserRelation {
         if (other == null || javaClass != other.javaClass) return false
         val that = other as UserRelation
         return friendNickname == that.friendNickname &&
-                friendId == that.friendId&&remark==that.remark
+                friendId == that.friendId && remark == that.remark
     }
 
     override fun hashCode(): Int {

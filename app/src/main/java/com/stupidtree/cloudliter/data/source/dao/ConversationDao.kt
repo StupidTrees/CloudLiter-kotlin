@@ -9,14 +9,17 @@ interface ConversationDao {
     @Query("SELECT * FROM conversation  ORDER BY updatedAt DESC")
     fun getConversations(): LiveData<MutableList<Conversation>>
 
-    @Query("SELECT * FROM conversation WHERE friendId IS :friendId")
-    fun getConversationAt(friendId:String):LiveData<Conversation?>
+    @Query("SELECT * FROM conversation WHERE id IS :conversationId")
+    fun getConversationAt(conversationId:String):LiveData<Conversation?>
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveConversations(data: MutableList<Conversation>)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveConversation(data: Conversation)
     @Delete
     fun deleteConversations(data:List<Conversation>)
+
+    @Query("delete from conversation where groupId is :groupId")
+    fun deleteGroupConversation(groupId:String)
 
     @Query("DELETE FROM conversation")
     fun clearTable()

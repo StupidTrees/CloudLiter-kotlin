@@ -24,11 +24,10 @@ interface ConversationService {
     /**
      * 查询两用户的某一对话
      * @param token 登陆状态token
-     * @param userId 用户id（非必须，缺失的话服务端将从token中解析出用户id）
      * @return 对话列表
      */
     @GET("/conversation/query")
-    fun queryConversation(@Header("token") token: String?, @Query("userId") userId: String?, @Query("friendId") friendId: String?): LiveData<ApiResponse<Conversation?>?>
+    fun queryConversation(@Header("token") token: String?, @Query("conversationId") conversationId: String?): LiveData<ApiResponse<Conversation?>?>
 
     /**
      * 获取对话词云
@@ -36,5 +35,5 @@ interface ConversationService {
      * @return 搜索结果
      */
     @GET("/conversation/word_cloud")
-    fun getWordCloud(@Header("token") token: String?, @Query("userId") userId: String?, @Query("friendId") friendId: String): LiveData<ApiResponse<HashMap<String, Float?>?>?>
+    fun getWordCloud(@Header("token") token: String?, @Query("conversationId") conversationId: String): LiveData<ApiResponse<HashMap<String, Float?>?>?>
 }

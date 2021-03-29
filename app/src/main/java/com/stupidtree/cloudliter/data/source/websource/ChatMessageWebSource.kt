@@ -78,8 +78,8 @@ class ChatMessageWebSource : BaseWebSource<ChatMessageService>(Retrofit.Builder(
      * @param token 令牌
      * @return 返回结果
      */
-    fun sendTextMessage(token: String, fromId:String,toId: String,content:String,uuid:String): LiveData<DataState<ChatMessage?>> {
-        return Transformations.map(service.sendTextMessage(token,fromId,toId,content,uuid)) { input ->
+    fun sendTextMessage(token: String, fromId:String,conversationId:String,content:String,uuid:String): LiveData<DataState<ChatMessage?>> {
+        return Transformations.map(service.sendTextMessage(token,fromId,conversationId,content,uuid)) { input ->
             if (input == null) {
                 return@map DataState<ChatMessage?>(DataState.STATE.FETCH_FAILED)
             }
@@ -99,8 +99,8 @@ class ChatMessageWebSource : BaseWebSource<ChatMessageService>(Retrofit.Builder(
      * @param file  文件
      * @return 返回结果
      */
-    fun sendImageMessage(token: String, toId: String, file: MultipartBody.Part, uuid: String?): LiveData<DataState<ChatMessage?>> {
-        return Transformations.map(service.sendImageMessage(token, toId, file, uuid)) { input ->
+    fun sendImageMessage(token: String, conversationId: String, file: MultipartBody.Part, uuid: String?): LiveData<DataState<ChatMessage?>> {
+        return Transformations.map(service.sendImageMessage(token, conversationId, file, uuid)) { input ->
             if (input == null) {
                 return@map DataState<ChatMessage?>(DataState.STATE.FETCH_FAILED)
             }
@@ -120,8 +120,8 @@ class ChatMessageWebSource : BaseWebSource<ChatMessageService>(Retrofit.Builder(
      * @param file  文件
      * @return 返回结果
      */
-    fun sendVoiceMessage(token: String, toId: String, file: MultipartBody.Part, uuid: String?,seconds:Int): LiveData<DataState<ChatMessage?>> {
-        return Transformations.map(service.sendVoiceMessage(token, toId, file, uuid,seconds)) { input: ApiResponse<ChatMessage?>? ->
+    fun sendVoiceMessage(token: String, conversationId: String,file: MultipartBody.Part, uuid: String?,seconds:Int): LiveData<DataState<ChatMessage?>> {
+        return Transformations.map(service.sendVoiceMessage(token, conversationId,file, uuid,seconds)) { input: ApiResponse<ChatMessage?>? ->
             Log.e("发送语音结果", input.toString())
             if (input == null) {
                 return@map DataState<ChatMessage?>(DataState.STATE.FETCH_FAILED)

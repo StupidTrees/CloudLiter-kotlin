@@ -1,4 +1,4 @@
-package com.stupidtree.cloudliter.ui.conversation
+package com.stupidtree.cloudliter.ui.conversation.normal
 
 import android.os.Bundle
 import com.stupidtree.cloudliter.R
@@ -8,7 +8,6 @@ import com.stupidtree.style.base.BaseActivity
 import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
-import com.stupidtree.cloudliter.utils.TextUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,9 +26,8 @@ class ConversationActivity : BaseActivity<ConversationViewModel, ActivityConvers
     override fun initViews() {
         setUpLiveData()
         binding.userLayout.setOnClickListener {
-            val id = intent.getStringExtra("friendId")
-            if (!TextUtils.isEmpty(id)) {
-                ActivityUtils.startProfileActivity(getThis(), id!!)
+            viewModel.conversationLiveData.value?.data?.friendId?.let {
+                ActivityUtils.startProfileActivity(getThis(), it)
             }
         }
         binding.refresh.setColorSchemeColors(getColorPrimary())
@@ -38,13 +36,13 @@ class ConversationActivity : BaseActivity<ConversationViewModel, ActivityConvers
         }
     }
 
-    private fun setUpLiveData(){
-        viewModel.conversationLiveData?.observe(this, { conversationDataState: DataState<Conversation?> ->
+    private fun setUpLiveData() {
+        viewModel.conversationLiveData.observe(this, { conversationDataState: DataState<Conversation?> ->
             if (conversationDataState.state === DataState.STATE.SUCCESS) {
                 conversationDataState.data?.let { setUpPage(it) }
             }
         })
-        viewModel.wordCloudLiveData?.observe(this, { listDataState ->
+        viewModel.wordCloudLiveData.observe(this, { listDataState ->
             binding.refresh.isRefreshing = false
             if (listDataState.state === DataState.STATE.SUCCESS) {
                 val tag = ArrayList<String>()
@@ -63,8 +61,8 @@ class ConversationActivity : BaseActivity<ConversationViewModel, ActivityConvers
         })
     }
 
-    private fun startRefresh(){
-        intent.getStringExtra("friendId")?.let { viewModel.startRefresh(it) }
+    private fun startRefresh() {
+        intent.getStringExtra("conversationId")?.let { viewModel.startRefresh(it) }
         binding.refresh.isRefreshing = true
     }
 
@@ -74,18 +72,15 @@ class ConversationActivity : BaseActivity<ConversationViewModel, ActivityConvers
     }
 
     private fun setUpPage(conversation: Conversation) {
-        conversation.friendAvatar?.let { ImageUtils.loadAvatarNoCacheInto(this, it, binding.avatar) }
-        if (TextUtils.isEmpty(conversation.friendRemark)) {
-            binding.remark.text = conversation.friendNickname
-        } else {
-            binding.remark.text = conversation.friendRemark
-        }
+        conversation.avatar.let { ImageUtils.loadAvatarInto(this, it, binding.avatar) }
+        binding.remark.text = conversation.name
         binding.metDate.text = SimpleDateFormat(getString(R.string.date_format_3), Locale.getDefault()).format(conversation.createdAt?.time)
         binding.lastChatDate.text = SimpleDateFormat(getString(R.string.date_format_3), Locale.getDefault()).format(conversation.updatedAt?.time)
-        binding.sinceMet.text = ((System.currentTimeMillis()- (conversation.createdAt?.time ?:System.currentTimeMillis() ))/(1000*60*60*24)).toString()
+        binding.sinceMet.text = ((System.currentTimeMillis() - (conversation.createdAt?.time
+                ?: System.currentTimeMillis())) / (1000 * 60 * 60 * 24)).toString()
     }
 
     override fun initViewBinding(): ActivityConversationBinding {
-       return ActivityConversationBinding.inflate(layoutInflater)
+        return ActivityConversationBinding.inflate(layoutInflater)
     }
 }

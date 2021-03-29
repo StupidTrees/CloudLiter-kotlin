@@ -10,15 +10,16 @@ import java.util.HashMap
 class ImageEntity {
     @PrimaryKey
     var id:String = ""
-    var fromId:String = ""
-    var toId:String = ""
+    var fromId:String? = ""
+    var toId:String? = ""
     var fileName:String = ""
-    var sensitive:String = ""
+    var sensitive:String? = ""
+
     var scene:String? = null
    // var tags:List<String> = listOf()
 
     /**
-     * 将extra字段解析为图片敏感检测结果
+     * 将extra字段解析为图片敏感检  测结果
      *
      * @return 检测结果
      */

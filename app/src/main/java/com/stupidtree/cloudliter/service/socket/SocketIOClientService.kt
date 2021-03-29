@@ -34,7 +34,7 @@ import java.util.*
  */
 class SocketIOClientService : Service() {
     //正在与谁进行对话
-    private var currentFriendId: String? = null
+    private var currentConversation: String? = null
 
     /**
      * 各个对话的未读消息数记录
@@ -50,17 +50,16 @@ class SocketIOClientService : Service() {
                 when (intent.action) {
                     ACTION_INTO_CONVERSATION -> {
                         val userId = intent.getStringExtra("userId")
-                        val friendId = intent.getStringExtra("friendId")
                         val conversationId = intent.getStringExtra("conversationId")
-                        socket?.emit("into_conversation", userId, friendId, conversationId)
-                        socket?.emit("query_online", userId, friendId)
-                        currentFriendId = friendId
+                        socket?.emit("into_conversation", userId, conversationId)
+                        socket?.emit("query_online", userId, conversationId)
+                        currentConversation = conversationId
                     }
                     ACTION_LEFT_CONVERSATION -> {
                         val conversationId = intent.getStringExtra("conversationId")
                         val userId = intent.getStringExtra("userId")
                         socket?.emit("left_conversation", userId, conversationId)
-                        currentFriendId = null
+                        currentConversation = null
                     }
                     ACTION_ONLINE -> if (intent.getStringExtra("userId") != null) {
                         val id = intent.getStringExtra("userId")
@@ -144,18 +143,18 @@ class SocketIOClientService : Service() {
             val chatMessage = Gson().fromJson(args[0].toString(), ChatMessage::class.java)
             val oldCount = incomingMessage[chatMessage.conversationId]
             if (oldCount == null) {
-                incomingMessage[chatMessage.conversationId ?: ""] = 1
+                incomingMessage[chatMessage.conversationId] = 1
             } else {
-                incomingMessage[chatMessage.conversationId ?: ""] = oldCount + 1
+                incomingMessage[chatMessage.conversationId] = oldCount + 1
             }
-            Log.e("收到消息", chatMessage.toString())
+            Log.e("收到消息", "$chatMessage,current:$currentConversation")
             val i = Intent(RECEIVE_RECEIVE_MESSAGE)
             val b = Bundle()
             b.putSerializable("message", chatMessage)
             i.putExtras(b)
             sendBroadcast(i)
             //当前聊天的新消息，不发送通知
-            if (currentFriendId != chatMessage.fromId) {
+            if (currentConversation != chatMessage.conversationId) {
                 sendNotificationNewMessage(chatMessage)
             }
         }
@@ -221,11 +220,11 @@ class SocketIOClientService : Service() {
         }
         socket?.on("query_online_result") { args: Array<Any> ->
             try {
-                val friendId = args[0].toString()
+                val conversationId = args[0].toString()
                 val isOnline = args[1].toString()
-                Log.d("查询好友在线结果", "$friendId:$isOnline")
+                Log.d("查询好友在线结果", "$conversationId:$isOnline")
                 val i = Intent(RECEIVE_FRIEND_STATE_CHANGED)
-                i.putExtra("id", friendId)
+                i.putExtra("conversationId", conversationId)
                 i.putExtra("online", isOnline)
                 sendBroadcast(i)
             } catch (e: Exception) {
@@ -282,13 +281,13 @@ class SocketIOClientService : Service() {
             rv.setTextViewText(R.id.title, newContent)
             val ul = LocalUserRepository.getInstance(application).getLoggedInUser()
             if (ul.isValid) {
-                val i = ActivityUtils.getIntentForChatActivity(this, message)
+                val i = ActivityUtils.getIntentForChatActivity(this, message.conversationId)
                 notificationBuilder.setContentIntent(PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT))
                 notificationBuilder.setFullScreenIntent(PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT), true)
             }
             val n = notificationBuilder.build()
             val notificationTarget = NotificationTarget(this, R.id.avatar, rv, n, notificationId)
-            message.friendAvatar?.let { ImageUtils.loadAvatarIntoNotification(this, it, notificationTarget) }
+            message.fromId?.let { ImageUtils.loadAvatarIntoNotification(this, it, notificationTarget) }
             notificationManager?.notify(notificationId, n)
         } else {
             val notificationBuilder = NotificationCompat.Builder(this, "cloudLiterMessageChanel")
@@ -301,13 +300,13 @@ class SocketIOClientService : Service() {
             notificationBuilder.priority = Notification.PRIORITY_HIGH
             val ul = LocalUserRepository.getInstance(application).getLoggedInUser()
             if (ul.isValid) {
-                val i = ActivityUtils.getIntentForChatActivity(this, message)
+                val i = ActivityUtils.getIntentForChatActivity(this, message.conversationId)
                 notificationBuilder.setContentIntent(PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT))
                 notificationBuilder.setFullScreenIntent(PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT), true)
             }
             val n = notificationBuilder.build()
             val notificationTarget = NotificationTarget(this, R.id.avatar, rv, n, notificationId)
-            ImageUtils.loadAvatarIntoNotification(this, message.friendAvatar
+            ImageUtils.loadAvatarIntoNotification(this, message.fromId
                     ?: "", notificationTarget)
             notificationManager?.notify(notificationId, n)
         }

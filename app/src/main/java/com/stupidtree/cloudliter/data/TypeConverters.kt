@@ -1,6 +1,7 @@
 package com.stupidtree.cloudliter.data
 
 import androidx.room.TypeConverter
+import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.model.UserLocal
 import java.sql.Timestamp
 
@@ -28,10 +29,21 @@ object TypeConverters {
 
     @JvmStatic
     @TypeConverter
-    fun stringToGender(str:String): UserLocal.GENDER {
+    fun stringToGender(str: String): UserLocal.GENDER {
         return UserLocal.GENDER.valueOf(str)
     }
 
+    @JvmStatic
+    @TypeConverter
+    fun conversationTypeToString(date: Conversation.TYPE): String {
+        return date.name
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun stringToConversationType(str: String): Conversation.TYPE {
+        return Conversation.TYPE.valueOf(str)
+    }
 
 
     @JvmStatic
@@ -42,7 +54,7 @@ object TypeConverters {
 
     @JvmStatic
     @TypeConverter
-    fun stringToTypePermission(str:String): UserLocal.TYPEPERMISSION {
+    fun stringToTypePermission(str: String): UserLocal.TYPEPERMISSION {
         return UserLocal.TYPEPERMISSION.valueOf(str)
     }
 }

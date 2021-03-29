@@ -52,12 +52,10 @@ class ConversationWebSource : BaseWebSource<ConversationService>(Retrofit.Builde
      * 查询两用户的对话对象
      *
      * @param token    令牌
-     * @param userId   我的id
-     * @param friendId 朋友的id
      * @return 查询结果
      */
-    fun queryConversation(token: String, userId: String?, friendId: String): LiveData<DataState<Conversation?>> {
-        return Transformations.map(service.queryConversation(token, userId, friendId), Function<ApiResponse<Conversation?>?, DataState<Conversation?>> { input ->
+    fun queryConversation(token: String,  conversationId: String): LiveData<DataState<Conversation?>> {
+        return Transformations.map(service.queryConversation(token, conversationId), Function<ApiResponse<Conversation?>?, DataState<Conversation?>> { input ->
             if (null == input) {
                 return@Function DataState<Conversation?>(DataState.STATE.FETCH_FAILED)
             }
@@ -74,8 +72,8 @@ class ConversationWebSource : BaseWebSource<ConversationService>(Retrofit.Builde
      * @param token 用户令牌
      * @return 词频表
      */
-    fun getWordCloud(token: String?, userId: String, friendId: String): LiveData<DataState<HashMap<String, Float?>?>> {
-        return Transformations.map<ApiResponse<HashMap<String, Float?>?>?, DataState<HashMap<String, Float?>?>>(service.getWordCloud(token, userId, friendId)) { input: ApiResponse<HashMap<String, Float?>?>? ->
+    fun getWordCloud(token: String?, conversationId:String): LiveData<DataState<HashMap<String, Float?>?>> {
+        return Transformations.map<ApiResponse<HashMap<String, Float?>?>?, DataState<HashMap<String, Float?>?>>(service.getWordCloud(token, conversationId)) { input: ApiResponse<HashMap<String, Float?>?>? ->
             // Log.e("getWordCloud", String.valueOf(input));
             if (input != null) {
                 when (input.code) {

@@ -45,19 +45,20 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             cm.isTimeStamp -> {
                 TYPE_TIME
             }
-            cm.toId == chatActivity.viewModel.myId -> {
-                when {
-                    cm.getTypeEnum() == ChatMessage.TYPE.IMG -> TYPE_FRIEND_IMAGE
-                    cm.getTypeEnum() == ChatMessage.TYPE.TXT -> TYPE_FRIEND
-                    else -> TYPE_FRIEND_VOICE
-                }
-            }
-            else -> {
+            cm.fromId == chatActivity.viewModel.myId -> {
                 when {
                     cm.getTypeEnum() == ChatMessage.TYPE.IMG -> TYPE_MINE_IMAGE
                     cm.getTypeEnum() == ChatMessage.TYPE.VOICE -> TYPE_MINE_VOICE
                     else -> TYPE_MINE
                 }
+            }
+            else -> {
+                when {
+                    cm.getTypeEnum() == ChatMessage.TYPE.IMG -> TYPE_FRIEND_IMAGE
+                    cm.getTypeEnum() == ChatMessage.TYPE.TXT -> TYPE_FRIEND
+                    else -> TYPE_FRIEND_VOICE
+                }
+
             }
         }
 
@@ -77,9 +78,9 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             } else {
                 holder.bindSensitiveAndEmotion(data)
                 if (holder.viewType == TYPE_MINE || holder.viewType == TYPE_MINE_IMAGE || holder.viewType == TYPE_MINE_VOICE) {
-                    chatActivity.viewModel.myAvatar?.let { ImageUtils.loadLocalAvatarInto(chatActivity, it, holder.avatar!!) }
+                     ImageUtils.loadAvatarInto(chatActivity, data.fromId, holder.avatar!!,useUserId = true)
                 } else {
-                    chatActivity.viewModel.friendAvatar?.let { ImageUtils.loadAvatarInto(chatActivity, it, holder.avatar!!) }
+                     ImageUtils.loadAvatarInto(chatActivity, data.fromId, holder.avatar!!,useUserId = true)
                 }
                 holder.avatar?.setOnClickListener { data.fromId?.let { ActivityUtils.startProfileActivity(chatActivity, it) } }
                 holder.setSendState(data)

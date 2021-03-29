@@ -2,15 +2,14 @@ package com.stupidtree.cloudliter.ui.main.conversations
 
 import android.app.Application
 import android.content.Context
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.repository.ConversationRepository
 import com.stupidtree.cloudliter.data.repository.ConversationRepository.Companion.getInstance
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
+import com.stupidtree.cloudliter.utils.MTransformations
 import com.stupidtree.component.data.DataState
+import com.stupidtree.component.data.Trigger
 import java.util.*
 
 class ConversationsViewModel(application: Application) : AndroidViewModel(application) {
@@ -27,8 +26,16 @@ class ConversationsViewModel(application: Application) : AndroidViewModel(applic
     /**
      * 数据区
      */
+    private val refreshController = MutableLiveData<Trigger>()
     //数据本体：列表数据
-    var listData: MediatorLiveData<DataState<MutableList<Conversation>?>>? = conversationRepository.listLiveData
+    var listData: LiveData<DataState<MutableList<Conversation>?>> = Transformations.switchMap(refreshController){
+        val userLocal = localUserRepository.getLoggedInUser()
+        return@switchMap if (userLocal.isValid) {
+            conversationRepository.getConversations(userLocal.token!!)
+        } else {
+            MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
+        }
+    }
 
     //数据本体：未读消息
     var unreadMessageState: LiveData<DataState<HashMap<String, Int>>> = Transformations.map(conversationRepository.unreadMessageState) { input ->
@@ -73,12 +80,7 @@ class ConversationsViewModel(application: Application) : AndroidViewModel(applic
 
 
     fun startRefresh() {
-        val userLocal = localUserRepository.getLoggedInUser()
-        if (userLocal.isValid) {
-            conversationRepository.actionGetConversations(userLocal.token!!)
-        } else {
-            listData!!.setValue(DataState(DataState.STATE.NOT_LOGGED_IN))
-        }
+        refreshController.value = Trigger.actioning
     }
 
     /**
@@ -101,18 +103,13 @@ class ConversationsViewModel(application: Application) : AndroidViewModel(applic
      */
     fun getUnreadNumber(conversation: Conversation): Int {
         val res = unreadMessages[conversation.id]
-        //        for(ChatMessage cm:unreadMessages){
-//            if(Objects.equals(cm.getConversationId(),conversation.getId())){
-//                res++;
-//            }
-//        }
         return res ?: 0
     }
 
     fun callOnline(context: Context) {
         val userLocal = localUserRepository.getLoggedInUser()
         if (userLocal.isValid) {
-            conversationRepository!!.actionCallOnline(context, userLocal)
+            conversationRepository.actionCallOnline(context, userLocal)
         }
     }
 

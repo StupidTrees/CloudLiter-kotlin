@@ -6,8 +6,6 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.google.gson.Gson
-import com.google.gson.JsonObject
-import com.stupidtree.cloudliter.utils.TextUtils
 import java.io.Serializable
 import java.sql.Timestamp
 import java.util.*
@@ -24,22 +22,20 @@ class ChatMessage : Serializable {
     @PrimaryKey
     var id: String = ""
     var fromId: String? = null
-    var toId: String? = null
-
     @ColumnInfo(defaultValue = "TXT")
     var type: String? = null
     var content: String? = null
 
     @Ignore
     var friendRemark: String? = null
+    @Ignore
     var friendTypePermission: UserLocal.TYPEPERMISSION = UserLocal.TYPEPERMISSION.PRIVATE
+    @Ignore
     var friendType: Int = 0
+    @Ignore
     var friendSubType: String? = null
 
-    @Ignore
-    var friendAvatar: String? = null
-    var conversationId: String? = null
-    var relationId: String? = null
+    var conversationId: String = ""
     var read = false
     var sensitive = false
     var emotion = 0f
@@ -69,20 +65,14 @@ class ChatMessage : Serializable {
     @Ignore
     var uuid: String = UUID.randomUUID().toString()
 
-    constructor() {
-    }
+    constructor()
 
     @Ignore
-    constructor(fromId: String?, toId: String?, content: String?) {
+    constructor(fromId: String?, content: String?,conversationId:String) {
         this.fromId = fromId
-        this.toId = toId
         this.content = content
+        this.conversationId = conversationId
         type = "TXT"
-        conversationId = if (fromId == null || toId == null) {
-            null
-        } else {
-            TextUtils.getP2PIdOrdered(fromId, toId)
-        }
         createdAt = Timestamp(System.currentTimeMillis())
         sendingState = SEND_STATE.SENDING
     }
@@ -113,7 +103,6 @@ class ChatMessage : Serializable {
         val message = other as ChatMessage
         return id == message.id &&
                 fromId == message.fromId &&
-                toId == message.toId &&
                 conversationId == message.conversationId &&
                 sensitive == message.sensitive &&
                 emotion == message.emotion &&
@@ -121,7 +110,7 @@ class ChatMessage : Serializable {
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(id, fromId, toId, conversationId, relationId)
+        return Objects.hash(id, fromId, conversationId)
     }
 
     /**
@@ -146,7 +135,7 @@ class ChatMessage : Serializable {
 
     companion object {
         fun getTimeStampHolderInstance(timestamp: Timestamp?): ChatMessage {
-            val cm = ChatMessage(null, null, null)
+            val cm = ChatMessage(null, null,"")
             cm.id = "time"
             cm.createdAt = timestamp
             return cm

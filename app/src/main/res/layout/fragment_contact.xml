@@ -64,6 +64,28 @@
             </FrameLayout>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/create_group"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:clickable="true"
+                android:contentDescription="@string/description_qr"
+                android:focusable="auto"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                app:cardBackgroundColor="?attr/colorPrimary"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:padding="12dp"
+                    app:srcCompat="@drawable/ic_baseline_group_24"
+                    app:tint="@android:color/white" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
                 android:id="@+id/search_friend"
                 android:layout_width="48dp"
                 android:layout_height="48dp"

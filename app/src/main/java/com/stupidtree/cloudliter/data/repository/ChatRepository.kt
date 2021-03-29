@@ -152,11 +152,9 @@ class ChatRepository(context: Context) {
      *
      * @param context        上下文
      * @param userId         用户id
-     * @param friendId       朋友id
-     * @param conversationId 对话id
      */
-    fun actionGetIntoConversation(context: Context, userId: String, friendId: String, conversationId: String) {
-        socketWebSource.getIntoConversation(context, userId, friendId, conversationId)
+    fun actionGetIntoConversation(context: Context, userId: String, conversationId: String) {
+        socketWebSource.getIntoConversation(context, userId,conversationId)
     }
 
     /**
@@ -171,10 +169,10 @@ class ChatRepository(context: Context) {
     }
 
 
-    fun sendTextMessage(token: String, fromId: String, toId: String, content: String): LiveData<Pair<DataState<ChatMessage?>, String>> {
-        val message = ChatMessage(fromId, toId, content)
+    fun sendTextMessage(token: String, fromId: String, conversationId: String, content: String): LiveData<Pair<DataState<ChatMessage?>, String>> {
+        val message = ChatMessage(fromId, content,conversationId)
         listDataState.value = DataState(listOf(message) as List?).setListAction(LIST_ACTION.APPEND_ONE)
-        return Transformations.switchMap(chatMessageWebSource.sendTextMessage(token, fromId, toId, content, message.uuid)) {
+        return Transformations.switchMap(chatMessageWebSource.sendTextMessage(token, fromId, conversationId,content, message.uuid)) {
             return@switchMap MutableLiveData(Pair(it, message.uuid))
         }
     }
@@ -187,11 +185,11 @@ class ChatRepository(context: Context) {
      * @param filePath 文件
      * @return 返回结果
      */
-    fun sendImageMessage(context: Context, token: String, fromId: String, toId: String, filePath: String): LiveData<Pair<DataState<ChatMessage?>, String>> {
+    fun sendImageMessage(context: Context, token: String, fromId: String, conversationId: String, filePath: String): LiveData<Pair<DataState<ChatMessage?>, String>> {
         val result = MediatorLiveData<Pair<DataState<ChatMessage?>, String>>()
         //读取图片文件
         val f = File(filePath)
-        val tempMsg = ChatMessage(fromId, toId, filePath)
+        val tempMsg = ChatMessage(fromId,  filePath,conversationId)
         tempMsg.setType(ChatMessage.TYPE.IMG)
         listDataState.value = DataState(listOf(tempMsg) as List?).setListAction(LIST_ACTION.APPEND_ONE)
         Luban.with(context)
@@ -209,7 +207,7 @@ class ChatRepository(context: Context) {
                         val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
                         //构造一个图片格式的POST表单
                         val body = MultipartBody.Part.createFormData("upload", file.name, requestFile)
-                        val sendResult = chatMessageWebSource.sendImageMessage(token, toId, body, tempMsg.uuid)
+                        val sendResult = chatMessageWebSource.sendImageMessage(token, conversationId,body, tempMsg.uuid)
                         result.addSource(sendResult) { v ->
                             result.value = Pair(v, tempMsg.uuid)
                         }
@@ -231,18 +229,18 @@ class ChatRepository(context: Context) {
      * @param filePath 文件
      * @return 返回结果
      */
-    fun actionSendVoiceMessage(token: String, fromId: String, toId: String, filePath: String, voiceSeconds: Int): LiveData<Pair<DataState<ChatMessage?>, String>> {
+    fun actionSendVoiceMessage(token: String, fromId: String, conversationId: String, filePath: String, voiceSeconds: Int): LiveData<Pair<DataState<ChatMessage?>, String>> {
         val result = MediatorLiveData<Pair<DataState<ChatMessage?>, String>>()
         //读取图片文件
         val f = File(filePath)
-        val tempMsg = ChatMessage(fromId, toId, filePath)
+        val tempMsg = ChatMessage(fromId,  filePath,conversationId)
         tempMsg.setType(ChatMessage.TYPE.VOICE)
         tempMsg.extra = voiceSeconds.toString()
         listDataState.value = DataState(listOf(tempMsg) as List?).setListAction(LIST_ACTION.APPEND_ONE)
         val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), f)
         //构造一个图片格式的POST表单
         val body = MultipartBody.Part.createFormData("upload", f.name, requestFile)
-        val sendResult = chatMessageWebSource.sendVoiceMessage(token, toId, body, tempMsg.uuid, voiceSeconds)
+        val sendResult = chatMessageWebSource.sendVoiceMessage(token,conversationId, body, tempMsg.uuid, voiceSeconds)
         result.addSource(sendResult) { v ->
             result.value = Pair(v, tempMsg.uuid)
         }
@@ -297,8 +295,8 @@ class ChatRepository(context: Context) {
         Thread { chatMessages?.let { chatMessageDao.saveMessage(it.toList()) } }.start()
     }
 
-    val friendsStateController: MutableLiveData<FriendStateTrigger>
-        get() = socketWebSource.friendStateController
+    val onlineStateController: MutableLiveData<FriendStateTrigger>
+        get() = socketWebSource.onlineStateController
 
     val messageReadState: MutableLiveData<DataState<MessageReadNotification>>
         get() = socketWebSource.messageReadState

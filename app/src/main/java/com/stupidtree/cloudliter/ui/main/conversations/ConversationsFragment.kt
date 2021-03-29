@@ -12,15 +12,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.Conversation
-import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.databinding.FragmentConversationsBinding
 import com.stupidtree.cloudliter.databinding.FragmentConversationsListItemBinding
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService.Companion.RECEIVE_RELATION_EVENT
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils
-import com.stupidtree.style.base.BaseFragmentWithReceiver
 import com.stupidtree.component.data.DataState
+import com.stupidtree.style.base.BaseFragmentWithReceiver
 import com.stupidtree.style.base.BaseListAdapter
 import com.stupidtree.style.base.BaseViewHolder
 import java.util.*
@@ -63,7 +62,7 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel, F
         binding?.list?.layoutManager = LinearLayoutManager(context)
         listAdapter!!.setOnItemClickListener(object : BaseListAdapter.OnItemClickListener<Conversation> {
             override fun onItemClick(data: Conversation, card: View?, position: Int) {
-                ActivityUtils.startChatActivity(requireContext(), data)
+                ActivityUtils.startChatActivity(requireContext(), data.id)
             }
         })
 
@@ -73,7 +72,7 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel, F
 
 
         // searchBar.setOnClickListener(view1 -> ActivityUtils.startSearchActivity(requireActivity()));
-        viewModel.listData?.observe(this, { listDataState ->
+        viewModel.listData.observe(this, { listDataState ->
             binding?.refresh?.isRefreshing = false
             if (listDataState.data != null && listDataState.data!!.isNotEmpty()) {
                 val listD = listDataState.data!!
@@ -135,12 +134,13 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel, F
     }
 
 
-    override fun onStart() {
-        super.onStart()
+    override fun onResume() {
+        super.onResume()
         viewModel.bindService(activity)
         viewModel.startRefresh()
         viewModel.callOnline(requireContext())
     }
+
 
     override fun onDetach() {
         super.onDetach()
@@ -156,13 +156,9 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel, F
 
         override fun bindHolder(holder: CHolder, data: Conversation?, position: Int) {
             if (data != null) {
-                ImageUtils.loadAvatarInto(mContext, data.friendAvatar, holder.binding.avatar)
+                ImageUtils.loadAvatarInto(mContext, data.avatar, holder.binding.avatar)
                 holder.binding.lastMessage.text = data.lastMessage
-                if (TextUtils.isEmpty(data.friendRemark)) {
-                    holder.binding.name.text = data.friendNickname
-                } else {
-                    holder.binding.name.text = data.friendRemark
-                }
+                holder.binding.name.text = data.name
                 val unread = viewModel.getUnreadNumber(data)
                 unreadMap[data.id] = unread
                 if (unread > 0) {
@@ -171,12 +167,6 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel, F
                 } else {
                     holder.binding.unread.visibility = View.INVISIBLE
                 }
-                if (data.friendTypePermission == UserLocal.TYPEPERMISSION.PRIVATE) {
-//                if(data.friendType==0){
-                    holder.binding.accessibilityIcon.visibility = View.GONE
-                } else {
-                    holder.binding.accessibilityIcon.visibility = View.VISIBLE
-                }
                 holder.binding.updatedAt.text = TextUtils.getConversationTimeText(mContext, data.updatedAt)
                 if (mOnItemClickListener != null) {
                     holder.binding.item.setOnClickListener { view: View? -> mOnItemClickListener!!.onItemClick(data, view, position) }
@@ -184,7 +174,11 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel, F
             }
         }
 
-        override fun notifyItemChangedSmooth(newL: List<Conversation>) {
+        override fun notifyItemChangedSmooth(list: List<Conversation>) {
+            val newL = list.toMutableList()
+            newL.sortWith { o1, o2 ->
+                o2?.updatedAt?.compareTo(o1?.updatedAt) ?: 0
+            }
             super.notifyItemChangedSmooth(newL, object : RefreshJudge<Conversation> {
                 override fun judge(oldData: Conversation, newData: Conversation): Boolean {
                     val newUnread = viewModel.getUnreadNumber(newData)

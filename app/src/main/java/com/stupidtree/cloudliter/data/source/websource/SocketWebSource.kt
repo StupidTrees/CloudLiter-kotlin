@@ -18,7 +18,7 @@ import java.sql.Timestamp
  */
 class SocketWebSource : BroadcastReceiver() {
     var newMessageState = MutableLiveData<ChatMessage>()
-    var friendStateController = MutableLiveData<FriendStateTrigger>()
+    var onlineStateController = MutableLiveData<FriendStateTrigger>()
 
     //消息已读通知
     var messageReadState = MutableLiveData<DataState<MessageReadNotification>>()
@@ -30,15 +30,15 @@ class SocketWebSource : BroadcastReceiver() {
                 if (message != null) {
                     newMessageState.value = message
                      val map = HashMap<String, Int>()
-                    message.conversationId?.let {
+                    message.conversationId.let {
                         map[it] = 1
                     }
                     unreadMessageState.value = DataState(map).setListAction(DataState.LIST_ACTION.APPEND)
                 }
             }
-            SocketIOClientService.RECEIVE_FRIEND_STATE_CHANGED -> if (intent.hasExtra("id") && intent.hasExtra("online")) {
-                friendStateController.value = FriendStateTrigger.getActioning(
-                        intent.getStringExtra("id"), intent.getStringExtra("online")
+            SocketIOClientService.RECEIVE_FRIEND_STATE_CHANGED -> if (intent.hasExtra("conversationId") && intent.hasExtra("online")) {
+                onlineStateController.value = FriendStateTrigger.getActioning(
+                        intent.getStringExtra("conversationId"), intent.getStringExtra("online"),intent.getIntExtra("num",0)
                 )
             }
             SocketIOClientService.RECEIVE_MESSAGE_READ -> if (intent.extras != null) {
@@ -91,10 +91,9 @@ class SocketWebSource : BroadcastReceiver() {
         unreadMessageState.value = DataState(map).setListAction(DataState.LIST_ACTION.DELETE)
     }
 
-    fun getIntoConversation(context: Context, userId: String?, friendId: String?, conversationId: String?) {
+    fun getIntoConversation(context: Context, userId: String?, conversationId: String?) {
         val i = Intent(SocketIOClientService.ACTION_INTO_CONVERSATION)
         i.putExtra("userId", userId)
-        i.putExtra("friendId", friendId)
         i.putExtra("conversationId", conversationId)
         context.sendBroadcast(i)
     }

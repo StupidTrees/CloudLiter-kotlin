@@ -79,7 +79,7 @@ class QRCodeActivity : BaseActivity<QRCodeViewModel, ActivityQRCodeBinding>() {
     }
 
     private fun setUserInfo(user: UserLocal) {
-        ImageUtils.loadLocalAvatarInto(this, user.avatar, binding.avatar)
+        ImageUtils.loadAvatarInto(this, user.id, binding.avatar)
         binding.nickname.text = user.nickname
     }
 

@@ -28,7 +28,6 @@ import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.model.Yunmoji
 import com.stupidtree.cloudliter.databinding.ActivityChatBinding
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpTextMessageDetail
-import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectBottomFragment
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.AnimationUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
@@ -70,7 +69,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                 viewModel.markAllRead(getThis())
                 //定时对长连接进行心跳检测
                 Log.e("对话：心跳声明", "--")
-                mHandler.postDelayed(this, 8 * 1000)
+                mHandler.postDelayed(this, 30 * 1000)
             }
         }
     }
@@ -97,41 +96,31 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
      * 生命周期事件区
      */
     //启动时，绑定服务
+    var firstEnter = true
     override fun onStart() {
         super.onStart()
+        intent.getStringExtra("conversationId")?.let { viewModel.startRefreshConversationInfo(it) }
         viewModel.bindService(this)
         refreshInputLayout()
-        if (intent.extras != null && intent.extras!!.getSerializable("conversation") != null) {
-            val conversation = intent.extras!!.getSerializable("conversation") as Conversation?
-            if (conversation != null) {
-                if (viewModel.conversationId == null) {
-                    viewModel.setConversation(conversation)
-                    viewModel.markAllRead(getThis())
-                    viewModel.fetchHistoryData() //初次进入时，重新加载聊天记录
-                } else {
-                    viewModel.fetchNewData() //非第一次进入
-                }
-            }
+        if (firstEnter) {
+            firstEnter = false
+            viewModel.fetchHistoryData() //初次进入时，重新加载聊天记录
+        } else {
+            viewModel.fetchNewData() //非第一次进入
         }
+        viewModel.markAllRead(getThis())
         viewModel.getIntoConversation(this)
         mHandler.postDelayed(heartBeatRunnable, 5 * 1000)
-        viewModel.refreshConversation()
     }
 
     //更新Intent时（更换聊天对象），刷新列表
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (intent.extras != null && intent.extras!!.getSerializable("conversation") != null) {
-            val conversation = intent.extras!!.getSerializable("conversation") as Conversation?
-            if (conversation != null) {
-                if (viewModel.conversationId != conversation.id) {
-                    viewModel.setConversation(conversation)
-                    listAdapter.clear()
-                    viewModel.fetchHistoryData() //变更对话时，重新加载聊天记录
-                }
-                viewModel.setConversation(conversation)
-            }
+        if (viewModel.getConversationId() != intent.getStringExtra("conversationId")) {
+            listAdapter.clear()
+            viewModel.fetchHistoryData() //变更对话时，重新加载聊天记录
         }
+        intent.getStringExtra("conversationId")?.let { viewModel.startRefreshConversationInfo(it) }
     }
 
     //每次页面失去焦点时，退出对话，解绑服务
@@ -195,8 +184,11 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         setUpMessageList()
         setUpYunmojiList()
         setUpButtons()
-        viewModel.conversation.observe(this, { conversation: Conversation? ->
-            conversation?.let { setConversationViews(it) }
+        viewModel.conversation.observe(this, {
+            if (it.state == DataState.STATE.SUCCESS) {
+                it.data?.let { it1 -> setConversationViews(it1) }
+            }
+
         })
         viewModel.listData.observe(this, { listDataState: DataState<List<ChatMessage>?> ->
             binding.refresh.isRefreshing = false
@@ -238,28 +230,28 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                 }
             }
         })
-        viewModel.friendStateLiveData.observe(this, { friendStateDataState: DataState<FriendState> ->
-            if (friendStateDataState.state === DataState.STATE.SUCCESS) {
-                when (friendStateDataState.data!!.state) {
-                    FriendState.STATE.ONLINE -> {
+        viewModel.onlineStateLiveData.observe(this, { onlineStateDataState: DataState<OnlineState> ->
+            if (onlineStateDataState.state === DataState.STATE.SUCCESS) {
+                when (onlineStateDataState.data!!.state) {
+                    OnlineState.STATE.ONLINE -> {
                         binding.state.setText(R.string.online)
                         binding.state.setTextColor(getColorPrimary())
                         binding.stateIcon.setImageResource(R.drawable.element_round_primary)
                         binding.stateBar.setBackgroundResource(R.drawable.element_rounded_bar_primary)
                     }
-                    FriendState.STATE.YOU -> {
+                    OnlineState.STATE.YOU -> {
                         binding.state.setText(R.string.with_you)
                         binding.state.setTextColor(getColorPrimary())
                         binding.stateIcon.setImageResource(R.drawable.element_round_primary)
                         binding.stateBar.setBackgroundResource(R.drawable.element_rounded_bar_primary)
                     }
-                    FriendState.STATE.OTHER -> {
+                    OnlineState.STATE.OTHER -> {
                         binding.state.setText(R.string.with_other)
                         binding.state.setTextColor(getColorPrimary())
                         binding.stateIcon.setImageResource(R.drawable.element_round_primary)
                         binding.stateBar.setBackgroundResource(R.drawable.element_rounded_bar_primary)
                     }
-                    FriendState.STATE.OFFLINE -> {
+                    OnlineState.STATE.OFFLINE -> {
                         binding.state.setText(R.string.offline)
                         binding.state.setTextColor(getTextColorSecondary())
                         binding.stateIcon.setImageResource(R.drawable.element_round_grey)
@@ -297,7 +289,17 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
     //设置toolbar
     private fun setUpToolbar() {
         binding.back.setOnClickListener { onBackPressed() }
-        binding.menu.setOnClickListener { ActivityUtils.startConversationActivity(getThis(), viewModel.friendId!!) }
+
+        binding.menu.setOnClickListener {
+            viewModel.conversation.value?.data?.let {
+                if (it.type == Conversation.TYPE.FRIEND) {
+                    ActivityUtils.startConversationActivity(getThis(), it.id)
+                } else {
+                    ActivityUtils.startConversationGroupActivity(getThis(), it.id, it.groupId ?: "")
+                }
+            }
+
+        }
     }
 
     //初始化聊天列表
@@ -418,7 +420,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
             false
         }
 
-        binding.input.setOnEditorActionListener (object : TextView.OnEditorActionListener {
+        binding.input.setOnEditorActionListener(object : TextView.OnEditorActionListener {
             override fun onEditorAction(textView: TextView, i: Int, keyEvent: KeyEvent?): Boolean {
                 if (textView.text.toString().isBlank()) return false
                 if (i == EditorInfo.IME_ACTION_GO || i == EditorInfo.IME_ACTION_SEND) {
@@ -482,51 +484,52 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
      */
     //设置聊天信息显示
     private fun setConversationViews(conversation: Conversation) {
-        if (TextUtils.isEmpty(conversation.friendRemark)) {
-            binding.title.text = conversation.friendNickname
-        } else {
-            binding.title.text = conversation.friendRemark
+        binding.title.text = conversation.name
+        if(conversation.type == Conversation.TYPE.GROUP){//群聊
+            binding.stateBar.visibility = View.GONE
+            binding.accessibilityIcon.visibility = View.GONE
+            binding.accessibilityIcon2.visibility = View.GONE
+            binding.accessibilityIcon3.visibility = View.GONE
+        }else{
+            binding.stateBar.visibility = View.VISIBLE
         }
 
-        binding.accessibilityIcon.visibility = View.GONE
-        binding.accessibilityIcon2.visibility = View.GONE
-        binding.accessibilityIcon3.visibility = View.GONE
-        if (conversation.friendType == 0) {
-            binding.typeIcon.visibility = View.GONE
-        } else {
-            binding.typeIcon.visibility = View.VISIBLE
-            when (conversation.friendType) {
-                1 -> {
-                    binding.accessibilityIcon.visibility = View.VISIBLE
-                }
-                2 -> {
-                    binding.accessibilityIcon2.visibility = View.VISIBLE
-                }
-                3 -> {
-                    binding.accessibilityIcon.visibility = View.VISIBLE
-                    binding.accessibilityIcon2.visibility = View.VISIBLE
-                }
-                4 -> {
-                    binding.accessibilityIcon3.visibility = View.VISIBLE
-                }
-                5 -> {
-                    binding.accessibilityIcon.visibility = View.VISIBLE
-                    binding.accessibilityIcon3.visibility = View.VISIBLE
-                }
-                6 -> {
-                    binding.accessibilityIcon2.visibility = View.VISIBLE
-                    binding.accessibilityIcon3.visibility = View.VISIBLE
-                }
-                7 -> {
-                    binding.accessibilityIcon.visibility = View.VISIBLE
-                    binding.accessibilityIcon2.visibility = View.VISIBLE
-                    binding.accessibilityIcon3.visibility = View.VISIBLE
-                }
-                else -> {
-                    binding.typeIcon.visibility = View.GONE
-                }
-            }
-        }
+//        if (conversation.friendType == 0) {
+//            binding.typeIcon.visibility = View.GONE
+//        } else {
+//            binding.typeIcon.visibility = View.VISIBLE
+//            when (conversation.friendType) {
+//                1 -> {
+//                    binding.accessibilityIcon.visibility = View.VISIBLE
+//                }
+//                2 -> {
+//                    binding.accessibilityIcon2.visibility = View.VISIBLE
+//                }
+//                3 -> {
+//                    binding.accessibilityIcon.visibility = View.VISIBLE
+//                    binding.accessibilityIcon2.visibility = View.VISIBLE
+//                }
+//                4 -> {
+//                    binding.accessibilityIcon3.visibility = View.VISIBLE
+//                }
+//                5 -> {
+//                    binding.accessibilityIcon.visibility = View.VISIBLE
+//                    binding.accessibilityIcon3.visibility = View.VISIBLE
+//                }
+//                6 -> {
+//                    binding.accessibilityIcon2.visibility = View.VISIBLE
+//                    binding.accessibilityIcon3.visibility = View.VISIBLE
+//                }
+//                7 -> {
+//                    binding.accessibilityIcon.visibility = View.VISIBLE
+//                    binding.accessibilityIcon2.visibility = View.VISIBLE
+//                    binding.accessibilityIcon3.visibility = View.VISIBLE
+//                }
+//                else -> {
+//                    binding.typeIcon.visibility = View.GONE
+//                }
+//            }
+//        }
     }
 
 
@@ -571,12 +574,12 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         if (!TextUtils.isEmpty(voiceHelper.filePath)) {
             voiceHelper.let {
                 viewModel.conversation.value?.let { conversation ->
-                    if (conversation.friendType == 2 || conversation.friendType == 3 || conversation.friendType == 6 || conversation.friendType == 7) {
-//                        viewModel.sendVoiceMessage(it.filePath, it.timeCount)
-                        viewModel.voiceTTSDirect(it.filePath)
-                    } else {
-                        viewModel.sendVoiceMessage(it.filePath, it.timeCount)
-                    }
+//                    if (conversation.friendType == 2 || conversation.friendType == 3 || conversation.friendType == 6 || conversation.friendType == 7) {
+////                        viewModel.sendVoiceMessage(it.filePath, it.timeCount)
+//                        viewModel.voiceTTSDirect(it.filePath)
+//                    } else {
+                    viewModel.sendVoiceMessage(it.filePath, it.timeCount)
+//                    }
                 }
             }
         }
@@ -711,7 +714,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         if (resultCode != Activity.RESULT_OK) {
             return
         }
-        if (requestCode ==  RC_CHOOSE_PHOTO) { //选择图片返回
+        if (requestCode == RC_CHOOSE_PHOTO) { //选择图片返回
             if (null == data) {
                 Toast.makeText(this, R.string.no_image_selected, Toast.LENGTH_SHORT).show()
                 return
@@ -724,20 +727,20 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
             val filePath = FileProviderUtils.getFilePathByUri(getThis(), uri)
             filePath?.let {
                 viewModel.conversation.value?.let { conversation ->
-                    if (conversation.friendType == 1 || conversation.friendType == 3 || conversation.friendType == 5 || conversation.friendType == 7) {
-                        ImageDetectBottomFragment().setMessage(null)
-                                .setTitle(getString(R.string.hint_accessibility_sure_to_send_title))
-                                .setSubtitle(getString(R.string.hint_type_visual_sure_to_send_subtitle))
-                                .setUrl(filePath)
-                                .setOnConfirmListener(object : ImageDetectBottomFragment.OnConfirmListener {
-                                    override fun onConfirm(url: String) {
-                                        viewModel.sendImageMessage(it)
-                                    }
-                                })
-                                .show(supportFragmentManager, "xx")
-                    } else {
-                        viewModel.sendImageMessage(it)
-                    }
+//                    if (conversation.friendType == 1 || conversation.friendType == 3 || conversation.friendType == 5 || conversation.friendType == 7) {
+//                        ImageDetectBottomFragment().setMessage(null)
+//                                .setTitle(getString(R.string.hint_accessibility_sure_to_send_title))
+//                                .setSubtitle(getString(R.string.hint_type_visual_sure_to_send_subtitle))
+//                                .setUrl(filePath)
+//                                .setOnConfirmListener(object : ImageDetectBottomFragment.OnConfirmListener {
+//                                    override fun onConfirm(url: String) {
+//                                        viewModel.sendImageMessage(it)
+//                                    }
+//                                })
+//                                .show(supportFragmentManager, "xx")
+//                    } else {
+                    viewModel.sendImageMessage(it)
+//                    }
                 }
             }
         }

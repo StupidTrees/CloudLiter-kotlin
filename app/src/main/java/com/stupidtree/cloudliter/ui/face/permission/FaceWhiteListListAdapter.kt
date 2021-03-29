@@ -24,7 +24,7 @@ class FaceWhiteListListAdapter(mContext: Context, mBeans: MutableList<FaceWhiteL
 
     override fun bindHolder(holder: WHolder, data: FaceWhiteListEntity?, position: Int) {
         holder.binding.name.text = data?.userName
-        ImageUtils.loadAvatarInto(mContext,data?.userAvatar,holder.binding.avatar)
+        ImageUtils.loadAvatarInto(mContext,data?.userId,holder.binding.avatar,useUserId = true)
         holder.binding.delete.setOnClickListener {
             data?.let { it1 -> mOnItemClickListener?.onItemClick(it1,it,position) }
         }

@@ -3,39 +3,39 @@ package com.stupidtree.cloudliter.ui.chat
 /**
  * 好友状态
  */
-class FriendState {
+class OnlineState {
     enum class STATE {
-        ONLINE, OFFLINE, YOU, OTHER
+        GROUP, ONLINE, OFFLINE, YOU, OTHER
     }
 
-   var state: STATE? = null
-
+    var state: STATE? = null
+    var num: Int = 0
 
     companion object {
-        val online: FriendState
+        val online: OnlineState
             get() {
-                val fs = FriendState()
+                val fs = OnlineState()
                 fs.state = STATE.ONLINE
                 return fs
             }
 
-        val offline: FriendState
+        val offline: OnlineState
             get() {
-                val fs = FriendState()
+                val fs = OnlineState()
                 fs.state = STATE.OFFLINE
                 return fs
             }
 
-        val withYou: FriendState
+        val withYou: OnlineState
             get() {
-                val fs = FriendState()
+                val fs = OnlineState()
                 fs.state = STATE.YOU
                 return fs
             }
 
-        val withOther: FriendState
+        val withOther: OnlineState
             get() {
-                val fs = FriendState()
+                val fs = OnlineState()
                 fs.state = STATE.OTHER
                 return fs
             }

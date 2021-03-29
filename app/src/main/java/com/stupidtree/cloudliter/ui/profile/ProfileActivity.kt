@@ -105,7 +105,7 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
 
     private fun setUpLiveData() {
         //为ViewModel中的各种数据设置监听
-        viewModel.userProfileLiveData?.observe(this, { userProfileDataState ->
+        viewModel.userProfileLiveData.observe(this, { userProfileDataState ->
             binding.refresh.isRefreshing = false
             if (userProfileDataState?.state === DataState.STATE.SUCCESS) {
                 //状态为成功，设置ui
@@ -115,7 +115,7 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
                 Toast.makeText(getThis(), "获取出错", Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel.makeFriendsResult?.observe(this, { booleanDataState ->
+        viewModel.makeFriendsResult.observe(this, { booleanDataState ->
             if (booleanDataState?.state === DataState.STATE.SUCCESS) {
                 //状态为成功
                 Toast.makeText(getThis(), R.string.send_request_success, Toast.LENGTH_SHORT).show()
@@ -124,15 +124,15 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
                 Toast.makeText(getThis(), booleanDataState?.message, Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel.changeRemarkResult?.observe(this, { stringDataState ->
-            if (stringDataState!!.state === DataState.STATE.SUCCESS) {
+        viewModel.changeRemarkResult.observe(this, { stringDataState ->
+            if (stringDataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.avatar_change_success, Toast.LENGTH_SHORT).show()
                 intent.getStringExtra("id")?.let { viewModel.startRefresh(it) }
             } else {
                 Toast.makeText(applicationContext, "失败", Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel.deleteFriendResult?.observe(this, { dataState ->
+        viewModel.deleteFriendResult.observe(this, { dataState ->
             if (dataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.delete_friend_success, Toast.LENGTH_SHORT).show()
                 intent.getStringExtra("id")?.let { viewModel.startRefresh(it) }
@@ -140,7 +140,7 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
                 Toast.makeText(applicationContext, "失败", Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel.assignGroupResult?.observe(this, { dataState: DataState<*> ->
+        viewModel.assignGroupResult.observe(this, { dataState: DataState<*> ->
             if (dataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.assign_group_success, Toast.LENGTH_SHORT).show()
                 intent.getStringExtra("id")?.let { viewModel.startRefresh(it) }
@@ -148,9 +148,9 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
                 Toast.makeText(applicationContext, R.string.fail, Toast.LENGTH_SHORT).show()
             }
         })
-        viewModel.relationLiveData?.observe(this, { userRelationDataState ->
+        viewModel.relationLiveData.observe(this, { userRelationDataState ->
             when {
-                userRelationDataState!!.state == DataState.STATE.SUCCESS -> {
+                userRelationDataState.state == DataState.STATE.SUCCESS -> {
                     //是好友关系，则提供发消息入口
                     binding.fab
                     binding.relationCard.visibility = View.VISIBLE
@@ -160,7 +160,7 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
                     binding.fab.isEnabled = true
                     binding.fab.setOnClickListener {
                         if (viewModel.getUserRelation() != null && viewModel.getUserProfile() != null && viewModel.getUserLocal() != null) {
-                            ActivityUtils.startChatActivity(getThis(), viewModel.getUserProfile()!!, viewModel.getUserRelation()!!, viewModel.getUserLocal()!!)
+                            ActivityUtils.startChatActivity(getThis(), viewModel.getUserRelation()?.conversationId?:"")
                         }
                     }
                     binding.remark.text = userRelationDataState.data!!.remark
@@ -236,7 +236,7 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
                 }
             }
         })
-        viewModel.wordCloudLiveData?.observe(this, { listDataState ->
+        viewModel.wordCloudLiveData.observe(this, { listDataState ->
             if (listDataState.state === DataState.STATE.SUCCESS) {//成功
                 val tag = ArrayList<String>()
                 if (listDataState.data!!.isEmpty()) {//没有词云
@@ -280,7 +280,7 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
      */
     private fun setProfileView(userInfo: UserProfile?) {
         if (userInfo != null) {
-            ImageUtils.loadAvatarNoCacheInto(getThis(), userInfo.avatar,binding.avatar)
+            ImageUtils.loadAvatarInto(getThis(), userInfo.avatar,binding.avatar)
             binding.textUsername.text = userInfo.username
             binding.textNickname.text = userInfo.nickname
             binding.iconGender.visibility = View.VISIBLE

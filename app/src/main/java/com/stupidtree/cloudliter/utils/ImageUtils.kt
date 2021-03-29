@@ -39,31 +39,25 @@ import java.util.*
  */
 object ImageUtils {
 
-
-    fun loadAvatarNoCacheInto(context: Context, filename: String?, target: ImageView) {
-        if (isEmpty(filename)) {
-            target.setImageResource(R.drawable.place_holder_avatar)
+    fun loadAvatarInto(context: Context, id: String?, target: ImageView, useUserId: Boolean = false) {
+        val url = if (useUserId) {
+            "http://hita.store:3000/user/profile/query_avatar?userId=$id"
         } else {
-            val glideUrl = GlideUrl("http://hita.store:3000/user/profile/avatar?path=" +
-                    filename, LazyHeaders.Builder().addHeader("device-type", "android").build())
-            Glide.with(context).load(glideUrl
-            ).apply(RequestOptions.bitmapTransform(CircleCrop()))
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .placeholder(R.drawable.place_holder_avatar)
-                    .into(target)
+            "http://hita.store:3000/user/profile/avatar?imageId=$id"
         }
+        val glideUrl = GlideUrl(url, LazyHeaders.Builder().addHeader("device-type", "android").build())
+        Glide.with(context).load(glideUrl).apply(RequestOptions.bitmapTransform(CircleCrop())).placeholder(R.drawable.place_holder_avatar).into(target)
     }
 
-    fun loadAvatarInto(context: Context, filename: String?, target: ImageView) {
-        if (isEmpty(filename)) {
-            target.setImageResource(R.drawable.place_holder_avatar)
-        } else {
-            val glideUrl = GlideUrl("http://hita.store:3000/user/profile/avatar?path=" +
-                    filename, LazyHeaders.Builder().addHeader("device-type", "android").build())
-            Glide.with(context).load(glideUrl
-            ).apply(RequestOptions.bitmapTransform(CircleCrop())).placeholder(R.drawable.place_holder_avatar).into(target)
-        }
+    fun loadAvatarIntoNotification(context: Context, userId: String?, target: NotificationTarget) {
+        // Log.e("path",filename);
+        Glide.with(context.applicationContext) // safer!
+                .asBitmap()
+                .load("http://hita.store:3000/user/profile/query_avatar?userId=$userId")
+                .apply(RequestOptions.bitmapTransform(CircleCrop()))
+                .into(target)
     }
+
 
     /**
      * 加载图片文件
@@ -87,64 +81,17 @@ object ImageUtils {
                 imageId
     }
 
-    fun loadAvatarIntoNotification(context: Context, filename: String, target: NotificationTarget) {
-        // Log.e("path",filename);
-        Glide.with(context.applicationContext) // safer!
-                .asBitmap()
-                .load("http://hita.store:3000/user/profile/avatar?path=$filename")
-                .apply(RequestOptions.bitmapTransform(CircleCrop()))
-                .into(target)
-    }
-
-    fun loadLocalAvatarInto(context: Context, filename: String?, target: ImageView) {
-        val sign = getInstance(context)!!.myAvatarGlideSignature
-        if (isEmpty(filename)) {
-            target.setImageResource(R.drawable.place_holder_avatar)
-        } else {
-            val glideUrl = GlideUrl("http://hita.store:3000/user/profile/avatar?path=" +
-                    filename, LazyHeaders.Builder().addHeader("device-type", "android").build())
-            Glide.with(context).load(glideUrl
-            ).apply(RequestOptions.bitmapTransform(CircleCrop()))
-                    .signature(ObjectKey(sign))
-                    .placeholder(R.drawable.place_holder_avatar)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE).into(target)
-            // p.edit().putString("my_avatar","normal").apply();
-        }
-    }
-
-    fun loadUserAvatar(context: Context, filename: String?): MutableLiveData<Bitmap?> {
-        val result = MutableLiveData<Bitmap?>()
-        val glideUrl = GlideUrl("http://hita.store:3000/user/profile/avatar?path=" +
-                filename, LazyHeaders.Builder().addHeader("device-type", "android").build())
-        Glide.with(context)
-                .asBitmap()
-                .load(glideUrl)
-                .apply(RequestOptions.bitmapTransform(CircleCrop()))
-                .placeholder(R.drawable.place_holder_avatar)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                        result.value = resource
-                    }
-
-                    override fun onLoadCleared(placeholder: Drawable?) {
-                        TODO("Not yet implemented")
-                    }
-                });
-        // p.edit().putString("my_avatar","normal").apply();
-        return result
-    }
 
     /**
      * 加载人脸文件
      */
-    fun loadFaceImageInto(context: Context,token:String,faceId: String, target: ImageView) {
+    fun loadFaceImageInto(context: Context, token: String, faceId: String, target: ImageView) {
         if (isEmpty(faceId)) {
             target.setImageResource(R.drawable.place_holder_loading)
         } else {
             val glideUrl = GlideUrl("http://hita.store:3000/image/face?faceId=$faceId", LazyHeaders.Builder()
                     .addHeader("device-type", "android")
-                    .addHeader("token",token)
+                    .addHeader("token", token)
                     .build())
             Glide.with(context).load(glideUrl)
                     .placeholder(R.drawable.place_holder_loading)

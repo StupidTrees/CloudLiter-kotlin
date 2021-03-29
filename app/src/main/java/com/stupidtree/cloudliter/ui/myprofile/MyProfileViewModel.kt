@@ -8,7 +8,6 @@ import com.stupidtree.cloudliter.data.model.UserProfile
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository
 import com.stupidtree.cloudliter.data.repository.ProfileRepository.Companion.getInstance
-import com.stupidtree.cloudliter.data.repository.ProfileRepository.Companion.instance
 import com.stupidtree.component.data.BooleanTrigger
 import com.stupidtree.component.data.DataState
 import com.stupidtree.component.data.StringTrigger
@@ -29,13 +28,13 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
     private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
 
 
-
     /**
      * 数据区
      */
 
     //Trigger：控制↑的刷新
     var profileController = MutableLiveData<StringTrigger>()
+
     //数据本体：我的用户资料
     var userProfileLiveData: LiveData<DataState<UserProfile?>> = Transformations.switchMap(profileController) { input ->
         val userLocal = localUserRepository.getLoggedInUser()
@@ -48,32 +47,21 @@ class MyProfileViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
 
-
-    //状态数据：更改头像的结果
-    var changeAvatarResult: LiveData<DataState<String?>>? = null
-        get() {
-            if (field == null) {
-                //controller改变时。。。巴拉巴拉
-                changeAvatarResult = Transformations.switchMap(changeAvatarController) { input: StringTrigger ->
-                    if (input.isActioning) {
-                        //要先判断本地用户当前是否登录
-                        val userLocal = localUserRepository.getLoggedInUser()
-                        if (userLocal.isValid) {
-                            //通知用户资料仓库，开始更换头像
-                            return@switchMap profileRepository.changeAvatar(userLocal.token!!, input.data)
-                        } else {
-                            return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
-                        }
-                    } else {
-                        return@switchMap MutableLiveData<DataState<String?>>()
-                    }
-                }
-            }
-            return field!!
-        }
-
     //Trigger：控制更改头像请求的发送，其中携带了新头像文件的路径字符串
     var changeAvatarController = MutableLiveData<StringTrigger>()
+
+    //状态数据：更改头像的结果
+    var changeAvatarResult: LiveData<DataState<String?>> = Transformations.switchMap(changeAvatarController) { input: StringTrigger ->
+        //要先判断本地用户当前是否登录
+        val userLocal = localUserRepository.getLoggedInUser()
+        if (userLocal.isValid) {
+            //通知用户资料仓库，开始更换头像
+            return@switchMap profileRepository.changeAvatar(userLocal.token!!, input.data)
+        } else {
+            return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
+        }
+    }
+
 
     //状态数据：更改昵称的结果
     var changeNicknameResult: LiveData<DataState<String?>>? = null

@@ -314,7 +314,7 @@ class UserWebSource : BaseWebSource<UserService>(Retrofit.Builder()
             }
             when (input.code) {
                 SUCCESS -> {
-                    val file1 = input.data?.let { JsonUtils.getStringData(it, "file") }
+                    val file1 = input.data?.let { JsonUtils.getStringData(it, "avatar") }
                     if (file1 != null) {
                         return@map DataState<String?>(file1)
                     } else {

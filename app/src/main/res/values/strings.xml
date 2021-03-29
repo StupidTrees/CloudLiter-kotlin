@@ -254,6 +254,16 @@
     <string name="label_light_engine">LightEngine</string>
     <string name="hint_light_engine">云升光引擎</string>
     <string name="light_engine_settings">LightEngine设置</string>
+    <string name="create_group_success">创建群聊成功！</string>
+    <string name="title_conversation_group">群聊信息</string>
+    <string name="group_chat_name">群名称</string>
+    <string name="edit_group_name">更改群名称</string>
+    <string name="label_group_created">建群日期</string>
+    <string name="label_group_word_cloud">群组聊天词云</string>
+    <string name="quit_group_chat">退出群聊</string>
+    <string name="destroy_group_chat">解散群聊</string>
+    <string name="sure_to_destroy_group">解散后，所有会话相关的资料都将删除！</string>
+    <string name="sure_to_quit_group">确认退群？</string>
     <string-array name="yunmoji_descriptions">
         <item>企鹅</item>
         <item>兔子</item>

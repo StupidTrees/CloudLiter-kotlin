@@ -2,7 +2,7 @@ package com.stupidtree.cloudliter.ui.main.contact
 
 import android.app.Application
 import androidx.lifecycle.*
-import com.stupidtree.cloudliter.data.repository.FriendsRepository
+import com.stupidtree.cloudliter.data.repository.GroupChatRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.data.repository.RelationRepository
 import com.stupidtree.component.data.DataState
@@ -17,39 +17,41 @@ class ContactViewModel(application: Application) : AndroidViewModel(application)
     /**
      * 仓库区
      */
-    //仓库1：好友仓库
-    private val friendsRepository: FriendsRepository = FriendsRepository.getInstance(application)
-
     //仓库2：关系仓库
     private val relationRepository: RelationRepository = RelationRepository.getInstance(application)
+
+    private val groupChatRepository = GroupChatRepository.getInstance(application)
 
     //仓库2：本地用户仓库
     private val localUserRepository: LocalUserRepository = LocalUserRepository.getInstance(application)
 
+
     /**
      * 未读好友事件数
      */
-    //数据本体：未读好友事件数
-    var unReadLiveData: LiveData<DataState<Int?>>? = null
-        get() {
-            if (field == null) {
-                field = Transformations.switchMap(unReadController) {
-                    val userLocal = localUserRepository.getLoggedInUser()
-                    if (userLocal.isValid) {
-                        return@switchMap relationRepository.countUnread(userLocal.token!!)
-                    } else {
-                        return@switchMap MutableLiveData(DataState<Int?>(DataState.STATE.NOT_LOGGED_IN))
-                    }
-                }
-            }
-            return field
-        }
-        private set
 
-    //Trigger：控制↑的获取
     private val unReadController = MutableLiveData<Trigger>()
+    //数据本体：未读好友事件数
+    var unReadLiveData: LiveData<DataState<Int?>> = Transformations.switchMap(unReadController) {
+        val userLocal = localUserRepository.getLoggedInUser()
+        if (userLocal.isValid) {
+            return@switchMap relationRepository.countUnread(userLocal.token!!)
+        } else {
+            return@switchMap MutableLiveData(DataState<Int?>(DataState.STATE.NOT_LOGGED_IN))
+        }
+    }
 
 
+    private val createGroupController = MutableLiveData<List<String>>()
+    val createGroupChatResult = Transformations.switchMap(createGroupController) {
+        val userLocal = localUserRepository.getLoggedInUser()
+        if (userLocal.isValid) {
+            return@switchMap groupChatRepository.createGroupChat(userLocal.token!!,"新建群聊",it)
+        } else {
+            return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
+        }
+
+    }
 
 
     /**
@@ -59,4 +61,7 @@ class ContactViewModel(application: Application) : AndroidViewModel(application)
         unReadController.value = Trigger.actioning
     }
 
+    fun startCreateGroup(list:List<String>){
+        createGroupController.value = list
+    }
 }

@@ -39,166 +39,127 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     /**
      * 数据区
      */
-    //数据本体：我和这个用户的好友关系
-    var relationLiveData: LiveData<DataState<UserRelation?>>? = null
-        get() {
-            if (field == null) {
-                relationLiveData = Transformations.switchMap(profileController) { input: StringTrigger ->
-                    val user = localUserRepository.getLoggedInUser()
-                    if (input.isActioning) {
-                        if (user.isValid) {
-
-                            //如果就是自己
-                            if (user.id == input.data) {
-                                return@switchMap MutableLiveData(DataState<UserRelation?>(DataState.STATE.SPECIAL))
-                            } else {
-                                //通知用户资料仓库进行好友判别
-                                return@switchMap relationRepository.queryRelation(user.token!!, input.data!!)
-                            }
-                        } else {
-                            return@switchMap MutableLiveData(DataState<UserRelation?>(DataState.STATE.NOT_LOGGED_IN))
-                        }
-                    }
-                    MutableLiveData(DataState(DataState.STATE.NOTHING))
-                }
-            }
-            return field!!
-        }
-
-    //数据本体：用户词云
-    var wordCloudLiveData: LiveData<DataState<HashMap<String, Float?>?>>? = null
-        get() {
-            if (field == null) {
-                wordCloudLiveData = Transformations.switchMap(profileController) { input: StringTrigger ->
-                    val user = localUserRepository.getLoggedInUser()
-                    if (input.isActioning) {
-                        if (user.isValid) {
-                            return@switchMap repository.getUserWordCloud(user.token!!, input.data)
-                        } else {
-                            return@switchMap MutableLiveData(DataState<HashMap<String, Float?>?>(DataState.STATE.NOT_LOGGED_IN))
-                        }
-                    }
-                    MutableLiveData(DataState(DataState.STATE.NOTHING))
-                }
-            }
-            return field!!
-        }
 
     //Trigger：控制↑三个的刷新
     private var profileController = MutableLiveData<StringTrigger>()
 
-    //状态数据：添加好友的结果
-    var makeFriendsResult: LiveData<DataState<String?>>? = null
-        get() {
-            if (field == null) {
-                makeFriendsResult = Transformations.switchMap(makeFriendsController) { input: StringTrigger ->
-                    val user = localUserRepository.getLoggedInUser()
-                    if (input.isActioning) {
-                        if (user.isValid) {
-                            //也是通过这个仓库进行好友建立
-                            return@switchMap relationRepository.sendFriendRequest(user.token!!, input.data)
-                            // return relationRepository.makeFriends(Objects.requireNonNull(user.getToken()),input.getData());
-                        } else {
-                            return@switchMap MutableLiveData<DataState<String?>>(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
-                        }
-                    }
-                    MutableLiveData<DataState<String?>>()
-                }
+    //从用户资料仓库中拉取数据
+    var userProfileLiveData = Transformations.switchMap(profileController) { input: StringTrigger ->
+        val user = localUserRepository.getLoggedInUser()
+        if (input.isActioning) {
+            if (user.isValid) {
+                //从用户资料仓库中拉取数据
+                return@switchMap repository.getUserProfile(input.data, user.token!!)
+            } else {
+                return@switchMap MutableLiveData(DataState<UserProfile?>(DataState.STATE.NOT_LOGGED_IN))
             }
-            return field!!
         }
+        MutableLiveData(DataState(DataState.STATE.NOTHING))
+    }
+
+    //数据本体：我和这个用户的好友关系
+    var relationLiveData = Transformations.switchMap(profileController) { input: StringTrigger ->
+        val user = localUserRepository.getLoggedInUser()
+        if (input.isActioning) {
+            if (user.isValid) {
+
+                //如果就是自己
+                if (user.id == input.data) {
+                    return@switchMap MutableLiveData(DataState<UserRelation?>(DataState.STATE.SPECIAL))
+                } else {
+                    //通知用户资料仓库进行好友判别
+                    return@switchMap relationRepository.queryRelation(user.token!!, input.data)
+                }
+            } else {
+                return@switchMap MutableLiveData(DataState<UserRelation?>(DataState.STATE.NOT_LOGGED_IN))
+            }
+        }
+        MutableLiveData(DataState(DataState.STATE.NOTHING))
+    }
+
+
+    //数据本体：用户词云
+    var wordCloudLiveData = Transformations.switchMap(profileController) { input: StringTrigger ->
+        val user = localUserRepository.getLoggedInUser()
+        if (input.isActioning) {
+            if (user.isValid) {
+                return@switchMap repository.getUserWordCloud(user.token!!, input.data)
+            } else {
+                return@switchMap MutableLiveData(DataState<HashMap<String, Float?>?>(DataState.STATE.NOT_LOGGED_IN))
+            }
+        }
+        MutableLiveData(DataState(DataState.STATE.NOTHING))
+    }
 
     //Trigger：控制添加好友的请求
     private var makeFriendsController = MutableLiveData<StringTrigger>()
 
-    //状态数据：更改签名的结果
-    var changeRemarkResult: LiveData<DataState<String?>>? = null
-        get() {
-            if (field == null) {
-                //也是一样的
-                changeRemarkResult = Transformations.switchMap(changeRemarkController) { input: StringTrigger ->
-                    if (input.isActioning) {
-                        val userLocal = localUserRepository.getLoggedInUser()
-                        if (userLocal.isValid && relationLiveData!!.value != null) {
-                            // System.out.println("friend id is" + relationLiveData.getValue().getData().getFriendId());
-                            return@switchMap relationRepository.changeRemark(userLocal.token!!, input.data, relationLiveData!!.value!!.data!!.friendId!!)
-                        } else {
-                            return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
-                        }
-                    }
-                    MutableLiveData()
-                }
+    //状态数据：添加好友的结果
+    var makeFriendsResult = Transformations.switchMap(makeFriendsController) { input: StringTrigger ->
+        val user = localUserRepository.getLoggedInUser()
+        if (input.isActioning) {
+            if (user.isValid) {
+                //也是通过这个仓库进行好友建立
+                return@switchMap relationRepository.sendFriendRequest(user.token!!, input.data)
+                // return relationRepository.makeFriends(Objects.requireNonNull(user.getToken()),input.getData());
+            } else {
+                return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
             }
-            return field!!
         }
+        MutableLiveData()
+    }
 
     //Trigger：控制更改签名请求的发送，其中携带了新昵称字符串
     var changeRemarkController = MutableLiveData<StringTrigger>()
 
-    //状态数据：删除好友的结果
-    var deleteFriendResult: LiveData<DataState<*>>? = null
-        get() {
-            if (field == null) {
-                deleteFriendResult = Transformations.switchMap(deleteFriendController) { input: StringTrigger ->
-                    if (input.isActioning) {
-                        val userLocal = localUserRepository.getLoggedInUser()
-                        if (userLocal.isValid) {
-                            return@switchMap relationRepository.deleteFriend(userLocal.token!!, input.data)
-                        } else {
-                            return@switchMap MutableLiveData<DataState<*>>(DataState<Any>(DataState.STATE.NOT_LOGGED_IN))
-                        }
-                    }
-                    MutableLiveData(DataState<Any>(DataState.STATE.NOTHING))
-                }
+    //状态数据：更改签名的结果
+    var changeRemarkResult = Transformations.switchMap(changeRemarkController) { input: StringTrigger ->
+        if (input.isActioning) {
+            val userLocal = localUserRepository.getLoggedInUser()
+            if (userLocal.isValid && relationLiveData.value != null) {
+                // System.out.println("friend id is" + relationLiveData.getValue().getData().getFriendId());
+                return@switchMap relationRepository.changeRemark(userLocal.token!!, input.data, relationLiveData.value?.data?.friendId!!)
+            } else {
+                return@switchMap MutableLiveData(DataState<String?>(DataState.STATE.NOT_LOGGED_IN))
             }
-            return field!!
         }
+        MutableLiveData()
+    }
+
 
     //Trigger：控制删除好友
-    var deleteFriendController = MutableLiveData<StringTrigger>()
+    private var deleteFriendController = MutableLiveData<StringTrigger>()
 
-    //状态数据：分配好友分组的结果
-    var assignGroupResult: LiveData<DataState<*>>? = null
-        get() {
-            if (field == null) {
-                assignGroupResult = Transformations.switchMap(assignGroupController) { input: StringTrigger ->
-                    if (input.isActioning) {
-                        val userLocal = localUserRepository.getLoggedInUser()
-                        if (userLocal.isValid && userId != null) {
-                            return@switchMap groupRepository.assignGroup(userLocal.token!!, userId!!, input.data)
-                        } else {
-                            return@switchMap MutableLiveData<DataState<*>>(DataState<Any>(DataState.STATE.NOT_LOGGED_IN))
-                        }
-                    }
-                    MutableLiveData<DataState<*>>(DataState<Any>(DataState.STATE.NOTHING))
-                }
+    //状态数据：删除好友的结果
+    var deleteFriendResult: LiveData<DataState<*>> = Transformations.switchMap(deleteFriendController) { input: StringTrigger ->
+        if (input.isActioning) {
+            val userLocal = localUserRepository.getLoggedInUser()
+            if (userLocal.isValid) {
+                return@switchMap relationRepository.deleteFriend(userLocal.token!!, input.data)
+            } else {
+                return@switchMap MutableLiveData<DataState<*>>(DataState<Any>(DataState.STATE.NOT_LOGGED_IN))
             }
-            return field!!
         }
+        MutableLiveData(DataState<Any>(DataState.STATE.NOTHING))
+    }
+
 
     //Trigger:控制分配好友分组
     private var assignGroupController = MutableLiveData<StringTrigger>()
 
-
-    //从用户资料仓库中拉取数据
-    var userProfileLiveData: LiveData<DataState<UserProfile?>>? = null
-        get() {
-            if (field == null) {
-                userProfileLiveData = Transformations.switchMap(profileController) { input: StringTrigger ->
-                    val user = localUserRepository.getLoggedInUser()
-                    if (input.isActioning) {
-                        if (user.isValid) {
-                            //从用户资料仓库中拉取数据
-                            return@switchMap repository.getUserProfile(input.data, user.token!!)
-                        } else {
-                            return@switchMap MutableLiveData(DataState<UserProfile?>(DataState.STATE.NOT_LOGGED_IN))
-                        }
-                    }
-                    MutableLiveData(DataState(DataState.STATE.NOTHING))
-                }
+    //状态数据：分配好友分组的结果
+    var assignGroupResult = Transformations.switchMap(assignGroupController) { input: StringTrigger ->
+        if (input.isActioning) {
+            val userLocal = localUserRepository.getLoggedInUser()
+            if (userLocal.isValid && userId != null) {
+                return@switchMap groupRepository.assignGroup(userLocal.token!!, userId!!, input.data)
+            } else {
+                return@switchMap MutableLiveData<DataState<*>>(DataState<Any>(DataState.STATE.NOT_LOGGED_IN))
             }
-            return field
         }
+        MutableLiveData(DataState<Any>(DataState.STATE.NOTHING))
+    }
+
 
     /**
      * 开始页面刷新
@@ -234,10 +195,8 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
      */
     val userId: String?
         get() {
-            userProfileLiveData?.let {
-                it.value?.let { it1 ->
-                    return it1.data?.id
-                }
+            userProfileLiveData.value?.let {
+                return it.data?.id
             }
             return null
         }
@@ -248,7 +207,7 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
      * @param newRemark 备注
      */
     fun startChangeRemark(newRemark: String) {
-        if (relationLiveData!!.value != null) {
+        if (relationLiveData.value != null) {
             changeRemarkController.value = StringTrigger.getActioning(newRemark)
         }
     }
@@ -269,23 +228,23 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     fun getUserRelation(): UserRelation? {
 
-        return if (relationLiveData!!.value != null) {
-            relationLiveData!!.value!!.data
+        return if (relationLiveData.value != null) {
+            relationLiveData.value?.data
         } else {
             null
         }
     }
 
     fun getUserProfile(): UserProfile? {
-        if (userProfileLiveData != null && userProfileLiveData!!.value != null) {
-            return userProfileLiveData!!.value!!.data
+        if (userProfileLiveData.value != null) {
+            return userProfileLiveData.value?.data
         }
         return null
     }
 
-    fun getUserLocal(): UserLocal?{
-            val userLocal = localUserRepository.getLoggedInUser()
-            return if (userLocal.isValid) userLocal else null
-        }
+    fun getUserLocal(): UserLocal? {
+        val userLocal = localUserRepository.getLoggedInUser()
+        return if (userLocal.isValid) userLocal else null
+    }
 
 }

@@ -112,7 +112,7 @@ class RelationEventActivity : BaseActivity<RelationEventViewModel, ActivityRelat
             if (data != null) {
                 holder.binding.nickname.text = data.otherNickname
                 holder.binding.time.text = TextUtils.getChatTimeText(mContext, data.createdAt)
-                ImageUtils.loadAvatarNoCacheInto(mContext, data.otherAvatar, holder.binding.avatar)
+                ImageUtils.loadAvatarInto(mContext, data.otherAvatar, holder.binding.avatar)
                 if (mOnItemClickListener != null) {
                     holder.binding.item.setOnClickListener { view: View? -> mOnItemClickListener!!.onItemClick(data, view, position) }
                 }

@@ -3,15 +3,12 @@ package com.stupidtree.cloudliter.utils
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
-import com.stupidtree.accessibility.LightEngine
 import com.stupidtree.cloudliter.data.model.*
-import com.stupidtree.cloudliter.data.model.Conversation.Companion.fromNewMessage
-import com.stupidtree.cloudliter.data.model.Conversation.Companion.fromUserRelationAndProfile
 import com.stupidtree.cloudliter.ui.accessibility.AccessibilityActivity
 import com.stupidtree.cloudliter.ui.accessibility.egine.LightEngineActivity
 import com.stupidtree.cloudliter.ui.chat.ChatActivity
-import com.stupidtree.cloudliter.ui.conversation.ConversationActivity
+import com.stupidtree.cloudliter.ui.conversation.group.ConversationGroupActivity
+import com.stupidtree.cloudliter.ui.conversation.normal.ConversationActivity
 import com.stupidtree.cloudliter.ui.face.MyFaceActivity
 import com.stupidtree.cloudliter.ui.face.permission.FaceWhiteListActivity
 import com.stupidtree.cloudliter.ui.gallery.scene.ScenesActivity
@@ -60,7 +57,7 @@ object ActivityUtils {
     fun startProfileActivity(from: Context, id: String) {
         val i = Intent(from, ProfileActivity::class.java)
         i.putExtra("id", id)
-        i.putExtra("showLogout",from is MainActivity)
+        i.putExtra("showLogout", from is MainActivity)
         from.startActivity(i)
     }
 
@@ -73,33 +70,15 @@ object ActivityUtils {
         from.startActivity(i)
     }
 
-    /**
-     * 启动聊天Activity
-     * @param from 调用者
-     * @param friendProfile 朋友资料对象
-     */
-    fun startChatActivity(from: Context, friendProfile: UserProfile, userRelation: UserRelation, userLocal: UserLocal) {
+    fun startChatActivity(from: Context, conversationId: String) {
         val i = Intent(from, ChatActivity::class.java)
-        val b = Bundle()
-        b.putSerializable("conversation", fromUserRelationAndProfile(friendProfile, userRelation, userLocal))
-        i.putExtras(b)
+        i.putExtra("conversationId", conversationId)
         from.startActivity(i)
     }
 
-    fun startChatActivity(from: Context, conversation: Conversation) {
+    fun getIntentForChatActivity(from: Context, conversationId: String): Intent {
         val i = Intent(from, ChatActivity::class.java)
-        val b = Bundle()
-        b.putSerializable("conversation", conversation)
-        i.putExtras(b)
-        from.startActivity(i)
-    }
-
-    fun getIntentForChatActivity(from: Context, message: ChatMessage): Intent {
-        val conversation = fromNewMessage(message)
-        val i = Intent(from, ChatActivity::class.java)
-        val b = Bundle()
-        b.putSerializable("conversation", conversation)
-        i.putExtras(b)
+        i.putExtra("conversationId", conversationId)
         return i
     }
 
@@ -108,11 +87,19 @@ object ActivityUtils {
      * @param from 上下文
      * @param friendId 朋友id
      */
-    fun startConversationActivity(from: Context, friendId: String) {
+    fun startConversationActivity(from: Context, conversationId: String) {
         val i = Intent(from, ConversationActivity::class.java)
-        i.putExtra("friendId", friendId)
+        i.putExtra("conversationId", conversationId)
         from.startActivity(i)
     }
+
+    fun startConversationGroupActivity(from: Context, conversationId: String, groupId: String) {
+        val i = Intent(from, ConversationGroupActivity::class.java)
+        i.putExtra("conversationId", conversationId)
+        i.putExtra("groupId", groupId)
+        from.startActivity(i)
+    }
+
 
     /**
      * 启动好友关系事件页面
@@ -171,7 +158,7 @@ object ActivityUtils {
     /**
      * 进入词云详情
      */
-    fun startWordCloudActivity(from:Context){
+    fun startWordCloudActivity(from: Context) {
         val it = Intent(from, WordCloudActivity::class.java)
         from.startActivity(it)
     }
@@ -179,15 +166,15 @@ object ActivityUtils {
     /**
      * 进入人脸管理
      */
-    fun startMyFaceActivity(from:Context){
-        val it = Intent(from,MyFaceActivity::class.java)
+    fun startMyFaceActivity(from: Context) {
+        val it = Intent(from, MyFaceActivity::class.java)
         from.startActivity(it)
     }
 
     /**
      * 进入类别
      */
-    fun startGalleryActivity(from: Context){
+    fun startGalleryActivity(from: Context) {
         val it = Intent(from, ScenesActivity::class.java)
         from.startActivity(it)
     }
@@ -195,41 +182,43 @@ object ActivityUtils {
     /**
      * 进入好友人脸相册
      */
-    fun startFriendFacesActivity(from: Context){
+    fun startFriendFacesActivity(from: Context) {
         val it = Intent(from, FriendFacesActivity::class.java)
         from.startActivity(it)
     }
+
     /**
      * 进入类别相册
      */
-    fun startAlbumActivity(from: Context,mode:AlbumQuery.QType,key:String,title:String?=""){
-        val it = Intent(from,AlbumActivity::class.java)
-        it.putExtra("key",key)
-        it.putExtra("mode",mode.name)
-        it.putExtra("title",title)
+    fun startAlbumActivity(from: Context, mode: AlbumQuery.QType, key: String, title: String? = "") {
+        val it = Intent(from, AlbumActivity::class.java)
+        it.putExtra("key", key)
+        it.putExtra("mode", mode.name)
+        it.putExtra("title", title)
         from.startActivity(it)
     }
 
     /**
      * 进入无障碍管理页面
      */
-    fun startAccessibilityActivity(from: Context){
-        val it = Intent(from,AccessibilityActivity::class.java)
+    fun startAccessibilityActivity(from: Context) {
+        val it = Intent(from, AccessibilityActivity::class.java)
         from.startActivity(it)
     }
 
     /**
      * 进入人脸白名单管理
      */
-    fun startFaceWhitelistActivity(from: Context){
-        val it = Intent(from,FaceWhiteListActivity::class.java)
+    fun startFaceWhitelistActivity(from: Context) {
+        val it = Intent(from, FaceWhiteListActivity::class.java)
         from.startActivity(it)
     }
+
     /**
      * 进入LightEngine面板
      */
-    fun startLightEngineActivity(from: Context){
-        val it = Intent(from,LightEngineActivity::class.java)
+    fun startLightEngineActivity(from: Context) {
+        val it = Intent(from, LightEngineActivity::class.java)
         from.startActivity(it)
     }
 }

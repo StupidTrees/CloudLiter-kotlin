@@ -46,7 +46,7 @@ interface ChatMessageService {
      */
     @FormUrlEncoded
     @POST("/message/send_text")
-    fun sendTextMessage(@Header("token") token: String, @Field("fromId") fromId: String, @Field("toId") toId:String, @Field("content") content:String,@Field("uuid") uuid: String): LiveData<ApiResponse<ChatMessage?>?>
+    fun sendTextMessage(@Header("token") token: String, @Field("fromId") fromId: String, @Field("conversationId") conversationId: String, @Field("content") content: String, @Field("uuid") uuid: String): LiveData<ApiResponse<ChatMessage?>?>
 
 
     /**
@@ -58,11 +58,11 @@ interface ChatMessageService {
      */
     @Multipart
     @POST("/message/send_image")
-    fun sendImageMessage(@Header("token") token: String, @Query("toId") toId: String, @Part file: MultipartBody.Part, @Query("uuid") uuid: String?): LiveData<ApiResponse<ChatMessage?>?>
+    fun sendImageMessage(@Header("token") token: String, @Query("conversationId") conversationId: String, @Part file: MultipartBody.Part, @Query("uuid") uuid: String?): LiveData<ApiResponse<ChatMessage?>?>
 
     @Multipart
     @POST("/message/send_voice")
-    fun sendVoiceMessage(@Header("token") token: String, @Query("toId") toId: String, @Part file: MultipartBody.Part, @Query("uuid") uuid: String?,@Query("seconds")seconds:Int): LiveData<ApiResponse<ChatMessage?>?>
+    fun sendVoiceMessage(@Header("token") token: String, @Query("conversationId") conversationId: String, @Part file: MultipartBody.Part, @Query("uuid") uuid: String?, @Query("seconds") seconds: Int): LiveData<ApiResponse<ChatMessage?>?>
 
 
     /**
@@ -73,7 +73,7 @@ interface ChatMessageService {
      */
     @FormUrlEncoded
     @POST("/ai/voice/tts")
-    fun startTTS(@Header("token") token: String, @Field("id") messageId:String): LiveData<ApiResponse<ChatMessage>>
+    fun startTTS(@Header("token") token: String, @Field("id") messageId: String): LiveData<ApiResponse<ChatMessage>>
 
 }
 

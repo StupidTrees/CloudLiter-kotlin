@@ -159,8 +159,8 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private fun setUserViews(userLocalInfo: UserLocal) {
         if (userLocalInfo.isValid) { //如果已登录
             //装载头像
-            ImageUtils.loadLocalAvatarInto(this, userLocalInfo.avatar, drawerAvatar!!)
-            ImageUtils.loadLocalAvatarInto(this, userLocalInfo.avatar, binding.avatar)
+            ImageUtils.loadAvatarInto(this, userLocalInfo.avatar, drawerAvatar!!)
+            ImageUtils.loadAvatarInto(this, userLocalInfo.avatar, binding.avatar)
             //设置各种文字
             drawerUsername!!.text = userLocalInfo.username
             drawerNickname!!.text = userLocalInfo.nickname

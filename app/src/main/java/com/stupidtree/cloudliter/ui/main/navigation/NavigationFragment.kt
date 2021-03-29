@@ -42,7 +42,7 @@ class NavigationFragment : BaseFragmentWithReceiver<NavigationViewModel, Fragmen
         viewModel.localUserLiveData.observe(this) { userLocalInfo ->
             if (userLocalInfo.isValid) { //如果已登录
                 //装载头像
-                binding?.avatar?.let { ImageUtils.loadLocalAvatarInto(requireContext(), userLocalInfo.avatar, it) }
+                binding?.avatar?.let { ImageUtils.loadAvatarInto(requireContext(), userLocalInfo.avatar, it) }
                 //设置各种文字
                 binding?.username?.text = userLocalInfo.username
                 binding?.nickname?.text = userLocalInfo.nickname

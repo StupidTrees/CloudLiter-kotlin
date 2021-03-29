@@ -18,7 +18,7 @@ class FriendFacesListAdapter(mContext: Context, mBeans: MutableList<FriendFaceEn
         holder.binding.card.setOnClickListener {
             data?.let { it1 -> mOnItemClickListener?.onItemClick(it1,it,position) }
         }
-        ImageUtils.loadAvatarInto(mContext, data?.userAvatar, holder.binding.image)
+        ImageUtils.loadAvatarInto(mContext, data?.userId, holder.binding.image,useUserId = true)
     }
 
     override fun getViewBinding(parent: ViewGroup, viewType: Int): ViewBinding {

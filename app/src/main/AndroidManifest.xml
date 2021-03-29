@@ -26,7 +26,7 @@
         <activity android:name=".ui.group.GroupEditorActivity" />
         <activity android:name=".ui.relationevent.RelationEventActivity" /> <!-- 不加↑这两行，裁剪没法用 -->
         <activity
-            android:name=".ui.conversation.ConversationActivity"
+            android:name=".ui.conversation.normal.ConversationActivity"
             android:launchMode="singleTask" />
         <activity
             android:name=".ui.myprofile.MyProfileActivity"
@@ -68,6 +68,7 @@
         <activity android:name=".ui.gallery.faces.FriendFacesActivity" />
         <activity android:name=".ui.face.permission.FaceWhiteListActivity" />
         <activity android:name=".ui.accessibility.egine.LightEngineActivity" />
+        <activity android:name=".ui.conversation.group.ConversationGroupActivity" />
 
         <service android:name=".service.socket.SocketIOClientService" />
     </application>
