@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "c8bb4924e58244fe12a4caf61dc66ae3",
+    "identityHash": "81382dec228abecf86cbdcc75b5c3c72",
     "entities": [
       {
         "tableName": "message",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `fromId` TEXT, `type` TEXT DEFAULT 'TXT', `content` TEXT, `conversationId` TEXT NOT NULL, `read` INTEGER NOT NULL, `sensitive` INTEGER NOT NULL, `emotion` REAL NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `extra` TEXT, `ttsResult` TEXT, `fileId` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `fromId` TEXT, `type` TEXT DEFAULT 'TXT', `content` TEXT, `friendRemark` TEXT, `conversationId` TEXT NOT NULL, `read` INTEGER NOT NULL, `sensitive` INTEGER NOT NULL, `emotion` REAL NOT NULL, `createdAt` INTEGER, `updatedAt` INTEGER, `extra` TEXT, `ttsResult` TEXT, `fileId` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -30,6 +30,12 @@
           {
             "fieldPath": "content",
             "columnName": "content",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "friendRemark",
+            "columnName": "friendRemark",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -400,7 +406,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c8bb4924e58244fe12a4caf61dc66ae3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '81382dec228abecf86cbdcc75b5c3c72')"
     ]
   }
 }

@@ -2,6 +2,7 @@ package com.stupidtree.cloudliter.ui.chat
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
@@ -10,6 +11,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ChatMessage
+import com.stupidtree.cloudliter.data.model.Conversation
+import com.stupidtree.cloudliter.ui.chat.read.PopUpReadUserFragment
 import com.stupidtree.style.base.BaseListAdapter
 import com.stupidtree.style.base.BaseListAdapterClassic
 import com.stupidtree.component.data.DataState
@@ -70,17 +73,19 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
 
     override fun bindHolder(holder: CHolder, data: ChatMessage?, position: Int) {
         if (data != null) {
-            if (holder.read != null) {
-                holder.read?.visibility = if (data.read && !data.sensitive) View.VISIBLE else View.GONE
-            }
+
+
+            holder.updateRead(data)
+            holder.name?.visibility = if (chatActivity.viewModel.getConversationType() == Conversation.TYPE.FRIEND) View.GONE else View.VISIBLE
+            holder.name?.text = data.friendRemark
             if (holder.viewType == TYPE_TIME) {
                 bindTimestamp(holder, data)
             } else {
                 holder.bindSensitiveAndEmotion(data)
                 if (holder.viewType == TYPE_MINE || holder.viewType == TYPE_MINE_IMAGE || holder.viewType == TYPE_MINE_VOICE) {
-                     ImageUtils.loadAvatarInto(chatActivity, data.fromId, holder.avatar!!,useUserId = true)
+                    ImageUtils.loadAvatarInto(chatActivity, data.fromId, holder.avatar!!, useUserId = true)
                 } else {
-                     ImageUtils.loadAvatarInto(chatActivity, data.fromId, holder.avatar!!,useUserId = true)
+                    ImageUtils.loadAvatarInto(chatActivity, data.fromId, holder.avatar!!, useUserId = true)
                 }
                 holder.avatar?.setOnClickListener { data.fromId?.let { ActivityUtils.startProfileActivity(chatActivity, it) } }
                 holder.setSendState(data)
@@ -147,6 +152,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
      * @param notification
      */
     fun messageRead(list: RecyclerView, notification: MessageReadNotification) {
+        Log.e("消息被堵啦！", notification.toString())
         val indexes: MutableList<Int> = ArrayList()
         for (i in mBeans.indices.reversed()) {
             if (notification.type == MessageReadNotification.TYPE.ALL) {
@@ -161,9 +167,10 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             }
         }
         for (index in indexes) {
-            mBeans[index].read = true
+            mBeans[index].read = mBeans[index].read.coerceAtLeast(notification.messageInfo[mBeans[index].id]
+                    ?: 1)
             val holder = list.findViewHolderForAdapterPosition(index) as CHolder?
-            if (!mBeans[index].sensitive) holder?.showRead()
+            if (!mBeans[index].sensitive) holder?.updateRead(mBeans[index])
         }
     }
 
@@ -374,6 +381,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
 
         var content: EmoticonsTextView? = itemView.findViewById(R.id.content)
         var avatar: ImageView? = itemView.findViewById(R.id.avatar)
+        var name: TextView? = itemView.findViewById(R.id.name)
         var bubble: View? = itemView.findViewById(R.id.bubble)
         var progress: View? = itemView.findViewById(R.id.progress)
         var fail: View? = itemView.findViewById(R.id.fail)
@@ -388,7 +396,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
         var ttsButton: ImageView? = itemView.findViewById(R.id.tts)//语音识别按钮
         var ttsResult: TextView? = itemView.findViewById(R.id.tts_result)//语音识别结果
 
-        var read: View? = itemView.findViewById(R.id.read)
+        var read: TextView? = itemView.findViewById(R.id.read)
 
 
         var imageSensitivePlaceHolder: ViewGroup? = itemView.findViewById(R.id.image_sensitive)
@@ -414,9 +422,21 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
 
         }
 
-        fun showRead() {
-            if (read != null) {
+        fun updateRead(data: ChatMessage?) {
+            if (data?.read != 0 && data?.sensitive != true) {
                 read?.visibility = View.VISIBLE
+                read?.setOnClickListener {
+                    data?.id?.let { it1 -> PopUpReadUserFragment(it1,chatActivity.viewModel.getConversationId()).show(chatActivity.supportFragmentManager, "read") }
+                }
+            } else {
+                read?.visibility = View.GONE
+                read?.setOnClickListener(null)
+            }
+            if (chatActivity.viewModel.getConversationType() == Conversation.TYPE.FRIEND) {
+                read?.setText(R.string.read)
+                read?.setOnClickListener(null)
+            } else {
+                read?.text = mContext.getString(R.string.read_group, data?.read ?: 0)
             }
         }
 
@@ -425,7 +445,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             sensitiveExpanded = !sensitiveExpanded
             if (see == null) return
             if (sensitiveExpanded) {
-                content?.text = data.content?:""
+                content?.text = data.content ?: ""
                 see?.setImageResource(R.drawable.ic_baseline_visibility_off_24)
                 if (data.getTypeEnum() == ChatMessage.TYPE.IMG && image != null && imageSensitivePlaceHolder != null) {
                     image?.visibility = View.VISIBLE

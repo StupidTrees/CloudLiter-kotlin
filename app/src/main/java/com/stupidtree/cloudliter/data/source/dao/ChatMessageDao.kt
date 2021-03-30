@@ -19,11 +19,9 @@ interface ChatMessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveMessage(data: List<ChatMessage>)
 
-    @Query("UPDATE message SET read = 1 WHERE id IS :messageId")
-    fun messageRead(messageId: String)
+    @Query("UPDATE message SET read = :read WHERE id IS :messageId")
+    fun messageRead(messageId: String, read:Int)
 
-    @Query("UPDATE message SET read = 1 WHERE conversationId IS :conversationId AND createdAt >= :fromTime")
-    fun messageAllRead(conversationId: String, fromTime: Timestamp?)
 
     @Query("DELETE FROM message")
     fun clearTable()

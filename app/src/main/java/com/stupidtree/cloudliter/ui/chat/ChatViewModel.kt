@@ -35,7 +35,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     val conversation = Transformations.switchMap(conversationIdLiveData) {
         val localUser = localUserRepository.getLoggedInUser()
         if (localUser.isValid) {
-            return@switchMap conversationRepository.queryConversation(localUser.token!!,it)
+            return@switchMap conversationRepository.queryConversation(localUser.token!!, it)
         } else {
             return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
         }
@@ -110,7 +110,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     //状态数据：消息发送结果
     //first为成功后的message，second为uuid
-    var messageSentLiveData = MediatorLiveData<Pair<DataState<ChatMessage?>, String>>()
+    private var messageSentLiveData = MediatorLiveData<Pair<DataState<ChatMessage?>, String>>()
     var messageSentState: LiveData<Pair<DataState<ChatMessage?>, String>> = Transformations.map(messageSentLiveData) { input ->
         input.first.data?.let {
             if (input.second == bottomUUID) {
@@ -151,6 +151,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             MutableLiveData(Pair(DataState(DataState.STATE.NOT_LOGGED_IN), ""))
         }
         messageSentLiveData.addSource(liveData) {
+            if(it.first.state==DataState.STATE.SUCCESS){
+                it.first.data?.let { it1 -> chatRepository.saveMessageAsync(it1) }
+            }
             messageSentLiveData.value = it
             messageSentLiveData.removeSource(liveData)
         }
@@ -167,6 +170,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             MutableLiveData(Pair(DataState(DataState.STATE.NOT_LOGGED_IN), ""))
         }
         messageSentLiveData.addSource(liveData) {
+            if(it.first.state==DataState.STATE.SUCCESS){
+                it.first.data?.let { it1 -> chatRepository.saveMessageAsync(it1) }
+            }
             messageSentLiveData.value = it
             messageSentLiveData.removeSource(liveData)
         }
@@ -185,6 +191,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             MutableLiveData(Pair(DataState(DataState.STATE.NOT_LOGGED_IN), ""))
         }
         messageSentLiveData.addSource(liveData) {
+            if(it.first.state==DataState.STATE.SUCCESS){
+                it.first.data?.let { it1 -> chatRepository.saveMessageAsync(it1) }
+            }
             messageSentLiveData.value = it
             messageSentLiveData.removeSource(liveData)
         }
@@ -261,6 +270,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             return userLocal.id
         }
 
+    fun getConversationType(): Conversation.TYPE {
+        return conversation.value?.data?.type ?: Conversation.TYPE.FRIEND
+    }
 
     fun getConversationId(): String {
         return conversationIdLiveData.value ?: ""
@@ -288,7 +300,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     fun markAllRead(context: Context) {
         if (localUserRepository.isUserLoggedIn) {
             if (topTime != null && myId != null) {
-                chatRepository.actionMarkAllRead(context, myId!!, getConversationId(),
+                chatRepository.actionMarkAllRead(context, getConversationType(),myId!!, getConversationId(),
                         topTime!!, pageSize)
             }
 
@@ -298,7 +310,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     fun markRead(context: Context, chatMessage: ChatMessage) {
         localUserRepository.getLoggedInUser().id?.let {
             chatMessage.conversationId?.let { it1 ->
-                chatRepository.actionMarkRead(context, it, chatMessage.id, it1)
+                chatRepository.actionMarkRead(context, getConversationType(),it, chatMessage.id, it1)
             }
         }
     }

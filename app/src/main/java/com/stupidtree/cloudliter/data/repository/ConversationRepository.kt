@@ -3,7 +3,6 @@ package com.stupidtree.cloudliter.data.repository
 import android.app.Application
 import android.content.Context
 import android.content.IntentFilter
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.stupidtree.cloudliter.data.AppDatabase
@@ -13,6 +12,7 @@ import com.stupidtree.cloudliter.data.source.dao.ConversationDao
 import com.stupidtree.cloudliter.data.source.websource.ConversationWebSource
 import com.stupidtree.cloudliter.data.source.websource.SocketWebSource
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
+import com.stupidtree.cloudliter.ui.chat.read.ReadUser
 import com.stupidtree.component.data.DataState
 import java.util.*
 
@@ -125,6 +125,10 @@ class ConversationRepository(context: Context) {
      */
     fun getUserWordCloud(token: String?, conversationId: String): LiveData<DataState<HashMap<String, Float?>?>> {
         return conversationWebSource.getWordCloud(token, conversationId)
+    }
+
+    fun getReadUsers(token: String, messageId: String,conversationId: String,read:Boolean): LiveData<DataState<List<ReadUser>>>{
+        return conversationWebSource.getReadUsers(token, messageId,conversationId,read)
     }
 
     companion object {

@@ -22,11 +22,22 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-4dp"
+            android:layout_marginBottom="8dp"
+            android:maxEms="16"
+            android:singleLine="true"
+            android:text="Im cloud light"
+            android:textSize="12sp" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/bubble"
@@ -84,10 +95,10 @@
                         android:layout_marginEnd="4dp"
                         android:alpha="0.4"
                         android:clickable="true"
+                        android:contentDescription="@string/voice_to_text"
                         android:foreground="?attr/selectableItemBackground"
                         android:padding="7dp"
                         android:theme="@style/rippleControlSmall"
-                        android:contentDescription="@string/voice_to_text"
                         app:srcCompat="@drawable/ic_tts" />
 
                 </LinearLayout>

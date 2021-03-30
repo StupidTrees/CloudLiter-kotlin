@@ -13,6 +13,7 @@ class MessageReadNotification : Serializable {
     var conversationId: String
     var userId: String
     var fromTime: Timestamp? = null
+    var messageInfo = mutableMapOf<String,Int>()
 
     constructor(userId: String, conversationId: String, fromTime: Timestamp?) {
         type = TYPE.ALL
@@ -29,10 +30,7 @@ class MessageReadNotification : Serializable {
     }
 
     override fun toString(): String {
-        return "MessageReadNotification{" +
-                "type=" + type +
-                ", id=" + id +
-                ", userId='" + userId + '\'' +
-                '}'
+        return "MessageReadNotification(type=$type, id=$id, conversationId='$conversationId', userId='$userId', fromTime=$fromTime, messageInfo=$messageInfo)"
     }
+
 }

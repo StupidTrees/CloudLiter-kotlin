@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import com.stupidtree.cloudliter.data.model.ChatMessage
+import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
 import com.stupidtree.component.data.DataState
@@ -67,9 +68,10 @@ class SocketWebSource : BroadcastReceiver() {
         context.sendBroadcast(i)
     }
 
-    fun markAllRead(context: Context, userId: String?, conversationId: String?, topTime: Timestamp, num: Int) {
+    fun markAllRead(context: Context, type:Conversation.TYPE,userId: String?, conversationId: String?, topTime: Timestamp, num: Int) {
         val i = Intent(SocketIOClientService.ACTION_MARK_ALL_READ)
         i.putExtra("userId", userId)
+        i.putExtra("type",type.name)
         i.putExtra("topTime", topTime.time)
         i.putExtra("num", num)
         i.putExtra("conversationId", conversationId)
@@ -80,9 +82,10 @@ class SocketWebSource : BroadcastReceiver() {
 
     }
 
-    fun markRead(context: Context, userId: String, messageId: String, conversationId: String) {
+    fun markRead(context: Context,type:Conversation.TYPE,userId: String, messageId: String, conversationId: String) {
         val i = Intent(SocketIOClientService.ACTION_MARK_READ)
         i.putExtra("userId", userId)
+        i.putExtra("type",type.name)
         i.putExtra("messageId", messageId)
         i.putExtra("conversationId", conversationId)
         context.sendBroadcast(i)

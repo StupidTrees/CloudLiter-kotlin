@@ -12,8 +12,9 @@
         android:id="@+id/fail"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_gravity="center|top"
+        android:layout_gravity="bottom|center"
         android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
         app:srcCompat="@android:drawable/stat_sys_warning"
         app:tint="@color/profileOrange" />
 
@@ -21,7 +22,7 @@
         android:id="@+id/see"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center|top"
+        android:layout_gravity="bottom|center"
         android:layout_marginEnd="-16dp"
         android:alpha="0.6"
         android:contentDescription="@string/description_switch_sensitive"
@@ -36,8 +37,9 @@
         style="?android:attr/progressBarStyle"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_gravity="center|top"
-        android:layout_marginTop="16dp" />
+        android:layout_gravity="bottom|center"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp" />
 
     <TextView
         android:id="@+id/read"

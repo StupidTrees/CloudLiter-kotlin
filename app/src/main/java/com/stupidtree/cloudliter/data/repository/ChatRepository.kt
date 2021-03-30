@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.model.ChatMessage
+import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.source.dao.ChatMessageDao
 import com.stupidtree.cloudliter.data.source.websource.ChatMessageWebSource
 import com.stupidtree.cloudliter.data.source.websource.SocketWebSource
@@ -74,7 +75,6 @@ class ChatRepository(context: Context) {
         } else {
             chatMessageDao.getMessages(conversationId, pageSize, topTime)
         }
-
         listDataState.addSource(localListState!!) { chatMessages ->
             listDataState.value = DataState(chatMessages).setListAction(action)
             if (action === LIST_ACTION.REPLACE_ALL && topId == null && chatMessages != null && chatMessages.isNotEmpty()) { //第一次获取，且本地已有消息
@@ -132,8 +132,8 @@ class ChatRepository(context: Context) {
      * @param userId         用户id
      * @param conversationId 对话id
      */
-    fun actionMarkAllRead(context: Context, userId: String, conversationId: String, topTime: Timestamp, num: Int) {
-        socketWebSource.markAllRead(context, userId, conversationId, topTime, num)
+    fun actionMarkAllRead(context: Context, type: Conversation.TYPE, userId: String, conversationId: String, topTime: Timestamp, num: Int) {
+        socketWebSource.markAllRead(context, type, userId, conversationId, topTime, num)
     }
 
     /**
@@ -143,8 +143,8 @@ class ChatRepository(context: Context) {
      * @param messageId      消息id
      * @param conversationId 对话id
      */
-    fun actionMarkRead(context: Context, userId: String, messageId: String, conversationId: String) {
-        socketWebSource.markRead(context, userId, messageId, conversationId)
+    fun actionMarkRead(context: Context, type: Conversation.TYPE, userId: String, messageId: String, conversationId: String) {
+        socketWebSource.markRead(context, type, userId, messageId, conversationId)
     }
 
     /**
@@ -154,7 +154,7 @@ class ChatRepository(context: Context) {
      * @param userId         用户id
      */
     fun actionGetIntoConversation(context: Context, userId: String, conversationId: String) {
-        socketWebSource.getIntoConversation(context, userId,conversationId)
+        socketWebSource.getIntoConversation(context, userId, conversationId)
     }
 
     /**
@@ -170,9 +170,9 @@ class ChatRepository(context: Context) {
 
 
     fun sendTextMessage(token: String, fromId: String, conversationId: String, content: String): LiveData<Pair<DataState<ChatMessage?>, String>> {
-        val message = ChatMessage(fromId, content,conversationId)
+        val message = ChatMessage(fromId, content, conversationId)
         listDataState.value = DataState(listOf(message) as List?).setListAction(LIST_ACTION.APPEND_ONE)
-        return Transformations.switchMap(chatMessageWebSource.sendTextMessage(token, fromId, conversationId,content, message.uuid)) {
+        return Transformations.switchMap(chatMessageWebSource.sendTextMessage(token, fromId, conversationId, content, message.uuid)) {
             return@switchMap MutableLiveData(Pair(it, message.uuid))
         }
     }
@@ -189,7 +189,7 @@ class ChatRepository(context: Context) {
         val result = MediatorLiveData<Pair<DataState<ChatMessage?>, String>>()
         //读取图片文件
         val f = File(filePath)
-        val tempMsg = ChatMessage(fromId,  filePath,conversationId)
+        val tempMsg = ChatMessage(fromId, filePath, conversationId)
         tempMsg.setType(ChatMessage.TYPE.IMG)
         listDataState.value = DataState(listOf(tempMsg) as List?).setListAction(LIST_ACTION.APPEND_ONE)
         Luban.with(context)
@@ -207,7 +207,7 @@ class ChatRepository(context: Context) {
                         val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
                         //构造一个图片格式的POST表单
                         val body = MultipartBody.Part.createFormData("upload", file.name, requestFile)
-                        val sendResult = chatMessageWebSource.sendImageMessage(token, conversationId,body, tempMsg.uuid)
+                        val sendResult = chatMessageWebSource.sendImageMessage(token, conversationId, body, tempMsg.uuid)
                         result.addSource(sendResult) { v ->
                             result.value = Pair(v, tempMsg.uuid)
                         }
@@ -233,14 +233,14 @@ class ChatRepository(context: Context) {
         val result = MediatorLiveData<Pair<DataState<ChatMessage?>, String>>()
         //读取图片文件
         val f = File(filePath)
-        val tempMsg = ChatMessage(fromId,  filePath,conversationId)
+        val tempMsg = ChatMessage(fromId, filePath, conversationId)
         tempMsg.setType(ChatMessage.TYPE.VOICE)
         tempMsg.extra = voiceSeconds.toString()
         listDataState.value = DataState(listOf(tempMsg) as List?).setListAction(LIST_ACTION.APPEND_ONE)
         val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), f)
         //构造一个图片格式的POST表单
         val body = MultipartBody.Part.createFormData("upload", f.name, requestFile)
-        val sendResult = chatMessageWebSource.sendVoiceMessage(token,conversationId, body, tempMsg.uuid, voiceSeconds)
+        val sendResult = chatMessageWebSource.sendVoiceMessage(token, conversationId, body, tempMsg.uuid, voiceSeconds)
         result.addSource(sendResult) { v ->
             result.value = Pair(v, tempMsg.uuid)
         }
@@ -279,21 +279,29 @@ class ChatRepository(context: Context) {
         // socketWebSource.unbindService(context)
     }
 
-    private fun saveMessageAsync(chatMessage: ChatMessage) {
+    fun saveMessageAsync(chatMessage: ChatMessage) {
         Thread { chatMessageDao.saveMessage(listOf(chatMessage)) }.start()
     }
 
     private fun markMessageReadAsync(notification: MessageReadNotification?) {
-        if (notification!!.type == MessageReadNotification.TYPE.ALL) {
-            Thread { chatMessageDao.messageAllRead(notification.conversationId, notification.fromTime) }.start()
-        } else {
-            Thread { notification.id?.let { chatMessageDao.messageRead(it) } }.start()
-        }
+//        if (notification!!.type == MessageReadNotification.TYPE.ALL) {
+        Thread {
+            notification?.messageInfo?.let {
+                for (x in it.entries) {
+                    chatMessageDao.messageRead(x.key, x.value)
+                }
+            }
+
+        }.start()
+//        } else {
+//            Thread { notification.id?.let { chatMessageDao.messageRead(it) } }.start()
+//        }
     }
 
     private fun saveMessageAsync(chatMessages: List<ChatMessage>?) {
         Thread { chatMessages?.let { chatMessageDao.saveMessage(it.toList()) } }.start()
     }
+
 
     val onlineStateController: MutableLiveData<FriendStateTrigger>
         get() = socketWebSource.onlineStateController

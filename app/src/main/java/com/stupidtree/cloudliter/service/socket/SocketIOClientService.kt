@@ -25,6 +25,7 @@ import com.stupidtree.cloudliter.utils.ImageUtils
 import io.socket.client.IO
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
+import org.json.JSONArray
 import java.net.URISyntaxException
 import java.sql.Timestamp
 import java.util.*
@@ -75,6 +76,7 @@ class SocketIOClientService : Service() {
                     }
                     ACTION_MARK_ALL_READ -> {
                         //从新消息队列中把该对话下的所有消息删除
+                        val type = intent.getStringExtra("type")
                         val conversationId = intent.getStringExtra("conversationId")
                         val topTime = intent.getLongExtra("topTime", -1)
                         val num = intent.getIntExtra("num", -1)
@@ -87,15 +89,16 @@ class SocketIOClientService : Service() {
                         }
                         incomingMessage.remove(conversationId)
                         if (topTime > 0) {
-                            socket?.emit("mark_all_read", userId, conversationId, topTime)
+                            socket?.emit("mark_all_read", type,userId, conversationId, topTime)
                         }
                     }
                     ACTION_MARK_READ -> {
+                        val type = intent.getStringExtra("type")
                         val messageId = intent.getStringExtra("messageId")
                         val userId = intent.getStringExtra("userId")
                         val conversationId = intent.getStringExtra("conversationId")
                         Log.e("emit_mark_read", "$userId,$conversationId,$messageId")
-                        socket?.emit("mark_read", userId, conversationId, messageId)
+                        socket?.emit("mark_read", type,userId, conversationId, messageId)
                         val oldCount = incomingMessage[conversationId]
                         if (oldCount != null && oldCount <= 1) {
                             incomingMessage.remove(conversationId)
@@ -159,15 +162,21 @@ class SocketIOClientService : Service() {
             }
         }
         socket?.on("friend_read_all") { args: Array<Any> ->
-            if (args.size == 3) {
+            if (args.size == 4) {
                 try {
                     val userId = args[0].toString()
                     val conversationId = args[1].toString()
                     val fromTime = Timestamp(args[2].toString().toLong())
+                    val info = JSONArray(args[3].toString())
                     Log.e("messageAllRead", "$userId-$fromTime")
                     val i = Intent(RECEIVE_MESSAGE_READ)
                     val b = Bundle()
-                    b.putSerializable("read", MessageReadNotification(userId, conversationId, fromTime))
+                    val notify = MessageReadNotification(userId, conversationId, fromTime)
+                    for(idx in 0 until info.length()){
+                        val obj = info.optJSONObject(idx)
+                        notify.messageInfo[obj.optString("messageId")] = obj.optInt("read")
+                    }
+                    b.putSerializable("read", notify)
                     i.putExtras(b)
                     sendBroadcast(i)
                 } catch (e: Exception) {
@@ -176,15 +185,21 @@ class SocketIOClientService : Service() {
             }
         }
         socket?.on("friend_read_one") { args: Array<Any> ->
-            if (args.size == 3) {
+            if (args.size == 4) {
                 try {
                     val userId = args[0].toString()
                     val conversationId = args[1].toString()
                     val id = args[2].toString()
+                    val info = JSONArray(args[3].toString())
                     Log.e("messageOneRead", "$userId-$id")
                     val i = Intent(RECEIVE_MESSAGE_READ)
                     val b = Bundle()
-                    b.putSerializable("read", MessageReadNotification(userId, conversationId, id))
+                    val notify = MessageReadNotification(userId, conversationId, id)
+                    for(idx in 0 until info.length()){
+                        val obj = info.optJSONObject(idx)
+                        notify.messageInfo[obj.optString("messageId")] = obj.optInt("read")
+                    }
+                    b.putSerializable("read", notify)
                     i.putExtras(b)
                     sendBroadcast(i)
                 } catch (e: Exception) {

@@ -394,6 +394,9 @@
     <string name="destroy_group_chat">解散群聊</string>
     <string name="sure_to_destroy_group">解散后，所有会话相关的资料都将删除！</string>
     <string name="sure_to_quit_group">确认退群？</string>
+    <string name="read_group">%d人已读</string>
+    <string name="read_users">已读列表</string>
+    <string name="unread">未读</string>
     <string-array name="yunmoji_descriptions">
         <item>狗</item>
         <item>狗</item>

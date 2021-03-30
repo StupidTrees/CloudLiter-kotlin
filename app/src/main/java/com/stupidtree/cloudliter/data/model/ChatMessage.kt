@@ -26,17 +26,10 @@ class ChatMessage : Serializable {
     var type: String? = null
     var content: String? = null
 
-    @Ignore
     var friendRemark: String? = null
-    @Ignore
-    var friendTypePermission: UserLocal.TYPEPERMISSION = UserLocal.TYPEPERMISSION.PRIVATE
-    @Ignore
-    var friendType: Int = 0
-    @Ignore
-    var friendSubType: String? = null
 
     var conversationId: String = ""
-    var read = false
+    var read:Int = 0
     var sensitive = false
     var emotion = 0f
     var createdAt: Timestamp? = null
@@ -104,8 +97,8 @@ class ChatMessage : Serializable {
         return id == message.id &&
                 fromId == message.fromId &&
                 conversationId == message.conversationId &&
+                friendRemark == message.friendRemark &&
                 sensitive == message.sensitive &&
-                emotion == message.emotion &&
                 read == message.read
     }
 

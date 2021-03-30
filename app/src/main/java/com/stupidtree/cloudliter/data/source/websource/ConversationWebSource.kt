@@ -8,6 +8,7 @@ import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.source.websource.service.ConversationService
 import com.stupidtree.cloudliter.data.source.websource.service.codes.SUCCESS
 import com.stupidtree.cloudliter.data.source.websource.service.codes.TOKEN_INVALID
+import com.stupidtree.cloudliter.ui.chat.read.ReadUser
 import com.stupidtree.component.data.DataState
 import com.stupidtree.component.web.BaseWebSource
 import com.stupidtree.component.web.LiveDataCallAdapter
@@ -80,6 +81,19 @@ class ConversationWebSource : BaseWebSource<ConversationService>(Retrofit.Builde
                     SUCCESS -> return@map DataState(input.data)
                     TOKEN_INVALID -> return@map DataState<HashMap<String, Float?>?>(DataState.STATE.TOKEN_INVALID)
                     else -> return@map DataState<HashMap<String, Float?>?>(DataState.STATE.FETCH_FAILED)
+                }
+            }
+            DataState(DataState.STATE.FETCH_FAILED)
+        }
+    }
+
+    fun getReadUsers(token: String, messageId: String,conversationId: String,read:Boolean): LiveData<DataState<List<ReadUser>>> {
+        return Transformations.map(service.getReadUser(token, messageId,conversationId,read)) { input ->
+            if (input != null) {
+                when (input.code) {
+                    SUCCESS -> return@map DataState(input.data?: listOf())
+                    TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                    else -> return@map DataState(DataState.STATE.FETCH_FAILED)
                 }
             }
             DataState(DataState.STATE.FETCH_FAILED)

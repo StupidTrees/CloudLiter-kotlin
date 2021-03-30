@@ -305,6 +305,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
     //初始化聊天列表
     @SuppressLint("ClickableViewAccessibility")
     private fun setUpMessageList() {
+        binding.list.itemAnimator = ChatItemAnimator()
         listAdapter = ChatListAdapter(this, LinkedList())
         binding.list.adapter = listAdapter
         val layoutManager = LinearLayoutManager(this)
