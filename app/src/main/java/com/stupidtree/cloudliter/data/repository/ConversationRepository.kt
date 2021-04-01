@@ -54,13 +54,13 @@ class ConversationRepository(context: Context) {
         val res = MediatorLiveData<DataState<MutableList<Conversation>?>>()
         val local = conversationDao.getConversations()
         res.addSource(local) { conversations ->
-            res.value = DataState(conversations).setRetry(false)
+            res.value = DataState(conversations).setFromCache(true)
             //只进行一次网络拉取
             val listWebData = conversationWebSource.getConversations(token)
             res.addSource(listWebData) { listDataState ->
                 if (listDataState.state === DataState.STATE.SUCCESS) {
                     res.removeSource(local)
-                    res.value = listDataState.setRetry(true).setRetryState(DataState.STATE.SUCCESS)
+                    res.value = listDataState.setFromCache(false).setRetryState(DataState.STATE.SUCCESS)
                     //找到本地上多余的，删除
                     val redundant = mutableListOf<Conversation>()
                     conversations.let {
@@ -82,7 +82,7 @@ class ConversationRepository(context: Context) {
                         conversationDao.saveConversations(listDataState.data as MutableList)
                     }.start()
                 } else if (listDataState.state === DataState.STATE.FETCH_FAILED) {
-                    res.value = DataState(conversations).setRetry(true).setRetryState(DataState.STATE.FETCH_FAILED)
+                    res.value = DataState(conversations).setFromCache(false).setRetryState(DataState.STATE.FETCH_FAILED)
                 }
             }
         }
@@ -105,14 +105,17 @@ class ConversationRepository(context: Context) {
      */
     fun queryConversation(token: String, conversationId: String): LiveData<DataState<Conversation?>> {
         val result = MediatorLiveData<DataState<Conversation?>>()
-        result.addSource(conversationDao.getConversationAt(conversationId)) {
-            result.value = DataState(it)
+        val local = conversationDao.getConversationAt(conversationId)
+        result.addSource(local) {
+            result.value = DataState(it).setFromCache(true)
         }
         result.addSource(conversationWebSource.queryConversation(token, conversationId)) {
             if (it.state == DataState.STATE.SUCCESS) {
+                result.removeSource(local)
                 Thread {
                     it.data?.let { it1 -> conversationDao.saveConversation(it1) }
                 }.start()
+                result.value = it.setFromCache(false)
             }
         }
         return result
@@ -128,12 +131,12 @@ class ConversationRepository(context: Context) {
         return conversationWebSource.getWordCloud(token, conversationId)
     }
 
-    fun getReadUsers(token: String, messageId: String,conversationId: String,read:Boolean): LiveData<DataState<List<ReadUser>>>{
-        return conversationWebSource.getReadUsers(token, messageId,conversationId,read)
+    fun getReadUsers(token: String, messageId: String, conversationId: String, read: Boolean): LiveData<DataState<List<ReadUser>>> {
+        return conversationWebSource.getReadUsers(token, messageId, conversationId, read)
     }
 
-    fun getAccessibilityInfo(token: String, conversationId: String,type:Conversation.TYPE): LiveData<DataState<AccessibilityInfo>>{
-        return conversationWebSource.getAccessibilityInfo(token,conversationId,type)
+    fun getAccessibilityInfo(token: String, conversationId: String, type: Conversation.TYPE): LiveData<DataState<AccessibilityInfo>> {
+        return conversationWebSource.getAccessibilityInfo(token, conversationId, type)
     }
 
 

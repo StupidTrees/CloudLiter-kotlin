@@ -46,7 +46,10 @@ object ImageUtils {
             "http://hita.store:3000/user/profile/avatar?imageId=$id"
         }
         val glideUrl = GlideUrl(url, LazyHeaders.Builder().addHeader("device-type", "android").build())
-        Glide.with(context).load(glideUrl).apply(RequestOptions.bitmapTransform(CircleCrop())).placeholder(R.drawable.place_holder_avatar).into(target)
+        Glide.with(context).load(glideUrl)
+                .error(R.drawable.place_holder_avatar)
+                .apply(RequestOptions.bitmapTransform(CircleCrop()))
+                .placeholder(R.drawable.place_holder_avatar).into(target)
     }
 
     fun loadAvatarIntoNotification(context: Context, userId: String?, target: NotificationTarget) {

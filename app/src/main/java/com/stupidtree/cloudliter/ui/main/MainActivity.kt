@@ -1,6 +1,7 @@
 package com.stupidtree.cloudliter.ui.main
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -41,20 +42,22 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private var drawerUsername: TextView? = null
     private var drawerHeader: ViewGroup? = null
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setSupportActionBar(binding.toolbar)
-        val bindIntent = Intent(this, SocketIOClientService::class.java)
-        startService(bindIntent)
     }
 
     override fun onStart() {
         super.onStart()
         try {
-            NotificationUtils.checkNotification(this)
+            val firstStart = getSharedPreferences("main", Context.MODE_PRIVATE).getBoolean("first",true)
+            if(firstStart){
+                NotificationUtils.checkNotification(this)
+                getSharedPreferences("main", Context.MODE_PRIVATE).edit().putBoolean("first",false).apply()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        ActivityUtils.startSocketService(this)
         setUserViews(viewModel.localUser)
     }
 

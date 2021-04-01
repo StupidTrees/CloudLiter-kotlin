@@ -81,7 +81,7 @@ class IconClassifierSource(private var application: Application) {
         modelBuf.put(buffer)
         val inputShape = arrayOf(intArrayOf(DIM_BATCH_SIZE, IMAGE_SIZE_Y, IMAGE_SIZE_X, DIM_PIXEL_SIZE))
         options.setNumThreads(3)
-        options.setDeviceType(AiBoostInterpreter.Device.QUALCOMM_DSP)
+        options.setDeviceType(AiBoostInterpreter.Device.QUALCOMM_NPU)
         options.setQComPowerLevel(AiBoostInterpreter.QCOMPowerLEVEL.QCOM_TURBO)
         options.setNativeLibPath(application.applicationInfo.nativeLibraryDir)
         aiboost = AiBoostInterpreter(modelBuf, inputShape, options)

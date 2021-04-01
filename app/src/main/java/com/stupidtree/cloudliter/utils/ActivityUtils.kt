@@ -3,7 +3,9 @@ package com.stupidtree.cloudliter.utils
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import com.stupidtree.cloudliter.data.model.*
+import com.stupidtree.cloudliter.service.socket.SocketIOClientService
 import com.stupidtree.cloudliter.ui.accessibility.AccessibilityActivity
 import com.stupidtree.cloudliter.ui.accessibility.egine.LightEngineActivity
 import com.stupidtree.cloudliter.ui.chat.ChatActivity
@@ -220,5 +222,14 @@ object ActivityUtils {
     fun startLightEngineActivity(from: Context) {
         val it = Intent(from, LightEngineActivity::class.java)
         from.startActivity(it)
+    }
+
+
+    fun startSocketService(context: Context) {
+        try {
+            context.startService(Intent(context, SocketIOClientService::class.java))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

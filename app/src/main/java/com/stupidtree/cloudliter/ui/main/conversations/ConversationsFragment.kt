@@ -97,18 +97,18 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel, F
                     binding?.placeHolder?.setOnClickListener {
                         ActivityUtils.startLoginActivity(requireContext())
                     }
-                    if (listDataState.isRetry) {
+                    if (!listDataState.fromCache) {
                         binding?.connectionFailedBar?.visibility = View.GONE
                     }
                 }
-                listDataState.isRetry && listDataState.stateRetried === DataState.STATE.FETCH_FAILED -> {
+                !listDataState.fromCache && listDataState.stateRetried === DataState.STATE.FETCH_FAILED -> {
                     binding?.list?.visibility = View.VISIBLE
                     binding?.placeHolder?.visibility = View.GONE
-                    if (listDataState.isRetry) {
+                    if (!listDataState.fromCache) {
                         binding?.connectionFailedBar?.visibility = View.VISIBLE
                     }
                 }
-                listDataState.isRetry && listDataState.stateRetried === DataState.STATE.SUCCESS -> {
+                !listDataState.fromCache && listDataState.stateRetried === DataState.STATE.SUCCESS -> {
                     binding?.placeHolder?.visibility = View.GONE
                     binding?.connectionFailedBar?.visibility = View.GONE
                     if (listDataState.data != null && listDataState.data!!.isEmpty()) {
@@ -120,7 +120,7 @@ class ConversationsFragment : BaseFragmentWithReceiver<ConversationsViewModel, F
                 listDataState.state !== DataState.STATE.SUCCESS -> {
                     binding?.placeHolder?.visibility = View.VISIBLE
                     binding?.list?.visibility = View.GONE
-                    if (listDataState.isRetry) {
+                    if (!listDataState.fromCache) {
                         binding?.connectionFailedBar?.visibility = View.GONE
                     }
                     binding?.placeHolderText?.setText(R.string.fetch_failed)

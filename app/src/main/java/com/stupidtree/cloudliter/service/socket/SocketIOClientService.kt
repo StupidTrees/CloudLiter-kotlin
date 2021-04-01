@@ -125,7 +125,6 @@ class SocketIOClientService : Service() {
     override fun onCreate() {
         super.onCreate()
         initReceiver()
-        registerReceiver()
         //连接到socketIO
         socket = try {
             IO.socket("http://hita.store:3000")
@@ -134,6 +133,22 @@ class SocketIOClientService : Service() {
         }
         socketConn()
         initNotification()
+    }
+
+
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+        Log.e("startCommand", this.toString())
+        mHandler.postDelayed(heartBeatRunnable, HEART_BEAT_RATE)
+        registerReceiver()
+        return START_STICKY
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.e("service_destroy", "DS!")
+        socket?.disconnect()
+        unregisterReceiver(receiver)
     }
 
 
@@ -327,24 +342,12 @@ class SocketIOClientService : Service() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.e("service_destroy", "DS!")
-        socket?.disconnect()
-        unregisterReceiver(receiver)
-    }
+
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
-
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
-        Log.e("startCommand", this.toString())
-        mHandler.postDelayed(heartBeatRunnable, HEART_BEAT_RATE)
-        return START_STICKY
-    }
 
     //重连调用可以在主线程中进行
     private var mHandler = Handler(Looper.getMainLooper())

@@ -41,7 +41,7 @@ class DataState<T> {
     var listAction = LIST_ACTION.REPLACE_ALL
 
     //是否为重试状态
-    var isRetry = false
+    var fromCache = false
 
     //重试后的状态
     var stateRetried: STATE = STATE.NOTHING
@@ -70,8 +70,8 @@ class DataState<T> {
         this.message = message
     }
 
-    fun setRetry(retry: Boolean): DataState<T> {
-        isRetry = retry
+    fun setFromCache(retry: Boolean): DataState<T> {
+        fromCache = retry
         return this
     }
     fun setRetryState(retryState: STATE): DataState<T> {

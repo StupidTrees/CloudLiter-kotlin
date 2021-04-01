@@ -132,6 +132,9 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     var accessibilityInfo = Transformations.switchMap(conversation) {
         val localUser = localUserRepository.getLoggedInUser()
+        if(it.fromCache){
+            return@switchMap MutableLiveData(DataState(DataState.STATE.NOTHING))
+        }
         if (localUser.isValid) {
             it.data?.let { conversation ->
                 return@switchMap conversationRepository.getAccessibilityInfo(localUser.token!!, conversation.id, conversation.type)

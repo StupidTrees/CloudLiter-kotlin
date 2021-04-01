@@ -26,6 +26,7 @@ import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.model.Yunmoji
 import com.stupidtree.cloudliter.databinding.ActivityChatBinding
+import com.stupidtree.cloudliter.service.socket.SocketIOClientService
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpTextMessageDetail
 import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectBottomFragment
 import com.stupidtree.cloudliter.utils.ActivityUtils
@@ -77,7 +78,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
     /**
      * 语音控制
      */
-    lateinit var voiceHelper: AudioRecordHelper
+    private lateinit var voiceHelper: AudioRecordHelper
     lateinit var audioPlayHelper: AudioPlayHelper
 
 
@@ -90,9 +91,10 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
      * 生命周期事件区
      */
     //启动时，绑定服务
-    var firstEnter = true
+    private var firstEnter = true
     override fun onStart() {
         super.onStart()
+        ActivityUtils.startSocketService(this)
         intent.getStringExtra("conversationId")?.let { viewModel.startRefreshConversationInfo(it) }
         viewModel.bindService(this)
         refreshInputLayout()
@@ -215,7 +217,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                     }
                 } else if (listDataState.listAction === DataState.LIST_ACTION.PUSH_HEAD) {
                     //下拉加载更多
-                    if (!listDataState.isRetry) { //第一次获取，本地数据
+                    if (listDataState.fromCache) { //第一次获取，本地数据
                         listAdapter.notifyItemsPushHead(listDataState.data!!)
                         if (listDataState.data!!.isNotEmpty()) {
                             binding.list.smoothScrollBy(0, -150)

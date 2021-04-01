@@ -85,7 +85,7 @@ class ChatRepository(context: Context) {
                     if (result.state === DataState.STATE.SUCCESS && result.data!!.isNotEmpty()) {
                         listDataState.removeSource(localListState!!)
                         saveMessageAsync(result.data?.toList())
-                        listDataState.value = result.setRetry(true).setListAction(action)
+                        listDataState.value = result.setFromCache(false).setListAction(action)
                     }
                 }
             } else { //本地无消息/上拉加载
@@ -96,7 +96,7 @@ class ChatRepository(context: Context) {
                         listDataState.removeSource(localListState!!)
                         saveMessageAsync(result.data?.toList())
                         if (chatMessages != null) {
-                            listDataState.value = result.setListAction(action).setRetry(chatMessages.isNotEmpty())
+                            listDataState.value = result.setListAction(action).setFromCache(!chatMessages.isNotEmpty())
                         }
                     }
                 }
