@@ -3,6 +3,7 @@ package com.stupidtree.cloudliter.data.source.websource.service
 import androidx.lifecycle.LiveData
 import com.stupidtree.component.web.ApiResponse
 import com.stupidtree.cloudliter.data.model.Conversation
+import com.stupidtree.cloudliter.data.model.AccessibilityInfo
 import com.stupidtree.cloudliter.ui.chat.read.ReadUser
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -42,5 +43,10 @@ interface ConversationService {
     @GET("/message/read_user")
     fun getReadUser(@Header("token") token: String, @Query("messageId") messageId: String, @Query("conversationId") conversationId: String,
                     @Query("read") read: Boolean): LiveData<ApiResponse<List<ReadUser>>>
+
+
+    @GET("/conversation/accessibility_info")
+    fun getAccessibilityInfo(@Header("token") token: String, @Query("conversationId") conversationId: String,
+                    @Query("type") type: Conversation.TYPE): LiveData<ApiResponse<AccessibilityInfo>>
 
 }

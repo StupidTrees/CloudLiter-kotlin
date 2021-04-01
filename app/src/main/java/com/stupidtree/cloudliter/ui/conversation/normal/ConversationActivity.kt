@@ -16,7 +16,7 @@ class ConversationActivity : BaseActivity<ConversationViewModel, ActivityConvers
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setToolbarActionBack(binding.toolbar)
-        setWindowParams(statusBar = true, darkColor = true, navi = false)
+
     }
 
     override fun getViewModelClass(): Class<ConversationViewModel> {

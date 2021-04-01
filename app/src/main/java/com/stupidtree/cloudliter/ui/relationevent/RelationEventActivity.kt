@@ -44,7 +44,7 @@ class RelationEventActivity : BaseActivity<RelationEventViewModel, ActivityRelat
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setWindowParams(true, darkColor = true, navi = false)
+
         setToolbarActionBack(binding.toolbar)
     }
 

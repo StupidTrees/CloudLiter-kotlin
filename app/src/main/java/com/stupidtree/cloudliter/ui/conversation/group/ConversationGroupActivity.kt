@@ -6,11 +6,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.Conversation
-import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.databinding.ActivityConversationGroupBinding
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
@@ -30,7 +27,7 @@ class ConversationGroupActivity : BaseActivity<ConversationGroupViewModel, Activ
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setToolbarActionBack(binding.toolbar)
-        setWindowParams(statusBar = true, darkColor = true, navi = false)
+
     }
 
     override fun getViewModelClass(): Class<ConversationGroupViewModel> {

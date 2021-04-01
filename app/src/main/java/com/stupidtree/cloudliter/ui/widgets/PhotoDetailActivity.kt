@@ -35,7 +35,7 @@ class PhotoDetailActivity : BaseActivity<PhotoDetailActivity.PhotoViewModel, Act
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setWindowParams(statusBar = true, darkColor = false, navi = true)
+
     }
 
     private fun initPager() {

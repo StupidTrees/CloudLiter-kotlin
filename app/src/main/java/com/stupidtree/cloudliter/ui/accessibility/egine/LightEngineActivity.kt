@@ -2,22 +2,14 @@ package com.stupidtree.cloudliter.ui.accessibility.egine
 
 import android.os.Bundle
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.stupidtree.cloudliter.R
-import com.stupidtree.cloudliter.data.model.UserLocal
-import com.stupidtree.cloudliter.data.model.UserProfile
 import com.stupidtree.cloudliter.databinding.ActivityLightEngineBinding
 import com.stupidtree.style.base.BaseActivity
-import com.stupidtree.component.data.DataState
-import com.stupidtree.style.widgets.PopUpMultipleCheckableList
-import com.stupidtree.style.widgets.PopUpSelectableList
-import com.stupidtree.cloudliter.utils.ActivityUtils
 
 class LightEngineActivity : BaseActivity<LightEngineViewModel, ActivityLightEngineBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setWindowParams(statusBar = true, darkColor = true, navi = false)
+
         setToolbarActionBack(binding.toolbar)
     }
 

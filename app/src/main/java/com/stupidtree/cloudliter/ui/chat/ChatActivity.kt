@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
-import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
@@ -28,6 +27,7 @@ import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.model.Yunmoji
 import com.stupidtree.cloudliter.databinding.ActivityChatBinding
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpTextMessageDetail
+import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectBottomFragment
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.AnimationUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
@@ -83,12 +83,6 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
 
     override fun getViewModelClass(): Class<ChatViewModel> {
         return ChatViewModel::class.java
-    }
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setWindowParams(statusBar = true, darkColor = true, navi = false)
     }
 
 
@@ -184,9 +178,18 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         setUpMessageList()
         setUpYunmojiList()
         setUpButtons()
+        bindLiveDatas()
+    }
+
+    private fun bindLiveDatas() {
         viewModel.conversation.observe(this, {
             if (it.state == DataState.STATE.SUCCESS) {
-                it.data?.let { it1 -> setConversationViews(it1) }
+                it.data?.let { conversation ->
+                    binding.title.text = conversation.name
+                    binding.stateBar.visibility = if (conversation.type == Conversation.TYPE.GROUP) View.GONE
+                    else View.VISIBLE
+
+                }
             }
 
         })
@@ -275,6 +278,50 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         viewModel.ttsResultLiveData.observe(this) {
             listAdapter.changeTTSState(binding.list, it.second, it.first.data, if (it.first.state == DataState.STATE.SUCCESS)
                 ChatMessage.TTS_STATE.SUCCESS else ChatMessage.TTS_STATE.FAILED)
+        }
+        viewModel.accessibilityInfo.observe(this) { data ->
+            if (data.state == DataState.STATE.SUCCESS) {
+                data.data?.let {
+                    if (it.hearing + it.limb + it.visual == 0) {
+                        binding.typeIcon.visibility = View.GONE
+                    } else {
+                        binding.typeIcon.visibility = View.VISIBLE
+                        if (it.hearing != 0) {
+                            binding.accessibilityHearing.visibility = View.VISIBLE
+                            if (it.hearing == 1 && viewModel.getConversationType() == Conversation.TYPE.FRIEND) {
+                                binding.hearingNum.visibility = View.INVISIBLE
+                            } else {
+                                binding.hearingNum.visibility = View.VISIBLE
+                                binding.hearingNum.text = it.hearing.toString()
+                            }
+                        } else {
+                            binding.accessibilityHearing.visibility = View.GONE
+                        }
+                        if (it.visual != 0) {
+                            binding.accessibilityHearing.visibility = View.VISIBLE
+                            if (it.visual == 1 && viewModel.getConversationType() == Conversation.TYPE.FRIEND) {
+                                binding.visualNum.visibility = View.INVISIBLE
+                            } else {
+                                binding.visualNum.visibility = View.VISIBLE
+                                binding.visualNum.text = it.visual.toString()
+                            }
+                        } else {
+                            binding.accessibilityHearing.visibility = View.GONE
+                        }
+                        if (it.limb != 0) {
+                            binding.accessibilityHearing.visibility = View.VISIBLE
+                            if (it.limb == 1 && viewModel.getConversationType() == Conversation.TYPE.FRIEND) {
+                                binding.limbNum.visibility = View.INVISIBLE
+                            } else {
+                                binding.limbNum.visibility = View.VISIBLE
+                                binding.limbNum.text = it.limb.toString()
+                            }
+                        } else {
+                            binding.accessibilityHearing.visibility = View.GONE
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -480,59 +527,6 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         yunmojiListAdapter.setOnItemClickListener(yunmojiOnItemClickListener)
     }
 
-    /**
-     * 动作区
-     */
-    //设置聊天信息显示
-    private fun setConversationViews(conversation: Conversation) {
-        binding.title.text = conversation.name
-        if(conversation.type == Conversation.TYPE.GROUP){//群聊
-            binding.stateBar.visibility = View.GONE
-            binding.accessibilityIcon.visibility = View.GONE
-            binding.accessibilityIcon2.visibility = View.GONE
-            binding.accessibilityIcon3.visibility = View.GONE
-        }else{
-            binding.stateBar.visibility = View.VISIBLE
-        }
-
-//        if (conversation.friendType == 0) {
-//            binding.typeIcon.visibility = View.GONE
-//        } else {
-//            binding.typeIcon.visibility = View.VISIBLE
-//            when (conversation.friendType) {
-//                1 -> {
-//                    binding.accessibilityIcon.visibility = View.VISIBLE
-//                }
-//                2 -> {
-//                    binding.accessibilityIcon2.visibility = View.VISIBLE
-//                }
-//                3 -> {
-//                    binding.accessibilityIcon.visibility = View.VISIBLE
-//                    binding.accessibilityIcon2.visibility = View.VISIBLE
-//                }
-//                4 -> {
-//                    binding.accessibilityIcon3.visibility = View.VISIBLE
-//                }
-//                5 -> {
-//                    binding.accessibilityIcon.visibility = View.VISIBLE
-//                    binding.accessibilityIcon3.visibility = View.VISIBLE
-//                }
-//                6 -> {
-//                    binding.accessibilityIcon2.visibility = View.VISIBLE
-//                    binding.accessibilityIcon3.visibility = View.VISIBLE
-//                }
-//                7 -> {
-//                    binding.accessibilityIcon.visibility = View.VISIBLE
-//                    binding.accessibilityIcon2.visibility = View.VISIBLE
-//                    binding.accessibilityIcon3.visibility = View.VISIBLE
-//                }
-//                else -> {
-//                    binding.typeIcon.visibility = View.GONE
-//                }
-//            }
-//        }
-    }
-
 
     //刷新输入区状态
     private fun refreshInputLayout() {
@@ -726,22 +720,21 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                 return
             }
             val filePath = FileProviderUtils.getFilePathByUri(getThis(), uri)
-            filePath?.let {
-                viewModel.conversation.value?.let { conversation ->
-//                    if (conversation.friendType == 1 || conversation.friendType == 3 || conversation.friendType == 5 || conversation.friendType == 7) {
-//                        ImageDetectBottomFragment().setMessage(null)
-//                                .setTitle(getString(R.string.hint_accessibility_sure_to_send_title))
-//                                .setSubtitle(getString(R.string.hint_type_visual_sure_to_send_subtitle))
-//                                .setUrl(filePath)
-//                                .setOnConfirmListener(object : ImageDetectBottomFragment.OnConfirmListener {
-//                                    override fun onConfirm(url: String) {
-//                                        viewModel.sendImageMessage(it)
-//                                    }
-//                                })
-//                                .show(supportFragmentManager, "xx")
-//                    } else {
-                    viewModel.sendImageMessage(it)
-//                    }
+            filePath?.let { image ->
+                viewModel.accessibilityInfo.value?.data?.let {
+                    if (it.visual > 0) {
+                        ImageDetectBottomFragment().setMessage(null)
+                                .setTitle(getString(R.string.hint_accessibility_sure_to_send_title))
+                                .setSubtitle(getString(R.string.hint_type_visual_sure_to_send_subtitle))
+                                .setUrl(filePath)
+                                .setOnConfirmListener(object : ImageDetectBottomFragment.OnConfirmListener {
+                                    override fun onConfirm(url: String) {
+                                        viewModel.sendImageMessage(image)
+                                    }
+                                })
+                                .show(supportFragmentManager, "xx")
+                    }
+                    viewModel.sendImageMessage(image)
                 }
             }
         }

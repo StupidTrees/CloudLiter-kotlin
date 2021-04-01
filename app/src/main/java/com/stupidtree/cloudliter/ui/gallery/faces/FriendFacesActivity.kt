@@ -3,9 +3,7 @@ package com.stupidtree.cloudliter.ui.gallery.faces
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.stupidtree.cloudliter.databinding.ActivityFriendFacesBinding
-import com.stupidtree.cloudliter.databinding.ActivityScenesBinding
 import com.stupidtree.cloudliter.ui.gallery.album.AlbumQuery
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.component.data.DataState
@@ -18,7 +16,7 @@ class FriendFacesActivity: BaseActivity<FriendFacesViewModel, ActivityFriendFace
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setWindowParams(statusBar = true, darkColor = true, navi = false)
+
         setToolbarActionBack(binding.toolbar)
     }
     override fun onStart() {

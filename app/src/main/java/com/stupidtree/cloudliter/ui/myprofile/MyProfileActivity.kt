@@ -35,11 +35,6 @@ class MyProfileActivity : BaseActivity<MyProfileViewModel, ActivityMyProfileBind
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setWindowParams(
-                statusBar = true,
-                darkColor = true,
-                navi = false
-        )
         setToolbarActionBack(binding.toolbar)
 
         // cropImgUri = Uri.parse("file:///" + Environment.getExternalStorageDirectory() + "/avatar_cropped.jpg")

@@ -27,7 +27,7 @@ class QRCodeActivity : BaseActivity<QRCodeViewModel, ActivityQRCodeBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         captureFragment = CaptureFragment.newInstance()
         super.onCreate(savedInstanceState)
-        setWindowParams(statusBar = true, darkColor = true, navi = false)
+
         setToolbarActionBack(binding.toolbar)
     }
 

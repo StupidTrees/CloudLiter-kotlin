@@ -12,6 +12,7 @@ import com.stupidtree.cloudliter.data.source.dao.ConversationDao
 import com.stupidtree.cloudliter.data.source.websource.ConversationWebSource
 import com.stupidtree.cloudliter.data.source.websource.SocketWebSource
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
+import com.stupidtree.cloudliter.data.model.AccessibilityInfo
 import com.stupidtree.cloudliter.ui.chat.read.ReadUser
 import com.stupidtree.component.data.DataState
 import java.util.*
@@ -130,6 +131,11 @@ class ConversationRepository(context: Context) {
     fun getReadUsers(token: String, messageId: String,conversationId: String,read:Boolean): LiveData<DataState<List<ReadUser>>>{
         return conversationWebSource.getReadUsers(token, messageId,conversationId,read)
     }
+
+    fun getAccessibilityInfo(token: String, conversationId: String,type:Conversation.TYPE): LiveData<DataState<AccessibilityInfo>>{
+        return conversationWebSource.getAccessibilityInfo(token,conversationId,type)
+    }
+
 
     companion object {
         //单例模式

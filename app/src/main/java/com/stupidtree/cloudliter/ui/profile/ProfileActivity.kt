@@ -48,7 +48,7 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setWindowParams(statusBar = true, darkColor = true, navi = false)
+
         super.onCreate(savedInstanceState)
         setToolbarActionBack(binding.toolbar)
     }

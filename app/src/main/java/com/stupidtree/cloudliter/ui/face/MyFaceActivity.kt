@@ -12,7 +12,6 @@ import com.stupidtree.cloudliter.databinding.ActivityMyFaceBinding
 import com.stupidtree.style.base.BaseActivity
 import com.stupidtree.style.base.BaseListAdapter
 import com.stupidtree.component.data.DataState
-import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
 import com.stupidtree.style.widgets.PopUpText
 import com.stupidtree.style.picker.FileProviderUtils
 import com.stupidtree.style.picker.GalleryPicker
@@ -23,7 +22,7 @@ class MyFaceActivity : BaseActivity<MyFaceViewModel, ActivityMyFaceBinding>() {
     lateinit var listAdapter: MyFaceAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setWindowParams(true, darkColor = true, navi = false)
+
         setToolbarActionBack(binding.toolbar)
     }
 

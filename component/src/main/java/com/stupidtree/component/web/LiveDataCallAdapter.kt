@@ -1,5 +1,6 @@
 package com.stupidtree.component.web
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import retrofit2.*
@@ -41,6 +42,7 @@ internal constructor(private val responseType: Type) : CallAdapter<Any,LiveData<
             }
 
             override fun onFailure(call: Call<Any>, t: Throwable) {
+                Log.e("request failed", t.toString())
                 result.postValue(null)
             }
         })

@@ -14,8 +14,8 @@ import com.stupidtree.cloudliter.utils.ActivityUtils
 class AccessibilityActivity : BaseActivity<AccessibilityViewModel, ActivityAccessibilityBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
-        setWindowParams(statusBar = true, darkColor = true, navi = false)
         setToolbarActionBack(binding.toolbar)
     }
 

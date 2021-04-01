@@ -30,7 +30,7 @@ class GroupEditorActivity : BaseActivity<GroupEditorViewModel, ActivityGroupEdit
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setToolbarActionBack(binding.toolbar)
-        setWindowParams(statusBar = true, darkColor = true, navi = false)
+
     }
 
     override fun initViews() {

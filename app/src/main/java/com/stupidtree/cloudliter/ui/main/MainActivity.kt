@@ -41,9 +41,9 @@ class MainActivity : BaseActivity<MainViewModel, ActivityMainBinding>() {
     private var drawerUsername: TextView? = null
     private var drawerHeader: ViewGroup? = null
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setSupportActionBar(binding.toolbar)
-        setWindowParams(statusBar = true, darkColor = true, navi = false)
         val bindIntent = Intent(this, SocketIOClientService::class.java)
         startService(bindIntent)
     }

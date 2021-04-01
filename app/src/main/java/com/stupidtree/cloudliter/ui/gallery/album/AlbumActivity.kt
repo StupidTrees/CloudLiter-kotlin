@@ -45,7 +45,7 @@ class AlbumActivity : BaseActivity<AlbumViewModel, ActivityAlbumBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setWindowParams(statusBar = true, darkColor = true, navi = false)
+
         intent.getStringExtra("title")?.let {
             if (it.isNotEmpty()) {
                 binding.toolbar.title = it

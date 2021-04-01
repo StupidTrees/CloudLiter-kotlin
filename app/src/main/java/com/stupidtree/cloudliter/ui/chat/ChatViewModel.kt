@@ -130,6 +130,17 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    var accessibilityInfo = Transformations.switchMap(conversation) {
+        val localUser = localUserRepository.getLoggedInUser()
+        if (localUser.isValid) {
+            it.data?.let { conversation ->
+                return@switchMap conversationRepository.getAccessibilityInfo(localUser.token!!, conversation.id, conversation.type)
+            }
+            return@switchMap MutableLiveData(DataState(DataState.STATE.FETCH_FAILED))
+        } else {
+            return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
+        }
+    }
     private val pageSize = 15
     private var topId: String? = null
     private var topTime: Timestamp? = null
@@ -151,7 +162,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             MutableLiveData(Pair(DataState(DataState.STATE.NOT_LOGGED_IN), ""))
         }
         messageSentLiveData.addSource(liveData) {
-            if(it.first.state==DataState.STATE.SUCCESS){
+            if (it.first.state == DataState.STATE.SUCCESS) {
                 it.first.data?.let { it1 -> chatRepository.saveMessageAsync(it1) }
             }
             messageSentLiveData.value = it
@@ -170,7 +181,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             MutableLiveData(Pair(DataState(DataState.STATE.NOT_LOGGED_IN), ""))
         }
         messageSentLiveData.addSource(liveData) {
-            if(it.first.state==DataState.STATE.SUCCESS){
+            if (it.first.state == DataState.STATE.SUCCESS) {
                 it.first.data?.let { it1 -> chatRepository.saveMessageAsync(it1) }
             }
             messageSentLiveData.value = it
@@ -191,7 +202,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             MutableLiveData(Pair(DataState(DataState.STATE.NOT_LOGGED_IN), ""))
         }
         messageSentLiveData.addSource(liveData) {
-            if(it.first.state==DataState.STATE.SUCCESS){
+            if (it.first.state == DataState.STATE.SUCCESS) {
                 it.first.data?.let { it1 -> chatRepository.saveMessageAsync(it1) }
             }
             messageSentLiveData.value = it
@@ -300,7 +311,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     fun markAllRead(context: Context) {
         if (localUserRepository.isUserLoggedIn) {
             if (topTime != null && myId != null) {
-                chatRepository.actionMarkAllRead(context, getConversationType(),myId!!, getConversationId(),
+                chatRepository.actionMarkAllRead(context, getConversationType(), myId!!, getConversationId(),
                         topTime!!, pageSize)
             }
 
@@ -310,7 +321,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     fun markRead(context: Context, chatMessage: ChatMessage) {
         localUserRepository.getLoggedInUser().id?.let {
             chatMessage.conversationId?.let { it1 ->
-                chatRepository.actionMarkRead(context, getConversationType(),it, chatMessage.id, it1)
+                chatRepository.actionMarkRead(context, getConversationType(), it, chatMessage.id, it1)
             }
         }
     }

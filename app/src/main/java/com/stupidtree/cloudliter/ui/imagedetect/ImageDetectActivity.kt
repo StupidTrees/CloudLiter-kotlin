@@ -18,7 +18,7 @@ class ImageDetectActivity : BaseActivity<ImageDetectViewModel, ActivityImageDeta
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setWindowParams(statusBar = true, darkColor = true, navi = false)
+
         setToolbarActionBack(binding.toolbar)
     }
 

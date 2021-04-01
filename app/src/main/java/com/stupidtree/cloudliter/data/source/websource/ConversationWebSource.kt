@@ -8,6 +8,7 @@ import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.source.websource.service.ConversationService
 import com.stupidtree.cloudliter.data.source.websource.service.codes.SUCCESS
 import com.stupidtree.cloudliter.data.source.websource.service.codes.TOKEN_INVALID
+import com.stupidtree.cloudliter.data.model.AccessibilityInfo
 import com.stupidtree.cloudliter.ui.chat.read.ReadUser
 import com.stupidtree.component.data.DataState
 import com.stupidtree.component.web.BaseWebSource
@@ -100,6 +101,18 @@ class ConversationWebSource : BaseWebSource<ConversationService>(Retrofit.Builde
         }
     }
 
+    fun getAccessibilityInfo(token: String, conversationId: String,type:Conversation.TYPE): LiveData<DataState<AccessibilityInfo>> {
+        return Transformations.map(service.getAccessibilityInfo(token, conversationId,type)) { input ->
+            if (input != null) {
+                when (input.code) {
+                    SUCCESS -> return@map DataState(input.data!!)
+                    TOKEN_INVALID -> return@map DataState(DataState.STATE.TOKEN_INVALID)
+                    else -> return@map DataState(DataState.STATE.FETCH_FAILED)
+                }
+            }
+            DataState(DataState.STATE.FETCH_FAILED)
+        }
+    }
     companion object {
         //单例模式
         @Volatile
