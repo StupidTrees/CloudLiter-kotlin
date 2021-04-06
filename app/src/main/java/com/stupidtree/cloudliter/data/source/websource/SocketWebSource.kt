@@ -9,9 +9,11 @@ import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
+import com.stupidtree.cloudliter.ui.chat.ConversationTopicsTrigger
 import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.chat.FriendStateTrigger
 import com.stupidtree.cloudliter.ui.chat.MessageReadNotification
+import com.stupidtree.cloudliter.ui.wordcloud.WordCloudEntity
 import java.sql.Timestamp
 
 /**
@@ -21,6 +23,7 @@ import java.sql.Timestamp
 class SocketWebSource : BroadcastReceiver() {
     var newMessageState = MutableLiveData<ChatMessage>()
     var onlineStateController = MutableLiveData<FriendStateTrigger>()
+    var conversationTopicsLiveData = MutableLiveData<ConversationTopicsTrigger>()
 
     //消息已读通知
     var messageReadState = MutableLiveData<DataState<MessageReadNotification>>()
@@ -31,7 +34,7 @@ class SocketWebSource : BroadcastReceiver() {
                 val message = intent.extras!!.getSerializable("message") as ChatMessage?
                 if (message != null) {
                     newMessageState.value = message
-                     val map = HashMap<String, Int>()
+                    val map = HashMap<String, Int>()
                     message.conversationId.let {
                         map[it] = 1
                     }
@@ -40,8 +43,15 @@ class SocketWebSource : BroadcastReceiver() {
             }
             SocketIOClientService.RECEIVE_FRIEND_STATE_CHANGED -> if (intent.hasExtra("conversationId") && intent.hasExtra("online")) {
                 onlineStateController.value = FriendStateTrigger.getActioning(
-                        intent.getStringExtra("conversationId"), intent.getStringExtra("online"),intent.getIntExtra("num",0)
+                        intent.getStringExtra("conversationId"), intent.getStringExtra("online"), intent.getIntExtra("num", 0)
                 )
+            }
+            SocketIOClientService.RECEIVE_CONVERSATION_TOPIC -> if (intent.hasExtra("conversationId") && intent.hasExtra("topTopics")) {
+                conversationTopicsLiveData.value = intent.getStringExtra("conversationId")?.let {
+                    ConversationTopicsTrigger.create(
+                            it, intent.getStringExtra("topTopics") ?: "[]"
+                    )
+                }
             }
             SocketIOClientService.RECEIVE_MESSAGE_READ -> if (intent.extras != null) {
                 val notification = intent.extras!!.getSerializable("read") as MessageReadNotification?
@@ -53,8 +63,8 @@ class SocketWebSource : BroadcastReceiver() {
                 //获得未读消息推送
                 val map = intent.extras?.getSerializable("map") as HashMap<*, *>?
                 map?.let {
-                    val m = HashMap<String,Int>()
-                    for(e in map.entries){
+                    val m = HashMap<String, Int>()
+                    for (e in map.entries) {
                         m[e.key.toString()] = e.value as Int
                     }
                     unreadMessageState.value = (DataState(m).setListAction(DataState.LIST_ACTION.REPLACE_ALL))
@@ -69,10 +79,10 @@ class SocketWebSource : BroadcastReceiver() {
         context.sendBroadcast(i)
     }
 
-    fun markAllRead(context: Context, type:Conversation.TYPE,userId: String?, conversationId: String?, topTime: Timestamp, num: Int) {
+    fun markAllRead(context: Context, type: Conversation.TYPE, userId: String?, conversationId: String?, topTime: Timestamp, num: Int) {
         val i = Intent(SocketIOClientService.ACTION_MARK_ALL_READ)
         i.putExtra("userId", userId)
-        i.putExtra("type",type.name)
+        i.putExtra("type", type.name)
         i.putExtra("topTime", topTime.time)
         i.putExtra("num", num)
         i.putExtra("conversationId", conversationId)
@@ -83,10 +93,10 @@ class SocketWebSource : BroadcastReceiver() {
 
     }
 
-    fun markRead(context: Context,type:Conversation.TYPE,userId: String, messageId: String, conversationId: String) {
+    fun markRead(context: Context, type: Conversation.TYPE, userId: String, messageId: String, conversationId: String) {
         val i = Intent(SocketIOClientService.ACTION_MARK_READ)
         i.putExtra("userId", userId)
-        i.putExtra("type",type.name)
+        i.putExtra("type", type.name)
         i.putExtra("messageId", messageId)
         i.putExtra("conversationId", conversationId)
         context.sendBroadcast(i)

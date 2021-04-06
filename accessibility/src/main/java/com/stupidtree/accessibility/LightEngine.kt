@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import android.view.ViewGroup
+import com.stupidtree.accessibility.ai.segmentation.SegmentationSource
 
 object LightEngine {
     private val lightAgents = mutableListOf<LightAgent>()
@@ -50,7 +51,7 @@ object LightEngine {
 
             }
         })
-
+        SegmentationSource.initSegmentation(application)
     }
 
 

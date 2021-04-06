@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".CApplication"
@@ -22,6 +22,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme"
         tools:targetApi="q">
+        <activity android:name=".ui.groupchat.CreateGroupChatActivity"></activity>
         <activity android:name=".ui.qrcode.QRCodeActivity" />
         <activity android:name=".ui.group.GroupEditorActivity" />
         <activity android:name=".ui.relationevent.RelationEventActivity" /> <!-- 不加↑这两行，裁剪没法用 -->
@@ -36,6 +37,7 @@
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -48,8 +50,8 @@
             android:windowSoftInputMode="adjustPan|stateVisible" />
         <activity
             android:name=".ui.chat.ChatActivity"
-            android:screenOrientation="portrait"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
             android:name=".ui.welcome.WelcomeActivity"

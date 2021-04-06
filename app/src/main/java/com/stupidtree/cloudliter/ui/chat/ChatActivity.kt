@@ -2,12 +2,16 @@ package com.stupidtree.cloudliter.ui.chat
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.Rect
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.PersistableBundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -21,6 +25,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.model.Conversation
@@ -28,24 +33,31 @@ import com.stupidtree.cloudliter.data.model.Yunmoji
 import com.stupidtree.cloudliter.databinding.ActivityChatBinding
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
 import com.stupidtree.cloudliter.ui.chat.detail.PopUpTextMessageDetail
+import com.stupidtree.cloudliter.ui.chat.segmentation.SegmentationListAdapter
+import com.stupidtree.cloudliter.ui.chat.topic.TopicListAdapter
 import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectBottomFragment
+import com.stupidtree.cloudliter.ui.wordcloud.WordCloudEntity
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.AnimationUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.cloudliter.utils.TextUtils
 import com.stupidtree.component.data.DataState
 import com.stupidtree.style.base.BaseActivity
+import com.stupidtree.style.base.BaseActivityWithReceiver
 import com.stupidtree.style.base.BaseListAdapter
 import com.stupidtree.style.picker.FileProviderUtils
 import com.stupidtree.style.picker.GalleryPicker
 import com.stupidtree.style.picker.GalleryPicker.RC_CHOOSE_PHOTO
+import com.stupidtree.style.picker.GalleryPicker.RC_TAKE_PHOTO
 import java.util.*
+import java.util.Collections.max
+import kotlin.math.max
 
 /**
  * 对话窗口
  */
 @SuppressLint("NonConstantResourceId")
-class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
+class ChatActivity() : BaseActivity<ChatViewModel, ActivityChatBinding>() {
 
     //输入状态：语音或文字
     private var textInput: Boolean = true
@@ -54,11 +66,20 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
 
     //底部展开栏状态
     var bottomPanelState: PANEL = PANEL.COLLAPSE
+    var receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == ACTION_TERMINATE_CHAT) {
+                finish()
+            }
+        }
+    }
 
     /**
      * 适配器
      */
     private lateinit var listAdapter: ChatListAdapter
+    private lateinit var segmentationListAdapter: SegmentationListAdapter
+    private lateinit var topicListAdapter: TopicListAdapter
     private lateinit var yunmojiListAdapter: YunmojiListAdapter //表情列表适配器
 
 
@@ -70,7 +91,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                 viewModel.markAllRead(getThis())
                 //定时对长连接进行心跳检测
                 Log.e("对话：心跳声明", "--")
-                mHandler.postDelayed(this, 30 * 1000)
+                mHandler.postDelayed(this, 10 * 1000)
             }
         }
     }
@@ -86,7 +107,6 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         return ChatViewModel::class.java
     }
 
-
     /**
      * 生命周期事件区
      */
@@ -96,7 +116,6 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         super.onStart()
         ActivityUtils.startSocketService(this)
         intent.getStringExtra("conversationId")?.let { viewModel.startRefreshConversationInfo(it) }
-        viewModel.bindService(this)
         refreshInputLayout()
         if (firstEnter) {
             firstEnter = false
@@ -104,11 +123,16 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         } else {
             viewModel.fetchNewData() //非第一次进入
         }
-        viewModel.markAllRead(getThis())
-        viewModel.getIntoConversation(this)
-        mHandler.postDelayed(heartBeatRunnable, 5 * 1000)
+        AnimationUtils.floatAnim(binding.topicIcon, 0, durationX = 3000, durationY = 900, rangeX = 6f, rangeY = 7f)
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.bindService(this)
+        viewModel.markAllRead(getThis())
+        viewModel.getIntoConversation(this)
+        mHandler.postDelayed(heartBeatRunnable, 1000)
+    }
     //更新Intent时（更换聊天对象），刷新列表
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -123,10 +147,15 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
     override fun onStop() {
         super.onStop()
         viewModel.leftConversation(this)
-        viewModel.unbindService(this)
         mHandler.removeCallbacks(heartBeatRunnable)
+        viewModel.unbindService(this)
     }
 
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        registerReceiver(receiver, getIntentFilter())
+    }
 
     // 初始化语音输入与播放
     private fun setUpAudio() {
@@ -178,6 +207,8 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         setUpAudio()
         setUpToolbar()
         setUpMessageList()
+        initSegmentationList()
+        initTopicList()
         setUpYunmojiList()
         setUpButtons()
         bindLiveDatas()
@@ -265,6 +296,17 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                 }
             }
         })
+
+        viewModel.conversationTopicsLiveData.observe(this) {
+            if (it.topics.isNotEmpty()) {
+                binding.topicLayout.visibility = View.VISIBLE
+                Log.e("topic_notify", it.topics.toString())
+                topicListAdapter.notifyItemChangedSmooth(it.topics)
+            } else {
+                binding.topicLayout.visibility = View.GONE
+            }
+        }
+
         //消息成功发送后反馈给列表
         viewModel.messageSentState.observe(this, { chatMessageDataState ->
             listAdapter.messageSent(binding.list, chatMessageDataState.first.data, chatMessageDataState.second, chatMessageDataState.first
@@ -285,9 +327,10 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
             if (data.state == DataState.STATE.SUCCESS) {
                 data.data?.let {
                     if (it.hearing + it.limb + it.visual == 0) {
-                        binding.typeIcon.visibility = View.GONE
+                        binding.accessibilityHearing.visibility = View.GONE
+                        binding.accessibilityVisual.visibility = View.GONE
+                        binding.accessibilityLimb.visibility = View.GONE
                     } else {
-                        binding.typeIcon.visibility = View.VISIBLE
                         if (it.hearing != 0) {
                             binding.accessibilityHearing.visibility = View.VISIBLE
                             if (it.hearing == 1 && viewModel.getConversationType() == Conversation.TYPE.FRIEND) {
@@ -324,6 +367,24 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                     }
                 }
             }
+        }
+        viewModel.segmentationLiveData.observe(this) {
+            if (it.state == DataState.STATE.SUCCESS) {
+                it.data?.let { it1 ->
+                    if (it1.isEmpty()) {
+                        binding.accessibilityIcons.visibility = View.VISIBLE
+                    } else {
+                        binding.accessibilityIcons.visibility = View.GONE
+                    }
+                    segmentationListAdapter.notifyItemChangedSmooth(it1, false)
+                    if (it1.isNotEmpty()) {
+                        binding.segmentationList.smoothScrollToPosition(max(0, binding.segmentationList.layoutManager?.itemCount
+                                ?: 1 - 1))
+                    }
+
+                }
+            }
+
         }
     }
 
@@ -372,10 +433,6 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                 if (data.getTypeEnum() == ChatMessage.TYPE.TXT && !data.isTimeStamp) {
                     PopUpTextMessageDetail().setChatMessage(data)
                             .show(supportFragmentManager, "detail")
-                } else if (data.getTypeEnum() == ChatMessage.TYPE.IMG && !data.isTimeStamp) {
-                    data.fileId?.let {
-                        ActivityUtils.startImageDetectionActivity(getThis(), it)
-                    }
                 }
                 return true
             }
@@ -384,7 +441,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
             override fun onItemClick(data: ChatMessage, card: View?, position: Int) {
                 if (data.getTypeEnum() == ChatMessage.TYPE.IMG && !data.isTimeStamp) {
                     val urls = listAdapter.imageUrls
-                    ActivityUtils.showMultipleImages(getThis(), urls, urls.indexOf(data.fileId?.let { ImageUtils.getCloudImageUrl(it) })
+                    ActivityUtils.showMultipleImages(getThis(), urls, urls.indexOf(data.fileId)
                     )
                 } else if (data.getTypeEnum() == ChatMessage.TYPE.VOICE && !data.isTimeStamp) {
                     if (audioPlayHelper.playingId != null) {
@@ -459,6 +516,7 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
             cancelVoiceMessage()
         }
 
+
         binding.input.setOnTouchListener { _, motionEvent ->
             if (motionEvent.action == MotionEvent.ACTION_UP) {
                 if (bottomPanelState != PANEL.COLLAPSE) {
@@ -492,9 +550,13 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
 
             override fun afterTextChanged(s: Editable?) {
                 setSendButtonEnabled(!s.isNullOrEmpty())
+                viewModel.startSegment(s.toString())
             }
 
         })
+        binding.photo.setOnClickListener {
+            GalleryPicker.takePhoto(this)
+        }
     }
 
 
@@ -529,6 +591,19 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         yunmojiListAdapter.setOnItemClickListener(yunmojiOnItemClickListener)
     }
 
+    private fun initSegmentationList() {
+        segmentationListAdapter = SegmentationListAdapter(this, mutableListOf())
+        binding.segmentationList.adapter = segmentationListAdapter
+        binding.segmentationList.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+
+    }
+
+    private fun initTopicList() {
+        topicListAdapter = TopicListAdapter(this, mutableListOf())
+        binding.topicList.adapter = topicListAdapter
+        binding.topicList.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+
+    }
 
     //刷新输入区状态
     private fun refreshInputLayout() {
@@ -711,17 +786,23 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         if (resultCode != Activity.RESULT_OK) {
             return
         }
-        if (requestCode == RC_CHOOSE_PHOTO) { //选择图片返回
-            if (null == data) {
-                Toast.makeText(this, R.string.no_image_selected, Toast.LENGTH_SHORT).show()
-                return
+        if (requestCode == RC_CHOOSE_PHOTO || requestCode == RC_TAKE_PHOTO) { //选择图片返回
+            Log.e("take", data?.dataString.toString())
+            var filePath: String? = null
+            if (requestCode == RC_CHOOSE_PHOTO) {
+                if (null == data) {
+                    Toast.makeText(this, R.string.no_image_selected, Toast.LENGTH_SHORT).show()
+                    return
+                }
+                val uri = data.data
+                if (null == uri) { //如果单个Uri为空，则可能是1:多个数据 2:没有数据
+                    Toast.makeText(this, R.string.no_image_selected, Toast.LENGTH_SHORT).show()
+                    return
+                }
+                filePath = FileProviderUtils.getFilePathByUri(getThis(), uri)
+            } else {
+                filePath = GalleryPicker.getPhotoFile(getThis()).absolutePath
             }
-            val uri = data.data
-            if (null == uri) { //如果单个Uri为空，则可能是1:多个数据 2:没有数据
-                Toast.makeText(this, R.string.no_image_selected, Toast.LENGTH_SHORT).show()
-                return
-            }
-            val filePath = FileProviderUtils.getFilePathByUri(getThis(), uri)
             filePath?.let { image ->
                 viewModel.accessibilityInfo.value?.data?.let {
                     if (it.visual > 0) {
@@ -735,8 +816,10 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
                                     }
                                 })
                                 .show(supportFragmentManager, "xx")
+                    } else {
+                        viewModel.sendImageMessage(image)
                     }
-                    viewModel.sendImageMessage(image)
+
                 }
             }
         }
@@ -745,9 +828,11 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
 
     override fun onDestroy() {
         super.onDestroy()
+        unregisterReceiver(receiver)
         audioPlayHelper.destroy()
         voiceHelper.destroy()
     }
+
 
     //隐藏键盘
     private fun hideSoftInput(context: Context, view: View?) {
@@ -759,5 +844,14 @@ class ChatActivity : BaseActivity<ChatViewModel, ActivityChatBinding>() {
         return ActivityChatBinding.inflate(layoutInflater)
     }
 
+    fun getIntentFilter(): IntentFilter {
+        val res = IntentFilter()
+        res.addAction(ACTION_TERMINATE_CHAT)
+        return res
+    }
 
+
+    companion object {
+        const val ACTION_TERMINATE_CHAT = "TERMINATE_CHAT"
+    }
 }

@@ -12,6 +12,7 @@ class CApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         LightEngine.init(this)
+
     }
 
 }

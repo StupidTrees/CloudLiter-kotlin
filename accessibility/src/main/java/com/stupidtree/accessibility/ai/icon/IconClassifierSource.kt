@@ -1,10 +1,8 @@
-package com.stupidtree.accessibility.ai
+package com.stupidtree.accessibility.ai.icon
 
 
 import android.app.Application
 import android.graphics.Bitmap
-import android.os.Looper
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.ai.aiboost.AiBoostInterpreter

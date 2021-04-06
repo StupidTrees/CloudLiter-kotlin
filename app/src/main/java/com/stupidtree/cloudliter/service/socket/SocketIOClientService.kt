@@ -20,6 +20,7 @@ import com.stupidtree.cloudliter.data.model.ChatMessage
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
 import com.stupidtree.cloudliter.ui.chat.MessageReadNotification
 import com.stupidtree.cloudliter.ui.widgets.EmoticonsTextView
+import com.stupidtree.cloudliter.ui.wordcloud.WordCloudEntity
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import io.socket.client.IO
@@ -89,7 +90,7 @@ class SocketIOClientService : Service() {
                         }
                         incomingMessage.remove(conversationId)
                         if (topTime > 0) {
-                            socket?.emit("mark_all_read", type,userId, conversationId, topTime)
+                            socket?.emit("mark_all_read", type, userId, conversationId, topTime)
                         }
                     }
                     ACTION_MARK_READ -> {
@@ -98,7 +99,7 @@ class SocketIOClientService : Service() {
                         val userId = intent.getStringExtra("userId")
                         val conversationId = intent.getStringExtra("conversationId")
                         Log.e("emit_mark_read", "$userId,$conversationId,$messageId")
-                        socket?.emit("mark_read", type,userId, conversationId, messageId)
+                        socket?.emit("mark_read", type, userId, conversationId, messageId)
                         val oldCount = incomingMessage[conversationId]
                         if (oldCount != null && oldCount <= 1) {
                             incomingMessage.remove(conversationId)
@@ -139,8 +140,9 @@ class SocketIOClientService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         Log.e("startCommand", this.toString())
-        mHandler.postDelayed(heartBeatRunnable, HEART_BEAT_RATE)
         registerReceiver()
+        mHeartbeatHandler.removeCallbacks(heartBeatRunnable)
+        mHeartbeatHandler.postDelayed(heartBeatRunnable, HEART_BEAT_RATE)
         return START_STICKY
     }
 
@@ -187,7 +189,7 @@ class SocketIOClientService : Service() {
                     val i = Intent(RECEIVE_MESSAGE_READ)
                     val b = Bundle()
                     val notify = MessageReadNotification(userId, conversationId, fromTime)
-                    for(idx in 0 until info.length()){
+                    for (idx in 0 until info.length()) {
                         val obj = info.optJSONObject(idx)
                         notify.messageInfo[obj.optString("messageId")] = obj.optInt("read")
                     }
@@ -210,7 +212,7 @@ class SocketIOClientService : Service() {
                     val i = Intent(RECEIVE_MESSAGE_READ)
                     val b = Bundle()
                     val notify = MessageReadNotification(userId, conversationId, id)
-                    for(idx in 0 until info.length()){
+                    for (idx in 0 until info.length()) {
                         val obj = info.optJSONObject(idx)
                         notify.messageInfo[obj.optString("messageId")] = obj.optInt("read")
                     }
@@ -256,6 +258,19 @@ class SocketIOClientService : Service() {
                 val i = Intent(RECEIVE_FRIEND_STATE_CHANGED)
                 i.putExtra("conversationId", conversationId)
                 i.putExtra("online", isOnline)
+                sendBroadcast(i)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        socket?.on("conversation_topic") { args ->
+            try {
+                val conversationId = args[0].toString()
+                val topTopic = args[1].toString()
+                Log.d("对话话题更新", "$conversationId:$topTopic")
+                val i = Intent(RECEIVE_CONVERSATION_TOPIC)
+                i.putExtra("conversationId", conversationId)
+                i.putExtra("topTopics", topTopic)
                 sendBroadcast(i)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -343,26 +358,29 @@ class SocketIOClientService : Service() {
     }
 
 
-
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
 
     //重连调用可以在主线程中进行
-    private var mHandler = Handler(Looper.getMainLooper())
-    private val heartBeatRunnable: Runnable = object : Runnable {
+    private val mHandlerThread = HandlerThread("heartbeat_thread")
+
+    init {
+        mHandlerThread.start()
+    }
+
+    private var mHeartbeatHandler = Handler(mHandlerThread.looper)
+    private val heartBeatRunnable = object : Runnable {
         override fun run() {
-            if (socket != null) {
-                socket?.connect()
-                Log.e("心跳重连", "--")
-                if (loggedInUserId != null) {
-                    socket?.emit("login", loggedInUserId)
-                }
+            socket?.connect()
+            Log.e("心跳重连", "--")
+            if (loggedInUserId != null) {
+                socket?.emit("login", loggedInUserId)
             }
-            //定时对长连接进行心跳检测
-            mHandler.postDelayed(this, HEART_BEAT_RATE)
+            mHeartbeatHandler.postDelayed(this, HEART_BEAT_RATE)
         }
+
     }
 
     companion object {
@@ -371,6 +389,7 @@ class SocketIOClientService : Service() {
         const val RECEIVE_MESSAGE_READ = "CLOUD_LITER_MESSAGE_READ"
         const val RECEIVE_RELATION_EVENT = "CLOUD_LITER_RELATION_EVENT"
         const val RECEIVE_UNREAD_MESSAGE = "CLOUD_LITER_UNREAD_FETCHED"
+        const val RECEIVE_CONVERSATION_TOPIC = "CLOUD_LITER_CONVERSATION_STATE"
 
 
         const val ACTION_INTO_CONVERSATION = "CLOUD_LITER_INTO_CONVERSATION"
@@ -379,7 +398,7 @@ class SocketIOClientService : Service() {
         const val ACTION_OFFLINE = "CLOUD_LITER_OFFLINE"
         const val ACTION_MARK_ALL_READ = "CLOUD_LITER_MARK_ALL_READ"
         const val ACTION_MARK_READ = "CLOUD_LITER_MARK_READ"
-        private const val HEART_BEAT_RATE = 10 * 1000.toLong() //每隔10秒进行一次对长连接的心跳检测
+        private const val HEART_BEAT_RATE = 30 * 1000.toLong() //每隔30秒进行一次对长连接的心跳检测
         private var loggedInUserId: String? = null;
     }
 }

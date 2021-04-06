@@ -55,9 +55,7 @@ class PopUpPickFriendFragment(private val onConfirmListener: OnConfirmListener,p
                 val sortedList = newList.sortedWith(comparator = object : Comparator<UserRelation> {
                     override fun compare(o1: UserRelation?, o2: UserRelation?): Int {
                         if (o1 == null || o2 == null) return -1
-                        val name1: String = if (o1.remark.isNullOrEmpty()) o1.friendNickname.toString() else o1.remark.toString()
-                        val name2: String = if (o2.remark.isNullOrEmpty()) o2.friendNickname.toString() else o2.remark.toString()
-                        return name1.compareTo(name2)
+                        return o1.getName().compareTo(o2.getName())
                     }
                 })
 

@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.FaceResult
 import com.stupidtree.cloudliter.databinding.FragmentImageDedectBinding
@@ -21,7 +22,8 @@ import java.text.DecimalFormat
 
 class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDedectBinding>() {
 
-
+    var local: Boolean? = false
+    var id: String? = ""
     override fun getViewModelClass(): Class<ImageDetectViewModel> {
         return ImageDetectViewModel::class.java
     }
@@ -31,15 +33,27 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
     }
 
     var listAdapter: DetectResultAdapter? = null
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        local = arguments?.getBoolean("local")
+        id = arguments?.getString("id")
+    }
 
     override fun onStart() {
         super.onStart()
-        refresh()
+        if (arguments?.getBoolean("refreshOnStart") == true) {
+            refresh(local, id)
+        }
+
     }
 
-    fun refresh() {
-        if (arguments?.getBoolean("local") == true) {
+    fun refresh(local: Boolean?, id: String?) {
+        if (local !=true && id == viewModel.imageIdLiveData.value?.first) {
+            return
+        }
+        this.local = local
+        this.id = id
+        if (local == true) {
             binding?.sceneCard?.visibility = View.GONE
             binding?.sensitiveCard?.visibility = View.GONE
         } else {
@@ -54,11 +68,15 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
 
         binding?.loadingSensitive?.visibility = View.VISIBLE
         binding?.sensitiveResult?.text = getString(R.string.sensitive_progressing)
-        viewModel.imageIdLiveData.value = Pair(arguments?.getString("id")
-                ?: "", arguments?.getBoolean("local") ?: false)
-
+        viewModel.imageIdLiveData.value = Pair(id ?: "", local ?: false)
     }
 
+
+    fun preLoadImage(imageId:String){
+        ImageUtils.loadCloudImage(requireContext(),imageId).observe(this){
+            binding?.labeledImageView?.setImage(it.data)
+        }
+    }
     @SuppressLint("SetTextI18n")
     override fun initViews(view: View) {
         listAdapter = DetectResultAdapter(requireContext(), mutableListOf())
@@ -84,10 +102,6 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
         }
         viewModel.imageLiveData.observe(this) {
             binding?.labeledImageView?.setImage(it)
-        }
-        viewModel.iconClassifyResult.observe(this){
-            val res = it.data?.sorted()?.get(0)
-            Toast.makeText(requireContext(),res.toString(),Toast.LENGTH_SHORT).show()
         }
         viewModel.detectionResult.observe(this) {
             binding?.loadingDetect?.visibility = View.GONE
@@ -124,7 +138,8 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
             if (it.state != DataState.STATE.SUCCESS) {
                 binding?.sceneResult?.text = getString(R.string.scene_classify_failed)
             } else {
-                binding?.sceneResult?.text = PlacesUtils.getNameForSceneKey(requireContext(),it.data?:"")
+                binding?.sceneResult?.text = PlacesUtils.getNameForSceneKey(requireContext(), it.data
+                        ?: "")
             }
         }
 
@@ -157,10 +172,11 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
     }
 
     companion object {
-        fun newInstance(url: String, local: Boolean): ImageDetectFragment {
+        fun newInstance(url: String, local: Boolean, refreshOnStart: Boolean = true): ImageDetectFragment {
             val args = Bundle()
             args.putString("id", url)
             args.putBoolean("local", local)
+            args.putBoolean("refreshOnStart", refreshOnStart)
             val fragment = ImageDetectFragment()
             fragment.arguments = args
             return fragment

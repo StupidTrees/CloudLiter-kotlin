@@ -7,14 +7,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.stupidtree.cloudliter.data.source.ai.detect.ObjectDetectSource.Companion.IMAGE_SIZE
 import com.stupidtree.component.data.DataState
+import java.util.concurrent.locks.ReentrantLock
 
 class YOLOSource(private var application: Application) {
     private var classifier: Classifier? = null
 
+    private val lock = ReentrantLock()
     fun detectImage(bitmap: Bitmap): LiveData<DataState<List<Classifier.Recognition>>> {
         val result = MutableLiveData<DataState<List<Classifier.Recognition>>>()
         Thread {
             try {
+                lock.lock()
                 if (classifier == null) init()
                 val cropped = Utils.processBitmap(bitmap, IMAGE_SIZE.toInt())
                 val r:List<Classifier.Recognition>? = try {
@@ -23,6 +26,7 @@ class YOLOSource(private var application: Application) {
                     e.printStackTrace()
                     null
                 }
+                lock.unlock()
                 r?.let {
                     result.postValue(DataState(it))
                 } ?: run {

@@ -6,7 +6,9 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
+import android.view.animation.Animation.INFINITE
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.RotateAnimation
 
@@ -76,21 +78,22 @@ object AnimationUtils {
     }
 
     @SuppressLint("WrongConstant")
-     fun floatAnim(view: View, delay: Int) {
+    fun floatAnim(view: View, delay: Int = 0, durationX: Long = 2200, durationY: Long = 4000, rangeX: Float = 6.0f, rangeY: Float = 24.0f) {
+        view.clearAnimation()
         val animators: MutableList<Animator> = ArrayList()
-        val translationXAnim = ObjectAnimator.ofFloat(view, "translationX", -6.0f, 6.0f, -6.0f)
-        translationXAnim.duration = 2200
+        val translationXAnim = ObjectAnimator.ofFloat(view, "translationX", -rangeX, rangeX, -rangeX)
+        translationXAnim.duration = durationX
         translationXAnim.repeatCount = ValueAnimator.INFINITE //无限循环
-        translationXAnim.repeatMode = -1
-        //translationXAnim.interpolator = DecelerateInterpolator()
+        translationXAnim.repeatMode = INFINITE
+        translationXAnim.interpolator = AccelerateDecelerateInterpolator()
         translationXAnim.start()
 
         animators.add(translationXAnim)
-        val translationYAnim = ObjectAnimator.ofFloat(view, "translationY", -24.0f, 24.0f, -24.0f)
-        translationYAnim.duration = 4000
+        val translationYAnim = ObjectAnimator.ofFloat(view, "translationY", -rangeY, rangeY, -rangeY)
+        translationYAnim.duration = durationY
         translationYAnim.repeatCount = ValueAnimator.INFINITE
-        translationYAnim.repeatMode = -1
-       // translationYAnim.interpolator = DecelerateInterpolator()
+        translationYAnim.repeatMode = INFINITE
+        translationYAnim.interpolator = AccelerateDecelerateInterpolator()
         translationYAnim.start()
         animators.add(translationYAnim)
         val btnSexAnimatorSet = AnimatorSet()

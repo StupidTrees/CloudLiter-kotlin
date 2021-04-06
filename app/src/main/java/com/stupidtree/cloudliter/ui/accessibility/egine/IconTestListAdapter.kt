@@ -1,8 +1,6 @@
 package com.stupidtree.cloudliter.ui.accessibility.egine
 
-import android.app.Activity
 import android.app.Application
-import android.content.Context
 import android.graphics.Bitmap
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -10,10 +8,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
-import com.stupidtree.accessibility.ai.IconClassifierSource
+import com.stupidtree.accessibility.ai.icon.IconClassifierSource
 import com.stupidtree.cloudliter.databinding.ActivityLightEngineTestItemBinding
-import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.component.data.DataState
 import com.stupidtree.style.base.BaseListAdapter
 import com.stupidtree.style.base.BaseViewHolder

@@ -18,6 +18,7 @@ import com.stupidtree.cloudliter.data.model.UserLocal
 import com.stupidtree.cloudliter.data.model.UserProfile
 import com.stupidtree.cloudliter.databinding.ActivityProfileBinding
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
+import com.stupidtree.cloudliter.ui.chat.ChatActivity
 import com.stupidtree.style.base.BaseActivityWithReceiver
 import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.group.pick.PickGroupDialog
@@ -82,6 +83,7 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
                     object : PopUpText.OnConfirmListener {
                         override fun OnConfirm() {
                             viewModel.logout(getThis())
+                            sendBroadcast(Intent(ChatActivity.ACTION_TERMINATE_CHAT))
                             finish()
                         }
 
@@ -135,6 +137,7 @@ class ProfileActivity : BaseActivityWithReceiver<ProfileViewModel, ActivityProfi
         viewModel.deleteFriendResult.observe(this, { dataState ->
             if (dataState.state === DataState.STATE.SUCCESS) {
                 Toast.makeText(getThis(), R.string.delete_friend_success, Toast.LENGTH_SHORT).show()
+                sendBroadcast(Intent(ChatActivity.ACTION_TERMINATE_CHAT))
                 intent.getStringExtra("id")?.let { viewModel.startRefresh(it) }
             } else {
                 Toast.makeText(applicationContext, "失败", Toast.LENGTH_SHORT).show()

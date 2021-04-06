@@ -11,8 +11,8 @@ android {
         applicationId 'com.stupidtree.cloudliter'
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 20210318
-        versionName "1.37"
+        versionCode 20210404
+        versionName "1.40"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -28,7 +28,6 @@ android {
             doNotStrip '*/arm64-v8a/libaiboost_skel*.so'
             doNotStrip '*/armeabi-v7a/libaiboost_skel*.so'
         }
-
 
     }
 

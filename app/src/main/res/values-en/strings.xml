@@ -397,6 +397,11 @@
     <string name="read_group">%d人已读</string>
     <string name="read_users">已读列表</string>
     <string name="unread">未读</string>
+    <string name="create_group_chat">创建群聊</string>
+    <string name="detect_expand">展开云升识图</string>
+    <string name="detect_collapse">收缩云升识图</string>
+    <string name="photo_description">第%d张图，共%d张</string>
+    <string name="take_photo">拍照以发送图片</string>
     <string-array name="yunmoji_descriptions">
         <item>狗</item>
         <item>狗</item>

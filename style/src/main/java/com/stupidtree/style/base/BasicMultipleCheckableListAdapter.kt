@@ -12,7 +12,7 @@ import java.util.*
 </H></TextRecord> */
 abstract class BasicMultipleCheckableListAdapter<T, H : RecyclerView.ViewHolder>
 (mContext: Context, mBeans: MutableList<T>, private val minCheckNumber: Int) : BaseListAdapter<T, H>(mContext, mBeans) {
-    protected var selectedIndex: MutableSet<Int> = mutableSetOf()
+    protected var selectedIndex = mutableListOf<Int>()
 
     fun getCheckedData():List<T>{
         val res = mutableListOf<T>()

@@ -80,11 +80,7 @@ class GroupedFriendsListAdapter(context: Context?) : GroupedRecyclerViewAdapter(
         //显示头像
         ImageUtils.loadAvatarInto(mContext, data.friendAvatar, avatar)
         //显示名称(备注)
-        if (!TextUtils.isEmpty(data.remark)) {
-            name.text = data.remark
-        } else {
-            name.text = data.friendNickname
-        }
+        name.text = data.getName()
     }
 
     /**

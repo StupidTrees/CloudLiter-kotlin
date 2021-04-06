@@ -15,7 +15,7 @@
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
@@ -28,7 +28,8 @@
                 android:id="@+id/labeledImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center">
+                android:layout_gravity="center"
+                android:minHeight="120dp">
 
             </com.stupidtree.cloudliter.ui.imagedetect.widgets.LabeledImageView>
         </androidx.cardview.widget.CardView>

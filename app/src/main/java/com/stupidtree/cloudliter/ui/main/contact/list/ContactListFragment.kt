@@ -76,9 +76,7 @@ class ContactListFragment : BaseFragmentWithReceiver<ContactListViewModel, Fragm
                 val newList = contactListState.data!!.sortedWith(comparator = object:Comparator<UserRelation>{
                     override fun compare(o1: UserRelation?, o2: UserRelation?): Int {
                         if(o1==null||o2==null) return -1
-                        val name1:String = if(o1.remark.isNullOrEmpty()) o1.friendNickname.toString() else o1.remark.toString()
-                        val name2:String = if(o2.remark.isNullOrEmpty()) o2.friendNickname.toString() else o2.remark.toString()
-                        return name1.compareTo(name2)
+                        return o1.getName().compareTo(o2.getName())
                     }
                 })
                 //状态为”成功“，那么列表设置为可见，并通知列表适配器丝滑地更新列表项
@@ -130,11 +128,7 @@ class ContactListFragment : BaseFragmentWithReceiver<ContactListViewModel, Fragm
                 //显示头像
                 ImageUtils.loadAvatarInto(mContext, data.friendAvatar, holder.binding.avatar)
                 //显示名称(备注)
-                if (!TextUtils.isEmpty(data.remark)) {
-                    holder.binding.name.text = data.remark
-                } else {
-                    holder.binding.name.text = data.friendNickname
-                }
+                holder.binding.name.text = data.getName()
                 //设置点击事件
                 if (mOnItemClickListener != null) {
                     holder.binding.item.setOnClickListener { view: View? -> mOnItemClickListener!!.onItemClick(data, view, position) }

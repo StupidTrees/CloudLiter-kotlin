@@ -128,7 +128,7 @@ internal class ChatListAdapter(var chatActivity: ChatActivity, mBeans: MutableLi
             for (cm in mBeans) {
                 if (!cm.isTimeStamp && cm.getTypeEnum() == ChatMessage.TYPE.IMG) {
                     cm.fileId?.let {
-                        res.add(ImageUtils.getCloudImageUrl(it))
+                        res.add(it)
                     }
                 }
             }

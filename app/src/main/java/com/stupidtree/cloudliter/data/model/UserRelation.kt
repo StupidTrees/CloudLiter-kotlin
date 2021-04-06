@@ -38,7 +38,6 @@ class UserRelation {
     //联系人用户的备注
     var remark: String? = null
 
-
     /**
      * 仅在本地使用的属性
      */
@@ -51,6 +50,11 @@ class UserRelation {
         val that = other as UserRelation
         return friendNickname == that.friendNickname &&
                 friendId == that.friendId && remark == that.remark
+    }
+
+    fun getName():String{
+        return if(remark.isNullOrEmpty()) friendNickname.toString()
+        else remark.toString()
     }
 
     override fun hashCode(): Int {

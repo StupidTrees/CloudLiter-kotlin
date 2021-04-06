@@ -42,16 +42,6 @@ class ContactViewModel(application: Application) : AndroidViewModel(application)
     }
 
 
-    private val createGroupController = MutableLiveData<List<String>>()
-    val createGroupChatResult = Transformations.switchMap(createGroupController) {
-        val userLocal = localUserRepository.getLoggedInUser()
-        if (userLocal.isValid) {
-            return@switchMap groupChatRepository.createGroupChat(userLocal.token!!,"新建群聊",it)
-        } else {
-            return@switchMap MutableLiveData(DataState(DataState.STATE.NOT_LOGGED_IN))
-        }
-
-    }
 
 
     /**
@@ -61,7 +51,5 @@ class ContactViewModel(application: Application) : AndroidViewModel(application)
         unReadController.value = Trigger.actioning
     }
 
-    fun startCreateGroup(list:List<String>){
-        createGroupController.value = list
-    }
+
 }

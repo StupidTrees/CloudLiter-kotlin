@@ -51,12 +51,7 @@ class ContactFragment : BaseFragmentWithReceiver<ContactViewModel, FragmentConta
         binding?.relationEvent?.setOnClickListener { ActivityUtils.startRelationEventActivity(requireContext()) }
         binding?.scanQr?.setOnClickListener { ActivityUtils.startQRCodeActivity(requireContext()) }
         binding?.createGroup?.setOnClickListener {
-            PopUpPickFriendFragment(object : PopUpPickFriendFragment.OnConfirmListener {
-                override fun onConfirm(userIds: List<String>) {
-                    viewModel.startCreateGroup(userIds)
-                }
-
-            }, listOf()).show(parentFragmentManager, "create_group")
+            ActivityUtils.startCreateGroupActivity(requireContext())
         }
     }
 
@@ -74,13 +69,7 @@ class ContactFragment : BaseFragmentWithReceiver<ContactViewModel, FragmentConta
                 binding?.unread?.visibility = View.GONE
             }
         })
-        viewModel.createGroupChatResult.observe(this){
-            if(it.state==DataState.STATE.SUCCESS){
-                Toast.makeText(requireContext(),R.string.create_group_success,Toast.LENGTH_SHORT).show()
-            }else{
-                Toast.makeText(requireContext(),R.string.fail,Toast.LENGTH_SHORT).show()
-            }
-        }
+
         binding?.tabs?.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 when (tab?.position) {

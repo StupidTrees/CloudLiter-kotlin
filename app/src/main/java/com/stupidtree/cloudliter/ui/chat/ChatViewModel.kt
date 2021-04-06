@@ -11,6 +11,7 @@ import com.stupidtree.cloudliter.data.repository.ChatRepository
 import com.stupidtree.cloudliter.data.repository.ChatRepository.Companion.getInstance
 import com.stupidtree.cloudliter.data.repository.ConversationRepository
 import com.stupidtree.cloudliter.data.repository.LocalUserRepository
+import com.stupidtree.cloudliter.ui.widgets.EmoticonsTextView
 import com.stupidtree.component.data.DataState
 import com.stupidtree.component.data.DataState.LIST_ACTION
 import com.stupidtree.cloudliter.utils.TextUtils
@@ -86,13 +87,14 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         input2
     }
 
-    //trigger：控制↓的刷新
+
     private val friendStateController: LiveData<FriendStateTrigger> = Transformations.map(chatRepository.onlineStateController) { input: FriendStateTrigger ->
         if (input.conversationId == getConversationId()) {
             return@map FriendStateTrigger.getActioning(input.conversationId, input.online, input.num)
         }
         FriendStateTrigger.still
     }
+
 
     //状态数据：朋友在线状态
     var onlineStateLiveData: LiveData<DataState<OnlineState>> = Transformations.switchMap(friendStateController) { input: FriendStateTrigger ->
@@ -107,6 +109,14 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         MutableLiveData(DataState<OnlineState>(DataState.STATE.NOTHING))
     }
 
+
+    //实时聊天话题
+   val conversationTopicsLiveData: LiveData<ConversationTopicsTrigger> = Transformations.map(chatRepository.conversationTopicsController) { input ->
+        if (input.conversationId == getConversationId()) {
+            return@map input
+        }
+        ConversationTopicsTrigger()
+    }
 
     //状态数据：消息发送结果
     //first为成功后的message，second为uuid
@@ -132,7 +142,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     var accessibilityInfo = Transformations.switchMap(conversation) {
         val localUser = localUserRepository.getLoggedInUser()
-        if(it.fromCache){
+        if (it.fromCache) {
             return@switchMap MutableLiveData(DataState(DataState.STATE.NOTHING))
         }
         if (localUser.isValid) {
@@ -150,6 +160,11 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     private var bottomId: String? = null
     private var bottomUUID: String? = null
 
+    private val segmentationTrigger = MutableLiveData<String>()
+    val segmentationLiveData = Transformations.switchMap(segmentationTrigger) {
+        val stripped = it.replace(EmoticonsTextView.buildPattern().toRegex(),"")
+        return@switchMap aiRepository.cutSentence(stripped)
+    }
 
     /**
      * 发送消息
@@ -344,6 +359,13 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             ttsResultLiveData.value = Pair(it, message.id)
             ttsResultLiveData.removeSource(dt) //移除任务
         }
+    }
+
+    /**
+     * 开始分词
+     */
+    fun startSegment(sentence: String) {
+        segmentationTrigger.value = sentence
     }
 
     /**

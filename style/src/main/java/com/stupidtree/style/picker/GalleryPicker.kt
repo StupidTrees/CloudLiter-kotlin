@@ -7,13 +7,14 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.stupidtree.style.picker.FileProviderUtils.getUriForFile
 import com.stupidtree.style.picker.FileProviderUtils.setIntentDataAndType
 import java.io.File
+
 
 /**
  * 此类封装了跳转到系统相册选取、裁剪图片的过程
@@ -28,6 +29,9 @@ object GalleryPicker {
     const val RC_TAKE_PHOTO = 11
     const val RC_CROP_PHOTO = 12
 
+    fun getPhotoFile(context: Context):File{
+        return File(context.externalCacheDir, "photo.jpg")
+    }
     /**
      * 打开相机
      */
@@ -46,9 +50,9 @@ object GalleryPicker {
         // 已授权
         val intentToTakePhoto = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         // 设置照片输出位置
-        val photoFile = File(Environment.getExternalStorageDirectory(), "photo.jpg")
+
         //  tempPhotoPath = photoFile.getAbsolutePath();
-        val tempImgUri = getUriForFile(mContext, photoFile)
+        val tempImgUri = getUriForFile(mContext, getPhotoFile(mContext))
         intentToTakePhoto.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
         mContext.startActivityForResult(intentToTakePhoto, RC_TAKE_PHOTO)
     }

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.model.Conversation
 import com.stupidtree.cloudliter.databinding.ActivityConversationGroupBinding
+import com.stupidtree.cloudliter.ui.chat.ChatActivity.Companion.ACTION_TERMINATE_CHAT
 import com.stupidtree.cloudliter.utils.ActivityUtils
 import com.stupidtree.cloudliter.utils.ImageUtils
 import com.stupidtree.component.data.DataState
@@ -122,6 +123,7 @@ class ConversationGroupActivity : BaseActivity<ConversationGroupViewModel, Activ
         }
         viewModel.quitGroupResult.observe(this){
             if(it.state==DataState.STATE.SUCCESS){
+                sendBroadcast(Intent(ACTION_TERMINATE_CHAT))
                 finish()
             }else{
                 Toast.makeText(getThis(),R.string.fail,Toast.LENGTH_SHORT).show()
@@ -129,6 +131,7 @@ class ConversationGroupActivity : BaseActivity<ConversationGroupViewModel, Activ
         }
         viewModel.destroyGroupResult.observe(this){
             if(it.state==DataState.STATE.SUCCESS){
+                sendBroadcast(Intent(ACTION_TERMINATE_CHAT))
                 finish()
             }else{
                 Toast.makeText(getThis(),R.string.fail,Toast.LENGTH_SHORT).show()

@@ -9,8 +9,10 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.google.gson.JsonObject
-import com.stupidtree.accessibility.ai.Classification
-import com.stupidtree.accessibility.ai.IconClassifierSource
+import com.stupidtree.accessibility.ai.icon.Classification
+import com.stupidtree.accessibility.ai.icon.IconClassifierSource
+import com.stupidtree.accessibility.ai.segmentation.SegmentationSource
+import com.stupidtree.accessibility.ai.segmentation.Token
 import com.stupidtree.cloudliter.data.AppDatabase
 import com.stupidtree.cloudliter.data.model.FaceResult
 import com.stupidtree.cloudliter.data.source.ai.yolo.Classifier
@@ -31,9 +33,10 @@ class AiRepository(application: Application) {
     //数据源1：网络类型数据，消息记录的网络数据源
     var aiWebSource: AiWebSource = AiWebSource.instance!!
     val yoloSource: YOLOSource = YOLOSource.getInstance(application)
-    val iconClassifierSource = IconClassifierSource.getInstance(application)
-    val imageDao = AppDatabase.getDatabase(application).imageDao()
-    val faceResultDao = AppDatabase.getDatabase(application).faceResultDao()
+    private val iconClassifierSource = IconClassifierSource.getInstance(application)
+    private val segmentationSource = SegmentationSource.getInstance(application)
+    private val imageDao = AppDatabase.getDatabase(application).imageDao()
+    private val faceResultDao = AppDatabase.getDatabase(application).faceResultDao()
 
     /**
      * 进行图片分类（上传图片文件形式）
@@ -155,8 +158,18 @@ class AiRepository(application: Application) {
         return yoloSource.detectImage(bitmap)
     }
 
+    /**
+     * 图标分类
+     */
     fun iconClassify(bitmap: Bitmap): LiveData<DataState<List<Classification>>> {
         return iconClassifierSource.classifyIcon(bitmap)
+    }
+
+    /**
+     * 图标分类
+     */
+    fun cutSentence(sentence:String): LiveData<DataState<List<Token>>> {
+        return segmentationSource.cutSentence(sentence)
     }
 
     companion object {

@@ -14,6 +14,7 @@ import com.stupidtree.cloudliter.data.source.dao.ChatMessageDao
 import com.stupidtree.cloudliter.data.source.websource.ChatMessageWebSource
 import com.stupidtree.cloudliter.data.source.websource.SocketWebSource
 import com.stupidtree.cloudliter.service.socket.SocketIOClientService
+import com.stupidtree.cloudliter.ui.chat.ConversationTopicsTrigger
 import com.stupidtree.component.data.DataState
 import com.stupidtree.component.data.DataState.LIST_ACTION
 import com.stupidtree.cloudliter.ui.chat.FriendStateTrigger
@@ -270,6 +271,7 @@ class ChatRepository(context: Context) {
         IF.addAction(SocketIOClientService.RECEIVE_FRIEND_STATE_CHANGED)
         IF.addAction(SocketIOClientService.RECEIVE_MESSAGE_READ)
         IF.addAction(SocketIOClientService.RECEIVE_UNREAD_MESSAGE)
+        IF.addAction(SocketIOClientService.RECEIVE_CONVERSATION_TOPIC)
         context.registerReceiver(socketWebSource, IF)
         //socketWebSource.bindService("Chat", context)
     }
@@ -305,6 +307,10 @@ class ChatRepository(context: Context) {
 
     val onlineStateController: MutableLiveData<FriendStateTrigger>
         get() = socketWebSource.onlineStateController
+
+    val conversationTopicsController: MutableLiveData<ConversationTopicsTrigger>
+        get() = socketWebSource.conversationTopicsLiveData
+
 
     val messageReadState: MutableLiveData<DataState<MessageReadNotification>>
         get() = socketWebSource.messageReadState

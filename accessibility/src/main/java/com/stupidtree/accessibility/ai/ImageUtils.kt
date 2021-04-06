@@ -1,11 +1,9 @@
 package com.stupidtree.accessibility.ai
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Matrix
+import com.stupidtree.accessibility.ai.icon.IconClassifierSource
 import java.nio.ByteBuffer
-import java.nio.ByteOrder
 
 object ImageUtils {
 

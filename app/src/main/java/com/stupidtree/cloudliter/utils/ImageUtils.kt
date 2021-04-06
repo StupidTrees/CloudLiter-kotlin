@@ -11,6 +11,7 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.Px
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.bumptech.glide.Glide
@@ -31,6 +32,7 @@ import com.google.zxing.qrcode.QRCodeWriter
 import com.stupidtree.cloudliter.R
 import com.stupidtree.cloudliter.data.source.websource.UserPreferenceSource.Companion.getInstance
 import com.stupidtree.cloudliter.utils.TextUtils.isEmpty
+import com.stupidtree.component.data.DataState
 import java.util.*
 
 /**
@@ -40,6 +42,10 @@ import java.util.*
 object ImageUtils {
 
     fun loadAvatarInto(context: Context, id: String?, target: ImageView, useUserId: Boolean = false) {
+        if(id.isNullOrEmpty()){
+            target.setImageResource(R.drawable.place_holder_avatar)
+            return
+        }
         val url = if (useUserId) {
             "http://hita.store:3000/user/profile/query_avatar?userId=$id"
         } else {
@@ -77,6 +83,25 @@ object ImageUtils {
                     .placeholder(R.drawable.place_holder_loading) //.apply(RequestOptions.bitmapTransform(new CornerTransform(context,dp2px(context,12))))
                     .into(target)
         }
+    }
+
+    /**
+     * 加载云图片，LiveData形式
+     */
+    fun loadCloudImage(context: Context,imageId: String):LiveData<DataState<Bitmap>>{
+        val res = MutableLiveData<DataState<Bitmap>>()
+        Thread {
+            try {
+                val myBitmap: Bitmap = Glide.with(context)
+                        .asBitmap()
+                        .load(getCloudImageUrl(imageId))
+                        .submit().get()
+                res.postValue(DataState(myBitmap))
+            } catch (e: Exception) {
+                res.postValue(DataState(DataState.STATE.FETCH_FAILED))
+            }
+        }.start()
+        return res
     }
 
     fun getCloudImageUrl(imageId: String): String {

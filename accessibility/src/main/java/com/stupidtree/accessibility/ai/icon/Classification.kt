@@ -1,4 +1,4 @@
-package com.stupidtree.accessibility.ai
+package com.stupidtree.accessibility.ai.icon
 
 import kotlin.math.roundToInt
 

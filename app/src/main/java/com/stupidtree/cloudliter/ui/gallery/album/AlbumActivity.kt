@@ -70,7 +70,7 @@ class AlbumActivity : BaseActivity<AlbumViewModel, ActivityAlbumBinding>() {
         listAdapter = AlbumListAdapter(this, mutableListOf())
         listAdapter.setOnItemClickListener(object : BaseListAdapter.OnItemClickListener<String> {
             override fun onItemClick(data: String, card: View?, position: Int) {
-                ActivityUtils.startImageDetectionActivity(getThis(), data)
+                ActivityUtils.showMultipleImages(getThis(),listAdapter.beans,position)
             }
 
         })

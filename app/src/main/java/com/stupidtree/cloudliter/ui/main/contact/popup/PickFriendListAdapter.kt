@@ -19,11 +19,7 @@ class PickFriendListAdapter(mContext: Context, mBeans: MutableList<UserRelation>
             //显示头像
             ImageUtils.loadAvatarInto(mContext, data.friendAvatar, holder.binding.avatar)
             //显示名称(备注)
-            if (!TextUtils.isEmpty(data.remark)) {
-                holder.binding.name.text = data.remark
-            } else {
-                holder.binding.name.text = data.friendNickname
-            }
+            holder.binding.name.text = data.getName()
             if (selectedIndex.contains(position)) { //若被选中
                 holder.binding.check.visibility = View.VISIBLE
             } else {
@@ -31,6 +27,7 @@ class PickFriendListAdapter(mContext: Context, mBeans: MutableList<UserRelation>
             }
             holder.binding.item.setOnClickListener {
                 checkItem(position)
+                mOnItemClickListener?.onItemClick(data,it,position)
             }
         }
     }

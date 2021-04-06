@@ -18,7 +18,7 @@ import com.stupidtree.cloudliter.ui.gallery.album.AlbumActivity
 import com.stupidtree.cloudliter.ui.gallery.album.AlbumQuery
 import com.stupidtree.cloudliter.ui.gallery.faces.FriendFacesActivity
 import com.stupidtree.cloudliter.ui.group.GroupEditorActivity
-import com.stupidtree.cloudliter.ui.imagedetect.ImageDetectActivity
+import com.stupidtree.cloudliter.ui.groupchat.CreateGroupChatActivity
 import com.stupidtree.cloudliter.ui.main.MainActivity
 import com.stupidtree.cloudliter.ui.myprofile.MyProfileActivity
 import com.stupidtree.cloudliter.ui.profile.ProfileActivity
@@ -121,16 +121,6 @@ object ActivityUtils {
         from.startActivity(i)
     }
 
-    /**
-     * 圖片識別
-     * @param from 上下文
-     * @param imageId 图片id
-     */
-    fun startImageDetectionActivity(from: Context, imageId: String) {
-        val it = Intent(from, ImageDetectActivity::class.java)
-        it.putExtra("id", imageId)
-        from.startActivity(it)
-    }
 
     /**
      * 显示多张大图
@@ -143,7 +133,7 @@ object ActivityUtils {
         //  ActivityOptionsCompat activityOptionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(from,view,"image");
         val urlsArr = arrayOfNulls<String>(urls.size)
         for (i in urlsArr.indices) urlsArr[i] = urls[i]
-        it.putExtra("urls", urlsArr)
+        it.putExtra("ids", urlsArr)
         it.putExtra("init_index", index)
         from.startActivity(it) //,activityOptionsCompat.toBundle());
     }
@@ -224,7 +214,10 @@ object ActivityUtils {
         from.startActivity(it)
     }
 
-
+    fun startCreateGroupActivity(from: Context) {
+        val it = Intent(from, CreateGroupChatActivity::class.java)
+        from.startActivity(it)
+    }
     fun startSocketService(context: Context) {
         try {
             context.startService(Intent(context, SocketIOClientService::class.java))
