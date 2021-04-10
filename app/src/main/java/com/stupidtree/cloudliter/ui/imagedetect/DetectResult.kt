@@ -3,16 +3,17 @@ package com.stupidtree.cloudliter.ui.imagedetect
 import android.graphics.RectF
 import com.stupidtree.cloudliter.data.source.ai.yolo.Classifier
 
-class DetectResult {
+class DetectResult(res: Classifier.Recognition) {
     var name: String? = ""
     var id: String = ""
     var confidence = 0f
     var friendId: String? = null
     var isFriend = false
     var friendName: String = ""
+    var expression:String? = null
     var rect: RectF = RectF(0f, 0f, 0f, 0f)
 
-    constructor(res: Classifier.Recognition) {
+    init {
         name = res.title
         id = res.id
         confidence = res.confidence
@@ -39,6 +40,7 @@ class DetectResult {
         if (friendId != other.friendId) return false
         if (isFriend != other.isFriend) return false
         if (friendName != other.friendName) return false
+        if (expression != other.expression) return false
 
         return true
     }
@@ -50,6 +52,7 @@ class DetectResult {
         result = 31 * result + (friendId?.hashCode() ?: 0)
         result = 31 * result + isFriend.hashCode()
         result = 31 * result + friendName.hashCode()
+        result = 31 * result + (expression?.hashCode() ?: 0)
         return result
     }
 

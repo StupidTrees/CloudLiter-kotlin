@@ -9,8 +9,6 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.google.gson.JsonObject
-import com.stupidtree.accessibility.ai.icon.Classification
-import com.stupidtree.accessibility.ai.icon.IconClassifierSource
 import com.stupidtree.accessibility.ai.segmentation.SegmentationSource
 import com.stupidtree.accessibility.ai.segmentation.Token
 import com.stupidtree.cloudliter.data.AppDatabase
@@ -18,25 +16,28 @@ import com.stupidtree.cloudliter.data.model.FaceResult
 import com.stupidtree.cloudliter.data.source.ai.yolo.Classifier
 import com.stupidtree.cloudliter.data.source.ai.yolo.YOLOSource
 import com.stupidtree.cloudliter.data.source.websource.AiWebSource
-import com.stupidtree.component.data.DataState
 import com.stupidtree.cloudliter.ui.imagedetect.BitmapRequestBody
 import com.stupidtree.cloudliter.ui.imagedetect.DetectResult
+import com.stupidtree.component.data.DataState
+import com.stupidtree.visual.face.expression.ExpressionInput
+import com.stupidtree.visual.face.expression.ExpressionResult
+import com.stupidtree.visual.face.expression.FacialExpressionSource
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import top.zibin.luban.Luban
 import top.zibin.luban.OnCompressListener
 import java.io.File
-import java.lang.Exception
 
 class AiRepository(application: Application) {
     //数据源1：网络类型数据，消息记录的网络数据源
     var aiWebSource: AiWebSource = AiWebSource.instance!!
-    val yoloSource: YOLOSource = YOLOSource.getInstance(application)
-    private val iconClassifierSource = IconClassifierSource.getInstance(application)
+    private val yoloSource: YOLOSource = YOLOSource.getInstance(application)
     private val segmentationSource = SegmentationSource.getInstance(application)
     private val imageDao = AppDatabase.getDatabase(application).imageDao()
     private val faceResultDao = AppDatabase.getDatabase(application).faceResultDao()
+    private val facialExpressionSource = FacialExpressionSource.getInstance(application)
+
 
     /**
      * 进行图片分类（上传图片文件形式）
@@ -89,7 +90,7 @@ class AiRepository(application: Application) {
             if (it.state == DataState.STATE.SUCCESS) {
                 Thread {
                     it.data?.let { jo ->
-                        imageDao.updateSceneSync(imageId, jo.toString())
+                        imageDao.updateSceneSync(imageId, jo)
                     }
                 }.start()
             }
@@ -114,6 +115,17 @@ class AiRepository(application: Application) {
         return result
     }
 
+
+    fun imageExpressionRecognition(bitmap: Bitmap,ranges:List<DetectResult>): LiveData<DataState<List<ExpressionResult>>> {
+        val rg = mutableListOf<ExpressionInput>()
+        for(range in ranges){
+            val r = ExpressionInput()
+            r.id = range.id
+            r.range = range.rect
+            rg.add(r)
+        }
+        return facialExpressionSource.getExpression(bitmap,rg)
+    }
 
     /**
      * 上传人脸图片
@@ -161,14 +173,7 @@ class AiRepository(application: Application) {
     /**
      * 图标分类
      */
-    fun iconClassify(bitmap: Bitmap): LiveData<DataState<List<Classification>>> {
-        return iconClassifierSource.classifyIcon(bitmap)
-    }
-
-    /**
-     * 图标分类
-     */
-    fun cutSentence(sentence:String): LiveData<DataState<List<Token>>> {
+    fun cutSentence(sentence: String): LiveData<DataState<List<Token>>> {
         return segmentationSource.cutSentence(sentence)
     }
 

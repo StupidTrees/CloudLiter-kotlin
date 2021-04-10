@@ -53,6 +53,13 @@ class ImageDetectViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
+    val expressionRecognitionResult = Transformations.switchMap(detectionResult) {
+        it.data?.let { list ->
+            imageLiveData.value?.let { bitmap ->
+                return@switchMap aiRepository.imageExpressionRecognition(bitmap, list)
+            }
+        }
+    }
 
     val faceRecognitionResult = Transformations.switchMap(detectionResult) { list ->
         val userLocal = localUserRepository.getLoggedInUser()

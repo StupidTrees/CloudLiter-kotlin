@@ -9,7 +9,7 @@ android {
     kotlinOptions { jvmTarget = 1.8}
     defaultConfig {
         applicationId 'com.stupidtree.cloudliter'
-        minSdkVersion 21
+        minSdkVersion 29
         targetSdkVersion 30
         versionCode 20210404
         versionName "1.40"
@@ -67,6 +67,7 @@ dependencies {
     implementation project(path: ':style')
     implementation project(path: ':component')
     implementation project(path: ':accessibility')
+    implementation project(path: ':visual')
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

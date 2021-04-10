@@ -95,6 +95,9 @@ class AiWebSource : BaseWebSource<AiService>(Retrofit.Builder()
         val xRel = 1f / IMAGE_SIZE
         val yRel = 1f / IMAGE_SIZE
         for (rect in rectList) {
+            if(rect.name != "人"){
+                continue
+            }
             val jo = JSONObject()
             jo.put("id", rect.id)
             jo.put("x", xRel*rect.rect.left)

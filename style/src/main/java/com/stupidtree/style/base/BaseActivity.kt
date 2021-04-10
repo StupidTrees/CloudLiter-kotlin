@@ -64,9 +64,6 @@ abstract class BaseActivity<T : ViewModel, V : ViewBinding> : AppCompatActivity(
 
     /**
      * 设置Activity的窗口属性
-     * @param statusBar 是否让状态栏沉浸
-     * @param darkColor 状态栏图标的颜色是否显示为深色
-     * @param navi 是否让导航栏沉浸（一些手机底部会开启三大金刚）
      */
     protected open fun setTranslucentStatusBar() {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)

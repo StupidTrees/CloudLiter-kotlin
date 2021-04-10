@@ -14,6 +14,8 @@ import com.stupidtree.cloudliter.data.source.ai.detect.ObjectDetectSource.Compan
 import com.stupidtree.cloudliter.databinding.ActivityImageDetailListItemBinding
 import com.stupidtree.style.base.BaseListAdapter
 import com.stupidtree.style.base.BaseViewHolder
+import com.stupidtree.visual.face.expression.ExpressionResult
+import kotlinx.android.synthetic.main.activity_image_detail_list_item.view.*
 import java.text.DecimalFormat
 
 class DetectResultAdapter(mContext: Context, mBeans: MutableList<DetectResult>) : BaseListAdapter<DetectResult, DetectResultAdapter.DHolder>(mContext, mBeans) {
@@ -31,6 +33,21 @@ class DetectResultAdapter(mContext: Context, mBeans: MutableList<DetectResult>) 
                 item.setFriendInfo(map[item.id]?.userId, map[item.id]?.userName)
             }
         }
+        //notifyDataSetChanged()
+        notifyItemChangedSmooth(newL = mBeans)
+    }
+
+    fun setExpressionInfo(list: List<ExpressionResult>) {
+        val map = mutableMapOf<String?, ExpressionResult>()
+        for (l in list) {
+            map[l.faceId] = l
+        }
+        for (item in mBeans) {
+            if (map.keys.contains(item.id)) {
+                item.expression = map[item.id]?.expression
+            }
+        }
+        //notifyDataSetChanged()
         notifyItemChangedSmooth(newL = mBeans)
     }
 
@@ -66,6 +83,12 @@ class DetectResultAdapter(mContext: Context, mBeans: MutableList<DetectResult>) 
                 holder.binding.userName.visibility = View.VISIBLE
             } else {
                 holder.binding.userName.visibility = View.GONE
+            }
+            it.expression?.let {
+                holder.binding.expression.visibility = View.VISIBLE
+                holder.binding.expression.text = it
+            } ?: run {
+                holder.binding.expression.visibility = View.GONE
             }
         }
         holder.binding.item.setOnClickListener {

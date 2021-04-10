@@ -3,6 +3,7 @@ package com.stupidtree.cloudliter.ui.imagedetect
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -48,7 +49,7 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
     }
 
     fun refresh(local: Boolean?, id: String?) {
-        if (local !=true && id == viewModel.imageIdLiveData.value?.first) {
+        if (local != true && id == viewModel.imageIdLiveData.value?.first) {
             return
         }
         this.local = local
@@ -72,11 +73,12 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
     }
 
 
-    fun preLoadImage(imageId:String){
-        ImageUtils.loadCloudImage(requireContext(),imageId).observe(this){
+    fun preLoadImage(imageId: String) {
+        ImageUtils.loadCloudImage(requireContext(), imageId).observe(this) {
             binding?.labeledImageView?.setImage(it.data)
         }
     }
+
     @SuppressLint("SetTextI18n")
     override fun initViews(view: View) {
         listAdapter = DetectResultAdapter(requireContext(), mutableListOf())
@@ -162,6 +164,9 @@ class ImageDetectFragment : BaseFragment<ImageDetectViewModel, FragmentImageDede
         }
         viewModel.faceRecognitionResult.observe(this) {
             it.data?.let { it1: List<FaceResult> -> listAdapter?.setFriendInfo(it1) }
+        }
+        viewModel.expressionRecognitionResult.observe(this) {
+            it.data?.let { it1 -> listAdapter?.setExpressionInfo(it1) }
         }
         listAdapter?.setOnItemClickListener(object : BaseListAdapter.OnItemClickListener<DetectResult> {
             override fun onItemClick(data: DetectResult, card: View?, position: Int) {

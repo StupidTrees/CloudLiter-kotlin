@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#304ffe</color>
     <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#304ffe</color>
+    <color name="colorAccent">#FF9E00</color>
     <color name="colorPrimaryDisabled">#cbd4e2</color>
     <color name="profileRed">#FF4500</color>
     <color name="profileOrange">#FF9E00 </color>
